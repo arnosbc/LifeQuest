@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../home/presentation/pages/home_page.dart';
+import '../../../home/home_page.dart';
 import '../widgets/custom_textfield.dart';
 import 'register_page.dart';
 
