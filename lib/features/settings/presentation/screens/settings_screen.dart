@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:proyecto_movil/features/auth/stores/auth_store.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/settings/presentation/widgets/account_card.dart';
 import 'package:proyecto_movil/features/settings/presentation/widgets/game_master_card.dart';
 import 'package:proyecto_movil/features/settings/presentation/widgets/notification_preferences_sheet.dart';
 import 'package:proyecto_movil/features/settings/presentation/widgets/sign_out_card.dart';
 
-class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({super.key, required this.userName, required this.onBack});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({
+    super.key,
+    required this.userName,
+    required this.onBack,
+    required this.onSignOut,
+  });
 
   final String userName;
   final VoidCallback onBack;
 
+  /// Cierra la sesión. Lo provee la app (la sesión vive en auth); al cerrarse,
+  /// el router vuelve al login.
+  final VoidCallback onSignOut;
+
   @override
-  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   final _notificationPreferences = NotificationPreferences();
 
   @override
@@ -98,11 +105,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ],
       ),
     );
-    if (shouldSignOut != true || !mounted) return;
-    await ref.read(authStoreProvider.notifier).signOut();
-    if (mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-    }
+    if (shouldSignOut == true) widget.onSignOut();
   }
 
   Future<void> _showNotificationPreferences() => showModalBottomSheet<void>(

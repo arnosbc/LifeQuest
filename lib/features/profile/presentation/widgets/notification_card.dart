@@ -58,7 +58,7 @@ class NotificationCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    LifeQuestIconTile(item.icon, size: 27),
+                    LifeQuestIconTile(_iconFor(item.kind), size: 27),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -118,4 +118,11 @@ class NotificationCard extends StatelessWidget {
       ),
     );
   }
+
+  /// El icono es presentación: se deriva del tipo de notificación.
+  static IconData _iconFor(NotificationKind kind) => switch (kind) {
+    NotificationKind.critical => Icons.water_drop_outlined,
+    NotificationKind.motivational => Icons.local_fire_department_outlined,
+    NotificationKind.informative => Icons.dashboard_customize_outlined,
+  };
 }

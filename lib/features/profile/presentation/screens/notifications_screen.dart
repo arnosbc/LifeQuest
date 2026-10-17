@@ -23,7 +23,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     AppNotification(
       id: 0,
       kind: NotificationKind.critical,
-      icon: Icons.water_drop_outlined,
       title: 'Recordatorio importante',
       description: 'No olvides Beber agua · llevas 3/4 esta semana.',
       time: 'hace 2h',
@@ -31,7 +30,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     AppNotification(
       id: 1,
       kind: NotificationKind.motivational,
-      icon: Icons.local_fire_department_outlined,
       title: 'Tu racha te está esperando',
       description: 'Vuelve a Leer y mantén tu progreso de hoy.',
       time: 'hace 2h',
@@ -39,7 +37,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     AppNotification(
       id: 2,
       kind: NotificationKind.informative,
-      icon: Icons.dashboard_customize_outlined,
       title: 'Digest informativo',
       description:
           '• 2 hábitos completados hoy\n• 1 recordatorio importante\n• 1 invitación para retomar tu racha',

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
+import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
-import 'package:proyecto_movil/features/goals/presentation/screens/goals_screen.dart';
-import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
-import 'package:proyecto_movil/features/marketplace/presentation/screens/marketplace_screen.dart';
-import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_screen.dart';
-import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
-import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/dashboard_greeting.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/level_card.dart';
@@ -24,12 +21,12 @@ class HomeScreen extends StatelessWidget {
   final ValueChanged<int> onNavigate;
 
   static const _sections = [
-    (Icons.auto_awesome_outlined, 'RPGenie', RpgenieScreen()),
-    (Icons.dashboard_outlined, 'Stage · P.A.R.A.', StageScreen()),
-    (Icons.auto_stories_outlined, 'Diario', JournalScreen()),
-    (Icons.flag_outlined, 'Objetivos', GoalsScreen()),
-    (Icons.sports_bar_outlined, 'Taverna', TavernScreen()),
-    (Icons.storefront_outlined, 'Marketplace', MarketplaceScreen()),
+    (Icons.auto_awesome_outlined, 'RPGenie', RoutePaths.rpgenie),
+    (Icons.dashboard_outlined, 'Stage · P.A.R.A.', RoutePaths.stage),
+    (Icons.auto_stories_outlined, 'Diario', RoutePaths.journal),
+    (Icons.flag_outlined, 'Objetivos', RoutePaths.goals),
+    (Icons.sports_bar_outlined, 'Taverna', RoutePaths.tavern),
+    (Icons.storefront_outlined, 'Marketplace', RoutePaths.marketplace),
   ];
 
   @override
@@ -106,23 +103,13 @@ class HomeScreen extends StatelessWidget {
 
   Widget _sectionAction(
     BuildContext context,
-    (IconData, String, Widget) section,
+    (IconData, String, String) section,
   ) {
-    final (icon, label, page) = section;
+    final (icon, label, path) = section;
     return QuickAction(
       icon: icon,
       label: label,
-      onTap: () => Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => LifeQuestTheme.lightOnly(
-            Scaffold(
-              backgroundColor: LifeQuestColors.background,
-              appBar: AppBar(backgroundColor: LifeQuestColors.background),
-              body: SafeArea(child: page),
-            ),
-          ),
-        ),
-      ),
+      onTap: () => context.push(path),
     );
   }
 }
