@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/app_user.dart';
+import 'package:proyecto_movil/features/auth/models/app_user.dart';
 
 /// Error de autenticación con un mensaje listo para mostrar al usuario.
 class AuthFailure implements Exception {

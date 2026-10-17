@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/lifequest_widgets.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 /// Separador "O ingresa con" + botones de Google y Apple (aún sin conectar).
 class SocialLoginButtons extends StatelessWidget {

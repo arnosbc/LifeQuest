@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'features/auth/presentation/pages/login_page.dart';
-import 'features/auth/stores/auth_store.dart';
-import 'features/home/home_page.dart';
-import 'shared/lifequest_widgets.dart';
+import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
+import 'package:proyecto_movil/features/auth/stores/auth_store.dart';
+import 'package:proyecto_movil/app/config/app_shell.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 // Se pasan al compilar: flutter run --dart-define-from-file=supabase.json
 const _supabaseUrl = String.fromEnvironment('SUPABASE_URL');
@@ -40,10 +40,10 @@ class MyApp extends ConsumerWidget {
       theme: LifeQuestTheme.light,
       darkTheme: LifeQuestTheme.dark,
       themeMode: ThemeMode.system,
-      routes: {'/login': (context) => const LoginPage()},
+      routes: {'/login': (context) => const LoginScreen()},
       home: user == null
-          ? const LoginPage()
-          : LifeQuestTheme.lightOnly(HomePage(userName: user.displayName)),
+          ? const LoginScreen()
+          : LifeQuestTheme.lightOnly(AppShell(userName: user.displayName)),
     );
   }
 }

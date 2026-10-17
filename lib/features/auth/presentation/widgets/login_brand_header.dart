@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/lifequest_widgets.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 class LoginBrandHeader extends StatelessWidget {
   const LoginBrandHeader({super.key});

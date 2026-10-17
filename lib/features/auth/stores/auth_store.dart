@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/app_user.dart';
-import '../services/auth_service.dart';
+import 'package:proyecto_movil/features/auth/models/app_user.dart';
+import 'package:proyecto_movil/features/auth/services/auth_service.dart';
 
 /// Estado de la sesión: quién entró y si hay una petición en curso.
 class AuthState {

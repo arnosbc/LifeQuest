@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proyecto_movil/features/auth/models/app_user.dart';
 import 'package:proyecto_movil/features/auth/services/auth_service.dart';
 
-import 'support/fake_auth_service.dart';
+import 'helpers/fake_auth_service.dart';
 
 void main() {
   testWidgets('LifeQuest login opens registration', (

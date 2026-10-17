@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/lifequest_widgets.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 /// Casilla de términos que forma parte del Form: `validate()` muestra su error
 /// junto a la casilla. Empieza desmarcada; el consentimiento debe ser explícito.

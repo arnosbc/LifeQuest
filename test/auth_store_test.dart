@@ -4,7 +4,7 @@ import 'package:proyecto_movil/features/auth/models/app_user.dart';
 import 'package:proyecto_movil/features/auth/services/auth_service.dart';
 import 'package:proyecto_movil/features/auth/stores/auth_store.dart';
 
-import 'support/fake_auth_service.dart';
+import 'helpers/fake_auth_service.dart';
 
 ProviderContainer _container(FakeAuthService service) {
   final container = ProviderContainer(

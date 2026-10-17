@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/lifequest_widgets.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 /// "¿No tienes cuenta? Crea tu perfil" y similares.
 class AuthFooterLink extends StatelessWidget {

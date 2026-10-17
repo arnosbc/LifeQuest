@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../shared/lifequest_widgets.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 /// Estructura común de login y registro: pantalla completa, desplazable si el
 /// teclado no deja espacio, con un formulario que ocupa todo el alto.
