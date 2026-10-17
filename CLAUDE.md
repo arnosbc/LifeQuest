@@ -253,6 +253,46 @@ Prioriza la "Misión actual" así: cualquier candidata en estado Crítico → ur
 - El Brain Dump debe abrirse desde cualquier pantalla con la mínima fricción (Modelo de Fogg).
 - Dentro de una sesión de Deep Working: sin navegación extra ni ruido.
 
+### Arquitectura Flutter (obligatoria)
+Feature-Driven Clean Architecture con **Bloc**, **get_it**, **go_router**, **fpdart** (`Either`) y **equatable**.
+
+```
+lib/
+├── app/
+│   ├── config/        # app_router (go_router), route_paths, app_shell, theme, constants
+│   ├── observers/     # AppBlocObserver
+│   └── app.dart       # MaterialApp.router + AuthBloc global
+├── core/
+│   ├── errors/        # exceptions.dart (data) y failures.dart (domain)
+│   ├── usecases/      # UseCase<Result, Params> + NoParams
+│   └── widgets/       # widgets compartidos entre features (excepción acordada)
+├── features/<feature>/
+│   ├── data/          # datasources/, models/ (toEntity), repositories/ (*_repository_impl)
+│   ├── domain/        # entities/, repositories/ (abstract), usecases/ (uno por archivo, call())
+│   └── presentation/  # blocs/ (_bloc, _event, _state), screens/ (*_screen), widgets/
+├── injection_container.dart   # registro de todo con get_it (sl)
+└── main.dart
+test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktail + bloc_test)
+```
+
+**Reglas no negociables:**
+1. `domain` es Dart puro: solo `equatable` y `fpdart`. Ni Flutter, ni Supabase, ni data/presentation.
+2. `presentation` solo conoce `domain` (usecases y entities), nunca models ni datasources.
+3. `data` implementa los contratos de `domain`; los models convierten con `toEntity()`.
+4. Los datasources lanzan `ServerException`/`NetworkException`; los repositorios devuelven `Left(Failure)` con el mensaje en español.
+5. Cada usecase tiene una sola responsabilidad y expone `call()`.
+6. Una feature no importa otra. Lo compartido va en `core/`; la composición (rutas, sesión, callbacks entre features) va en `app/`.
+7. Toda dependencia se registra en `injection_container.dart` y se inyecta por constructor.
+8. Nada de lógica de negocio en widgets ni screens.
+
+**Convenciones:** archivos en `snake_case`; sufijos `Model`, `RepositoryImpl`, `RemoteDataSource`, `LocalDataSource`, `Bloc`, `Screen`; estados `Initial`, `Loading`, `Success`, `Failure(message)`; imports siempre `package:proyecto_movil/...`.
+
+**Flujo para crear una feature (de adentro hacia afuera):** domain (entities → repositorio abstracto → usecases) → data (models → datasources → repository impl) → presentation (bloc → widgets → screens) → registro en `injection_container.dart` y ruta en `app/config/app_router.dart` → tests de usecases, repositorio y bloc.
+
+**Desviaciones acordadas:** sin Dio ni `core/network` (el SDK de Supabase es el cliente HTTP); los widgets compartidos viven en `core/widgets/`.
+
+**Deuda de arquitectura:** solo `auth` cumple las 3 capas. Home, misiones, hábitos, dungeon, perfil, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`.
+
 ### Calidad
 - Prueba los cambios de SQL contra un Postgres real (con un stub de `auth.users`, `auth.uid()` y `auth.role()` si no es Supabase).
 - Prueba el comportamiento, no solo la sintaxis: límites, unicidad, triggers y aislamiento de RLS entre dos usuarios.
