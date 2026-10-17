@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+
+import 'lifequest_colors.dart';
+
+class LifeQuestSurface extends StatelessWidget {
+  const LifeQuestSurface({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(12),
+    this.color = Colors.white,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: padding,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(11),
+      border: Border.all(color: LifeQuestColors.line),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x08000000),
+          blurRadius: 7,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: child,
+  );
+}

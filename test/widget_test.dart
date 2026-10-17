@@ -52,6 +52,15 @@ void main() {
     expect(find.text('ACCESOS RÁPIDOS'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
 
+    await tester.scrollUntilVisible(find.text('Taverna'), 200);
+    await tester.tap(find.text('Taverna'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entrenadora Vera · Salud'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('EXPLORA EL REINO'), findsOneWidget);
+
     await tester.tap(find.text('Misiones').last);
     await tester.pumpAndSettle();
 
