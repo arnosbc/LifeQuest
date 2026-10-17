@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/lifequest_widgets.dart';
+import '../../../home/home_page.dart';
+import '../../services/auth_service.dart';
+import '../../stores/auth_store.dart';
 import '../widgets/auth_footer_link.dart';
 import '../widgets/auth_form_layout.dart';
 import '../widgets/auth_primary_button.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/terms_checkbox.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _isSubmitting = false;
 
   static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
-  void _onRegisterPressed() {
-    if (_isSubmitting) return;
+  Future<void> _onRegisterPressed() async {
+    if (ref.read(authStoreProvider).isLoading) return;
 
     final invalid = _formKey.currentState!.validateGranularly();
     if (invalid.isNotEmpty) {
@@ -34,19 +37,46 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // shortcut: registro simulado; con Supabase, esperar la respuesta aquí y
-    // mostrar carga mientras _isSubmitting sea true.
-    setState(() => _isSubmitting = true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '¡Héroe "${_nameController.text.trim()}" creado con éxito!',
-        ),
-        backgroundColor: context.lq.ink,
-      ),
-    );
-    Navigator.pop(context);
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    try {
+      final outcome = await ref
+          .read(authStoreProvider.notifier)
+          .signUp(
+            username: name,
+            email: email,
+            password: _passwordController.text,
+          );
+      if (!mounted) return;
+
+      if (outcome == SignUpOutcome.signedIn) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute<void>(
+            builder: (_) => LifeQuestTheme.lightOnly(
+              HomePage(userName: ref.read(authStoreProvider).user!.displayName),
+            ),
+          ),
+          (route) => false,
+        );
+        return;
+      }
+
+      // El proyecto pide confirmar el correo antes de entrar.
+      _showMessage(
+        '¡Héroe "$name" creado! Te enviamos un enlace a $email. '
+        'Confírmalo y luego inicia sesión.',
+      );
+      Navigator.pop(context);
+    } on AuthFailure catch (failure) {
+      if (mounted) _showMessage(failure.message);
+    }
   }
+
+  void _showMessage(String message) => ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: context.lq.ink),
+    );
 
   /// Lleva a la vista el primer campo con error y lo anuncia en TalkBack.
   void _revealFirstError(Set<FormFieldState<Object?>> invalid) {
@@ -186,6 +216,7 @@ class _RegisterPageState extends State<RegisterPage> {
         label: 'Crear cuenta',
         icon: const Icon(Icons.auto_awesome, size: 18),
         onPressed: _onRegisterPressed,
+        isLoading: ref.watch(authStoreProvider).isLoading,
       ),
       const SizedBox(height: 4),
       AuthFooterLink(

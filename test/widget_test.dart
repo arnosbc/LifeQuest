@@ -9,12 +9,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:proyecto_movil/main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:proyecto_movil/features/auth/models/app_user.dart';
+import 'package:proyecto_movil/features/auth/services/auth_service.dart';
+
+import 'support/fake_auth_service.dart';
 
 void main() {
   testWidgets('LifeQuest login opens registration', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authServiceProvider.overrideWithValue(FakeAuthService())],
+        child: const MyApp(),
+      ),
+    );
 
     expect(find.text('LifeQuest'), findsOneWidget);
     expect(find.text('Continuar'), findsOneWidget);
@@ -30,7 +40,7 @@ void main() {
     expect(find.text('Crear cuenta'), findsOneWidget);
   });
 
-  testWidgets('valid login opens home and bottom tabs navigate', (
+  testWidgets('signed-in user opens home and bottom tabs navigate', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(320, 756);
@@ -38,14 +48,23 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MyApp());
-
-    await tester.enterText(
-      find.byType(TextFormField).at(0),
-      'alex@example.com',
+    // Sesión ya iniciada (main.dart la lee de Supabase al arrancar).
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authServiceProvider.overrideWithValue(
+            FakeAuthService(
+              currentUser: const AppUser(
+                id: 'u1',
+                email: 'alex@example.com',
+                username: 'Alex',
+              ),
+            ),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     );
-    await tester.enterText(find.byType(TextFormField).at(1), 'secret123');
-    await tester.tap(find.text('Continuar'));
     await tester.pumpAndSettle();
 
     expect(find.text('Buenos días, Alex'), findsOneWidget);

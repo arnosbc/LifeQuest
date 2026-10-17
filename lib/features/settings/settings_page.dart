@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/stores/auth_store.dart';
 import '../../shared/lifequest_widgets.dart';
 import 'widgets/account_card.dart';
 import 'widgets/game_master_card.dart';
 import 'widgets/notification_preferences_sheet.dart';
 import 'widgets/sign_out_card.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key, required this.userName, required this.onBack});
 
   final String userName;
   final VoidCallback onBack;
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   final _notificationPreferences = NotificationPreferences();
 
   @override
@@ -96,7 +98,9 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
-    if (shouldSignOut == true && mounted) {
+    if (shouldSignOut != true || !mounted) return;
+    await ref.read(authStoreProvider.notifier).signOut();
+    if (mounted) {
       Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
     }
   }
