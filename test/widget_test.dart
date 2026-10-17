@@ -26,8 +26,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Crea tu Héroe'), findsOneWidget);
-    expect(find.text('Confirmar Contraseña'), findsOneWidget);
-    expect(find.text('Crear Cuenta'), findsOneWidget);
+    expect(find.text('Confirmar contraseña'), findsOneWidget);
+    expect(find.text('Crear cuenta'), findsOneWidget);
   });
 
   testWidgets('valid login opens home and bottom tabs navigate', (

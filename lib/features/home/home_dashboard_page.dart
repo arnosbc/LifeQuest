@@ -114,10 +114,12 @@ class HomeDashboardPage extends StatelessWidget {
       label: label,
       onTap: () => Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
-          builder: (_) => Scaffold(
-            backgroundColor: LifeQuestColors.background,
-            appBar: AppBar(backgroundColor: LifeQuestColors.background),
-            body: SafeArea(child: page),
+          builder: (_) => LifeQuestTheme.lightOnly(
+            Scaffold(
+              backgroundColor: LifeQuestColors.background,
+              appBar: AppBar(backgroundColor: LifeQuestColors.background),
+              body: SafeArea(child: page),
+            ),
           ),
         ),
       ),

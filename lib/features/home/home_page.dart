@@ -52,9 +52,11 @@ class _HomePageState extends State<HomePage> {
         onOpenAppearance: () => _openProfileSubpage(_ProfileSubpage.appearance),
         onOpenSettings: () => Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
-            builder: (settingsContext) => SettingsPage(
-              userName: widget.userName,
-              onBack: () => Navigator.of(settingsContext).pop(),
+            builder: (settingsContext) => LifeQuestTheme.lightOnly(
+              SettingsPage(
+                userName: widget.userName,
+                onBack: () => Navigator.of(settingsContext).pop(),
+              ),
             ),
           ),
         ),

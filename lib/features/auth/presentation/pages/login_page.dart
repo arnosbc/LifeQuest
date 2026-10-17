@@ -31,7 +31,8 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute<void>(
-          builder: (context) => HomePage(userName: userName),
+          builder: (context) =>
+              LifeQuestTheme.lightOnly(HomePage(userName: userName)),
         ),
       );
     }
@@ -39,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _showNotice(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: LifeQuestColors.ink),
+      SnackBar(content: Text(message), backgroundColor: context.lq.ink),
     );
   }
 
@@ -82,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
             'La recuperación de contraseña estará disponible pronto.',
           ),
           style: TextButton.styleFrom(
-            foregroundColor: LifeQuestColors.deepGreen,
+            foregroundColor: context.lq.deepGreen,
             padding: const EdgeInsets.symmetric(vertical: 4),
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,

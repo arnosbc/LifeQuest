@@ -16,18 +16,18 @@ class AuthPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: 44,
+    height: 52,
     child: ElevatedButton.icon(
       onPressed: onPressed,
       icon: icon,
       label: Text(label),
+      // deepGreen: el blanco sobre `green` no llega al 4.5:1 de WCAG AA.
       style: ElevatedButton.styleFrom(
-        backgroundColor: LifeQuestColors.green,
-        foregroundColor: Colors.white,
-        elevation: 7,
-        shadowColor: LifeQuestColors.green.withValues(alpha: 0.24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        backgroundColor: context.lq.deepGreen,
+        foregroundColor: context.lq.onDeepGreen,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
     ),
   );

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../../../shared/lifequest_widgets.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -6,6 +9,10 @@ class CustomTextField extends StatefulWidget {
   final IconData prefixIcon;
   final bool isPassword;
   final TextInputType keyboardType;
+  final TextInputAction? textInputAction;
+  final Iterable<String>? autofillHints;
+  final ValueChanged<String>? onFieldSubmitted;
+  final int? maxLength;
   final String? Function(String?)? validator;
 
   const CustomTextField({
@@ -15,6 +22,10 @@ class CustomTextField extends StatefulWidget {
     required this.prefixIcon,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
+    this.textInputAction,
+    this.autofillHints,
+    this.onFieldSubmitted,
+    this.maxLength,
     this.validator,
   });
 
@@ -27,37 +38,49 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    const borderColor = Color(0xFFD7E7DC);
+    final borderColor = context.lq.outline;
+    final errorColor = context.lq.error;
+    final iconColor = context.lq.muted;
+    final isEmail = widget.keyboardType == TextInputType.emailAddress;
 
+    // TalkBack lee la etiqueta en el campo; la visible se excluye para no
+    // duplicarla, y el botón de ver contraseña queda como nodo propio.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          widget.label,
-          style: const TextStyle(
-            color: Color(0xFF53685B),
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
+        ExcludeSemantics(
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              color: context.lq.muted,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
-        const SizedBox(height: 4),
-        SizedBox(
-          height: 44,
+        const SizedBox(height: 6),
+        Semantics(
+          label: widget.label,
           child: TextFormField(
             controller: widget.controller,
             obscureText: _obscureText,
             keyboardType: widget.keyboardType,
+            textInputAction: widget.textInputAction,
+            autofillHints: widget.autofillHints,
+            onFieldSubmitted: widget.onFieldSubmitted,
+            autocorrect: !widget.isPassword && !isEmail,
+            enableSuggestions: !widget.isPassword && !isEmail,
             validator: widget.validator,
-            style: const TextStyle(color: Color(0xFF263A2E), fontSize: 12),
+            inputFormatters: widget.maxLength == null
+                ? null
+                : [LengthLimitingTextInputFormatter(widget.maxLength)],
+            cursorColor: context.lq.deepGreen,
+            style: TextStyle(color: context.lq.ink, fontSize: 15),
             decoration: InputDecoration(
-              prefixIcon: Icon(
-                widget.prefixIcon,
-                size: 17,
-                color: const Color(0xFF617268),
-              ),
+              prefixIcon: Icon(widget.prefixIcon, size: 20, color: iconColor),
               prefixIconConstraints: const BoxConstraints(
-                minWidth: 38,
-                minHeight: 40,
+                minWidth: 44,
+                minHeight: 48,
               ),
               suffixIcon: widget.isPassword
                   ? IconButton(
@@ -71,37 +94,39 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         _obscureText
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        size: 17,
-                        color: const Color(0xFF617268),
+                        size: 20,
+                        color: iconColor,
                       ),
                     )
                   : null,
               filled: true,
-              fillColor: Colors.white,
+              fillColor: context.lq.surface,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
-                vertical: 10,
+                vertical: 14,
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: borderColor),
+                borderSide: BorderSide(color: borderColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Color(0xFF29B951),
-                  width: 1.3,
-                ),
+                borderSide: BorderSide(color: context.lq.deepGreen, width: 1.5),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFFC84D4D)),
+                borderSide: BorderSide(color: errorColor),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFFC84D4D)),
+                borderSide: BorderSide(color: errorColor, width: 1.5),
               ),
-              errorStyle: const TextStyle(fontSize: 10, height: 1.2),
+              errorStyle: TextStyle(
+                color: errorColor,
+                fontSize: 12,
+                height: 1.3,
+              ),
+              errorMaxLines: 2,
             ),
           ),
         ),

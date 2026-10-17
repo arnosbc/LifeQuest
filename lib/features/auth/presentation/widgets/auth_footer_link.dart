@@ -20,21 +20,17 @@ class AuthFooterLink extends StatelessWidget {
     alignment: WrapAlignment.center,
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      Text(
-        question,
-        style: const TextStyle(color: LifeQuestColors.muted, fontSize: 10),
-      ),
+      Text(question, style: TextStyle(color: context.lq.muted, fontSize: 13)),
       TextButton(
         onPressed: onTap,
         style: TextButton.styleFrom(
-          foregroundColor: LifeQuestColors.deepGreen,
-          padding: EdgeInsets.zero,
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          foregroundColor: context.lq.deepGreen,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          minimumSize: const Size(48, 48),
         ),
         child: Text(
           linkLabel,
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
         ),
       ),
     ],

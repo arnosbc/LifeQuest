@@ -8,14 +8,14 @@ class SocialLoginButtons extends StatelessWidget {
 
   final ValueChanged<String> onNotice;
 
-  static const _buttonStyle = ButtonStyle(
+  static ButtonStyle _buttonStyle(BuildContext context) => ButtonStyle(
     minimumSize: WidgetStatePropertyAll(Size.fromHeight(40)),
     padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 6)),
-    foregroundColor: WidgetStatePropertyAll(Color(0xFF293D31)),
+    foregroundColor: WidgetStatePropertyAll(context.lq.ink),
     textStyle: WidgetStatePropertyAll(
       TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
     ),
-    side: WidgetStatePropertyAll(BorderSide(color: Color(0xFFD7E7DC))),
+    side: WidgetStatePropertyAll(BorderSide(color: context.lq.outline)),
     shape: WidgetStatePropertyAll(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(9)),
@@ -27,14 +27,14 @@ class SocialLoginButtons extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const Row(
+      Row(
         children: [
           Expanded(child: Divider(height: 1)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               'O ingresa con',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+              style: TextStyle(color: context.lq.muted, fontSize: 9),
             ),
           ),
           Expanded(child: Divider(height: 1)),
@@ -49,7 +49,7 @@ class SocialLoginButtons extends StatelessWidget {
                   onNotice('El inicio con Google estará disponible pronto.'),
               icon: const Icon(Icons.g_mobiledata, size: 18),
               label: const Text('Google'),
-              style: _buttonStyle,
+              style: _buttonStyle(context),
             ),
           ),
           const SizedBox(width: 8),
@@ -59,7 +59,7 @@ class SocialLoginButtons extends StatelessWidget {
                   onNotice('El inicio con Apple estará disponible pronto.'),
               icon: const Icon(Icons.phone_iphone, size: 15),
               label: const Text('Apple'),
-              style: _buttonStyle,
+              style: _buttonStyle(context),
             ),
           ),
         ],

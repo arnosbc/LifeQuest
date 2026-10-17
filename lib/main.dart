@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'features/auth/presentation/pages/login_page.dart';
+import 'shared/lifequest_widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,14 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'LifeQuest',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF29B951),
-          brightness: Brightness.light,
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF4F9F6),
-      ),
+      theme: LifeQuestTheme.light,
+      darkTheme: LifeQuestTheme.dark,
+      themeMode: ThemeMode.system,
       routes: {'/login': (context) => const LoginPage()},
       home: const LoginPage(),
     );

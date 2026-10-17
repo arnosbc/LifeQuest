@@ -12,31 +12,27 @@ class LoginBrandHeader extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: const Color(0xFFEDF8F0),
+          color: context.lq.softGreen,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: LifeQuestColors.line),
+          border: Border.all(color: context.lq.line),
         ),
-        child: const Icon(
-          Icons.auto_awesome,
-          size: 22,
-          color: LifeQuestColors.green,
-        ),
+        child: Icon(Icons.auto_awesome, size: 22, color: context.lq.green),
       ),
       const SizedBox(height: 7),
-      const Text(
+      Text(
         'LifeQuest',
         style: TextStyle(
-          color: LifeQuestColors.ink,
+          color: context.lq.ink,
           fontSize: 19,
           fontWeight: FontWeight.w700,
         ),
       ),
       const SizedBox(height: 2),
-      const Text(
+      Text(
         'AVANZA CON RITMO Y PROGRESO REAL',
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: Color(0xFF63796B),
+          color: context.lq.muted,
           fontSize: 8,
           fontWeight: FontWeight.w500,
         ),

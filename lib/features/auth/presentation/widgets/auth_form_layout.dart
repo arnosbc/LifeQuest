@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,17 +19,18 @@ class AuthFormLayout extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final List<Widget> children;
 
+  static const _maxFormWidth = 480.0;
+  static const _maxFormHeight = 880.0;
+
   @override
   Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
     value: const SystemUiOverlayStyle(
-      statusBarColor: LifeQuestColors.background,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
-      systemNavigationBarColor: LifeQuestColors.background,
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
     child: Scaffold(
-      backgroundColor: LifeQuestColors.background,
+      backgroundColor: context.lq.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
@@ -35,12 +38,25 @@ class AuthFormLayout extends StatelessWidget {
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: IntrinsicHeight(
                 child: Padding(
-                  padding: padding,
+                  // En tablet o en horizontal el formulario no pasa de
+                  // _maxFormWidth × _maxFormHeight y queda centrado.
+                  padding: EdgeInsets.symmetric(
+                    horizontal: max(
+                      0,
+                      (constraints.maxWidth - _maxFormWidth) / 2,
+                    ),
+                    vertical: max(
+                      0,
+                      (constraints.maxHeight - _maxFormHeight) / 2,
+                    ),
+                  ).add(padding),
                   child: Form(
                     key: formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: children,
+                    child: AutofillGroup(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: children,
+                      ),
                     ),
                   ),
                 ),
