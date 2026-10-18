@@ -1,68 +1,127 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 
-class HabitStrip extends StatefulWidget {
-  const HabitStrip({super.key});
+/// Hábitos buenos de hoy. Tocar uno pendiente lo registra; registrarlo da
+/// XP y Monedas en el servidor, así que no se desmarca desde aquí.
+class HabitStrip extends StatelessWidget {
+  const HabitStrip({
+    super.key,
+    required this.habits,
+    required this.onComplete,
+    required this.onOpenHabits,
+    this.busyHabitId,
+  });
+
+  /// shortcut: el Home muestra los 3 primeros; el resto está en Hábitos.
+  static const maxVisible = 3;
+
+  final List<TodayHabit> habits;
+  final ValueChanged<String> onComplete;
+  final VoidCallback onOpenHabits;
+  final String? busyHabitId;
 
   @override
-  State<HabitStrip> createState() => _HabitStripState();
-}
-
-class _HabitStripState extends State<HabitStrip> {
-  final Set<int> _completedHabits = {0, 1};
-
-  @override
-  Widget build(BuildContext context) => LifeQuestSurface(
-    padding: const EdgeInsets.all(7),
-    child: Row(
-      children: [
-        _habitChip(0, 'Leer', Icons.menu_book_outlined),
-        _habitChip(1, 'Ejercicio', Icons.fitness_center),
-        _habitChip(2, 'Agua', Icons.water_drop_outlined),
-      ],
-    ),
-  );
-
-  Widget _habitChip(int index, String label, IconData icon) => Expanded(
-    child: InkWell(
-      onTap: () => setState(
-        () => _completedHabits.contains(index)
-            ? _completedHabits.remove(index)
-            : _completedHabits.add(index),
-      ),
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        padding: const EdgeInsets.symmetric(vertical: 7),
-        decoration: BoxDecoration(
-          color: _completedHabits.contains(index)
-              ? LifeQuestColors.softGreen
-              : Colors.white,
-          border: Border.all(color: LifeQuestColors.line),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
+  Widget build(BuildContext context) {
+    if (habits.isEmpty) {
+      return LifeQuestSurface(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+        child: Row(
           children: [
-            Icon(
-              _completedHabits.contains(index) ? Icons.check_circle : icon,
-              color: _completedHabits.contains(index)
-                  ? LifeQuestColors.green
-                  : LifeQuestColors.muted,
-              size: 17,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: const TextStyle(
-                color: LifeQuestColors.ink,
-                fontSize: 8,
-                fontWeight: FontWeight.w600,
+            const Expanded(
+              child: Text(
+                'Hoy no tienes hábitos programados.',
+                style: TextStyle(color: LifeQuestColors.muted, fontSize: 13),
               ),
+            ),
+            TextButton(
+              onPressed: onOpenHabits,
+              style: TextButton.styleFrom(
+                foregroundColor: LifeQuestColors.deepGreen,
+                minimumSize: const Size(48, 48),
+              ),
+              child: const Text('Crear hábito'),
             ),
           ],
         ),
+      );
+    }
+
+    final visible = habits.take(maxVisible).toList();
+    return Row(
+      children: [
+        for (var i = 0; i < visible.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(child: _habitChip(visible[i])),
+        ],
+      ],
+    );
+  }
+
+  Widget _habitChip(TodayHabit habit) {
+    final busy = habit.id == busyHabitId;
+    return MergeSemantics(
+      child: Semantics(
+        checked: habit.done,
+        child: Material(
+          color: habit.done ? LifeQuestColors.softGreen : Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: habit.done ? LifeQuestColors.green : LifeQuestColors.line,
+            ),
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: InkWell(
+            onTap: habit.done || busy ? null : () => onComplete(habit.id),
+            customBorder: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+              child: Column(
+                children: [
+                  SizedBox.square(
+                    dimension: 24,
+                    child: busy
+                        ? const Padding(
+                            padding: EdgeInsets.all(3),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: LifeQuestColors.deepGreen,
+                            ),
+                          )
+                        : AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: Icon(
+                              habit.done
+                                  ? Icons.check_circle_rounded
+                                  : Icons.radio_button_unchecked_rounded,
+                              key: ValueKey(habit.done),
+                              color: habit.done
+                                  ? LifeQuestColors.deepGreen
+                                  : LifeQuestColors.muted,
+                              size: 24,
+                            ),
+                          ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    habit.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: LifeQuestColors.ink,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

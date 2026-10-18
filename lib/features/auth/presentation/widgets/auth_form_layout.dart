@@ -10,12 +10,13 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 class AuthFormLayout extends StatelessWidget {
   const AuthFormLayout({
     super.key,
-    required this.formKey,
+    this.formKey,
     required this.padding,
     required this.children,
   });
 
-  final GlobalKey<FormState> formKey;
+  /// Opcional: las pantallas sin campos no lo necesitan.
+  final GlobalKey<FormState>? formKey;
   final EdgeInsetsGeometry padding;
   final List<Widget> children;
 

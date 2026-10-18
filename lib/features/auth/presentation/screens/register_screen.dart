@@ -3,6 +3,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_footer_link.dart';
@@ -50,12 +51,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     switch (state) {
       case AuthFailure(:final message):
         _showMessage(message);
-      case AuthEmailConfirmationRequired(:final username, :final email):
-        _showMessage(
-          '¡Héroe "$username" creado! Te enviamos un enlace a $email. '
-          'Confírmalo y luego inicia sesión.',
-        );
-        context.pop();
+      case AuthEmailConfirmationRequired():
+        // Reemplaza el registro: al volver se llega al login.
+        context.pushReplacement(RoutePaths.checkEmail, extra: state);
       default:
         break;
     }

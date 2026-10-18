@@ -3,6 +3,7 @@
 abstract final class RoutePaths {
   static const login = '/login';
   static const register = '/register';
+  static const checkEmail = '/check-email';
 
   // Pestañas de la barra inferior.
   static const home = '/home';

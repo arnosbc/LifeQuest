@@ -18,30 +18,33 @@ class LifeQuestSectionHeading extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: [
       Expanded(
-        child: Text(
-          title,
-          style: const TextStyle(
-            color: Color(0xFF64786B),
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
+        child: Semantics(
+          header: true,
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: LifeQuestColors.muted,
+              fontSize: 12,
+              letterSpacing: .6,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ),
       if (action != null)
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(4),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 3),
-            child: Text(
-              action!,
-              style: const TextStyle(
-                color: LifeQuestColors.green,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-              ),
+        TextButton(
+          onPressed: onTap,
+          style: TextButton.styleFrom(
+            foregroundColor: LifeQuestColors.deepGreen,
+            disabledForegroundColor: LifeQuestColors.deepGreen,
+            minimumSize: const Size(48, 40),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            textStyle: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
             ),
           ),
+          child: Text(action!),
         ),
     ],
   );

@@ -7,73 +7,113 @@ class DashboardGreeting extends StatelessWidget {
     super.key,
     required this.userName,
     required this.onOpenProfile,
+    this.now,
   });
 
   final String userName;
   final VoidCallback onOpenProfile;
+  final DateTime? now;
+
+  static const _weekdays = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+  ];
+  static const _months = [
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
+  ];
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Martes, 29 de septiembre',
-              style: TextStyle(
-                color: LifeQuestColors.deepGreen,
-                fontSize: 10,
+  Widget build(BuildContext context) {
+    final date = now ?? DateTime.now();
+    final greeting = date.hour < 12
+        ? 'Buenos días'
+        : date.hour < 19
+        ? 'Buenas tardes'
+        : 'Buenas noches';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${_weekdays[date.weekday - 1]}, ${date.day} de '
+                '${_months[date.month - 1]}',
+                style: const TextStyle(
+                  color: LifeQuestColors.deepGreen,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '$greeting, $userName',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: LifeQuestColors.ink,
+                  fontSize: 24,
+                  height: 1.2,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Tu siguiente avance está listo.',
+                style: TextStyle(color: LifeQuestColors.muted, fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          tooltip: 'Notificaciones',
+          onPressed: () =>
+              showLifeQuestMessage(context, 'No tienes notificaciones nuevas.'),
+          icon: const Icon(Icons.notifications_none_rounded, size: 22),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: LifeQuestColors.ink,
+            side: const BorderSide(color: LifeQuestColors.line),
+            minimumSize: const Size(48, 48),
+          ),
+        ),
+        IconButton(
+          tooltip: 'Abrir perfil',
+          onPressed: onOpenProfile,
+          style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
+          icon: CircleAvatar(
+            radius: 18,
+            backgroundColor: LifeQuestColors.deepGreen,
+            child: Text(
+              userName.isEmpty ? 'A' : userName[0].toUpperCase(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              'Buenos días, $userName',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: LifeQuestColors.ink,
-                fontSize: 20,
-                height: 1.1,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 3),
-            const Text(
-              'Tu siguiente avance está listo.',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 10),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(width: 7),
-      IconButton(
-        tooltip: 'Notificaciones',
-        onPressed: () =>
-            showLifeQuestMessage(context, 'No tienes notificaciones nuevas.'),
-        icon: const Icon(Icons.notifications_none_rounded, size: 21),
-        style: IconButton.styleFrom(
-          backgroundColor: Colors.white,
-          side: const BorderSide(color: LifeQuestColors.line),
-        ),
-      ),
-      const SizedBox(width: 4),
-      InkWell(
-        onTap: onOpenProfile,
-        child: CircleAvatar(
-          radius: 16,
-          backgroundColor: LifeQuestColors.green,
-          child: Text(
-            userName.isEmpty ? 'A' : userName[0].toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
           ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }

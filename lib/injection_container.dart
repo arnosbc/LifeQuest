@@ -9,6 +9,21 @@ import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/home/data/datasources/home_remote_datasource.dart';
+import 'package:proyecto_movil/features/home/data/repositories/home_repository_impl.dart';
+import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
+import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:proyecto_movil/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:proyecto_movil/features/profile/domain/repositories/profile_repository.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/create_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/delete_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/get_character_profile.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -41,5 +56,39 @@ Future<void> initDependencies() async {
   // Datasources
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Home ----------
+  // Bloc: factory, uno nuevo cada vez que se construye la pantalla.
+  sl.registerFactory(
+    () => HomeBloc(getHomeDashboard: sl(), completeHabit: sl()),
+  );
+  sl.registerLazySingleton(() => GetHomeDashboard(sl()));
+  sl.registerLazySingleton(() => CompleteHabit(sl()));
+  sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
+  sl.registerLazySingleton<HomeRemoteDataSource>(
+    () => HomeRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Perfil ----------
+  sl.registerFactory(
+    () => ProfileBloc(
+      getCharacterProfile: sl(),
+      updateIdentity: sl(),
+      createSkill: sl(),
+      renameSkill: sl(),
+      deleteSkill: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetCharacterProfile(sl()));
+  sl.registerLazySingleton(() => UpdateIdentity(sl()));
+  sl.registerLazySingleton(() => CreateSkill(sl()));
+  sl.registerLazySingleton(() => RenameSkill(sl()));
+  sl.registerLazySingleton(() => DeleteSkill(sl()));
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(sl()),
   );
 }

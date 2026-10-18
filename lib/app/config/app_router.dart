@@ -8,15 +8,18 @@ import 'package:proyecto_movil/app/config/app_shell.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
 import 'package:proyecto_movil/features/goals/presentation/screens/goals_screen.dart';
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
+import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
 import 'package:proyecto_movil/features/marketplace/presentation/screens/marketplace_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/screens/missions_screen.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/notifications_screen.dart';
@@ -25,6 +28,7 @@ import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_scr
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
 import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
+import 'package:proyecto_movil/injection_container.dart';
 
 /// Rutas de la app. Aquí se componen las features: cada pantalla recibe por
 /// constructor lo que viene de otra (nombre de usuario, cerrar sesión, navegar),
@@ -34,9 +38,11 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
   refreshListenable: _BlocRefresh(authBloc.stream),
   redirect: (context, state) {
     final signedIn = authBloc.state is AuthSuccess;
-    final atAuth =
-        state.matchedLocation == RoutePaths.login ||
-        state.matchedLocation == RoutePaths.register;
+    final atAuth = const [
+      RoutePaths.login,
+      RoutePaths.register,
+      RoutePaths.checkEmail,
+    ].contains(state.matchedLocation);
     if (!signedIn && !atAuth) return RoutePaths.login;
     if (signedIn && atAuth) return RoutePaths.home;
     return null;
@@ -50,6 +56,20 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
       path: RoutePaths.register,
       builder: (context, state) => const RegisterScreen(),
     ),
+    GoRoute(
+      path: RoutePaths.checkEmail,
+      // Sin datos del registro (p. ej. al restaurar la app) no hay qué mostrar.
+      redirect: (context, state) => state.extra is AuthEmailConfirmationRequired
+          ? null
+          : RoutePaths.login,
+      builder: (context, state) {
+        final pending = state.extra! as AuthEmailConfirmationRequired;
+        return CheckEmailScreen(
+          username: pending.username,
+          email: pending.email,
+        );
+      },
+    ),
     StatefulShellRoute.indexedStack(
       // shortcut: estas pantallas aún usan colores fijos del tema claro; quitar
       // lightOnly cuando se migren a context.lq.
@@ -60,10 +80,13 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
           routes: [
             GoRoute(
               path: RoutePaths.home,
-              builder: (context, state) => HomeScreen(
-                userName: _userName(context),
-                onNavigate: (tab) =>
-                    StatefulNavigationShell.of(context).goBranch(tab),
+              builder: (context, state) => BlocProvider(
+                create: (_) => sl<HomeBloc>()..add(const HomeRequested()),
+                child: HomeScreen(
+                  userName: _userName(context),
+                  onNavigate: (tab) =>
+                      StatefulNavigationShell.of(context).goBranch(tab),
+                ),
               ),
             ),
           ],
@@ -96,12 +119,16 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
           routes: [
             GoRoute(
               path: RoutePaths.profile,
-              builder: (context, state) => ProfileScreen(
-                userName: _userName(context),
-                onOpenNotifications: () => context.go(RoutePaths.notifications),
-                onOpenHelp: () => context.go(RoutePaths.help),
-                onOpenAppearance: () => context.go(RoutePaths.appearance),
-                onOpenSettings: () => context.push(RoutePaths.settings),
+              builder: (context, state) => BlocProvider(
+                create: (_) => sl<ProfileBloc>()..add(const ProfileRequested()),
+                child: ProfileScreen(
+                  userName: _userName(context),
+                  onOpenNotifications: () =>
+                      context.go(RoutePaths.notifications),
+                  onOpenHelp: () => context.go(RoutePaths.help),
+                  onOpenAppearance: () => context.go(RoutePaths.appearance),
+                  onOpenSettings: () => context.push(RoutePaths.settings),
+                ),
               ),
               routes: [
                 GoRoute(

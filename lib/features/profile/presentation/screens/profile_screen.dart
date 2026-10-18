@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/account_action_tile.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/character_card.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/completion_rate_card.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_quick_link.dart';
+import 'package:proyecto_movil/features/profile/presentation/widgets/profile_sheets.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/skill_tile.dart';
 
+/// Perfil del Personaje. Necesita un [ProfileBloc] por encima (lo provee el
+/// router).
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
@@ -17,6 +24,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenSettings,
   });
 
+  /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
   final String userName;
   final VoidCallback onOpenNotifications;
   final VoidCallback onOpenHelp;
@@ -24,101 +32,242 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenSettings;
 
   @override
-  Widget build(BuildContext context) => LifeQuestPage(
-    title: 'Perfil',
-    subtitle: 'Tu progreso, a tu manera.',
-    trailing: IconButton(
-      onPressed: onOpenSettings,
-      tooltip: 'Configuración',
-      visualDensity: VisualDensity.compact,
-      icon: const Icon(Icons.settings_outlined, size: 18),
+  Widget build(BuildContext context) => BlocConsumer<ProfileBloc, ProfileState>(
+    listenWhen: (_, state) => state is ProfileSuccess && state.message != null,
+    listener: (context, state) =>
+        showLifeQuestMessage(context, (state as ProfileSuccess).message!),
+    builder: (context, state) => switch (state) {
+      ProfileInitial() || ProfileLoading() => const Center(
+        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+      ),
+      ProfileFailure(:final message) => _ErrorView(
+        message: message,
+        onRetry: () =>
+            context.read<ProfileBloc>().add(const ProfileRequested()),
+      ),
+      ProfileSuccess(:final profile, :final saving) => RefreshIndicator(
+        color: LifeQuestColors.deepGreen,
+        onRefresh: () => _refresh(context.read<ProfileBloc>()),
+        child: _content(context, profile, saving: saving),
+      ),
+    },
+  );
+
+  static Future<void> _refresh(ProfileBloc bloc) {
+    bloc.add(const ProfileRequested());
+    return bloc.stream.firstWhere(
+      (state) => state is! ProfileSuccess || !state.saving,
+    );
+  }
+
+  Widget _content(
+    BuildContext context,
+    CharacterProfile profile, {
+    required bool saving,
+  }) {
+    final name = profile.displayName ?? userName;
+    final bloc = context.read<ProfileBloc>();
+
+    Future<void> editIdentity() async {
+      final result = await showIdentitySheet(
+        context,
+        displayName: name,
+        identityStatement: profile.identityStatement,
+      );
+      if (result case (final displayName, final identity)) {
+        bloc.add(
+          ProfileIdentitySaved(
+            displayName: displayName,
+            identityStatement: identity,
+          ),
+        );
+      }
+    }
+
+    Future<void> addSkill() async {
+      if (await showSkillSheet(context) case SkillNameSaved(:final name)) {
+        bloc.add(ProfileSkillCreated(name));
+      }
+    }
+
+    Future<void> editSkill(Skill skill) async {
+      switch (await showSkillSheet(context, name: skill.name)) {
+        case SkillNameSaved(:final name) when name != skill.name:
+          bloc.add(ProfileSkillRenamed(skillId: skill.id, name: name));
+        case SkillDeleteRequested():
+          bloc.add(ProfileSkillDeleted(skill.id));
+        case _:
+      }
+    }
+
+    void soon(String feature) =>
+        showLifeQuestMessage(context, '$feature llegará pronto.');
+
+    return LifeQuestPage(
+      title: 'Perfil',
+      subtitle: 'Tu progreso, a tu manera.',
+      trailing: IconButton(
+        onPressed: onOpenSettings,
+        tooltip: 'Configuración',
+        icon: const Icon(Icons.settings_outlined, size: 22),
+        color: LifeQuestColors.ink,
+        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
+      ),
+      children: [
+        // Guardando o refrescando: una línea fina, sin tapar el contenido.
+        SizedBox(
+          height: 3,
+          child: saving
+              ? const LinearProgressIndicator(
+                  color: LifeQuestColors.deepGreen,
+                  backgroundColor: Colors.transparent,
+                )
+              : null,
+        ),
+        const SizedBox(height: 8),
+        CharacterCard(
+          name: name,
+          profile: profile,
+          onEditIdentity: editIdentity,
+        ),
+        const SizedBox(height: 8),
+        _row([
+          LifeQuestStat(
+            value: '${profile.hpCurrent} / ${profile.hpMax}',
+            label: profile.isWeakened ? 'Vitalidad · débil' : 'Vitalidad (HP)',
+          ),
+          LifeQuestStat(value: _number(profile.coins), label: 'Monedas'),
+        ]),
+        const SizedBox(height: 8),
+        CompletionRateCard(profile: profile),
+        const SizedBox(height: 24),
+        const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
+        const SizedBox(height: 8),
+        _row([
+          ProfileQuickLink(
+            icon: Icons.visibility_outlined,
+            label: 'Vision Board',
+            onTap: () => soon('El Vision Board'),
+          ),
+          ProfileQuickLink(
+            icon: Icons.inventory_2_outlined,
+            label: 'Inventario / Logros',
+            onTap: () => soon('El Inventario'),
+          ),
+        ]),
+        const SizedBox(height: 8),
+        _row([
+          ProfileQuickLink(
+            icon: Icons.history_rounded,
+            label: 'Historial',
+            onTap: () => soon('El Historial'),
+          ),
+          ProfileQuickLink(
+            icon: Icons.tune_rounded,
+            label: 'Game Master',
+            onTap: onOpenSettings,
+          ),
+        ]),
+        const SizedBox(height: 24),
+        LifeQuestSectionHeading(
+          'ÁRBOL DE HABILIDADES',
+          action: '${profile.skills.length} / ${profile.skillLimit}',
+        ),
+        if (profile.skills.isEmpty) ...[
+          const SizedBox(height: 4),
+          const Text(
+            'Las skills son tus áreas de vida. Cada misión y hábito que '
+            'vincules a una la hará crecer.',
+            style: TextStyle(color: LifeQuestColors.muted, fontSize: 13),
+          ),
+        ],
+        for (final pair in _pairs([
+          for (final skill in profile.skills)
+            SkillTile(skill: skill, onTap: () => editSkill(skill)),
+          if (profile.canAddSkill) AddSkillTile(onTap: addSkill),
+        ])) ...[const SizedBox(height: 8), _row(pair)],
+        const SizedBox(height: 24),
+        const LifeQuestSectionHeading('CUENTA'),
+        const SizedBox(height: 8),
+        AccountActionTile(
+          icon: Icons.notifications_outlined,
+          title: 'Notificaciones',
+          onTap: onOpenNotifications,
+        ),
+        AccountActionTile(
+          icon: Icons.palette_outlined,
+          title: 'Apariencia',
+          onTap: onOpenAppearance,
+        ),
+        AccountActionTile(
+          icon: Icons.help_outline,
+          title: 'Ayuda',
+          onTap: onOpenHelp,
+        ),
+      ],
+    );
+  }
+
+  static Iterable<List<Widget>> _pairs(List<Widget> tiles) sync* {
+    for (var i = 0; i < tiles.length; i += 2) {
+      yield tiles.sublist(i, i + 2 > tiles.length ? tiles.length : i + 2);
+    }
+  }
+
+  /// Dos columnas de igual alto; una fila impar deja el hueco a la derecha.
+  static Widget _row(List<Widget> children) => IntrinsicHeight(
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: children[0]),
+        const SizedBox(width: 8),
+        Expanded(
+          child: children.length > 1 ? children[1] : const SizedBox.shrink(),
+        ),
+      ],
     ),
-    children: [
-      CharacterCard(userName: userName),
-      const SizedBox(height: 11),
-      const Row(
+  );
+}
+
+/// 12450 → "12.450".
+String _number(int value) => value.toString().replaceAllMapped(
+  RegExp(r'\B(?=(\d{3})+(?!\d))'),
+  (_) => '.',
+);
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: LifeQuestStat(value: '100 / 100', label: '♡ Puntos de vida'),
+          const LifeQuestIconTile(Icons.cloud_off_rounded, size: 48),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: LifeQuestColors.ink, fontSize: 15),
           ),
-          SizedBox(width: 7),
-          Expanded(
-            child: LifeQuestStat(value: '2,450', label: '◉ Monedas'),
-          ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      const CompletionRateCard(),
-      const SizedBox(height: 14),
-      const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
-      const SizedBox(height: 6),
-      const Row(
-        children: [
-          Expanded(
-            child: ProfileQuickLink(
-              icon: Icons.visibility_outlined,
-              label: 'Vision Board',
-            ),
-          ),
-          SizedBox(width: 7),
-          Expanded(
-            child: ProfileQuickLink(
-              icon: Icons.inventory_2_outlined,
-              label: 'Inventario / Logros',
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 6),
-      const Row(
-        children: [
-          Expanded(
-            child: ProfileQuickLink(icon: Icons.history, label: 'Historial'),
-          ),
-          SizedBox(width: 7),
-          Expanded(
-            child: ProfileQuickLink(
-              icon: Icons.auto_awesome,
-              label: 'Game Master',
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 20),
+            label: const Text('Reintentar'),
+            style: FilledButton.styleFrom(
+              backgroundColor: LifeQuestColors.deepGreen,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(48, 48),
             ),
           ),
         ],
       ),
-      const SizedBox(height: 14),
-      const LifeQuestSectionHeading('ÁRBOL DE HABILIDADES'),
-      const SizedBox(height: 6),
-      GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        mainAxisSpacing: 7,
-        crossAxisSpacing: 7,
-        childAspectRatio: 2.7,
-        children: const [
-          SkillTile('Inglés', 'Nivel 18'),
-          SkillTile('Salud', 'Nivel 20'),
-          SkillTile('Diseño UX', 'Nivel 17'),
-          SkillTile('Universidad', 'Nivel 16'),
-        ],
-      ),
-      const SizedBox(height: 13),
-      const LifeQuestSectionHeading('CUENTA'),
-      const SizedBox(height: 6),
-      AccountActionTile(
-        icon: Icons.notifications_outlined,
-        title: 'Notificaciones',
-        onTap: onOpenNotifications,
-      ),
-      AccountActionTile(
-        icon: Icons.palette_outlined,
-        title: 'Apariencia',
-        onTap: onOpenAppearance,
-      ),
-      AccountActionTile(
-        icon: Icons.help_outline,
-        title: 'Ayuda',
-        onTap: onOpenHelp,
-      ),
-    ],
+    ),
   );
 }

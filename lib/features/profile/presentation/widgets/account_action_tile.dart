@@ -16,32 +16,43 @@ class AccountActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(9),
-      child: LifeQuestSurface(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-        child: Row(
-          children: [
-            Icon(icon, color: LifeQuestColors.deepGreen, size: 17),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(color: LifeQuestColors.line),
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Icon(icon, color: LifeQuestColors.deepGreen, size: 22),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      color: LifeQuestColors.ink,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: LifeQuestColors.muted,
+                ),
+              ],
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: LifeQuestColors.muted,
-              size: 17,
-            ),
-          ],
+          ),
         ),
       ),
     ),

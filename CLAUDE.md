@@ -291,7 +291,7 @@ test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktai
 
 **Desviaciones acordadas:** sin Dio ni `core/network` (el SDK de Supabase es el cliente HTTP); los widgets compartidos viven en `core/widgets/`.
 
-**Deuda de arquitectura:** solo `auth` cumple las 3 capas. Home, misiones, hábitos, dungeon, perfil, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`.
+**Deuda de arquitectura:** `auth`, `home` y la pantalla principal de `profile` cumplen las 3 capas. `home` lee la RPC `home_dashboard` (`supabase/migrations/001_home.sql`); `profile` lee `profile_overview` y edita identidad y skills (`002_profile.sql`). Siguen fijos: Accesos rápidos y Explora el reino del Home, y las subpáginas de Perfil (Notificaciones, Ayuda, Apariencia). Las migraciones se prueban con `supabase/tests` (`npm install && npm test`). Misiones, hábitos, dungeon, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`.
 
 ### Calidad
 - Prueba los cambios de SQL contra un Postgres real (con un stub de `auth.users`, `auth.uid()` y `auth.role()` si no es Supabase).

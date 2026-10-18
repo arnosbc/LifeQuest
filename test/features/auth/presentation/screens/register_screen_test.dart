@@ -2,10 +2,13 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
 
 import '../../../../helpers/mocks.dart';
@@ -117,6 +120,56 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets(
+    'si falta confirmar el correo, abre la pantalla de verificación',
+    (tester) async {
+      whenListen(
+        authBloc,
+        Stream.fromIterable(const [
+          AuthLoading(),
+          AuthEmailConfirmationRequired(
+            username: 'Ana',
+            email: 'ana@correo.com',
+          ),
+        ]),
+        initialState: const AuthUnauthenticated(),
+      );
+      await tester.pumpWidget(
+        BlocProvider<AuthBloc>.value(
+          value: authBloc,
+          child: MaterialApp.router(
+            theme: LifeQuestTheme.light,
+            routerConfig: GoRouter(
+              initialLocation: RoutePaths.register,
+              routes: [
+                GoRoute(
+                  path: RoutePaths.register,
+                  builder: (_, _) => const RegisterScreen(),
+                ),
+                GoRoute(
+                  path: RoutePaths.checkEmail,
+                  builder: (_, state) {
+                    final pending =
+                        state.extra! as AuthEmailConfirmationRequired;
+                    return CheckEmailScreen(
+                      username: pending.username,
+                      email: pending.email,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CheckEmailScreen), findsOneWidget);
+      expect(find.text('ana@correo.com'), findsOneWidget);
+      expect(find.byType(SnackBar), findsNothing);
+    },
+  );
 
   testWidgets('mientras carga, el botón muestra el indicador', (tester) async {
     when(() => authBloc.state).thenReturn(const AuthLoading());
