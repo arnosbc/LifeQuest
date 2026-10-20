@@ -6,6 +6,7 @@ import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/app/config/constants.dart';
 import 'package:proyecto_movil/app/observers/app_bloc_observer.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 Future<void> main() async {
@@ -21,7 +22,12 @@ Future<void> main() async {
   // Se resuelve la sesión guardada antes de pintar, para que el router no
   // muestre el login un instante a quien ya tiene sesión.
   final authBloc = sl<AuthBloc>()..add(const AuthCheckRequested());
-  await authBloc.stream.firstWhere((state) => state is! AuthInitial);
+  // Igual con el tema: sin esperar, quien eligió oscuro vería un destello claro.
+  final appearanceBloc = sl<AppearanceBloc>()..add(const AppearanceRequested());
+  await (
+    authBloc.stream.firstWhere((state) => state is! AuthInitial),
+    appearanceBloc.stream.firstWhere((state) => state is AppearanceSuccess),
+  ).wait;
 
-  runApp(App(authBloc: authBloc));
+  runApp(App(authBloc: authBloc, appearanceBloc: appearanceBloc));
 }

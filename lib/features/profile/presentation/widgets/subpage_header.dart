@@ -12,31 +12,25 @@ class SubpageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      InkWell(
-        onTap: onBack,
-        borderRadius: BorderRadius.circular(9),
-        child: Container(
-          width: 27,
-          height: 27,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: LifeQuestColors.line),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(
-            Icons.chevron_left,
-            color: LifeQuestColors.muted,
-            size: 18,
-          ),
-        ),
+      IconButton(
+        onPressed: onBack,
+        tooltip: 'Volver',
+        icon: const Icon(Icons.arrow_back_rounded, size: 22),
+        color: context.lq.ink,
+        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
       ),
-      const SizedBox(width: 8),
-      Text(
-        title,
-        style: const TextStyle(
-          color: LifeQuestColors.ink,
-          fontSize: 13,
-          fontWeight: FontWeight.w800,
+      const SizedBox(width: 4),
+      Expanded(
+        child: Semantics(
+          header: true,
+          child: Text(
+            title,
+            style: TextStyle(
+              color: context.lq.ink,
+              fontSize: 21,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ),
       ),
     ],

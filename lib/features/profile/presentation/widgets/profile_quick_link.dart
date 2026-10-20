@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 
+/// Acceso rápido de icono y etiqueta; varios comparten una fila.
 class ProfileQuickLink extends StatelessWidget {
   const ProfileQuickLink({
     super.key,
@@ -15,36 +16,29 @@ class ProfileQuickLink extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.white,
-    shape: RoundedRectangleBorder(
-      side: const BorderSide(color: LifeQuestColors.line),
-      borderRadius: BorderRadius.circular(11),
-    ),
+  Widget build(BuildContext context) => Semantics(
+    button: true,
     child: InkWell(
       onTap: onTap,
-      customBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(11),
-      ),
+      borderRadius: BorderRadius.circular(11),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 56),
+        constraints: const BoxConstraints(minHeight: 48),
         child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 10),
+          child: Column(
             children: [
-              LifeQuestIconTile(icon),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: LifeQuestColors.ink,
-                    fontSize: 13,
-                    height: 1.2,
-                    fontWeight: FontWeight.w600,
-                  ),
+              LifeQuestIconTile(icon, size: 44),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: context.lq.ink,
+                  fontSize: 12,
+                  height: 1.2,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

@@ -27,7 +27,6 @@ Future<(String, String)?> showIdentitySheet(
   context: context,
   isScrollControlled: true,
   showDragHandle: true,
-  backgroundColor: Colors.white,
   builder: (_) => _IdentityForm(
     displayName: displayName,
     identityStatement: identityStatement ?? '',
@@ -42,7 +41,6 @@ Future<SkillSheetResult?> showSkillSheet(
   context: context,
   isScrollControlled: true,
   showDragHandle: true,
-  backgroundColor: Colors.white,
   builder: (_) => _SkillForm(name: name),
 );
 
@@ -90,7 +88,7 @@ class _IdentityFormState extends State<_IdentityForm> {
             maxLength: 40,
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.words,
-            decoration: _decoration('Nombre del héroe'),
+            decoration: _decoration(context, 'Nombre del héroe'),
             validator: (value) => (value ?? '').trim().isEmpty
                 ? 'Escribe cómo quieres que te llamemos.'
                 : null,
@@ -103,6 +101,7 @@ class _IdentityFormState extends State<_IdentityForm> {
             maxLines: 5,
             textCapitalization: TextCapitalization.sentences,
             decoration: _decoration(
+              context,
               '¿Quién eres en este reino?',
               hint: 'Ej.: Una estratega que termina lo que empieza.',
             ),
@@ -157,7 +156,7 @@ class _SkillFormState extends State<_SkillForm> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: LifeQuestColors.error),
+            style: TextButton.styleFrom(foregroundColor: context.lq.error),
             child: const Text('Eliminar'),
           ),
         ],
@@ -177,12 +176,12 @@ class _SkillFormState extends State<_SkillForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (_isNew)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
               child: Text(
                 'Una skill es un área de tu vida que quieres hacer crecer: '
                 'Salud, Inglés, Universidad…',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 13),
+                style: TextStyle(color: context.lq.muted, fontSize: 13),
               ),
             ),
           TextFormField(
@@ -192,7 +191,7 @@ class _SkillFormState extends State<_SkillForm> {
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _save(),
-            decoration: _decoration('Nombre de la skill'),
+            decoration: _decoration(context, 'Nombre de la skill'),
             validator: (value) => (value ?? '').trim().isEmpty
                 ? 'Ponle un nombre a tu skill.'
                 : null,
@@ -209,7 +208,7 @@ class _SkillFormState extends State<_SkillForm> {
               icon: const Icon(Icons.delete_outline_rounded, size: 20),
               label: const Text('Eliminar skill'),
               style: TextButton.styleFrom(
-                foregroundColor: LifeQuestColors.error,
+                foregroundColor: context.lq.error,
                 minimumSize: const Size.fromHeight(48),
               ),
             ),
@@ -243,8 +242,8 @@ class _SheetFrame extends StatelessWidget {
             header: true,
             child: Text(
               title,
-              style: const TextStyle(
-                color: LifeQuestColors.ink,
+              style: TextStyle(
+                color: context.lq.ink,
                 fontSize: 21,
                 fontWeight: FontWeight.w800,
               ),
@@ -270,8 +269,8 @@ class _PrimaryButton extends StatelessWidget {
     child: FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(
-        backgroundColor: LifeQuestColors.deepGreen,
-        foregroundColor: Colors.white,
+        backgroundColor: context.lq.deepGreen,
+        foregroundColor: context.lq.onDeepGreen,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
@@ -280,22 +279,27 @@ class _PrimaryButton extends StatelessWidget {
   );
 }
 
-InputDecoration _decoration(String label, {String? hint}) => InputDecoration(
-  labelText: label,
-  hintText: hint,
-  alignLabelWithHint: true,
-  filled: true,
-  fillColor: Colors.white,
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(10),
-    borderSide: const BorderSide(color: LifeQuestColors.outline),
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(10),
-    borderSide: const BorderSide(color: LifeQuestColors.outline),
-  ),
-  focusedBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(10),
-    borderSide: const BorderSide(color: LifeQuestColors.deepGreen, width: 1.5),
-  ),
-);
+InputDecoration _decoration(
+  BuildContext context,
+  String label, {
+  String? hint,
+}) {
+  final lq = context.lq;
+  OutlineInputBorder border(Color color, [double width = 1]) =>
+      OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: color, width: width),
+      );
+  return InputDecoration(
+    labelText: label,
+    hintText: hint,
+    alignLabelWithHint: true,
+    filled: true,
+    fillColor: lq.surface,
+    border: border(lq.outline),
+    enabledBorder: border(lq.outline),
+    focusedBorder: border(lq.deepGreen, 1.5),
+    errorBorder: border(lq.error),
+    focusedErrorBorder: border(lq.error, 1.5),
+  );
+}

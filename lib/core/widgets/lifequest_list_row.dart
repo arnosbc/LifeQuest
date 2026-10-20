@@ -33,8 +33,8 @@ class LifeQuestListRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: LifeQuestColors.ink,
+                  style: TextStyle(
+                    color: context.lq.ink,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -42,10 +42,7 @@ class LifeQuestListRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: LifeQuestColors.muted,
-                    fontSize: 10,
-                  ),
+                  style: TextStyle(color: context.lq.muted, fontSize: 10),
                 ),
               ],
             ),
@@ -53,8 +50,8 @@ class LifeQuestListRow extends StatelessWidget {
           if (trailing != null)
             Text(
               trailing!,
-              style: const TextStyle(
-                color: LifeQuestColors.deepGreen,
+              style: TextStyle(
+                color: context.lq.deepGreen,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
               ),

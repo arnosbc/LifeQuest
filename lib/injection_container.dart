@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -15,14 +16,20 @@ import 'package:proyecto_movil/features/home/domain/repositories/home_repository
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/profile/data/datasources/appearance_local_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:proyecto_movil/features/profile/data/repositories/appearance_repository_impl.dart';
 import 'package:proyecto_movil/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:proyecto_movil/features/profile/domain/repositories/appearance_repository.dart';
 import 'package:proyecto_movil/features/profile/domain/repositories/profile_repository.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/create_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/delete_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/get_character_profile.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 
 final sl = GetIt.instance;
@@ -90,5 +97,19 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Apariencia (tema) ----------
+  // Bloc: singleton porque el tema es de toda la app.
+  sl.registerLazySingleton(
+    () => AppearanceBloc(getThemePreference: sl(), saveThemePreference: sl()),
+  );
+  sl.registerLazySingleton(() => GetThemePreference(sl()));
+  sl.registerLazySingleton(() => SaveThemePreference(sl()));
+  sl.registerLazySingleton<AppearanceRepository>(
+    () => AppearanceRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<AppearanceLocalDataSource>(
+    () => AppearanceLocalDataSourceImpl(SharedPreferencesAsync()),
   );
 }

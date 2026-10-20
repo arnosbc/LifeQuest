@@ -71,10 +71,16 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
       },
     ),
     StatefulShellRoute.indexedStack(
-      // shortcut: estas pantallas aún usan colores fijos del tema claro; quitar
-      // lightOnly cuando se migren a context.lq.
-      builder: (context, state, shell) =>
-          LifeQuestTheme.lightOnly(AppShell(navigationShell: shell)),
+      // shortcut: salvo las rutas de _themedPaths, estas pantallas usan colores
+      // fijos del tema claro; añadir cada ruta al migrarla a context.lq.
+      // Siempre se envuelve en Theme (solo cambia `data`) para no reconstruir
+      // las ramas y perder su estado al cambiar de pestaña.
+      builder: (context, state, shell) => Theme(
+        data: _themedPaths.contains(state.uri.path)
+            ? Theme.of(context)
+            : LifeQuestTheme.light,
+        child: AppShell(navigationShell: shell),
+      ),
       branches: [
         StatefulShellBranch(
           routes: [
@@ -171,6 +177,9 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
     _section(RoutePaths.marketplace, const MarketplaceScreen()),
   ],
 );
+
+/// Rutas de la barra inferior ya migradas a `context.lq` (siguen el tema).
+const _themedPaths = {RoutePaths.profile, RoutePaths.appearance};
 
 /// Secciones del menú (RF-114) que no caben en la barra inferior: pantalla
 /// completa con botón de volver.

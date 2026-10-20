@@ -37,13 +37,15 @@ Los documentos viven en el Project de claude.ai "LifeQuest". Cuando dos fuentes 
 | 2 | `Requerimientos_Funcionales.md` | 116 RF verificables (RF-001…RF-116). Verdad del **comportamiento**. |
 | 3 | `Casos_de_Uso.md` | 31 UC con trazabilidad a los RF. |
 | 4 | `Esquema_Base_de_Datos.md` | Justificación del esquema y registro de cambios (C1–C8). |
-| 5 | `ideas-proyecto-productividad-gamificada.md` | Documento vivo de diseño: el "porqué". **Está desactualizado** respecto a los RF (ver §12). |
+| 5 | `docs/ideas-proyecto-productividad-gamificada.md` | Documento vivo de diseño: el "porqué". Su versión de **cierre del diseño (oct 2026)** trae decisiones más nuevas que los RF y el esquema (ver §13). |
 
 **Al cambiar algo:**
 - Cita siempre el RF que justifica el cambio (ej. `-- RF-032`).
 - Si cambias `schema.sql`, actualiza también `Esquema_Base_de_Datos.md`.
 - Si una decisión nueva altera un RF o un UC, actualiza ambos documentos y mantén la trazabilidad RF ↔ UC.
-- No inventes valores de la economía (ver §11): déjalos como configuración o semilla marcada como provisional.
+- No inventes valores de la economía: usa los de `docs/ideas-proyecto-productividad-gamificada.md` (sección «Economía estable») o déjalos como configuración marcada como provisional.
+- Diseño visual y producto: `DESIGN.md` y `PRODUCT.md` **se están rehaciendo desde cero** (ver §14).
+- **Decisiones de §13 que chocan con un RF o con el esquema:** antes de implementarlas, actualiza el RF, el UC y `schema.sql`. Hasta entonces mandan RF y esquema.
 
 ---
 
@@ -84,7 +86,7 @@ Alternativas evaluadas y descartadas de hecho al elegir Supabase: Node.js + Expr
 | Deep Working | Contenedor de la sesión de concentración | `focus_sessions`, `focus_session_tasks` |
 | Mazmorra | Cada ciclo Pomodoro dentro de la sesión | `dungeon_runs` |
 | Historial de Misiones / Bitácora | Registro de todo lo cumplido o fallado | `quest_log_entries` |
-| Diario del Héroe | Texto narrativo diario (caché) | `hero_journal_entries` |
+| Diario del Héroe | Texto narrativo diario (caché). **Eliminado en el cierre del diseño** (§13) | `hero_journal_entries` |
 | Marketplace / Tienda | Catálogo global cerrado: Descanso, Indulgencia, Experiencia | `market_items`, `user_market_selection`, `purchases` |
 | Hotel | Compra de recuperación de HP | `hp_recovery_purchases` |
 | Mercado negro | Ítems raros, p. ej. "Recuperar racha" | `black_market_items`, `black_market_redemptions` |
@@ -99,10 +101,12 @@ Alternativas evaluadas y descartadas de hecho al elegir Supabase: Node.js + Expr
 
 ### Menú principal (9 secciones, RF-114)
 
+> **Superado por el diseño (§13):** la navegación es una barra inferior de 5 pestañas (Inicio · Stage · Hábitos · Mazmorra · Perfil), ver `docs/ideas-proyecto-productividad-gamificada.md` → Menú / Navegación principal. Esta lista se conserva como inventario de contenidos de RF-114 hasta actualizar el RF.
+
 1. **Perfil del Personaje**: nivel, Monedas, HP, identidad, tasa de finalización, árbol de skills. Desde aquí se accede a **Inventario/Logros** y **Configuración (Game Master)**.
 2. **RPGenie — Misión actual**.
 3. **Stage · P.A.R.A. (G.T.D.)**: centro de mando. Aquí viven las misiones (ya no es ítem propio del menú).
-4. **Diario**: el texto del Diario del Héroe seguido del Historial filtrable, sin datos propios (RF-116).
+4. **Diario**: solo la Bitácora filtrable, sin datos propios y sin Diario del Héroe (§13; RF-116 pendiente de actualizar). Se abre desde Perfil.
 5. **Hábitos**: buenos y malos, con estadísticas de crecimiento y mapa de calor.
 6. **Mazmorras / Deep Working**.
 7. **Objetivos**: Goal → Boss Fight + Growth (S.M.A.R.T.).
@@ -137,7 +141,7 @@ Se usa **la misma instancia** desde Brain Dump y desde Quick Add de P.A.R.A. (RF
 
 ### Economía dual
 - **XP**: mide progreso, **nunca se gasta**, sube el nivel del personaje y el de la skill asociada.
-- **Monedas**: se ganan junto al XP (proporcionales a la dificultad) y **sí se gastan**.
+- **Monedas**: se ganan junto al XP y **sí se gastan**. Según el diseño (§13), son el 30 % de la XP e iguales en todas las dificultades.
 - Gastar Monedas nunca debe sentirse como perder avance.
 - La dificultad del usuario aplica multiplicadores (`difficulty_levels`, semilla provisional):
 
@@ -147,8 +151,12 @@ Se usa **la misma instancia** desde Brain Dump y desde Quick Add de P.A.R.A. (RF
 | `normal` | ×1.00 | ×1.00 | ×1.00 |
 | `hard` | ×0.80 | ×0.80 | ×1.20 |
 
+> **Superado por §13 (cerrado el 2026-10-18):** XP ×1,2 / ×1 / ×0,85; vida perdida ×0,75 / ×1 / ×1,25; Monedas iguales. Se elige en el Onboarding y solo se cambia en Configuración. La semilla de `difficulty_levels` ya la actualiza `004_structure.sql`.
+
 ### Recompensa sugerida (RF-022)
 Se calcula a partir de `difficulty` y `estimated_minutes`, multiplicada por la dificultad del usuario. El usuario puede editarla. Anti-inflado: la recompensa no puede subir por editar repetidamente la descripción (RF-112).
+
+> **Superado por §13:** las tareas ya no tienen tiempo estimado ni dificultad elegida por el usuario; RPGenie calcula la XP por reglas (10–40) y el usuario no la edita. Reglas en `docs/ideas-proyecto-productividad-gamificada.md` → Estimación automática de recompensa. Antes de implementarlo hay que actualizar RF-022 y quitar `tasks.difficulty` y `tasks.estimated_minutes` del esquema.
 
 ### Urgencia automática de Proyectos (RF-019/020)
 ```
@@ -244,9 +252,10 @@ Prioriza la "Misión actual" así: cualquier candidata en estado Crítico → ur
   3. actualizan `character_stats` y la `skill`,
   4. escriben la fila en `quest_log_entries`.
 - Analogía: como en un juego en línea, el jugador **ve** su oro, pero solo el servidor puede **cambiarlo**.
-- ⚠️ El `schema.sql` v2 **todavía** concede escritura `ALL` al dueño en tablas económicas (`character_stats`, `quest_log_entries`, `user_achievements`, `recovery_passes`, `black_market_redemptions`, `dungeon_runs`, `hp_recovery_purchases`, `purchases`). Al tocar estas tablas, migra a: **cliente solo `SELECT`** + funciones RPC.
+- Las migraciones `003_security.sql` a `007_daily.sql` (`supabase/migrations/`) cierran la escritura del cliente en las tablas económicas y dan las RPC del juego (`complete_task`, `complete_project`, `complete_habit`, `register_bad_habit`, `claim_daily_chest`, `purchase`, `buy_black_market`, `use_recovery_pass`, `upgrade_refuge`, `request_npc_mission`, `activate_elixir`, `complete_dungeon_cycle`). Todo pago pasa por `_award`; los números viven en `game_rules`. Plan y estado: `docs/plan-cambios-esquema.md`. ⚠️ Aplicarlas en Supabase en orden.
 
 ### Frontend (Flutter)
+- Antes de tocar UI, lee la sección **§14 Diseño**.
 - Textos de UI en español, con el tono de invitación de §7.
 - Las "pieles" de estado (Éxito/Fracaso, "¡Hazlo ahora!") son un mapeo en la UI sobre `objective_status`.
 - Stage · P.A.R.A., el Diario y el Daily Highlight son **pantallas de lectura** sobre datos de otros módulos: no deben duplicar datos.
@@ -291,7 +300,7 @@ test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktai
 
 **Desviaciones acordadas:** sin Dio ni `core/network` (el SDK de Supabase es el cliente HTTP); los widgets compartidos viven en `core/widgets/`.
 
-**Deuda de arquitectura:** `auth`, `home` y la pantalla principal de `profile` cumplen las 3 capas. `home` lee la RPC `home_dashboard` (`supabase/migrations/001_home.sql`); `profile` lee `profile_overview` y edita identidad y skills (`002_profile.sql`). Siguen fijos: Accesos rápidos y Explora el reino del Home, y las subpáginas de Perfil (Notificaciones, Ayuda, Apariencia). Las migraciones se prueban con `supabase/tests` (`npm install && npm test`). Misiones, hábitos, dungeon, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`.
+**Deuda de arquitectura:** `auth`, `home` y la pantalla principal de `profile` cumplen las 3 capas. `home` lee la RPC `home_dashboard` (`supabase/migrations/001_home.sql`); `profile` lee `profile_overview` y edita identidad y skills (`002_profile.sql`). Siguen fijos: Accesos rápidos y Explora el reino del Home, y las subpáginas Notificaciones y Ayuda. Apariencia guarda el tema (claro/oscuro/sistema) con `AppearanceBloc` global y `shared_preferences`. Las migraciones se prueban con `supabase/tests` (`npm install && npm test`). Misiones, hábitos, dungeon, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`. Perfil y Apariencia ya usan `context.lq`; al migrar otra pestaña, añade su ruta a `_themedPaths` en `app_router.dart`.
 
 ### Calidad
 - Prueba los cambios de SQL contra un Postgres real (con un stub de `auth.users`, `auth.uid()` y `auth.role()` si no es Supabase).
@@ -314,7 +323,7 @@ test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktai
 | Ítem | Motivo |
 |---|---|
 | Financial Vault (ingresos, gastos, presupuestos, wish list, cuentas) | Pausado; se conserva el diseño, sin tablas |
-| Personalización visual completa (avatar, ropa, temas, marcos) | Falta decidir el enfoque (arte propio o modelos generativos) |
+| Personalización visual completa (avatar, ropa, temas visuales completos como pixel art, marcos, cosméticos sorpresa) | Falta decidir el enfoque (arte propio o modelos generativos). **Sí entran** el modo claro/oscuro/automático y temas de color (los 4 del paquete se quitaron; pendientes de rediseño, §13) |
 | Modo cooperativo, gremios y rankings | Foco en un solo usuario |
 | Autorecompensas de texto libre en la Tienda | Eliminadas; reemplazadas por el catálogo cerrado |
 | Planificación de MVP y fases | Retirada hasta cerrar las especificaciones |
@@ -323,21 +332,68 @@ test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktai
 
 ## 11. Decisiones abiertas (no las cierres sin consultar)
 
-- **Economía numérica:** valor fijo de HP por penalización, multiplicadores definitivos, precios y cooldowns del Hotel y del Mercado negro, catálogo concreto de la Tienda. `black_market_items` no tiene semilla todavía.
+- **Propuesta del cierre del diseño por confirmar:** orden de prioridad de la Misión actual (§13). *(Cerrados el 2026-10-18: debilitado < 30 de vida y −25 % de XP, 48 h para salvar una racha y multiplicadores de dificultad con Monedas iguales; ver `docs/plan-cambios-esquema.md` §7.)*
+- **Economía:** los valores (§13) ya están en las migraciones 004–007 (`game_rules`, semillas de `difficulty_levels`, `market_items` y `black_market_items`, Refugio, Tesoro, tope diario); falta validarlos con usuarios reales el primer mes.
 - **Daily Highlight, "Pending":** definido como "tarea delegada"; otra propuesta del equipo era "sin fecha".
+- **Diagnosis G.T.D., pregunta 4:** se mantiene RF-011 (estado `delegated` con «¿a quién?»); el «Evento con contacto» del cierre del diseño queda descartado por ahora (2026-10-18).
 - **Tipo de misión** diaria / semanal / épica (RF-050): ¿basta `repeat_rule` o se agrega un enum `mission_type`?
-- **Anti-inflado (RF-112):** propuesta de guardar `suggested_xp` y `suggested_coins` en `tasks`.
-- **Renombrar enums de dificultad:** `difficulty_scale` → `task_difficulty`, `difficulty_level` → `game_difficulty` (propuesto).
-- **Goal → Boss Fight:** el usuario hará ajustes al final del diseño, como el cálculo del daño al Boss.
-- **Inventario/Logros:** ¿dentro de Perfil (como dicen los RF) o también en el Diario?
+- **Renombrar enums de dificultad:** `difficulty_scale` → `task_difficulty`, `difficulty_level` → `game_difficulty` (propuesto). `004_structure.sql` ya borra `difficulty_scale`.
+- **Bitácora:** ¿notas propias del usuario? ¿filtro por skill/Área?
 - **RPGenie avanzado:** fórmula de "ritmo necesario" con el ritmo histórico del usuario, y el modelo de IA.
-- Job diario de rachas: `pg_cron` o Edge Function programada.
+- Decisiones abiertas del esquema (recompensa de NPC, precio del Refugio, catálogos de títulos, cofre y logros, RF-031): ver `docs/plan-cambios-esquema.md` §7.
 
 ---
 
 ## 12. Deuda documental conocida
 
-- `ideas-proyecto-productividad-gamificada.md` aún marca como pendientes decisiones que los RF ya cerraron (estado debilitado, reemplazo de autorecompensas, Diagnosis P4, descansos, priorización de RPGenie, fórmula de urgencia, alcance del Diario). También conserva la sección de MVP y fases y menciona el Vault y `NpcMission` en Arquitectura.
+- `docs/ideas-proyecto-productividad-gamificada.md` (copia del paquete de diseño, oct 2026) ya cerró la mayoría de pendientes, pero conserva la sección de MVP y fases (retirada, ver §10), menciona `NpcMission` y entidades del Vault en Arquitectura, mantiene Node.js/Firebase como stack posible y marca como pendiente la duración de los descansos, que RF-067 ya fijó.
+- **RF, UC, `schema.sql` y `Esquema_Base_de_Datos.md` no reflejan todavía las decisiones de §13** (Diario del Héroe, recompensa por reglas, dificultad, economía, navegación, temas de color). Las migraciones 003–007 sí las aplican; faltan RF-022, RF-030, RF-034, RF-043, RF-048, RF-112 y RF-116 (ver `docs/plan-cambios-esquema.md` §7).
 - `Casos_de_Uso.md` tiene referencias cruzadas rotas: UC-08 apunta a UC-12 (debe ser UC-10) y a UC-17 (debe ser UC-15); UC-09 apunta a UC-13 (debe ser UC-11).
 - RF-048 conviene reescribirlo como "elegir qué ítems del catálogo aparecen en su Tienda".
+- El código implementa el sistema visual anterior («El Jardín del Héroe»: Roboto, `LifeQuestColors` / `context.lq`, navegación Inicio · Misiones · Dungeon · Hábitos · Perfil). El nuevo sistema visual se definirá en `DESIGN.md` (pendiente).
 - El documento explicativo del esquema hecho en otro chat describe la **v1** (31 tablas). La v2 tiene **33 tablas, 18 enums y 2 vistas**.
+
+---
+
+## 13. Decisiones del cierre del diseño (oct 2026)
+
+Vienen de `docs/ideas-proyecto-productividad-gamificada.md` (versión del paquete de diseño), tras diseñar 60 tableros en el lienzo "Questly — Diseño de la app" (sistema de diseño «Bosque vivo»). Son más nuevas que los RF y el esquema; la columna **Choca con** dice qué hay que actualizar antes de implementarlas (§2).
+
+| Tema | Decisión | Choca con |
+|---|---|---|
+| Diario | **Se elimina el Diario del Héroe.** El Diario es solo la Bitácora (`quest_log_entries`) con un resumen semanal arriba y enlace a Estadísticas. Filtros: Todo, Tareas, Hábitos, Mazmorras, Metas | RF-116, `hero_journal_entries` |
+| Recompensa de tareas | Sin tiempo estimado ni dificultad elegidos por el usuario. XP por reglas, **10–40 por tarea**: base 10; +10 si el título tiene ≥ 5 palabras; +10 prioridad alta / +5 media; +10 si va vinculada a una Meta / +5 a un Proyecto. Monedas = 30 % de la XP. El usuario no la edita y editar la tarea no la recalcula (cierra RF-112) | RF-022, `tasks.difficulty`, `tasks.estimated_minutes` |
+| Dificultad | Solo se cambia en Configuración (y se elige en el Onboarding). XP ×1,2 / ×1 / ×0,85; vida perdida ×0,75 / ×1 / ×1,25; **Monedas iguales** en las tres | Semilla de `difficulty_levels` (§6) |
+| Niveles | XP para subir: 100 × nivel^1,5 | — |
+| HP (propuesta) | Mal hábito −3 / −5 / −8 según la gravedad que elige el usuario; plazo incumplido −5; día sin jugar −5; +4 por día con al menos un hábito bueno (+1 por nivel del Huerto). **Debilitado:** por debajo de 30 de vida, −25 % de XP y nunca menos Monedas | RF-034 (≤ 20 %, −10 % de XP y Monedas) |
+| Rachas | Al romperse hay **48 h** para usar un Pase o "Recuperar racha"; el récord se guarda | — |
+| Economía estable y catálogo | Monedas = 30 % de la XP, tope suave diario (75 máx.), bolsa con límite y Tesoro del reino, precios fijos, Refugio creciente, anti-trampa, entradas, catálogo (Hotel, Mercado, Mercado negro, Refugio) y ajuste post-lanzamiento. **Valores en `docs/ideas-proyecto-productividad-gamificada.md` → Economía estable** | Esquema (faltan tablas); `market_items`, `black_market_items` sin semilla |
+| Navegación | Barra inferior de 5 pestañas: **Inicio · Stage · Hábitos · Mazmorra · Perfil**. Desde Inicio: Taverna, Brain Dump, Misión actual, Boss Fight y Avisos. Desde Perfil: Diario, Estadísticas, Vision Board, Inventario y logros, Marketplace y Configuración. Onboarding de 5 pasos | Código actual (Inicio, Misiones, Dungeon, Hábitos, Perfil); RF-114 |
+| Apariencia | Modo claro / oscuro / automático en Configuración (Game Master), aplicado a toda la app. Hoy el modo está implementado en Perfil → Apariencia (`AppearanceBloc`). **Temas de color: los 4 del paquete (Bosque, Río, Brasa, Oro) se quitaron el 2026-10-18; pendientes de rediseño** | `game_master_settings` (sin columnas de apariencia) |
+| Mazmorra | **Mochila de misiones:** hoja con buscador y filtros (Sugeridas, Hoy, Urgentes, Todas), máx. **5 tareas** por sesión, mapa de ruta de mazmorras y descansos. Duración del bloque en pasos de 30 min | — |
+| Taverna | "Pedir misión al momento": gratis cada 3 h, si no cuesta 15 Monedas. Máx. 3 NPCs (+1 por nivel de Estandarte). Asistente "Crear NPC" en 4 pasos | — |
+| Boss Fight | Arena con vida y fecha, ataques disponibles (cada tarea o proyecto vinculado con su daño), golpes recientes y ficha S.M.A.R.T. Victoria: +300 XP, +90 Monedas y un título. Si vence la fecha: "El jefe escapó… por ahora", se conserva la XP, sin castigo extra, y se ofrece replantear o archivar | — |
+| RPGenie (propuesta) | Prioriza: vence antes → más daño a jefes activos → lo más ligero si el usuario dice estar cansado o con poco tiempo. "Ahora no" (cansado / poco tiempo / no es prioridad / ya no quiero) cambia la misión sin castigo | RF-097 |
+| Inventario | Vive en el Perfil (pestañas Logros y Objetos). Los **títulos de prestigio** se ganan (logros, nivel, Tesoro), no se compran | — |
+| Estadísticas | Pantalla nueva desde Perfil y Diario: XP, misiones, tiempo en Mazmorra y racha comparados con el periodo anterior; XP por día y por Área; hábitos más constantes; 3 observaciones de RPGenie | — |
+| Notificaciones (UI) | Centro de avisos con pestañas Todos / Importantes. En pantalla: **▲ Crítico · ● Importante · ○ Informativo** ("Importante" agrupa lo motivacional), siempre símbolo + texto | — |
+| Entidades nuevas sin tabla | Mejoras del Refugio, Tesoro del reino, control del tope diario de Monedas, consumibles (Elixir, Cofre) y títulos | Esquema |
+
+---
+
+## 14. Diseño
+
+> **Reinicio (2026-10-18):** `DESIGN.md`, `PRODUCT.md` y el paquete de pantallas se borraron para empezar de cero. Se rehacen tomando como punto de partida `docs/ideas-proyecto-productividad-gamificada.md`.
+
+Mientras no existan:
+- No inventes colores, fuentes, tamaños ni componentes nuevos: no toques la UI salvo que se pida.
+- El código sigue con `LifeQuestColors` / `context.lq` y el modo claro/oscuro de `AppearanceBloc`.
+- **Accesibilidad WCAG 2.1 AA** sigue siendo obligatoria: contraste 4,5:1 (3:1 texto grande), zonas táctiles amplias, `Semantics` en botones de icono y el color nunca va solo.
+- La Mazmorra (Deep Working) es siempre oscura y respeta la reducción de movimiento del sistema.
+
+Cuando existan, esta sección se reescribe para apuntar a ellos.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->

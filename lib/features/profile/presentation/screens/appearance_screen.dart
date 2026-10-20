@@ -1,153 +1,102 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:proyecto_movil/core/widgets/widgets.dart';
-import 'package:proyecto_movil/features/profile/presentation/widgets/accent_picker.dart';
-import 'package:proyecto_movil/features/profile/presentation/widgets/appearance_preview.dart';
-import 'package:proyecto_movil/features/profile/presentation/widgets/display_preference_tile.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/subpage_header.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/theme_option_card.dart';
 
-class AppearanceScreen extends StatefulWidget {
+/// Elige el tema de la app. Necesita el [AppearanceBloc] global por encima.
+class AppearanceScreen extends StatelessWidget {
   const AppearanceScreen({super.key, required this.onBack});
 
   final VoidCallback onBack;
 
   @override
-  State<AppearanceScreen> createState() => _AppearanceScreenState();
-}
-
-class _AppearanceScreenState extends State<AppearanceScreen> {
-  ThemeChoice _theme = ThemeChoice.light;
-  Color _accent = const Color(0xFF12A34A);
-  bool _largeText = false;
-  bool _reduceMotion = false;
-  bool _highContrast = false;
-
-  static const _accents = [
-    Color(0xFF12A34A),
-    Color(0xFF078B43),
-    Color(0xFF00A05A),
-    Color(0xFF07964D),
-    Color(0xFF008F54),
-    Color(0xFF008F43),
-  ];
-
-  @override
-  Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.fromLTRB(14, 9, 14, 22),
-    children: [
-      SubpageHeader(title: 'Apariencia', onBack: widget.onBack),
-      const Divider(height: 17, color: LifeQuestColors.line),
-      const LifeQuestSectionHeading('TEMA'),
-      const SizedBox(height: 6),
-      Row(
+  Widget build(
+    BuildContext context,
+  ) => BlocConsumer<AppearanceBloc, AppearanceState>(
+    listenWhen: (_, state) =>
+        state is AppearanceSuccess && state.message != null,
+    listener: (context, state) =>
+        showLifeQuestMessage(context, (state as AppearanceSuccess).message!),
+    builder: (context, state) {
+      final lq = context.lq;
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(8, 9, 19, 22),
         children: [
-          Expanded(child: _themeOption(ThemeChoice.light, 'Claro')),
-          const SizedBox(width: 6),
-          Expanded(child: _themeOption(ThemeChoice.dark, 'Oscuro')),
-          const SizedBox(width: 6),
-          Expanded(child: _themeOption(ThemeChoice.system, 'Sistema')),
-        ],
-      ),
-      const SizedBox(height: 11),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'COLOR DE ACENTO',
-            style: TextStyle(
-              color: LifeQuestColors.muted,
-              fontSize: 8,
-              fontWeight: FontWeight.w800,
+          SubpageHeader(title: 'Apariencia', onBack: onBack),
+          Padding(
+            padding: const EdgeInsets.only(left: 11),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                const LifeQuestSectionHeading('TEMA'),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final theme in ThemePreference.values) ...[
+                      if (theme != ThemePreference.values.first)
+                        const SizedBox(width: 8),
+                      Expanded(
+                        child: ThemeOptionCard(
+                          theme: theme,
+                          selected: state.theme == theme,
+                          onTap: () => context.read<AppearanceBloc>().add(
+                            AppearanceThemeChanged(theme),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  switch (state.theme) {
+                    ThemePreference.light =>
+                      'Fondo de niebla y superficies blancas.',
+                    ThemePreference.dark =>
+                      'Fondo de bosque nocturno, más cómodo con poca luz.',
+                    ThemePreference.system =>
+                      'Cambia entre claro y oscuro según tu teléfono.',
+                  },
+                  style: TextStyle(color: lq.muted, fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 28),
+                const LifeQuestSectionHeading('TAMAÑO DEL TEXTO'),
+                const SizedBox(height: 8),
+                LifeQuestSurface(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const LifeQuestIconTile(
+                        Icons.text_fields_rounded,
+                        size: 40,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'Sigue el tamaño de letra de los ajustes de '
+                          'tu teléfono.',
+                          style: TextStyle(
+                            color: lq.ink,
+                            fontSize: 14,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            _accentName,
-            style: TextStyle(
-              color: _accent,
-              fontSize: 8,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
         ],
-      ),
-      const SizedBox(height: 5),
-      AccentPicker(
-        accents: _accents,
-        selected: _accent,
-        onSelected: (color) => setState(() => _accent = color),
-      ),
-      const SizedBox(height: 11),
-      const LifeQuestSectionHeading('PREFERENCIAS DE VISUALIZACIÓN'),
-      const SizedBox(height: 5),
-      DisplayPreferenceTile(
-        icon: Icons.text_fields,
-        title: 'Texto más grande',
-        subtitle: 'Aumenta el tamaño del contenido',
-        value: _largeText,
-        onChanged: (value) => setState(() => _largeText = value),
-        activeColor: _accent,
-      ),
-      DisplayPreferenceTile(
-        icon: Icons.motion_photos_off_outlined,
-        title: 'Reducir movimiento',
-        subtitle: 'Limita animaciones y transiciones',
-        value: _reduceMotion,
-        onChanged: (value) => setState(() => _reduceMotion = value),
-        activeColor: _accent,
-      ),
-      DisplayPreferenceTile(
-        icon: Icons.contrast,
-        title: 'Alto contraste',
-        subtitle: 'Mejora la distinción entre elementos',
-        value: _highContrast,
-        onChanged: (value) => setState(() => _highContrast = value),
-        activeColor: _accent,
-      ),
-      const SizedBox(height: 11),
-      const LifeQuestSectionHeading('VISTA PREVIA'),
-      const SizedBox(height: 5),
-      AppearancePreview(
-        theme: _theme,
-        accent: _accent,
-        largeText: _largeText,
-        reduceMotion: _reduceMotion,
-        highContrast: _highContrast,
-      ),
-      const SizedBox(height: 8),
-      LifeQuestSurface(
-        color: const Color(0xFFEAF8EE),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-        child: Row(
-          children: [
-            Icon(Icons.auto_awesome, color: _accent, size: 13),
-            const SizedBox(width: 6),
-            const Expanded(
-              child: Text(
-                'La vista previa se actualiza al instante con tus preferencias.',
-                style: TextStyle(color: LifeQuestColors.deepGreen, fontSize: 8),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-
-  String get _accentName => switch (_accents.indexOf(_accent)) {
-    0 => 'Verde',
-    1 => 'Bosque',
-    2 => 'Menta',
-    3 => 'Esmeralda',
-    4 => 'Jade',
-    _ => 'Hoja',
-  };
-
-  Widget _themeOption(ThemeChoice choice, String label) => ThemeOptionCard(
-    choice: choice,
-    label: label,
-    selected: _theme == choice,
-    accent: _accent,
-    onTap: () => setState(() => _theme = choice),
+      );
+    },
   );
 }

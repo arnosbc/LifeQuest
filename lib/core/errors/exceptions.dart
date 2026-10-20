@@ -24,3 +24,13 @@ class NetworkException implements Exception {
   @override
   String toString() => 'NetworkException: $message';
 }
+
+/// No se pudo leer o escribir el almacenamiento local del dispositivo.
+class CacheException implements Exception {
+  const CacheException([this.message]);
+
+  final String? message;
+
+  @override
+  String toString() => 'CacheException: $message';
+}

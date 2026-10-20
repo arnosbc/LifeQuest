@@ -4,16 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/account_action_tile.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/character_card.dart';
-import 'package:proyecto_movil/features/profile/presentation/widgets/completion_rate_card.dart';
+import 'package:proyecto_movil/features/profile/presentation/widgets/hero_status_card.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_quick_link.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_sheets.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/skill_tile.dart';
+import 'package:proyecto_movil/features/profile/presentation/widgets/theme_option_card.dart';
 
-/// Perfil del Personaje. Necesita un [ProfileBloc] por encima (lo provee el
-/// router).
+/// Perfil del Personaje. Necesita un [ProfileBloc] (lo provee el router) y el
+/// [AppearanceBloc] global por encima.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
@@ -37,8 +40,8 @@ class ProfileScreen extends StatelessWidget {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as ProfileSuccess).message!),
     builder: (context, state) => switch (state) {
-      ProfileInitial() || ProfileLoading() => const Center(
-        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+      ProfileInitial() || ProfileLoading() => Center(
+        child: CircularProgressIndicator(color: context.lq.deepGreen),
       ),
       ProfileFailure(:final message) => _ErrorView(
         message: message,
@@ -46,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
             context.read<ProfileBloc>().add(const ProfileRequested()),
       ),
       ProfileSuccess(:final profile, :final saving) => RefreshIndicator(
-        color: LifeQuestColors.deepGreen,
+        color: context.lq.deepGreen,
         onRefresh: () => _refresh(context.read<ProfileBloc>()),
         child: _content(context, profile, saving: saving),
       ),
@@ -65,6 +68,7 @@ class ProfileScreen extends StatelessWidget {
     CharacterProfile profile, {
     required bool saving,
   }) {
+    final lq = context.lq;
     final name = profile.displayName ?? userName;
     final bloc = context.read<ProfileBloc>();
 
@@ -110,7 +114,7 @@ class ProfileScreen extends StatelessWidget {
         onPressed: onOpenSettings,
         tooltip: 'Configuración',
         icon: const Icon(Icons.settings_outlined, size: 22),
-        color: LifeQuestColors.ink,
+        color: lq.ink,
         style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
       ),
       children: [
@@ -118,8 +122,8 @@ class ProfileScreen extends StatelessWidget {
         SizedBox(
           height: 3,
           child: saving
-              ? const LinearProgressIndicator(
-                  color: LifeQuestColors.deepGreen,
+              ? LinearProgressIndicator(
+                  color: lq.deepGreen,
                   backgroundColor: Colors.transparent,
                 )
               : null,
@@ -130,55 +134,53 @@ class ProfileScreen extends StatelessWidget {
           profile: profile,
           onEditIdentity: editIdentity,
         ),
-        const SizedBox(height: 8),
-        _row([
-          LifeQuestStat(
-            value: '${profile.hpCurrent} / ${profile.hpMax}',
-            label: profile.isWeakened ? 'Vitalidad · débil' : 'Vitalidad (HP)',
-          ),
-          LifeQuestStat(value: _number(profile.coins), label: 'Monedas'),
-        ]),
-        const SizedBox(height: 8),
-        CompletionRateCard(profile: profile),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
+        HeroStatusCard(profile: profile),
+        const SizedBox(height: 28),
         const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
         const SizedBox(height: 8),
-        _row([
-          ProfileQuickLink(
-            icon: Icons.visibility_outlined,
-            label: 'Vision Board',
-            onTap: () => soon('El Vision Board'),
+        _group(
+          padding: const EdgeInsets.all(6),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final link in [
+                ProfileQuickLink(
+                  icon: Icons.visibility_outlined,
+                  label: 'Vision Board',
+                  onTap: () => soon('El Vision Board'),
+                ),
+                ProfileQuickLink(
+                  icon: Icons.inventory_2_outlined,
+                  label: 'Inventario',
+                  onTap: () => soon('El Inventario'),
+                ),
+                ProfileQuickLink(
+                  icon: Icons.history_rounded,
+                  label: 'Historial',
+                  onTap: () => soon('El Historial'),
+                ),
+                ProfileQuickLink(
+                  icon: Icons.tune_rounded,
+                  label: 'Game Master',
+                  onTap: onOpenSettings,
+                ),
+              ])
+                Expanded(child: link),
+            ],
           ),
-          ProfileQuickLink(
-            icon: Icons.inventory_2_outlined,
-            label: 'Inventario / Logros',
-            onTap: () => soon('El Inventario'),
-          ),
-        ]),
-        const SizedBox(height: 8),
-        _row([
-          ProfileQuickLink(
-            icon: Icons.history_rounded,
-            label: 'Historial',
-            onTap: () => soon('El Historial'),
-          ),
-          ProfileQuickLink(
-            icon: Icons.tune_rounded,
-            label: 'Game Master',
-            onTap: onOpenSettings,
-          ),
-        ]),
-        const SizedBox(height: 24),
+        ),
+        const SizedBox(height: 28),
         LifeQuestSectionHeading(
           'ÁRBOL DE HABILIDADES',
           action: '${profile.skills.length} / ${profile.skillLimit}',
         ),
         if (profile.skills.isEmpty) ...[
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Las skills son tus áreas de vida. Cada misión y hábito que '
             'vincules a una la hará crecer.',
-            style: TextStyle(color: LifeQuestColors.muted, fontSize: 13),
+            style: TextStyle(color: lq.muted, fontSize: 13, height: 1.4),
           ),
         ],
         for (final pair in _pairs([
@@ -186,27 +188,49 @@ class ProfileScreen extends StatelessWidget {
             SkillTile(skill: skill, onTap: () => editSkill(skill)),
           if (profile.canAddSkill) AddSkillTile(onTap: addSkill),
         ])) ...[const SizedBox(height: 8), _row(pair)],
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
         const LifeQuestSectionHeading('CUENTA'),
         const SizedBox(height: 8),
-        AccountActionTile(
-          icon: Icons.notifications_outlined,
-          title: 'Notificaciones',
-          onTap: onOpenNotifications,
-        ),
-        AccountActionTile(
-          icon: Icons.palette_outlined,
-          title: 'Apariencia',
-          onTap: onOpenAppearance,
-        ),
-        AccountActionTile(
-          icon: Icons.help_outline,
-          title: 'Ayuda',
-          onTap: onOpenHelp,
+        _group(
+          child: Column(
+            children: [
+              AccountActionTile(
+                icon: Icons.notifications_outlined,
+                title: 'Notificaciones',
+                onTap: onOpenNotifications,
+              ),
+              Divider(height: 1, indent: 54, color: lq.line),
+              BlocSelector<AppearanceBloc, AppearanceState, ThemePreference>(
+                selector: (state) => state.theme,
+                builder: (context, theme) => AccountActionTile(
+                  icon: Icons.palette_outlined,
+                  title: 'Apariencia',
+                  value: themeLabel(theme),
+                  onTap: onOpenAppearance,
+                ),
+              ),
+              Divider(height: 1, indent: 54, color: lq.line),
+              AccountActionTile(
+                icon: Icons.help_outline,
+                title: 'Ayuda',
+                onTap: onOpenHelp,
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
+
+  /// Superficie que agrupa filas tocables; recorta su efecto de toque.
+  static Widget _group({required Widget child, EdgeInsets? padding}) =>
+      LifeQuestSurface(
+        padding: padding ?? EdgeInsets.zero,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Material(type: MaterialType.transparency, child: child),
+        ),
+      );
 
   static Iterable<List<Widget>> _pairs(List<Widget> tiles) sync* {
     for (var i = 0; i < tiles.length; i += 2) {
@@ -229,12 +253,6 @@ class ProfileScreen extends StatelessWidget {
   );
 }
 
-/// 12450 → "12.450".
-String _number(int value) => value.toString().replaceAllMapped(
-  RegExp(r'\B(?=(\d{3})+(?!\d))'),
-  (_) => '.',
-);
-
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
 
@@ -253,7 +271,7 @@ class _ErrorView extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: LifeQuestColors.ink, fontSize: 15),
+            style: TextStyle(color: context.lq.ink, fontSize: 15),
           ),
           const SizedBox(height: 16),
           FilledButton.icon(
@@ -261,8 +279,8 @@ class _ErrorView extends StatelessWidget {
             icon: const Icon(Icons.refresh_rounded, size: 20),
             label: const Text('Reintentar'),
             style: FilledButton.styleFrom(
-              backgroundColor: LifeQuestColors.deepGreen,
-              foregroundColor: Colors.white,
+              backgroundColor: context.lq.deepGreen,
+              foregroundColor: context.lq.onDeepGreen,
               minimumSize: const Size(48, 48),
             ),
           ),

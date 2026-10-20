@@ -12,9 +12,9 @@ class SkillTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    color: context.lq.surface,
     shape: RoundedRectangleBorder(
-      side: const BorderSide(color: LifeQuestColors.line),
+      side: BorderSide(color: context.lq.line),
       borderRadius: BorderRadius.circular(11),
     ),
     child: InkWell(
@@ -23,7 +23,7 @@ class SkillTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(11),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -31,28 +31,28 @@ class SkillTile extends StatelessWidget {
               skill.name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: LifeQuestColors.ink,
-                fontSize: 14,
+              style: TextStyle(
+                color: context.lq.ink,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               'Nivel ${skill.level}',
-              style: const TextStyle(
-                color: LifeQuestColors.deepGreen,
-                fontSize: 12,
+              style: TextStyle(
+                color: context.lq.deepGreen,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const Spacer(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             LinearProgressIndicator(
               value: skill.progress,
               minHeight: 6,
-              color: LifeQuestColors.green,
-              backgroundColor: LifeQuestColors.softGreen,
+              color: context.lq.green,
+              backgroundColor: context.lq.softGreen,
               borderRadius: const BorderRadius.all(Radius.circular(6)),
               semanticsLabel: 'XP de ${skill.name}',
               semanticsValue: '${(skill.progress * 100).round()} %',
@@ -72,9 +72,9 @@ class AddSkillTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: LifeQuestColors.softGreen,
+    color: context.lq.softGreen,
     shape: RoundedRectangleBorder(
-      side: const BorderSide(color: LifeQuestColors.line),
+      side: BorderSide(color: context.lq.line),
       borderRadius: BorderRadius.circular(11),
     ),
     child: InkWell(
@@ -82,17 +82,17 @@ class AddSkillTile extends StatelessWidget {
       customBorder: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(11),
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_rounded, color: LifeQuestColors.deepGreen),
-            SizedBox(height: 4),
+            Icon(Icons.add_rounded, color: context.lq.deepGreen),
+            const SizedBox(height: 4),
             Text(
               'Añadir skill',
               style: TextStyle(
-                color: LifeQuestColors.deepGreen,
+                color: context.lq.deepGreen,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),

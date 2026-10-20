@@ -14,9 +14,9 @@ class LifeQuestIconTile extends StatelessWidget {
     height: size,
     alignment: Alignment.center,
     decoration: BoxDecoration(
-      color: const Color(0xFFEAF8EE),
+      color: context.lq.softGreen,
       borderRadius: BorderRadius.circular(9),
     ),
-    child: Icon(icon, color: LifeQuestColors.deepGreen, size: size * .55),
+    child: Icon(icon, color: context.lq.deepGreen, size: size * .55),
   );
 }

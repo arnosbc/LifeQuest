@@ -7,6 +7,8 @@ import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
@@ -16,9 +18,16 @@ import 'helpers/mocks.dart';
 
 void main() {
   late MockAuthBloc authBloc;
+  late MockAppearanceBloc appearanceBloc;
 
   setUp(() {
     authBloc = MockAuthBloc();
+    appearanceBloc = MockAppearanceBloc();
+    whenListen(
+      appearanceBloc,
+      const Stream<AppearanceState>.empty(),
+      initialState: const AppearanceSuccess(ThemePreference.system),
+    );
     // El Home pide su bloc a get_it; aquí, uno simulado con datos fijos.
     sl.registerFactory<HomeBloc>(() {
       final homeBloc = MockHomeBloc();
@@ -52,7 +61,9 @@ void main() {
     tester,
   ) async {
     givenAuthState(const AuthUnauthenticated());
-    await tester.pumpWidget(App(authBloc: authBloc));
+    await tester.pumpWidget(
+      App(authBloc: authBloc, appearanceBloc: appearanceBloc),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Continuar'), findsOneWidget);
@@ -77,7 +88,9 @@ void main() {
         User(id: 'u1', email: 'alex@example.com', username: 'Alex'),
       ),
     );
-    await tester.pumpWidget(App(authBloc: authBloc));
+    await tester.pumpWidget(
+      App(authBloc: authBloc, appearanceBloc: appearanceBloc),
+    );
     await tester.pumpAndSettle();
 
     // El saludo cambia con la hora; el nombre sale del perfil.
@@ -111,7 +124,9 @@ void main() {
     givenAuthState(
       const AuthSuccess(User(id: 'u1', email: 'alex@example.com')),
     );
-    await tester.pumpWidget(App(authBloc: authBloc));
+    await tester.pumpWidget(
+      App(authBloc: authBloc, appearanceBloc: appearanceBloc),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Perfil').last);

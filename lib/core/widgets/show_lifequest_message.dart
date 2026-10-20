@@ -9,7 +9,8 @@ void showLifeQuestMessage(BuildContext context, String message) {
       SnackBar(
         content: Text(message),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: LifeQuestColors.ink,
+        // Tinta de Musgo en claro; en oscuro se invierte con su texto.
+        backgroundColor: context.lq.ink,
       ),
     );
 }

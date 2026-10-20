@@ -19,3 +19,8 @@ class ServerFailure extends Failure {
 class NetworkFailure extends Failure {
   const NetworkFailure(super.message);
 }
+
+/// Falló el almacenamiento local del dispositivo.
+class CacheFailure extends Failure {
+  const CacheFailure(super.message);
+}

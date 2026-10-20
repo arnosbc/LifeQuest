@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/theme.dart';
@@ -27,28 +28,40 @@ class AppShell extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: LifeQuestColors.background,
-    body: SafeArea(bottom: false, child: navigationShell),
-    bottomNavigationBar: NavigationBar(
-      height: 66,
-      selectedIndex: navigationShell.currentIndex,
-      // Tocar la pestaña activa vuelve a su pantalla inicial.
-      onDestinationSelected: (index) => navigationShell.goBranch(
-        index,
-        initialLocation: index == navigationShell.currentIndex,
-      ),
-      backgroundColor: Colors.white,
-      indicatorColor: LifeQuestColors.softGreen,
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      destinations: [
-        for (var i = 0; i < _labels.length; i++)
-          NavigationDestination(
-            icon: Icon(_icons[i]),
-            selectedIcon: Icon(_selectedIcons[i]),
-            label: _labels[i],
+  Widget build(BuildContext context) {
+    final lq = context.lq;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    // Iconos de las barras del sistema legibles sobre el fondo de cada tema.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: (dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+          .copyWith(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: lq.surface,
           ),
-      ],
-    ),
-  );
+      child: Scaffold(
+        backgroundColor: lq.background,
+        body: SafeArea(bottom: false, child: navigationShell),
+        bottomNavigationBar: NavigationBar(
+          height: 66,
+          selectedIndex: navigationShell.currentIndex,
+          // Tocar la pestaña activa vuelve a su pantalla inicial.
+          onDestinationSelected: (index) => navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          ),
+          backgroundColor: lq.surface,
+          indicatorColor: lq.softGreen,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: [
+            for (var i = 0; i < _labels.length; i++)
+              NavigationDestination(
+                icon: Icon(_icons[i]),
+                selectedIcon: Icon(_selectedIcons[i]),
+                label: _labels[i],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }

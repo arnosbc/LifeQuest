@@ -25,8 +25,8 @@ class LifeQuestPage extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: LifeQuestColors.ink,
+              style: TextStyle(
+                color: context.lq.ink,
                 fontSize: 21,
                 fontWeight: FontWeight.w800,
               ),
@@ -36,10 +36,7 @@ class LifeQuestPage extends StatelessWidget {
         ],
       ),
       const SizedBox(height: 3),
-      Text(
-        subtitle,
-        style: const TextStyle(color: LifeQuestColors.muted, fontSize: 11),
-      ),
+      Text(subtitle, style: TextStyle(color: context.lq.muted, fontSize: 13)),
       const SizedBox(height: 17),
       ...children,
     ],

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
 
@@ -12,10 +14,17 @@ import '../../profile_fixtures.dart';
 
 void main() {
   late MockProfileBloc bloc;
+  late MockAppearanceBloc appearanceBloc;
   late int settingsOpened;
 
   setUp(() {
     bloc = MockProfileBloc();
+    appearanceBloc = MockAppearanceBloc();
+    whenListen(
+      appearanceBloc,
+      const Stream<AppearanceState>.empty(),
+      initialState: const AppearanceSuccess(ThemePreference.dark),
+    );
     settingsOpened = 0;
   });
 
@@ -37,8 +46,11 @@ void main() {
             textScaler: TextScaler.linear(textScale),
           ),
           child: Scaffold(
-            body: BlocProvider<ProfileBloc>.value(
-              value: bloc,
+            body: MultiBlocProvider(
+              providers: [
+                BlocProvider<ProfileBloc>.value(value: bloc),
+                BlocProvider<AppearanceBloc>.value(value: appearanceBloc),
+              ],
               child: ProfileScreen(
                 userName: 'Alex',
                 onOpenNotifications: () {},
@@ -63,6 +75,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('80 / 100'), findsOneWidget);
+    expect(find.text('Oscuro'), findsOneWidget);
     expect(find.text('2.450'), findsOneWidget);
     expect(find.text('76 %'), findsOneWidget);
     expect(find.text('38 de 50 misiones cumplidas'), findsOneWidget);

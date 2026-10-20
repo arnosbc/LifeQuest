@@ -22,8 +22,8 @@ class LifeQuestSectionHeading extends StatelessWidget {
           header: true,
           child: Text(
             title,
-            style: const TextStyle(
-              color: LifeQuestColors.muted,
+            style: TextStyle(
+              color: context.lq.muted,
               fontSize: 12,
               letterSpacing: .6,
               fontWeight: FontWeight.w800,
@@ -35,8 +35,8 @@ class LifeQuestSectionHeading extends StatelessWidget {
         TextButton(
           onPressed: onTap,
           style: TextButton.styleFrom(
-            foregroundColor: LifeQuestColors.deepGreen,
-            disabledForegroundColor: LifeQuestColors.deepGreen,
+            foregroundColor: context.lq.deepGreen,
+            disabledForegroundColor: context.lq.deepGreen,
             minimumSize: const Size(48, 40),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             textStyle: const TextStyle(

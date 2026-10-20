@@ -1,0 +1,11 @@
+{
+  "name": "lifequest-sql-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node 001_home.test.mjs && node 002_profile.test.mjs && node 003_007.test.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.2.17"
+  }
+}

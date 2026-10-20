@@ -12,7 +12,7 @@ class LifeQuestStat extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
     decoration: BoxDecoration(
-      color: const Color(0xFFF0FAF3),
+      color: context.lq.softGreen,
       borderRadius: BorderRadius.circular(8),
     ),
     child: Column(
@@ -20,18 +20,18 @@ class LifeQuestStat extends StatelessWidget {
         Text(
           value,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: LifeQuestColors.ink,
+          style: TextStyle(
+            color: context.lq.ink,
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            fontFeatures: [FontFeature.tabularFigures()],
+            fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: LifeQuestColors.muted, fontSize: 12),
+          style: TextStyle(color: context.lq.muted, fontSize: 12),
         ),
       ],
     ),

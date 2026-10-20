@@ -13,13 +13,18 @@ import 'package:proyecto_movil/features/home/domain/repositories/home_repository
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/profile/data/datasources/appearance_local_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:proyecto_movil/features/profile/domain/repositories/appearance_repository.dart';
 import 'package:proyecto_movil/features/profile/domain/repositories/profile_repository.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/create_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/delete_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/get_character_profile.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
@@ -63,3 +68,15 @@ class MockCreateSkill extends Mock implements CreateSkill {}
 class MockRenameSkill extends Mock implements RenameSkill {}
 
 class MockDeleteSkill extends Mock implements DeleteSkill {}
+
+class MockAppearanceBloc extends MockBloc<AppearanceEvent, AppearanceState>
+    implements AppearanceBloc {}
+
+class MockAppearanceRepository extends Mock implements AppearanceRepository {}
+
+class MockAppearanceLocalDataSource extends Mock
+    implements AppearanceLocalDataSource {}
+
+class MockGetThemePreference extends Mock implements GetThemePreference {}
+
+class MockSaveThemePreference extends Mock implements SaveThemePreference {}

@@ -15,6 +15,8 @@ abstract final class LifeQuestColors {
   static const outline = Color(0xFF6F8A78);
   // Errores de validación: ≥4.5:1 sobre background.
   static const error = Color(0xFFB23A3A);
+  // Pérdida de HP y malos hábitos: solo relleno o iconos, nunca texto pequeño.
+  static const warning = Color(0xFFE67777);
 }
 
 /// Los mismos roles de color, con valores para tema claro y oscuro.
@@ -32,6 +34,7 @@ class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
     required this.softGreen,
     required this.outline,
     required this.error,
+    required this.warning,
   });
 
   final Color green;
@@ -45,6 +48,7 @@ class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
   final Color softGreen;
   final Color outline;
   final Color error;
+  final Color warning;
 
   static const light = LifeQuestPalette(
     green: LifeQuestColors.green,
@@ -58,6 +62,7 @@ class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
     softGreen: LifeQuestColors.softGreen,
     outline: LifeQuestColors.outline,
     error: LifeQuestColors.error,
+    warning: LifeQuestColors.warning,
   );
 
   // Mismos contrastes AA que el tema claro, sobre background y surface oscuros.
@@ -73,6 +78,7 @@ class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
     softGreen: Color(0xFF1D3326),
     outline: Color(0xFF7E9A88),
     error: Color(0xFFF28B82),
+    warning: Color(0xFFE8938C),
   );
 
   @override
@@ -94,6 +100,7 @@ class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
       softGreen: c(softGreen, other.softGreen),
       outline: c(outline, other.outline),
       error: c(error, other.error),
+      warning: c(warning, other.warning),
     );
   }
 }
@@ -108,11 +115,31 @@ abstract final class LifeQuestTheme {
   static ThemeData _build(Brightness brightness, LifeQuestPalette p) =>
       ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: LifeQuestColors.green,
-          brightness: brightness,
-        ),
+        // Los roles de Material apuntan a la paleta, así los componentes sin
+        // color explícito (hojas, diálogos, avisos, campos) siguen el tema.
+        colorScheme:
+            ColorScheme.fromSeed(
+              seedColor: LifeQuestColors.green,
+              brightness: brightness,
+            ).copyWith(
+              primary: p.deepGreen,
+              onPrimary: p.onDeepGreen,
+              secondaryContainer: p.softGreen,
+              onSecondaryContainer: p.deepGreen,
+              surface: p.surface,
+              onSurface: p.ink,
+              onSurfaceVariant: p.muted,
+              surfaceContainerLow: p.surface,
+              surfaceContainer: p.surface,
+              surfaceContainerHigh: p.surface,
+              outline: p.outline,
+              outlineVariant: p.line,
+              error: p.error,
+              inverseSurface: p.ink,
+              onInverseSurface: p.background,
+            ),
         scaffoldBackgroundColor: p.background,
+        dividerColor: p.line,
         extensions: [p],
       );
 

@@ -5,12 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:proyecto_movil/app/config/app_router.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 
-/// Raíz de la app: provee la sesión (AuthBloc) por encima del router.
+/// Raíz de la app: provee la sesión (AuthBloc) y el tema (AppearanceBloc) por
+/// encima del router.
 class App extends StatefulWidget {
-  const App({super.key, required this.authBloc});
+  const App({super.key, required this.authBloc, required this.appearanceBloc});
 
   final AuthBloc authBloc;
+  final AppearanceBloc appearanceBloc;
 
   @override
   State<App> createState() => _AppState();
@@ -26,15 +30,25 @@ class _AppState extends State<App> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocProvider.value(
-    value: widget.authBloc,
-    child: MaterialApp.router(
-      title: 'LifeQuest',
-      debugShowCheckedModeBanner: false,
-      theme: LifeQuestTheme.light,
-      darkTheme: LifeQuestTheme.dark,
-      themeMode: ThemeMode.system,
-      routerConfig: _router,
+  Widget build(BuildContext context) => MultiBlocProvider(
+    providers: [
+      BlocProvider.value(value: widget.authBloc),
+      BlocProvider.value(value: widget.appearanceBloc),
+    ],
+    child: BlocSelector<AppearanceBloc, AppearanceState, ThemePreference>(
+      selector: (state) => state.theme,
+      builder: (context, theme) => MaterialApp.router(
+        title: 'LifeQuest',
+        debugShowCheckedModeBanner: false,
+        theme: LifeQuestTheme.light,
+        darkTheme: LifeQuestTheme.dark,
+        themeMode: switch (theme) {
+          ThemePreference.light => ThemeMode.light,
+          ThemePreference.dark => ThemeMode.dark,
+          ThemePreference.system => ThemeMode.system,
+        },
+        routerConfig: _router,
+      ),
     ),
   );
 }
