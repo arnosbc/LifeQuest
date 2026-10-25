@@ -17,6 +17,22 @@ void main() {
     }).toEntity();
 
     expect(entity, newProfile);
+    expect(entity.treasury, 0);
+    expect(entity.activeTitle, isNull);
+    expect(entity.earnedTitles, isEmpty);
+  });
+
+  test('un título sin nombre se ignora', () {
+    final entity = CharacterProfileModel.fromJson(const {
+      'active_title': {'id': 't1', 'name': ' '},
+      'titles': [
+        {'id': 't1', 'name': ''},
+        {'name': 'Sin id'},
+      ],
+    }).toEntity();
+
+    expect(entity.activeTitle, isNull);
+    expect(entity.earnedTitles, isEmpty);
   });
 
   test('tasa de finalización y espacio para skills', () {

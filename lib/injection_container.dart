@@ -27,6 +27,7 @@ import 'package:proyecto_movil/features/profile/domain/usecases/delete_skill.dar
 import 'package:proyecto_movil/features/profile/domain/usecases/get_character_profile.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/set_active_title.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
@@ -85,11 +86,13 @@ Future<void> initDependencies() async {
       createSkill: sl(),
       renameSkill: sl(),
       deleteSkill: sl(),
+      setActiveTitle: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetCharacterProfile(sl()));
   sl.registerLazySingleton(() => UpdateIdentity(sl()));
   sl.registerLazySingleton(() => CreateSkill(sl()));
+  sl.registerLazySingleton(() => SetActiveTitle(sl()));
   sl.registerLazySingleton(() => RenameSkill(sl()));
   sl.registerLazySingleton(() => DeleteSkill(sl()));
   sl.registerLazySingleton<ProfileRepository>(

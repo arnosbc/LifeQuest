@@ -25,6 +25,18 @@ class Skill extends Equatable {
   List<Object?> get props => [id, name, level, currentXp, xpToNextLevel];
 }
 
+/// Título de prestigio: se gana (logros, nivel, Tesoro), nunca se compra.
+class PrestigeTitle extends Equatable {
+  const PrestigeTitle({required this.id, required this.name, this.description});
+
+  final String id;
+  final String name;
+  final String? description;
+
+  @override
+  List<Object?> get props => [id, name, description];
+}
+
 /// Perfil del Personaje: identidad, progreso, vitalidad y árbol de skills.
 class CharacterProfile extends Equatable {
   const CharacterProfile({
@@ -39,6 +51,9 @@ class CharacterProfile extends Equatable {
     required this.questsFailed,
     required this.skills,
     required this.skillLimit,
+    this.treasury = 0,
+    this.activeTitle,
+    this.earnedTitles = const [],
     this.displayName,
     this.characterClass,
     this.identityStatement,
@@ -53,6 +68,9 @@ class CharacterProfile extends Equatable {
   final int currentXp;
   final int xpToNextLevel;
   final int coins;
+
+  /// Tesoro del reino: Monedas que no cupieron en la bolsa. No se gasta.
+  final int treasury;
   final int hpCurrent;
   final int hpMax;
   final bool isWeakened;
@@ -62,6 +80,12 @@ class CharacterProfile extends Equatable {
 
   /// Máximo de skills (6 por defecto, ampliable en Game Master).
   final int skillLimit;
+
+  /// Título que el jugador eligió lucir; null si ninguno.
+  final PrestigeTitle? activeTitle;
+
+  /// Títulos ganados, en orden de obtención.
+  final List<PrestigeTitle> earnedTitles;
 
   double get xpProgress =>
       xpToNextLevel <= 0 ? 0 : (currentXp / xpToNextLevel).clamp(0, 1);
@@ -83,6 +107,7 @@ class CharacterProfile extends Equatable {
     currentXp,
     xpToNextLevel,
     coins,
+    treasury,
     hpCurrent,
     hpMax,
     isWeakened,
@@ -90,5 +115,7 @@ class CharacterProfile extends Equatable {
     questsFailed,
     skills,
     skillLimit,
+    activeTitle,
+    earnedTitles,
   ];
 }

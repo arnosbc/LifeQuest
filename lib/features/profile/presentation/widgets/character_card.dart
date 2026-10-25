@@ -11,11 +11,13 @@ class CharacterCard extends StatelessWidget {
     required this.name,
     required this.profile,
     required this.onEditIdentity,
+    required this.onChooseTitle,
   });
 
   final String name;
   final CharacterProfile profile;
   final VoidCallback onEditIdentity;
+  final VoidCallback onChooseTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +61,19 @@ class CharacterCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    if (p.activeTitle case final title?) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        title.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: lq.muted,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 4),
                     Text(
                       p.characterClass == null
@@ -82,7 +97,21 @@ class CharacterCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          TextButton.icon(
+            onPressed: onChooseTitle,
+            icon: const Icon(Icons.workspace_premium_outlined, size: 18),
+            label: const Text('Elegir título'),
+            style: TextButton.styleFrom(
+              foregroundColor: lq.deepGreen,
+              minimumSize: const Size(48, 48),
+              padding: EdgeInsets.zero,
+              textStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: p.identityStatement == null

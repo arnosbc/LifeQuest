@@ -132,7 +132,8 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
                   onOpenNotifications: () =>
                       context.go(RoutePaths.notifications),
                   onOpenHelp: () => context.go(RoutePaths.help),
-                  onOpenAppearance: () => context.go(RoutePaths.appearance),
+                  onOpenJournal: () => context.push(RoutePaths.journal),
+                  onOpenMarketplace: () => context.push(RoutePaths.marketplace),
                   onOpenSettings: () => context.push(RoutePaths.settings),
                 ),
               ),
@@ -146,11 +147,6 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
                   path: 'help',
                   builder: (context, state) =>
                       HelpScreen(onBack: () => context.pop()),
-                ),
-                GoRoute(
-                  path: 'appearance',
-                  builder: (context, state) =>
-                      AppearanceScreen(onBack: () => context.pop()),
                 ),
               ],
             ),
@@ -166,8 +162,17 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
           onBack: () => context.pop(),
           onSignOut: () =>
               context.read<AuthBloc>().add(const LogoutRequested()),
+          onOpenAppearance: () => context.push(RoutePaths.appearance),
         ),
       ),
+      routes: [
+        // Sigue el tema (está en _themedPaths), fuera de lightOnly.
+        GoRoute(
+          path: 'appearance',
+          builder: (context, state) =>
+              AppearanceScreen(onBack: () => context.pop()),
+        ),
+      ],
     ),
     _section(RoutePaths.rpgenie, const RpgenieScreen()),
     _section(RoutePaths.stage, const StageScreen()),

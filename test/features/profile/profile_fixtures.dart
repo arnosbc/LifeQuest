@@ -9,6 +9,7 @@ const profileJson = <String, dynamic>{
   'current_xp': 7850,
   'xp_to_next_level': 12000,
   'coins': 2450,
+  'treasury': 12500,
   'hp_current': 80,
   'hp_max': 100,
   'is_weakened': false,
@@ -31,7 +32,34 @@ const profileJson = <String, dynamic>{
       'xp_to_next_level': 100,
     },
   ],
+  'active_title': {
+    'id': 't1',
+    'name': 'Guardián del Huerto',
+    'description': 'Cuidaste tus hábitos 30 días.',
+  },
+  'titles': [
+    {
+      'id': 't1',
+      'name': 'Guardián del Huerto',
+      'description': 'Cuidaste tus hábitos 30 días.',
+      'earned_at': '2026-10-01T10:00:00Z',
+    },
+    {
+      'id': 't2',
+      'name': 'Explorador',
+      'description': null,
+      'earned_at': '2026-10-20T10:00:00Z',
+    },
+  ],
 };
+
+const guardianTitle = PrestigeTitle(
+  id: 't1',
+  name: 'Guardián del Huerto',
+  description: 'Cuidaste tus hábitos 30 días.',
+);
+
+const explorerTitle = PrestigeTitle(id: 't2', name: 'Explorador');
 
 const englishSkill = Skill(
   id: 's1',
@@ -49,6 +77,7 @@ const profile = CharacterProfile(
   currentXp: 7850,
   xpToNextLevel: 12000,
   coins: 2450,
+  treasury: 12500,
   hpCurrent: 80,
   hpMax: 100,
   isWeakened: false,
@@ -65,6 +94,8 @@ const profile = CharacterProfile(
       xpToNextLevel: 100,
     ),
   ],
+  activeTitle: guardianTitle,
+  earnedTitles: [guardianTitle, explorerTitle],
 );
 
 /// Héroe recién registrado.

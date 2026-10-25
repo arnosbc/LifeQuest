@@ -21,6 +21,9 @@ abstract class ProfileRemoteDataSource {
   Future<void> renameSkill({required String skillId, required String name});
 
   Future<void> deleteSkill(String skillId);
+
+  /// RPC `set_active_title` (009_profile_titles.sql); null quita el título.
+  Future<void> setActiveTitle(String? titleId);
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -73,6 +76,12 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<void> deleteSkill(String skillId) =>
       _guard(() => _client.from('skills').delete().eq('id', skillId));
+
+  @override
+  Future<void> setActiveTitle(String? titleId) => _guard(
+    () =>
+        _client.rpc<void>('set_active_title', params: {'p_title_id': titleId}),
+  );
 
   String get _userId =>
       _client.auth.currentUser?.id ??

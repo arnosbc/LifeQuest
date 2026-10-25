@@ -12,6 +12,7 @@ class SettingsScreen extends StatefulWidget {
     required this.userName,
     required this.onBack,
     required this.onSignOut,
+    required this.onOpenAppearance,
   });
 
   final String userName;
@@ -20,6 +21,9 @@ class SettingsScreen extends StatefulWidget {
   /// Cierra la sesión. Lo provee la app (la sesión vive en auth); al cerrarse,
   /// el router vuelve al login.
   final VoidCallback onSignOut;
+
+  /// Abre la pantalla de Apariencia (modo claro, oscuro o del sistema).
+  final VoidCallback onOpenAppearance;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -43,6 +47,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       const SizedBox(height: 11),
       GameMasterCard(
         onOpenNotificationPreferences: _showNotificationPreferences,
+        onOpenAppearance: widget.onOpenAppearance,
       ),
       const SizedBox(height: 11),
       const SignOutCard(),

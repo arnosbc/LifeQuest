@@ -52,3 +52,13 @@ class ProfileSkillDeleted extends ProfileEvent {
   @override
   List<Object?> get props => [skillId];
 }
+
+/// Luce un título ganado; null no luce ninguno.
+class ProfileActiveTitleChanged extends ProfileEvent {
+  const ProfileActiveTitleChanged(this.titleId);
+
+  final String? titleId;
+
+  @override
+  List<Object?> get props => [titleId];
+}

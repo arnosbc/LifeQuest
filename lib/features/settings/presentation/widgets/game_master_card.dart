@@ -7,9 +7,11 @@ class GameMasterCard extends StatefulWidget {
   const GameMasterCard({
     super.key,
     required this.onOpenNotificationPreferences,
+    required this.onOpenAppearance,
   });
 
   final VoidCallback onOpenNotificationPreferences;
+  final VoidCallback onOpenAppearance;
 
   @override
   State<GameMasterCard> createState() => _GameMasterCardState();
@@ -73,6 +75,18 @@ class _GameMasterCardState extends State<GameMasterCard> {
           title: 'Preferencias de notificaciones',
           description: 'Ajusta recordatorios, logros y alertas del juego.',
           onTap: widget.onOpenNotificationPreferences,
+        ),
+        const SizedBox(height: 7),
+        const Text(
+          'Apariencia',
+          style: TextStyle(color: LifeQuestColors.muted, fontSize: 8),
+        ),
+        const SizedBox(height: 4),
+        SettingLink(
+          icon: Icons.palette_outlined,
+          title: 'Apariencia',
+          description: 'Modo claro, oscuro o del sistema.',
+          onTap: widget.onOpenAppearance,
         ),
       ],
     ),

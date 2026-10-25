@@ -22,4 +22,8 @@ abstract class ProfileRepository {
 
   /// La skill se quita de metas, proyectos, tareas y hábitos que la usen.
   Future<Either<Failure, Unit>> deleteSkill(String skillId);
+
+  /// Luce un título ganado; [titleId] null quita el título. El servidor
+  /// rechaza los que el jugador no ganó.
+  Future<Either<Failure, Unit>> setActiveTitle(String? titleId);
 }

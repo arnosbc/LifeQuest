@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 
 /// Lo que el usuario decide en el formulario de una skill.
 sealed class SkillSheetResult {
@@ -43,6 +44,77 @@ Future<SkillSheetResult?> showSkillSheet(
   showDragHandle: true,
   builder: (_) => _SkillForm(name: name),
 );
+
+/// El título que el jugador eligió lucir ([titleId] null: ninguno).
+class TitleChosen {
+  const TitleChosen(this.titleId);
+
+  final String? titleId;
+}
+
+/// Elige entre los títulos ganados (o ninguno). Null si se cierra sin elegir.
+Future<TitleChosen?> showTitleSheet(
+  BuildContext context, {
+  required List<PrestigeTitle> earned,
+  PrestigeTitle? active,
+}) => showModalBottomSheet<TitleChosen>(
+  context: context,
+  isScrollControlled: true,
+  showDragHandle: true,
+  builder: (_) => _TitlePicker(earned: earned, active: active),
+);
+
+class _TitlePicker extends StatelessWidget {
+  const _TitlePicker({required this.earned, this.active});
+
+  final List<PrestigeTitle> earned;
+  final PrestigeTitle? active;
+
+  @override
+  Widget build(BuildContext context) {
+    final lq = context.lq;
+    Widget option(String name, String? description, String? id) {
+      final selected = active?.id == id;
+      return Semantics(
+        selected: selected,
+        button: true,
+        child: ListTile(
+          minVerticalPadding: 12,
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            name,
+            style: TextStyle(color: lq.ink, fontWeight: FontWeight.w700),
+          ),
+          subtitle: description == null
+              ? null
+              : Text(description, style: TextStyle(color: lq.muted)),
+          trailing: selected
+              ? Icon(Icons.check_rounded, color: lq.deepGreen)
+              : null,
+          onTap: () => Navigator.pop(context, TitleChosen(id)),
+        ),
+      );
+    }
+
+    return _SheetFrame(
+      title: 'Tu título',
+      child: earned.isEmpty
+          ? Text(
+              'Aún no tienes títulos. Se ganan con logros, subiendo de nivel '
+              'y llenando tu Tesoro del reino.',
+              style: TextStyle(color: lq.muted, fontSize: 15, height: 1.4),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                option('Sin título', null, null),
+                for (final title in earned)
+                  option(title.name, title.description, title.id),
+              ],
+            ),
+    );
+  }
+}
 
 class _IdentityForm extends StatefulWidget {
   const _IdentityForm({

@@ -48,6 +48,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
     return unit;
   });
 
+  @override
+  Future<Either<Failure, Unit>> setActiveTitle(String? titleId) =>
+      _run(() async {
+        await _remote.setActiveTitle(titleId);
+        return unit;
+      });
+
   Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
     try {
       return Right(await action());
@@ -75,6 +82,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
         // CHECK de longitud (002_profile.sql).
         (_, '23514') =>
           'Usa un nombre de 1 a 40 caracteres y una identidad de hasta 280.',
+        // check_active_title (004_structure.sql).
+        ('title_not_earned', _) =>
+          'Ese título todavía no es tuyo. Los títulos se ganan con logros, '
+              'nivel y Tesoro.',
         ('profile_not_found', _) =>
           'Estamos preparando tu personaje. Desliza para actualizar en un '
               'momento.',

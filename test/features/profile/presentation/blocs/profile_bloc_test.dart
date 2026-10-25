@@ -19,6 +19,7 @@ void main() {
   late MockCreateSkill createSkill;
   late MockRenameSkill renameSkill;
   late MockDeleteSkill deleteSkill;
+  late MockSetActiveTitle setActiveTitle;
   const failure = ServerFailure('Algo salió mal.');
 
   setUpAll(() {
@@ -33,6 +34,7 @@ void main() {
     createSkill = MockCreateSkill();
     renameSkill = MockRenameSkill();
     deleteSkill = MockDeleteSkill();
+    setActiveTitle = MockSetActiveTitle();
   });
 
   ProfileBloc build() => ProfileBloc(
@@ -41,6 +43,7 @@ void main() {
     createSkill: createSkill,
     renameSkill: renameSkill,
     deleteSkill: deleteSkill,
+    setActiveTitle: setActiveTitle,
   );
 
   void givenProfile(Either<Failure, CharacterProfile> result) =>
@@ -141,6 +144,56 @@ void main() {
           const RenameSkillParams(skillId: 's1', name: 'Inglés C1'),
         ),
       ).called(1),
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'elegir un título lo confirma con su nombre',
+      setUp: () {
+        when(
+          () => setActiveTitle('t2'),
+        ).thenAnswer((_) async => const Right(unit));
+        givenProfile(const Right(profile));
+      },
+      build: build,
+      seed: () => const ProfileSuccess(profile),
+      act: (bloc) => bloc.add(const ProfileActiveTitleChanged('t2')),
+      expect: () => [
+        const ProfileSuccess(profile, saving: true),
+        const ProfileSuccess(profile, message: 'Ahora luces «Explorador».'),
+      ],
+      verify: (_) => verify(() => setActiveTitle('t2')).called(1),
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'quitar el título lo confirma',
+      setUp: () {
+        when(
+          () => setActiveTitle(null),
+        ).thenAnswer((_) async => const Right(unit));
+        givenProfile(const Right(profile));
+      },
+      build: build,
+      seed: () => const ProfileSuccess(profile),
+      act: (bloc) => bloc.add(const ProfileActiveTitleChanged(null)),
+      expect: () => [
+        const ProfileSuccess(profile, saving: true),
+        const ProfileSuccess(profile, message: 'Ya no muestras ningún título.'),
+      ],
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'si el título se rechaza, conserva el anterior',
+      setUp: () => when(
+        () => setActiveTitle(any()),
+      ).thenAnswer((_) async => const Left(failure)),
+      build: build,
+      seed: () => const ProfileSuccess(profile),
+      act: (bloc) => bloc.add(const ProfileActiveTitleChanged('t9')),
+      expect: () => [
+        const ProfileSuccess(profile, saving: true),
+        ProfileSuccess(profile, message: failure.message),
+      ],
+      verify: (_) => verifyNever(() => getProfile(any())),
     );
 
     blocTest<ProfileBloc, ProfileState>(

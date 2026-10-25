@@ -15,10 +15,12 @@ abstract final class RoutePaths {
   // Subpáginas de perfil (dentro de la pestaña Perfil).
   static const notifications = '/profile/notifications';
   static const help = '/profile/help';
-  static const appearance = '/profile/appearance';
 
   // Pantallas completas fuera de la barra inferior (RF-114).
   static const settings = '/settings';
+
+  // Subpáginas de Configuración.
+  static const appearance = '/settings/appearance';
   static const rpgenie = '/rpgenie';
   static const stage = '/stage';
   static const journal = '/journal';

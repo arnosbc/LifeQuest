@@ -4,7 +4,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_format.dart';
 
-/// Vitalidad, Monedas y tasa de finalización en una sola lista.
+/// Vitalidad, Monedas, Tesoro del reino y tasa de finalización en una sola lista.
 class HeroStatusCard extends StatelessWidget {
   const HeroStatusCard({super.key, required this.profile});
 
@@ -46,7 +46,8 @@ class HeroStatusCard extends StatelessWidget {
                 if (p.isWeakened) ...[
                   const SizedBox(height: 6),
                   Text(
-                    'Vitalidad baja: ganas un 10 % menos hasta recuperarte.',
+                    'Vitalidad baja: ganas un 25 % menos de XP hasta '
+                    'recuperarte. Tus Monedas no cambian.',
                     style: TextStyle(color: lq.muted, fontSize: 13),
                   ),
                 ],
@@ -59,6 +60,16 @@ class HeroStatusCard extends StatelessWidget {
             label: 'Monedas',
             value: formatNumber(p.coins),
             detail: _detail(context, 'Para canjear en el Marketplace'),
+          ),
+          divider,
+          _StatusRow(
+            icon: Icons.account_balance_outlined,
+            label: 'Tesoro del reino',
+            value: formatNumber(p.treasury),
+            detail: _detail(
+              context,
+              'Lo que no cabe en tu bolsa. No se gasta: es tu prestigio.',
+            ),
           ),
           divider,
           _StatusRow(

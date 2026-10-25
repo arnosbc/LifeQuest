@@ -23,6 +23,7 @@ import 'package:proyecto_movil/features/profile/domain/usecases/get_character_pr
 import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_preference.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/set_active_title.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
@@ -68,6 +69,8 @@ class MockCreateSkill extends Mock implements CreateSkill {}
 class MockRenameSkill extends Mock implements RenameSkill {}
 
 class MockDeleteSkill extends Mock implements DeleteSkill {}
+
+class MockSetActiveTitle extends Mock implements SetActiveTitle {}
 
 class MockAppearanceBloc extends MockBloc<AppearanceEvent, AppearanceState>
     implements AppearanceBloc {}

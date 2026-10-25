@@ -1,7 +1,7 @@
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 
 /// Respuesta JSON de la RPC `profile_overview`
-/// (supabase/migrations/002_profile.sql).
+/// (supabase/migrations/002_profile.sql, ampliada en 009_profile_titles.sql).
 class CharacterProfileModel {
   const CharacterProfileModel(this.json);
 
@@ -13,6 +13,8 @@ class CharacterProfileModel {
   CharacterProfile toEntity() {
     final skills = (json['skills'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
+    final titles = (json['titles'] as List<dynamic>? ?? const [])
+        .cast<Map<String, dynamic>>();
     return CharacterProfile(
       displayName: _text(json['display_name']),
       characterClass: _text(json['character_class']),
@@ -22,6 +24,7 @@ class CharacterProfileModel {
       currentXp: _int(json['current_xp']),
       xpToNextLevel: _int(json['xp_to_next_level'], 100),
       coins: _int(json['coins']),
+      treasury: _int(json['treasury']),
       hpCurrent: _int(json['hp_current'], 100),
       hpMax: _int(json['hp_max'], 100),
       isWeakened: json['is_weakened'] as bool? ?? false,
@@ -38,6 +41,19 @@ class CharacterProfileModel {
             xpToNextLevel: _int(skill['xp_to_next_level'], 100),
           ),
       ],
+      activeTitle: _title(json['active_title'] as Map<String, dynamic>?),
+      earnedTitles: [for (final title in titles) ?_title(title)],
+    );
+  }
+
+  static PrestigeTitle? _title(Map<String, dynamic>? json) {
+    final id = json?['id'];
+    final name = _text(json?['name']);
+    if (id is! String || name == null) return null;
+    return PrestigeTitle(
+      id: id,
+      name: name,
+      description: _text(json!['description']),
     );
   }
 

@@ -252,7 +252,7 @@ Prioriza la "Misión actual" así: cualquier candidata en estado Crítico → ur
   3. actualizan `character_stats` y la `skill`,
   4. escriben la fila en `quest_log_entries`.
 - Analogía: como en un juego en línea, el jugador **ve** su oro, pero solo el servidor puede **cambiarlo**.
-- Las migraciones `003_security.sql` a `007_daily.sql` (`supabase/migrations/`) cierran la escritura del cliente en las tablas económicas y dan las RPC del juego (`complete_task`, `complete_project`, `complete_habit`, `register_bad_habit`, `claim_daily_chest`, `purchase`, `buy_black_market`, `use_recovery_pass`, `upgrade_refuge`, `request_npc_mission`, `activate_elixir`, `complete_dungeon_cycle`). Todo pago pasa por `_award`; los números viven en `game_rules`. Plan y estado: `docs/plan-cambios-esquema.md`. ⚠️ Aplicarlas en Supabase en orden.
+- Las migraciones `003_security.sql` a `008_fix_exploits.sql` (`supabase/migrations/`) cierran la escritura del cliente en las tablas económicas y dan las RPC del juego (`complete_task`, `complete_project`, `complete_habit`, `register_bad_habit`, `claim_daily_chest`, `purchase`, `buy_black_market`, `use_recovery_pass`, `upgrade_refuge`, `request_npc_mission`, `activate_elixir`, `complete_dungeon_cycle`). Todo pago pasa por `_award`; los números viven en `game_rules`. `audit_double_rewards()` (solo `service_role`) lista cobros repetidos sin corregirlos. Plan y estado: `docs/plan-cambios-esquema.md`. ⚠️ Aplicarlas en Supabase en orden.
 
 ### Frontend (Flutter)
 - Antes de tocar UI, lee la sección **§14 Diseño**.
@@ -300,7 +300,7 @@ test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktai
 
 **Desviaciones acordadas:** sin Dio ni `core/network` (el SDK de Supabase es el cliente HTTP); los widgets compartidos viven en `core/widgets/`.
 
-**Deuda de arquitectura:** `auth`, `home` y la pantalla principal de `profile` cumplen las 3 capas. `home` lee la RPC `home_dashboard` (`supabase/migrations/001_home.sql`); `profile` lee `profile_overview` y edita identidad y skills (`002_profile.sql`). Siguen fijos: Accesos rápidos y Explora el reino del Home, y las subpáginas Notificaciones y Ayuda. Apariencia guarda el tema (claro/oscuro/sistema) con `AppearanceBloc` global y `shared_preferences`. Las migraciones se prueban con `supabase/tests` (`npm install && npm test`). Misiones, hábitos, dungeon, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`. Perfil y Apariencia ya usan `context.lq`; al migrar otra pestaña, añade su ruta a `_themedPaths` en `app_router.dart`.
+**Deuda de arquitectura:** `auth`, `home` y la pantalla principal de `profile` cumplen las 3 capas. `home` lee la RPC `home_dashboard` (`supabase/migrations/001_home.sql`); `profile` lee `profile_overview` y edita identidad y skills (`002_profile.sql`); `009_profile_titles.sql` le añade el Tesoro, el título activo y los títulos ganados, y la RPC `set_active_title` para elegirlo. Siguen fijos: Accesos rápidos y Explora el reino del Home, y las subpáginas Notificaciones y Ayuda. Apariencia se abre desde Configuración (`/settings/appearance`) y guarda el tema (claro/oscuro/sistema) con `AppearanceBloc` global y `shared_preferences`. Las migraciones se prueban con `supabase/tests` (`npm install && npm test`). Misiones, hábitos, dungeon, ajustes, objetivos, diario, marketplace, stage, taverna y RPGenie tienen solo `presentation/` y guardan estado y datos de ejemplo en las screens (incumplen la regla 8). Cada una se migra con el flujo de arriba al conectarla a sus tablas. Las rutas de esas pantallas se fuerzan a tema claro (`LifeQuestTheme.lightOnly`) hasta que usen `context.lq`. Perfil y Apariencia ya usan `context.lq`; al migrar otra pestaña, añade su ruta a `_themedPaths` en `app_router.dart`.
 
 ### Calidad
 - Prueba los cambios de SQL contra un Postgres real (con un stub de `auth.users`, `auth.uid()` y `auth.role()` si no es Supabase).
@@ -395,5 +395,6 @@ Cuando existan, esta sección se reescribe para apuntar a ellos.
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+shell commands, and other important information, read the current plan:
+`specs/004-profile-update/plan.md`
 <!-- SPECKIT END -->

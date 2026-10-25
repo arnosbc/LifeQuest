@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
-import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
-import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/account_action_tile.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/character_card.dart';
@@ -13,17 +11,16 @@ import 'package:proyecto_movil/features/profile/presentation/widgets/hero_status
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_quick_link.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_sheets.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/skill_tile.dart';
-import 'package:proyecto_movil/features/profile/presentation/widgets/theme_option_card.dart';
 
-/// Perfil del Personaje. Necesita un [ProfileBloc] (lo provee el router) y el
-/// [AppearanceBloc] global por encima.
+/// Perfil del Personaje. Necesita un [ProfileBloc] (lo provee el router).
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
     required this.userName,
     required this.onOpenNotifications,
     required this.onOpenHelp,
-    required this.onOpenAppearance,
+    required this.onOpenJournal,
+    required this.onOpenMarketplace,
     required this.onOpenSettings,
   });
 
@@ -31,7 +28,8 @@ class ProfileScreen extends StatelessWidget {
   final String userName;
   final VoidCallback onOpenNotifications;
   final VoidCallback onOpenHelp;
-  final VoidCallback onOpenAppearance;
+  final VoidCallback onOpenJournal;
+  final VoidCallback onOpenMarketplace;
   final VoidCallback onOpenSettings;
 
   @override
@@ -88,6 +86,15 @@ class ProfileScreen extends StatelessWidget {
       }
     }
 
+    Future<void> chooseTitle() async {
+      final choice = await showTitleSheet(
+        context,
+        earned: profile.earnedTitles,
+        active: profile.activeTitle,
+      );
+      if (choice != null) bloc.add(ProfileActiveTitleChanged(choice.titleId));
+    }
+
     Future<void> addSkill() async {
       if (await showSkillSheet(context) case SkillNameSaved(:final name)) {
         bloc.add(ProfileSkillCreated(name));
@@ -133,40 +140,58 @@ class ProfileScreen extends StatelessWidget {
           name: name,
           profile: profile,
           onEditIdentity: editIdentity,
+          onChooseTitle: chooseTitle,
         ),
         const SizedBox(height: 12),
         HeroStatusCard(profile: profile),
         const SizedBox(height: 28),
         const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
         const SizedBox(height: 8),
+        // Dos filas de 3: seis en una fila no caben en un teléfono.
         _group(
           padding: const EdgeInsets.all(6),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
             children: [
-              for (final link in [
-                ProfileQuickLink(
-                  icon: Icons.visibility_outlined,
-                  label: 'Vision Board',
-                  onTap: () => soon('El Vision Board'),
-                ),
-                ProfileQuickLink(
-                  icon: Icons.inventory_2_outlined,
-                  label: 'Inventario',
-                  onTap: () => soon('El Inventario'),
-                ),
-                ProfileQuickLink(
-                  icon: Icons.history_rounded,
-                  label: 'Historial',
-                  onTap: () => soon('El Historial'),
-                ),
-                ProfileQuickLink(
-                  icon: Icons.tune_rounded,
-                  label: 'Game Master',
-                  onTap: onOpenSettings,
-                ),
+              for (final row in [
+                [
+                  ProfileQuickLink(
+                    icon: Icons.menu_book_outlined,
+                    label: 'Diario',
+                    onTap: onOpenJournal,
+                  ),
+                  ProfileQuickLink(
+                    icon: Icons.insights_outlined,
+                    label: 'Estadísticas',
+                    onTap: () => soon('Las Estadísticas'),
+                  ),
+                  ProfileQuickLink(
+                    icon: Icons.visibility_outlined,
+                    label: 'Vision Board',
+                    onTap: () => soon('El Vision Board'),
+                  ),
+                ],
+                [
+                  ProfileQuickLink(
+                    icon: Icons.inventory_2_outlined,
+                    label: 'Inventario y logros',
+                    onTap: () => soon('El Inventario y los logros'),
+                  ),
+                  ProfileQuickLink(
+                    icon: Icons.storefront_outlined,
+                    label: 'Marketplace',
+                    onTap: onOpenMarketplace,
+                  ),
+                  ProfileQuickLink(
+                    icon: Icons.tune_rounded,
+                    label: 'Configuración',
+                    onTap: onOpenSettings,
+                  ),
+                ],
               ])
-                Expanded(child: link),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [for (final link in row) Expanded(child: link)],
+                ),
             ],
           ),
         ),
@@ -198,16 +223,6 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.notifications_outlined,
                 title: 'Notificaciones',
                 onTap: onOpenNotifications,
-              ),
-              Divider(height: 1, indent: 54, color: lq.line),
-              BlocSelector<AppearanceBloc, AppearanceState, ThemePreference>(
-                selector: (state) => state.theme,
-                builder: (context, theme) => AccountActionTile(
-                  icon: Icons.palette_outlined,
-                  title: 'Apariencia',
-                  value: themeLabel(theme),
-                  onTap: onOpenAppearance,
-                ),
               ),
               Divider(height: 1, indent: 54, color: lq.line),
               AccountActionTile(

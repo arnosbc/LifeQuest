@@ -45,6 +45,32 @@ void main() {
     );
   });
 
+  test('setActiveTitle llama a la RPC con el título', () async {
+    when(() => remote.setActiveTitle('t1')).thenAnswer((_) async {});
+
+    expect(
+      await repository.setActiveTitle('t1'),
+      const Right<Failure, Unit>(unit),
+    );
+    verify(() => remote.setActiveTitle('t1')).called(1);
+  });
+
+  test('un título no ganado se explica al usuario', () async {
+    when(() => remote.setActiveTitle(any())).thenThrow(
+      const ServerException(code: 'title_not_earned', statusCode: '42501'),
+    );
+
+    expect(
+      await repository.setActiveTitle('t9'),
+      const Left<Failure, Unit>(
+        ServerFailure(
+          'Ese título todavía no es tuyo. Los títulos se ganan con logros, '
+          'nivel y Tesoro.',
+        ),
+      ),
+    );
+  });
+
   test('sin conexión devuelve NetworkFailure', () async {
     when(() => remote.createSkill(any())).thenThrow(const NetworkException());
 

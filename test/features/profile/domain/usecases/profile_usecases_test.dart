@@ -9,6 +9,7 @@ import 'package:proyecto_movil/features/profile/domain/usecases/create_skill.dar
 import 'package:proyecto_movil/features/profile/domain/usecases/delete_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/get_character_profile.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/set_active_title.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 
 import '../../../../helpers/mocks.dart';
@@ -66,4 +67,12 @@ void main() {
       expect(await DeleteSkill(repository)('s1'), ok);
     },
   );
+
+  test('SetActiveTitle delega en el repositorio, también sin título', () async {
+    when(() => repository.setActiveTitle('t1')).thenAnswer((_) async => ok);
+    when(() => repository.setActiveTitle(null)).thenAnswer((_) async => ok);
+
+    expect(await SetActiveTitle(repository)('t1'), ok);
+    expect(await SetActiveTitle(repository)(null), ok);
+  });
 }
