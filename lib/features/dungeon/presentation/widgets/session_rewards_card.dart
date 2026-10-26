@@ -1,45 +1,66 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/dungeon/presentation/widgets/cycle_duration_card.dart';
 
+/// Lo ganado en la sesión (o el botín final al cerrarla).
 class SessionRewardsCard extends StatelessWidget {
-  const SessionRewardsCard({super.key});
+  const SessionRewardsCard({
+    super.key,
+    required this.title,
+    required this.xp,
+    required this.coins,
+    required this.cycles,
+    required this.minutes,
+  });
+
+  final String title;
+  final int xp;
+  final int coins;
+  final int cycles;
+  final int minutes;
 
   @override
-  Widget build(BuildContext context) => const LifeQuestSurface(
-    padding: EdgeInsets.all(11),
+  Widget build(BuildContext context) => LifeQuestSurface(
+    padding: const EdgeInsets.all(11),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'RECOMPENSAS ESTIMADAS',
-          style: TextStyle(
+          title,
+          style: const TextStyle(
             color: LifeQuestColors.muted,
             fontSize: 9,
             fontWeight: FontWeight.w800,
           ),
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
         Row(
           children: [
             Expanded(
-              child: LifeQuestStat(value: '150 XP', label: 'XP ganada'),
+              child: LifeQuestStat(value: '$xp XP', label: 'XP ganada'),
             ),
-            SizedBox(width: 7),
+            const SizedBox(width: 7),
             Expanded(
-              child: LifeQuestStat(value: '60 ◉', label: 'Monedas ganadas'),
+              child: LifeQuestStat(value: '$coins ◉', label: 'Monedas ganadas'),
             ),
           ],
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
         Row(
           children: [
             Expanded(
-              child: LifeQuestStat(value: '2 🔥', label: 'Ciclos completados'),
+              child: LifeQuestStat(
+                value: '$cycles 🔥',
+                label: 'Ciclos completados',
+              ),
             ),
-            SizedBox(width: 7),
+            const SizedBox(width: 7),
             Expanded(
-              child: LifeQuestStat(value: '1 h 15 m', label: 'Tiempo efectivo'),
+              child: LifeQuestStat(
+                value: CycleDurationCard.hours(minutes),
+                label: 'Tiempo efectivo',
+              ),
             ),
           ],
         ),

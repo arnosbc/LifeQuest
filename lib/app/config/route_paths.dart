@@ -5,12 +5,15 @@ abstract final class RoutePaths {
   static const register = '/register';
   static const checkEmail = '/check-email';
 
-  // Pestañas de la barra inferior.
+  // Pestañas de la barra inferior (§13: Inicio · Stage · Hábitos · Mazmorra · Perfil).
   static const home = '/home';
-  static const missions = '/missions';
-  static const dungeon = '/dungeon';
+  static const stage = '/stage';
   static const habits = '/habits';
+  static const dungeon = '/dungeon';
   static const profile = '/profile';
+
+  // Dentro de la pestaña Stage.
+  static const missions = '/stage/missions';
 
   // Subpáginas de perfil (dentro de la pestaña Perfil).
   static const notifications = '/profile/notifications';
@@ -22,7 +25,6 @@ abstract final class RoutePaths {
   // Subpáginas de Configuración.
   static const appearance = '/settings/appearance';
   static const rpgenie = '/rpgenie';
-  static const stage = '/stage';
   static const journal = '/journal';
   static const goals = '/goals';
   static const tavern = '/tavern';

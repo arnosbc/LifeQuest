@@ -1,35 +1,57 @@
-class Mission {
+import 'package:equatable/equatable.dart';
+
+/// Escala única de urgencia de la app (`urgency_level`).
+enum MissionPriority { low, medium, high }
+
+/// Grupo del Daily Highlight (RF-089), en el orden en que se muestran.
+enum MissionBucket { urgent, high, medium, low, pending }
+
+/// Misión abierta (tarea sin padre). La recompensa la fija el servidor.
+class Mission extends Equatable {
   const Mission({
+    required this.id,
     required this.title,
-    required this.description,
-    required this.due,
-    required this.duration,
     required this.priority,
-    required this.xp,
-    required this.coins,
-    this.started = false,
-    this.highlight = false,
+    required this.bucket,
+    required this.xpReward,
+    required this.coinReward,
+    this.description,
+    this.dueDate,
+    this.skillName,
+    this.projectTitle,
+    this.goalTitle,
+    this.subtasksTotal = 0,
+    this.subtasksDone = 0,
   });
 
+  final String id;
   final String title;
-  final String description;
-  final String due;
-  final String duration;
-  final String priority;
-  final int xp;
-  final int coins;
-  final bool started;
-  final bool highlight;
+  final String? description;
+  final MissionPriority priority;
+  final MissionBucket bucket;
+  final DateTime? dueDate;
+  final int xpReward;
+  final int coinReward;
+  final String? skillName;
+  final String? projectTitle;
+  final String? goalTitle;
+  final int subtasksTotal;
+  final int subtasksDone;
 
-  Mission copyWith({bool? started}) => Mission(
-    title: title,
-    description: description,
-    due: due,
-    duration: duration,
-    priority: priority,
-    xp: xp,
-    coins: coins,
-    started: started ?? this.started,
-    highlight: highlight,
-  );
+  @override
+  List<Object?> get props => [
+    id,
+    title,
+    description,
+    priority,
+    bucket,
+    dueDate,
+    xpReward,
+    coinReward,
+    skillName,
+    projectTitle,
+    goalTitle,
+    subtasksTotal,
+    subtasksDone,
+  ];
 }

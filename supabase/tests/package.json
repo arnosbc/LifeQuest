@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node 001_home.test.mjs && node 002_profile.test.mjs && node 003_007.test.mjs && node 008_fix_exploits.test.mjs && node 009_profile_titles.test.mjs"
+    "test": "node 001_home.test.mjs && node 002_profile.test.mjs && node 003_007.test.mjs && node 008_fix_exploits.test.mjs && node 009_profile_titles.test.mjs && node 010_missions.test.mjs && node 011_habits.test.mjs && node 012_dungeon.test.mjs && node 013_stage.test.mjs && node 014_goals.test.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.2.17"

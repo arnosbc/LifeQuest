@@ -3,8 +3,18 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
 /// Formato de cifras y fechas del Home, en español.
 abstract final class HomeFormat {
   static const _months = [
-    'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-    'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
+    'ene',
+    'feb',
+    'mar',
+    'abr',
+    'may',
+    'jun',
+    'jul',
+    'ago',
+    'sep',
+    'oct',
+    'nov',
+    'dic',
   ];
 
   /// 12450 → "12.450".

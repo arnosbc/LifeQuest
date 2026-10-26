@@ -2,8 +2,27 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 
+/// Elige el ciclo (25, 30 o 45 min) y la duración total en pasos de 30 min.
 class CycleDurationCard extends StatelessWidget {
-  const CycleDurationCard({super.key});
+  const CycleDurationCard({
+    super.key,
+    required this.cycleMinutes,
+    required this.totalMinutes,
+    required this.onCycleChanged,
+    required this.onTotalChanged,
+  });
+
+  final int cycleMinutes;
+  final int totalMinutes;
+  final ValueChanged<int> onCycleChanged;
+  final ValueChanged<int> onTotalChanged;
+
+  static String hours(int minutes) {
+    final h = minutes ~/ 60;
+    final m = minutes % 60;
+    if (h == 0) return '$m min';
+    return m == 0 ? '$h h' : '$h h $m min';
+  }
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
@@ -24,32 +43,57 @@ class CycleDurationCard extends StatelessWidget {
           spacing: 6,
           runSpacing: 5,
           children: [
-            _duration('25 min', selected: true),
-            _duration('30 min'),
-            _duration('45 min'),
-            _duration('5 min descanso'),
+            for (final minutes in const [25, 30, 45])
+              ChoiceChip(
+                label: Text('$minutes min'),
+                selected: cycleMinutes == minutes,
+                onSelected: (_) => onCycleChanged(minutes),
+              ),
           ],
         ),
+        const SizedBox(height: 10),
+        const Text(
+          'DURACIÓN TOTAL',
+          style: TextStyle(
+            color: LifeQuestColors.muted,
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Quitar 30 minutos',
+              onPressed: totalMinutes - 30 >= cycleMinutes
+                  ? () => onTotalChanged(totalMinutes - 30)
+                  : null,
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            Expanded(
+              child: Text(
+                '${hours(totalMinutes)} · ${totalMinutes ~/ cycleMinutes} ciclos',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: LifeQuestColors.ink,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Añadir 30 minutos',
+              onPressed: totalMinutes + 30 <= 480
+                  ? () => onTotalChanged(totalMinutes + 30)
+                  : null,
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
+        ),
+        const Text(
+          'Descansos: 5 min, y 15 min cada 4 ciclos.',
+          style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+        ),
       ],
-    ),
-  );
-
-  Widget _duration(String label, {bool selected = false}) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-    decoration: BoxDecoration(
-      color: selected ? LifeQuestColors.softGreen : const Color(0xFFF6FAF7),
-      border: Border.all(
-        color: selected ? LifeQuestColors.deepGreen : LifeQuestColors.line,
-      ),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Text(
-      label,
-      style: const TextStyle(
-        color: LifeQuestColors.deepGreen,
-        fontSize: 9,
-        fontWeight: FontWeight.w600,
-      ),
     ),
   );
 }

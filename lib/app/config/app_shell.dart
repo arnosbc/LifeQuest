@@ -11,19 +11,19 @@ class AppShell extends StatelessWidget {
 
   final StatefulNavigationShell navigationShell;
 
-  static const _labels = ['Inicio', 'Misiones', 'Dungeon', 'Hábitos', 'Perfil'];
+  static const _labels = ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil'];
   static const _icons = [
     Icons.home_outlined,
-    Icons.edit_note_outlined,
-    Icons.shield_outlined,
+    Icons.dashboard_outlined,
     Icons.monitor_heart_outlined,
+    Icons.shield_outlined,
     Icons.person_outline,
   ];
   static const _selectedIcons = [
     Icons.home_rounded,
-    Icons.edit_note_rounded,
-    Icons.shield_rounded,
+    Icons.dashboard_rounded,
     Icons.monitor_heart_rounded,
+    Icons.shield_rounded,
     Icons.person_rounded,
   ];
 

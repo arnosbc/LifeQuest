@@ -29,7 +29,9 @@ class HomeDashboardModel {
           : PriorityMission(
               id: mission['id'] as String,
               title: mission['title'] as String,
-              priority: UrgencyLevel.values.byName(mission['priority'] as String),
+              priority: UrgencyLevel.values.byName(
+                mission['priority'] as String,
+              ),
               xpReward: _int(mission['xp_reward']),
               coinReward: _int(mission['coin_reward']),
               dueDate: mission['due_date'] == null

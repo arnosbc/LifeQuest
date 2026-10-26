@@ -7,13 +7,17 @@ import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 import 'features/home/home_fixtures.dart';
+import 'features/missions/missions_fixtures.dart';
 import 'features/profile/profile_fixtures.dart';
+import 'features/stage/stage_fixtures.dart';
 import 'helpers/mocks.dart';
 
 void main() {
@@ -37,6 +41,24 @@ void main() {
         initialState: HomeSuccess(dashboard),
       );
       return homeBloc;
+    });
+    sl.registerFactory<MissionsBloc>(() {
+      final missionsBloc = MockMissionsBloc();
+      whenListen(
+        missionsBloc,
+        const Stream<MissionsState>.empty(),
+        initialState: const MissionsSuccess(board),
+      );
+      return missionsBloc;
+    });
+    sl.registerFactory<StageBloc>(() {
+      final stageBloc = MockStageBloc();
+      whenListen(
+        stageBloc,
+        const Stream<StageState>.empty(),
+        initialState: const StageSuccess(stageBoard),
+      );
+      return stageBloc;
     });
     sl.registerFactory<ProfileBloc>(() {
       final profileBloc = MockProfileBloc();
@@ -107,9 +129,31 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('EXPLORA EL REINO'), findsOneWidget);
 
-    await tester.tap(find.text('Misiones').last);
+    // La barra sigue el diseño: Inicio · Stage · Hábitos · Mazmorra · Perfil.
+    for (final tab in ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil']) {
+      expect(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text(tab),
+        ),
+        findsOneWidget,
+      );
+    }
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Stage'),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(find.text('Preparar presentación del proyecto'), findsOneWidget);
+    expect(find.text('Lanzamiento de la app'), findsOneWidget);
+    expect(find.textContaining('🔴 Alta'), findsOneWidget);
+    expect(find.text('METAS (JEFES)'), findsOneWidget);
+
+    // Misiones vive dentro de Stage y conserva la barra inferior.
+    await tester.tap(find.text('Ver misiones (1)'));
+    await tester.pumpAndSettle();
+    expect(find.text('Preparar la exposición'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 

@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
+import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/bad_habits_view.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/create_habit_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/good_habits_view.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_tab_button.dart';
 
+/// Hábitos. Necesita un [HabitsBloc] por encima (lo provee el router).
 class HabitsScreen extends StatefulWidget {
   const HabitsScreen({super.key});
 
@@ -13,45 +19,133 @@ class HabitsScreen extends StatefulWidget {
 }
 
 class _HabitsScreenState extends State<HabitsScreen> {
-  final Set<int> _completed = {0, 1};
   bool _showBadHabits = false;
 
   @override
-  Widget build(BuildContext context) => LifeQuestPage(
-    title: 'Hábitos',
-    subtitle: 'La constancia también es una aventura.',
-    children: [
-      Row(
-        children: [
-          Expanded(
-            child: HabitTabButton(
-              label: 'Buenos hábitos',
-              selected: !_showBadHabits,
-              onTap: () => setState(() => _showBadHabits = false),
-            ),
-          ),
-          const SizedBox(width: 7),
-          Expanded(
-            child: HabitTabButton(
-              label: 'Malos hábitos',
-              selected: _showBadHabits,
-              onTap: () => setState(() => _showBadHabits = true),
-            ),
-          ),
-        ],
+  Widget build(BuildContext context) => BlocConsumer<HabitsBloc, HabitsState>(
+    listenWhen: (_, state) => state is HabitsSuccess && state.message != null,
+    listener: (context, state) =>
+        showLifeQuestMessage(context, (state as HabitsSuccess).message!),
+    builder: (context, state) => switch (state) {
+      HabitsInitial() || HabitsLoading() => const Center(
+        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
       ),
-      const SizedBox(height: 11),
-      if (_showBadHabits)
-        const BadHabitsView()
-      else
-        GoodHabitsView(
-          completed: _completed,
-          onToggle: (index) => setState(
-            () => _completed.contains(index)
-                ? _completed.remove(index)
-                : _completed.add(index),
+      HabitsFailure(:final message) => _ErrorView(
+        message: message,
+        onRetry: () => context.read<HabitsBloc>().add(const HabitsRequested()),
+      ),
+      HabitsSuccess() => RefreshIndicator(
+        color: LifeQuestColors.deepGreen,
+        onRefresh: () => _refresh(context.read<HabitsBloc>()),
+        child: _content(context, state),
+      ),
+    },
+  );
+
+  static Future<void> _refresh(HabitsBloc bloc) {
+    bloc.add(const HabitsRequested());
+    return bloc.stream.firstWhere(
+      (state) => state is! HabitsSuccess || !state.refreshing,
+    );
+  }
+
+  Future<void> _create(BuildContext context, HabitsSuccess state) async {
+    final bloc = context.read<HabitsBloc>();
+    final habit = await showModalBottomSheet<NewHabit>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => CreateHabitSheet(
+        type: _showBadHabits ? HabitType.bad : HabitType.good,
+        skills: state.board.skills,
+      ),
+    );
+    if (habit != null) bloc.add(HabitCreated(habit));
+  }
+
+  Widget _content(BuildContext context, HabitsSuccess state) {
+    final bloc = context.read<HabitsBloc>();
+    final idle = state.busyHabitId == null && !state.saving;
+    return LifeQuestPage(
+      title: 'Hábitos',
+      subtitle: 'La constancia también es una aventura.',
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: HabitTabButton(
+                label: 'Buenos hábitos',
+                selected: !_showBadHabits,
+                onTap: () => setState(() => _showBadHabits = false),
+              ),
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: HabitTabButton(
+                label: 'Malos hábitos',
+                selected: _showBadHabits,
+                onTap: () => setState(() => _showBadHabits = true),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 11),
+        if (_showBadHabits)
+          BadHabitsView(
+            board: state.board,
+            busyHabitId: state.busyHabitId,
+            onRegister: idle ? (id) => bloc.add(BadHabitRegistered(id)) : null,
+          )
+        else
+          GoodHabitsView(
+            board: state.board,
+            now: DateTime.now(),
+            busyHabitId: state.busyHabitId,
+            onComplete: idle ? (id) => bloc.add(GoodHabitCompleted(id)) : null,
+          ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 48,
+          child: OutlinedButton.icon(
+            onPressed: idle ? () => _create(context, state) : null,
+            icon: state.saving
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.add),
+            label: Text(state.saving ? 'Creando hábito…' : 'Nuevo hábito'),
           ),
         ),
-    ],
+      ],
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: LifeQuestColors.ink),
+          ),
+          const SizedBox(height: 12),
+          FilledButton(onPressed: onRetry, child: const Text('Reintentar')),
+        ],
+      ),
+    ),
   );
 }

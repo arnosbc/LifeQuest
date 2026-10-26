@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
 
   static const _sections = [
     (Icons.auto_awesome_outlined, 'RPGenie', RoutePaths.rpgenie),
-    (Icons.dashboard_outlined, 'Stage · P.A.R.A.', RoutePaths.stage),
+    (Icons.edit_note_outlined, 'Misiones', RoutePaths.missions),
     (Icons.auto_stories_outlined, 'Diario', RoutePaths.journal),
     (Icons.flag_outlined, 'Objetivos', RoutePaths.goals),
     (Icons.sports_bar_outlined, 'Taverna', RoutePaths.tavern),
@@ -82,13 +82,13 @@ class HomeScreen extends StatelessWidget {
         LifeQuestSectionHeading(
           'MISIÓN PRIORITARIA',
           action: 'Ver todas',
-          onTap: () => onNavigate(1),
+          onTap: () => context.go(RoutePaths.missions),
         ),
         _headingGap,
         PriorityMissionCard(
           mission: dashboard.priorityMission,
-          onContinue: () => onNavigate(1),
-          onCreate: () => onNavigate(1),
+          onContinue: () => context.go(RoutePaths.missions),
+          onCreate: () => context.go(RoutePaths.missions),
         ),
         _gap,
         const LifeQuestSectionHeading('TU HÉROE'),
@@ -98,7 +98,7 @@ class HomeScreen extends StatelessWidget {
         LifeQuestSectionHeading(
           'HÁBITOS DE HOY',
           action: _streakLabel(dashboard),
-          onTap: () => onNavigate(3),
+          onTap: () => onNavigate(2),
         ),
         _headingGap,
         HabitStrip(
@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
           busyHabitId: state.busyHabitId,
           onComplete: (id) =>
               context.read<HomeBloc>().add(HomeHabitCompleted(id)),
-          onOpenHabits: () => onNavigate(3),
+          onOpenHabits: () => onNavigate(2),
         ),
         _gap,
         const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
@@ -115,12 +115,12 @@ class HomeScreen extends StatelessWidget {
           QuickAction(
             icon: Icons.add_box_outlined,
             label: 'Nueva tarea',
-            onTap: () => onNavigate(1),
+            onTap: () => context.go(RoutePaths.missions),
           ),
           QuickAction(
             icon: Icons.timer_outlined,
             label: 'Modo focus',
-            onTap: () => onNavigate(2),
+            onTap: () => onNavigate(3),
           ),
         ]),
         const SizedBox(height: 8),
@@ -128,7 +128,7 @@ class HomeScreen extends StatelessWidget {
           QuickAction(
             icon: Icons.monitor_heart_outlined,
             label: 'Registrar hábito',
-            onTap: () => onNavigate(3),
+            onTap: () => onNavigate(2),
           ),
           QuickAction(
             icon: Icons.tune_rounded,
@@ -178,7 +178,9 @@ class HomeScreen extends StatelessWidget {
       icon: icon,
       label: label,
       vertical: true,
-      onTap: () => context.push(path),
+      // Misiones vive dentro de la pestaña Stage: se va a ella, no se apila.
+      onTap: () =>
+          path == RoutePaths.missions ? context.go(path) : context.push(path),
     );
   }
 }

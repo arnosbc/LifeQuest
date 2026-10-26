@@ -22,7 +22,14 @@ class PriorityMission extends Equatable {
   final DateTime? dueDate;
 
   @override
-  List<Object?> get props => [id, title, priority, xpReward, coinReward, dueDate];
+  List<Object?> get props => [
+    id,
+    title,
+    priority,
+    xpReward,
+    coinReward,
+    dueDate,
+  ];
 }
 
 /// Hábito bueno programado para hoy.

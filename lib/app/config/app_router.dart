@@ -11,13 +11,16 @@ import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
+import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
 import 'package:proyecto_movil/features/goals/presentation/screens/goals_screen.dart';
+import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
 import 'package:proyecto_movil/features/marketplace/presentation/screens/marketplace_screen.dart';
+import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/screens/missions_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
@@ -26,6 +29,7 @@ import 'package:proyecto_movil/features/profile/presentation/screens/notificatio
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
 import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_screen.dart';
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
+import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
 import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
@@ -100,16 +104,29 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: RoutePaths.missions,
-              builder: (context, state) => const MissionsScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: RoutePaths.dungeon,
-              builder: (context, state) => const DungeonScreen(),
+              path: RoutePaths.stage,
+              builder: (context, state) => BlocProvider(
+                create: (_) => sl<StageBloc>()..add(const StageRequested()),
+                child: StageScreen(
+                  onOpenMissions: () => context.go(RoutePaths.missions),
+                ),
+              ),
+              routes: [
+                GoRoute(
+                  path: 'missions',
+                  builder: (context, state) => Scaffold(
+                    backgroundColor: LifeQuestColors.background,
+                    appBar: AppBar(backgroundColor: LifeQuestColors.background),
+                    body: BlocProvider(
+                      create: (_) =>
+                          sl<MissionsBloc>()..add(const MissionsRequested()),
+                      child: MissionsScreen(
+                        onStartFocus: () => context.go(RoutePaths.dungeon),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -117,7 +134,21 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
           routes: [
             GoRoute(
               path: RoutePaths.habits,
-              builder: (context, state) => const HabitsScreen(),
+              builder: (context, state) => BlocProvider(
+                create: (_) => sl<HabitsBloc>()..add(const HabitsRequested()),
+                child: const HabitsScreen(),
+              ),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RoutePaths.dungeon,
+              builder: (context, state) => BlocProvider(
+                create: (_) => sl<DungeonBloc>()..add(const DungeonRequested()),
+                child: const DungeonScreen(),
+              ),
             ),
           ],
         ),
@@ -175,7 +206,6 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
       ],
     ),
     _section(RoutePaths.rpgenie, const RpgenieScreen()),
-    _section(RoutePaths.stage, const StageScreen()),
     _section(RoutePaths.journal, const JournalScreen()),
     _section(RoutePaths.goals, const GoalsScreen()),
     _section(RoutePaths.tavern, const TavernScreen()),
