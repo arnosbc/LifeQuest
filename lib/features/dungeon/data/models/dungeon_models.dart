@@ -12,6 +12,7 @@ class DungeonBoardModel {
 
   DungeonBoard toEntity() {
     final s = json['session'] as Map<String, dynamic>?;
+    final breaks = json['breaks'] as Map<String, dynamic>? ?? const {};
     return DungeonBoard(
       session: s == null
           ? null
@@ -27,6 +28,9 @@ class DungeonBoardModel {
       candidates: [for (final t in _list(json['candidates'])) _task(t)],
       maxTasks: _int(json['max_tasks'], 5),
       cycleXp: _int(json['cycle_xp'], 10),
+      shortBreakMinutes: _int(breaks['short_minutes'], 5),
+      longBreakMinutes: _int(breaks['long_minutes'], 15),
+      longBreakEveryNCycles: _int(breaks['long_every_n_cycles'], 4),
     );
   }
 

@@ -11,6 +11,35 @@ import 'package:proyecto_movil/features/dungeon/domain/entities/dungeon_board.da
 import '../../helpers/mocks.dart';
 
 void main() {
+  test('DungeonBoardModel lee los descansos del jugador (RF-067)', () {
+    final board = DungeonBoardModel.fromJson({
+      'breaks': {
+        'short_minutes': 10,
+        'long_minutes': 30,
+        'long_every_n_cycles': 3,
+      },
+    }).toEntity();
+    expect(
+      [
+        board.shortBreakMinutes,
+        board.longBreakMinutes,
+        board.longBreakEveryNCycles,
+      ],
+      [10, 30, 3],
+    );
+    // Largo justo tras cada 3 ciclos; corto en los demás.
+    expect(
+      [
+        for (final c in [1, 2, 3, 4, 6]) board.breakAfter(c).inMinutes,
+      ],
+      [10, 10, 30, 10, 30],
+    );
+    // Sin `breaks` (servidor sin 017): los de RF-067 por defecto.
+    final fallback = DungeonBoardModel.fromJson({}).toEntity();
+    expect(fallback.breakAfter(4), const Duration(minutes: 15));
+    expect(fallback.breakAfter(1), const Duration(minutes: 5));
+  });
+
   test('DungeonBoardModel convierte la sesión abierta', () {
     final board = DungeonBoardModel.fromJson({
       'session': {

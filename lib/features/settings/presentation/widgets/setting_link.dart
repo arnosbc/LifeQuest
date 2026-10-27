@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 
+/// Fila de Configuración que abre una hoja u otra pantalla.
 class SettingLink extends StatelessWidget {
   const SettingLink({
     super.key,
@@ -14,55 +15,59 @@ class SettingLink extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
-  final VoidCallback onTap;
+
+  /// Null la deshabilita (p. ej. mientras se guarda).
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.transparent,
-    borderRadius: BorderRadius.circular(8),
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF3F9F5),
-          borderRadius: BorderRadius.circular(8),
+  Widget build(BuildContext context) {
+    final lq = context.lq;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: lq.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(11),
+          side: BorderSide(color: lq.line),
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: LifeQuestColors.deepGreen, size: 14),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(11),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: LifeQuestColors.ink,
-                      fontSize: 8,
-                      fontWeight: FontWeight.w700,
+                  LifeQuestIconTile(icon),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: lq.ink,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          description,
+                          style: TextStyle(color: lq.muted, fontSize: 12),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      color: LifeQuestColors.muted,
-                      fontSize: 7,
-                    ),
-                  ),
+                  Icon(Icons.chevron_right_rounded, color: lq.muted),
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: LifeQuestColors.muted,
-              size: 15,
-            ),
-          ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

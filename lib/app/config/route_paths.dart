@@ -5,6 +5,9 @@ abstract final class RoutePaths {
   static const register = '/register';
   static const checkEmail = '/check-email';
 
+  // Primer inicio de sesión, antes de Inicio.
+  static const onboarding = '/onboarding';
+
   // Pestañas de la barra inferior (§13: Inicio · Stage · Hábitos · Mazmorra · Perfil).
   static const home = '/home';
   static const stage = '/stage';

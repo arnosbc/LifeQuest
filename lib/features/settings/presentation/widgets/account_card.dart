@@ -1,101 +1,103 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/settings/domain/entities/game_settings.dart';
 
+/// Nombre, nivel y progreso de XP. Sin [overview] (cargando o sin conexión)
+/// muestra solo el nombre.
 class AccountCard extends StatelessWidget {
-  const AccountCard({super.key, required this.userName});
+  const AccountCard({super.key, required this.userName, this.overview});
 
   final String userName;
+  final SettingsOverview? overview;
 
   @override
-  Widget build(BuildContext context) => LifeQuestSurface(
-    padding: const EdgeInsets.all(11),
-    child: Column(
-      children: [
-        Row(
-          children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: const Color(0xFFDFF8E8),
-              child: Text(
-                userName.isEmpty ? 'A' : userName[0].toUpperCase(),
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
+  Widget build(BuildContext context) {
+    final lq = context.lq;
+    final data = overview;
+    return LifeQuestSurface(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: lq.softGreen,
+                child: Text(
+                  userName.isEmpty ? 'H' : userName[0].toUpperCase(),
+                  style: TextStyle(
+                    color: lq.deepGreen,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userName,
-                    style: const TextStyle(
-                      color: LifeQuestColors.ink,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 2),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      color: LifeQuestColors.softGreen,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'NIVEL 24',
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: LifeQuestColors.deepGreen,
-                        fontSize: 7,
+                        color: lq.ink,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    if (data != null)
+                      Text(
+                        'Nivel ${data.level}',
+                        style: TextStyle(
+                          color: lq.deepGreen,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (data != null) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Progreso de XP',
+                    style: TextStyle(color: lq.muted, fontSize: 12),
                   ),
-                ],
-              ),
+                ),
+                Text(
+                  '${data.currentXp} / ${data.xpToNextLevel} XP',
+                  style: TextStyle(
+                    color: lq.ink,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.more_horiz,
-              color: LifeQuestColors.muted,
-              size: 17,
-            ),
-            const SizedBox(width: 5),
-          ],
-        ),
-        const SizedBox(height: 8),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'PROGRESO XP',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 7),
-            ),
-            Text(
-              '1,450 / 2,000 XP',
-              style: TextStyle(
-                color: LifeQuestColors.ink,
-                fontSize: 7,
-                fontWeight: FontWeight.w700,
+            const SizedBox(height: 6),
+            ExcludeSemantics(
+              child: LinearProgressIndicator(
+                value: data.xpToNextLevel <= 0
+                    ? 0
+                    : (data.currentXp / data.xpToNextLevel).clamp(0, 1),
+                minHeight: 6,
+                borderRadius: BorderRadius.circular(4),
+                color: lq.deepGreen,
+                backgroundColor: lq.line,
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 4),
-        const LinearProgressIndicator(
-          value: .72,
-          minHeight: 4,
-          color: LifeQuestColors.green,
-          backgroundColor: Color(0xFFE3EEE7),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }

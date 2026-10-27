@@ -86,9 +86,7 @@ class DungeonScreen extends StatelessWidget {
       session.maxCycles,
     );
     final total = rest
-        ? (session.cyclesDone % 4 == 0
-              ? DungeonBloc.longBreak
-              : DungeonBloc.shortBreak)
+        ? state.board.breakAfter(session.cyclesDone)
         : Duration(minutes: session.cycleMinutes);
     return LifeQuestPage(
       title: 'Mazmorra',

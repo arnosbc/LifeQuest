@@ -6,6 +6,7 @@ import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/app/config/constants.dart';
 import 'package:proyecto_movil/app/observers/app_bloc_observer.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
@@ -29,5 +30,11 @@ Future<void> main() async {
     appearanceBloc.stream.firstWhere((state) => state is AppearanceSuccess),
   ).wait;
 
-  runApp(App(authBloc: authBloc, appearanceBloc: appearanceBloc));
+  runApp(
+    App(
+      authBloc: authBloc,
+      appearanceBloc: appearanceBloc,
+      onboardingBloc: sl<OnboardingBloc>(),
+    ),
+  );
 }

@@ -21,6 +21,8 @@ import 'package:proyecto_movil/features/home/presentation/screens/home_screen.da
 import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
 import 'package:proyecto_movil/features/marketplace/presentation/screens/marketplace_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/screens/missions_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
@@ -28,6 +30,7 @@ import 'package:proyecto_movil/features/profile/presentation/screens/help_screen
 import 'package:proyecto_movil/features/profile/presentation/screens/notifications_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
 import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_screen.dart';
+import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
@@ -37,21 +40,38 @@ import 'package:proyecto_movil/injection_container.dart';
 /// Rutas de la app. Aquí se componen las features: cada pantalla recibe por
 /// constructor lo que viene de otra (nombre de usuario, cerrar sesión, navegar),
 /// así ninguna feature importa a otra.
-GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
+GoRouter createAppRouter(
+  AuthBloc authBloc,
+  OnboardingBloc onboardingBloc,
+) => GoRouter(
   initialLocation: RoutePaths.home,
-  refreshListenable: _BlocRefresh(authBloc.stream),
+  refreshListenable: Listenable.merge([
+    _BlocRefresh(authBloc.stream),
+    _BlocRefresh(onboardingBloc.stream),
+  ]),
   redirect: (context, state) {
     final signedIn = authBloc.state is AuthSuccess;
+    final location = state.matchedLocation;
     final atAuth = const [
       RoutePaths.login,
       RoutePaths.register,
       RoutePaths.checkEmail,
-    ].contains(state.matchedLocation);
-    if (!signedIn && !atAuth) return RoutePaths.login;
-    if (signedIn && atAuth) return RoutePaths.home;
+    ].contains(location);
+    if (!signedIn) return atAuth ? null : RoutePaths.login;
+    // Mientras se consulta también va al Onboarding (muestra un indicador),
+    // así quien lo tiene pendiente nunca ve Inicio antes (FR-001).
+    final onboarding = onboardingBloc.state is! OnboardingNotNeeded;
+    if (onboarding) {
+      return location == RoutePaths.onboarding ? null : RoutePaths.onboarding;
+    }
+    if (atAuth || location == RoutePaths.onboarding) return RoutePaths.home;
     return null;
   },
   routes: [
+    GoRoute(
+      path: RoutePaths.onboarding,
+      builder: (context, state) => const OnboardingScreen(),
+    ),
     GoRoute(
       path: RoutePaths.login,
       builder: (context, state) => const LoginScreen(),
@@ -187,21 +207,28 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
     ),
     GoRoute(
       path: RoutePaths.settings,
-      builder: (context, state) => LifeQuestTheme.lightOnly(
-        SettingsScreen(
-          userName: _userName(context),
-          onBack: () => context.pop(),
-          onSignOut: () =>
-              context.read<AuthBloc>().add(const LogoutRequested()),
-          onOpenAppearance: () => context.push(RoutePaths.appearance),
+      builder: (context, state) => Scaffold(
+        body: SafeArea(
+          child: BlocProvider(
+            create: (_) => sl<SettingsBloc>()..add(const SettingsRequested()),
+            child: SettingsScreen(
+              userName: _userName(context),
+              onBack: () => context.pop(),
+              onSignOut: () =>
+                  context.read<AuthBloc>().add(const LogoutRequested()),
+              onOpenAppearance: () => context.push(RoutePaths.appearance),
+            ),
+          ),
         ),
       ),
       routes: [
-        // Sigue el tema (está en _themedPaths), fuera de lightOnly.
         GoRoute(
           path: 'appearance',
-          builder: (context, state) =>
-              AppearanceScreen(onBack: () => context.pop()),
+          builder: (context, state) => Scaffold(
+            body: SafeArea(
+              child: AppearanceScreen(onBack: () => context.pop()),
+            ),
+          ),
         ),
       ],
     ),

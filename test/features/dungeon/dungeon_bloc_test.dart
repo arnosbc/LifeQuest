@@ -15,22 +15,25 @@ import '../../helpers/mocks.dart';
 const _t1 = DungeonTask(id: 't1', title: 'Estudiar');
 const _t2 = DungeonTask(id: 't2', title: 'Escribir');
 
-DungeonBoard _board({int cycles = 0, int total = 60, bool t1Done = false}) =>
-    DungeonBoard(
-      session: DungeonSession(
-        id: 's1',
-        totalMinutes: total,
-        cycleMinutes: 25,
-        cyclesDone: cycles,
-        xpEarned: cycles * 10,
-        tasks: [
-          t1Done
-              ? const DungeonTask(id: 't1', title: 'Estudiar', done: true)
-              : _t1,
-          _t2,
-        ],
-      ),
-    );
+DungeonBoard _board({
+  int cycles = 0,
+  int total = 60,
+  bool t1Done = false,
+  int shortBreak = 5,
+}) => DungeonBoard(
+  shortBreakMinutes: shortBreak,
+  session: DungeonSession(
+    id: 's1',
+    totalMinutes: total,
+    cycleMinutes: 25,
+    cyclesDone: cycles,
+    xpEarned: cycles * 10,
+    tasks: [
+      t1Done ? const DungeonTask(id: 't1', title: 'Estudiar', done: true) : _t1,
+      _t2,
+    ],
+  ),
+);
 
 const _setupBoard = DungeonBoard(candidates: [_t1, _t2]);
 
@@ -151,7 +154,7 @@ void main() {
         board: _board(cycles: 1),
         phase: DungeonPhase.rest,
         now: now,
-        phaseEndsAt: now.add(DungeonBloc.shortBreak),
+        phaseEndsAt: now.add(const Duration(minutes: 5)),
         currentTaskId: 't1',
         message: '¡Mazmorra superada! Toma un descanso.',
       ),
@@ -161,6 +164,33 @@ void main() {
         const CompleteDungeonCycleParams(sessionId: 's1', taskId: 't1'),
       ),
     ).called(1),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'el descanso dura lo que el jugador eligió en Configuración',
+    setUp: () {
+      when(
+        () => completeCycle(any()),
+      ).thenAnswer((_) async => const Right(unit));
+      givenBoard(_board(cycles: 1, shortBreak: 8));
+    },
+    build: build,
+    seed: () => focus(_board(shortBreak: 8)),
+    act: (bloc) {
+      now = now.add(const Duration(minutes: 25));
+      bloc.add(const DungeonTicked());
+    },
+    skip: 1,
+    expect: () => [
+      DungeonReady(
+        board: _board(cycles: 1, shortBreak: 8),
+        phase: DungeonPhase.rest,
+        now: now,
+        phaseEndsAt: now.add(const Duration(minutes: 8)),
+        currentTaskId: 't1',
+        message: '¡Mazmorra superada! Toma un descanso.',
+      ),
+    ],
   );
 
   blocTest<DungeonBloc, DungeonState>(

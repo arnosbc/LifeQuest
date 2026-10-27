@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-20
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Onboarding de 5 pasos tras el primer inicio de sesión, según docs/ideas-proyecto-productividad-gamificada.md: presenta el juego, pide la identidad («¿Quién eres en este reino?»), la primera skill/Área y la dificultad (Fácil, Normal o Difícil, que después solo se cambia en Configuración), y deja al usuario en Inicio. Se muestra una sola vez y se puede saltar sin perder nada. Guarda lo elegido con las tablas y RPC existentes (profiles, skills, game_master_settings). Sin rediseño visual: DESIGN.md está pendiente; se usan los widgets de core/widgets."
 

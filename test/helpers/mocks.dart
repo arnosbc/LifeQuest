@@ -53,6 +53,16 @@ import 'package:proyecto_movil/features/stage/domain/repositories/stage_reposito
 import 'package:proyecto_movil/features/stage/domain/usecases/archive_stage_item.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_stage_task.dart';
+import 'package:proyecto_movil/features/onboarding/data/datasources/onboarding_remote_datasource.dart';
+import 'package:proyecto_movil/features/onboarding/domain/repositories/onboarding_repository.dart';
+import 'package:proyecto_movil/features/onboarding/domain/usecases/complete_onboarding.dart';
+import 'package:proyecto_movil/features/onboarding/domain/usecases/get_onboarding_status.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
+import 'package:proyecto_movil/features/settings/data/datasources/settings_remote_datasource.dart';
+import 'package:proyecto_movil/features/settings/domain/repositories/settings_repository.dart';
+import 'package:proyecto_movil/features/settings/domain/usecases/get_settings.dart';
+import 'package:proyecto_movil/features/settings/domain/usecases/save_game_settings.dart';
+import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_resource.dart';
@@ -183,3 +193,27 @@ class MockCompleteProject extends Mock implements CompleteProject {}
 class MockCreateGoal extends Mock implements CreateGoal {}
 
 class MockCompleteStageTask extends Mock implements CompleteStageTask {}
+
+class MockOnboardingBloc extends MockBloc<OnboardingEvent, OnboardingState>
+    implements OnboardingBloc {}
+
+class MockOnboardingRepository extends Mock implements OnboardingRepository {}
+
+class MockOnboardingRemoteDataSource extends Mock
+    implements OnboardingRemoteDataSource {}
+
+class MockGetOnboardingStatus extends Mock implements GetOnboardingStatus {}
+
+class MockCompleteOnboarding extends Mock implements CompleteOnboarding {}
+
+class MockSettingsBloc extends MockBloc<SettingsEvent, SettingsState>
+    implements SettingsBloc {}
+
+class MockSettingsRepository extends Mock implements SettingsRepository {}
+
+class MockSettingsRemoteDataSource extends Mock
+    implements SettingsRemoteDataSource {}
+
+class MockGetSettings extends Mock implements GetSettings {}
+
+class MockSaveGameSettings extends Mock implements SaveGameSettings {}

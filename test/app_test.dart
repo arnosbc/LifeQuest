@@ -8,7 +8,9 @@ import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
+import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
@@ -16,17 +18,26 @@ import 'package:proyecto_movil/injection_container.dart';
 
 import 'features/home/home_fixtures.dart';
 import 'features/missions/missions_fixtures.dart';
+import 'features/onboarding/onboarding_fixtures.dart';
 import 'features/profile/profile_fixtures.dart';
+import 'features/settings/settings_fixtures.dart';
 import 'features/stage/stage_fixtures.dart';
 import 'helpers/mocks.dart';
 
 void main() {
   late MockAuthBloc authBloc;
   late MockAppearanceBloc appearanceBloc;
+  late MockOnboardingBloc onboardingBloc;
 
   setUp(() {
     authBloc = MockAuthBloc();
     appearanceBloc = MockAppearanceBloc();
+    onboardingBloc = MockOnboardingBloc();
+    whenListen(
+      onboardingBloc,
+      const Stream<OnboardingState>.empty(),
+      initialState: const OnboardingNotNeeded(),
+    );
     whenListen(
       appearanceBloc,
       const Stream<AppearanceState>.empty(),
@@ -60,6 +71,15 @@ void main() {
       );
       return stageBloc;
     });
+    sl.registerFactory<SettingsBloc>(() {
+      final settingsBloc = MockSettingsBloc();
+      whenListen(
+        settingsBloc,
+        const Stream<SettingsState>.empty(),
+        initialState: const SettingsSuccess(settingsOverview),
+      );
+      return settingsBloc;
+    });
     sl.registerFactory<ProfileBloc>(() {
       final profileBloc = MockProfileBloc();
       whenListen(
@@ -84,7 +104,11 @@ void main() {
   ) async {
     givenAuthState(const AuthUnauthenticated());
     await tester.pumpWidget(
-      App(authBloc: authBloc, appearanceBloc: appearanceBloc),
+      App(
+        authBloc: authBloc,
+        appearanceBloc: appearanceBloc,
+        onboardingBloc: onboardingBloc,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -111,7 +135,11 @@ void main() {
       ),
     );
     await tester.pumpWidget(
-      App(authBloc: authBloc, appearanceBloc: appearanceBloc),
+      App(
+        authBloc: authBloc,
+        appearanceBloc: appearanceBloc,
+        onboardingBloc: onboardingBloc,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -157,6 +185,31 @@ void main() {
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 
+  testWidgets('con el Onboarding pendiente lo muestra en lugar de Inicio', (
+    tester,
+  ) async {
+    whenListen(
+      onboardingBloc,
+      const Stream<OnboardingState>.empty(),
+      initialState: const OnboardingPending(pendingStatus),
+    );
+    givenAuthState(
+      const AuthSuccess(User(id: 'u1', email: 'alex@example.com')),
+    );
+    await tester.pumpWidget(
+      App(
+        authBloc: authBloc,
+        appearanceBloc: appearanceBloc,
+        onboardingBloc: onboardingBloc,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Paso 1 de 5'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    verify(() => onboardingBloc.add(const OnboardingRequested())).called(1);
+  });
+
   testWidgets('cerrar sesión desde Ajustes envía LogoutRequested', (
     tester,
   ) async {
@@ -169,7 +222,11 @@ void main() {
       const AuthSuccess(User(id: 'u1', email: 'alex@example.com')),
     );
     await tester.pumpWidget(
-      App(authBloc: authBloc, appearanceBloc: appearanceBloc),
+      App(
+        authBloc: authBloc,
+        appearanceBloc: appearanceBloc,
+        onboardingBloc: onboardingBloc,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -177,8 +234,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Configuración'));
     await tester.pumpAndSettle();
-    final signOutButton = find.widgetWithText(OutlinedButton, 'Cerrar Sesión');
-    await tester.ensureVisible(signOutButton);
+    final signOutButton = find.text('Cerrar sesión');
+    await tester.scrollUntilVisible(signOutButton, 200);
     await tester.pumpAndSettle();
     await tester.tap(signOutButton);
     await tester.pumpAndSettle();

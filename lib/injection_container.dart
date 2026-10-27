@@ -40,6 +40,12 @@ import 'package:proyecto_movil/features/missions/domain/usecases/complete_missio
 import 'package:proyecto_movil/features/missions/domain/usecases/create_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/get_missions_board.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/onboarding/data/datasources/onboarding_remote_datasource.dart';
+import 'package:proyecto_movil/features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import 'package:proyecto_movil/features/onboarding/domain/repositories/onboarding_repository.dart';
+import 'package:proyecto_movil/features/onboarding/domain/usecases/complete_onboarding.dart';
+import 'package:proyecto_movil/features/onboarding/domain/usecases/get_onboarding_status.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/appearance_local_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/repositories/appearance_repository_impl.dart';
@@ -57,6 +63,12 @@ import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/stage/data/datasources/stage_remote_datasource.dart';
+import 'package:proyecto_movil/features/settings/data/datasources/settings_remote_datasource.dart';
+import 'package:proyecto_movil/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:proyecto_movil/features/settings/domain/repositories/settings_repository.dart';
+import 'package:proyecto_movil/features/settings/domain/usecases/get_settings.dart';
+import 'package:proyecto_movil/features/settings/domain/usecases/save_game_settings.dart';
+import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/stage/data/repositories/stage_repository_impl.dart';
 import 'package:proyecto_movil/features/stage/domain/repositories/stage_repository.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/archive_stage_item.dart';
@@ -195,6 +207,20 @@ Future<void> initDependencies() async {
     () => StageRemoteDataSourceImpl(sl()),
   );
 
+  // ---------- Onboarding ----------
+  // Bloc: singleton porque el router lo consulta en toda la app.
+  sl.registerLazySingleton(
+    () => OnboardingBloc(getOnboardingStatus: sl(), completeOnboarding: sl()),
+  );
+  sl.registerLazySingleton(() => GetOnboardingStatus(sl()));
+  sl.registerLazySingleton(() => CompleteOnboarding(sl()));
+  sl.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<OnboardingRemoteDataSource>(
+    () => OnboardingRemoteDataSourceImpl(sl()),
+  );
+
   // ---------- Perfil ----------
   sl.registerFactory(
     () => ProfileBloc(
@@ -217,6 +243,19 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Configuración (Game Master) ----------
+  sl.registerFactory(
+    () => SettingsBloc(getSettings: sl(), saveGameSettings: sl()),
+  );
+  sl.registerLazySingleton(() => GetSettings(sl()));
+  sl.registerLazySingleton(() => SaveGameSettings(sl()));
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<SettingsRemoteDataSource>(
+    () => SettingsRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Apariencia (tema) ----------

@@ -62,6 +62,9 @@ class DungeonBoard extends Equatable {
     this.candidates = const [],
     this.maxTasks = 5,
     this.cycleXp = 10,
+    this.shortBreakMinutes = 5,
+    this.longBreakMinutes = 15,
+    this.longBreakEveryNCycles = 4,
   });
 
   /// Null si no hay sesión abierta.
@@ -74,8 +77,28 @@ class DungeonBoard extends Equatable {
   /// XP base por ciclo (sin multiplicadores).
   final int cycleXp;
 
+  /// RF-067: descansos que el jugador eligió en Configuración.
+  final int shortBreakMinutes;
+  final int longBreakMinutes;
+  final int longBreakEveryNCycles;
+
+  /// Descanso que sigue a [cyclesDone] ciclos superados.
+  Duration breakAfter(int cyclesDone) => Duration(
+    minutes: cyclesDone > 0 && cyclesDone % longBreakEveryNCycles == 0
+        ? longBreakMinutes
+        : shortBreakMinutes,
+  );
+
   @override
-  List<Object?> get props => [session, candidates, maxTasks, cycleXp];
+  List<Object?> get props => [
+    session,
+    candidates,
+    maxTasks,
+    cycleXp,
+    shortBreakMinutes,
+    longBreakMinutes,
+    longBreakEveryNCycles,
+  ];
 }
 
 /// Resumen al cerrar la sesión.

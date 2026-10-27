@@ -10,12 +10,17 @@ class CycleDurationCard extends StatelessWidget {
     required this.totalMinutes,
     required this.onCycleChanged,
     required this.onTotalChanged,
+    required this.breaksNote,
   });
 
   final int cycleMinutes;
   final int totalMinutes;
   final ValueChanged<int> onCycleChanged;
   final ValueChanged<int> onTotalChanged;
+
+  /// Descansos del jugador (Configuración), p. ej. «Descansos: 5 min, y 15
+  /// min cada 4 ciclos.».
+  final String breaksNote;
 
   static String hours(int minutes) {
     final h = minutes ~/ 60;
@@ -89,8 +94,8 @@ class CycleDurationCard extends StatelessWidget {
             ),
           ],
         ),
-        const Text(
-          'Descansos: 5 min, y 15 min cada 4 ciclos.',
+        Text(
+          breaksNote,
           style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
         ),
       ],

@@ -36,6 +36,10 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         CycleDurationCard(
+          breaksNote:
+              'Descansos: ${widget.board.shortBreakMinutes} min, y '
+              '${widget.board.longBreakMinutes} min cada '
+              '${widget.board.longBreakEveryNCycles} ciclos.',
           cycleMinutes: _cycle,
           totalMinutes: _total,
           onCycleChanged: (v) => setState(() {

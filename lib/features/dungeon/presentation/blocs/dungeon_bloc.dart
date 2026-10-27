@@ -43,11 +43,6 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     );
   }
 
-  // RF-067: descanso corto de 5 min y largo de 15 cada 4 ciclos.
-  // shortcut: valores fijos; leer game_master_settings cuando Ajustes esté conectado.
-  static const shortBreak = Duration(minutes: 5);
-  static const longBreak = Duration(minutes: 15);
-
   final GetDungeonBoard _getBoard;
   final StartDungeon _start;
   final CompleteDungeonCycle _completeCycle;
@@ -230,8 +225,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         now: now,
         busy: false,
         phase: done ? DungeonPhase.done : DungeonPhase.rest,
-        phaseEndsAt: () =>
-            done ? null : now.add(cycles % 4 == 0 ? longBreak : shortBreak),
+        phaseEndsAt: () => done ? null : now.add(board.breakAfter(cycles)),
         currentTaskId: () => _nextTask(s, taskId),
         message: done
             ? '¡Último ciclo superado! Termina la sesión para ver tu botín.'

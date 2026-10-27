@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/settings/domain/entities/game_settings.dart';
+import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/settings/presentation/widgets/account_card.dart';
-import 'package:proyecto_movil/features/settings/presentation/widgets/game_master_card.dart';
-import 'package:proyecto_movil/features/settings/presentation/widgets/notification_preferences_sheet.dart';
-import 'package:proyecto_movil/features/settings/presentation/widgets/sign_out_card.dart';
+import 'package:proyecto_movil/features/settings/presentation/widgets/setting_link.dart';
+import 'package:proyecto_movil/features/settings/presentation/widgets/settings_sheets.dart';
 
-class SettingsScreen extends StatefulWidget {
+/// Configuración (Game Master). Necesita un [SettingsBloc] (lo provee el router).
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
     super.key,
     required this.userName,
@@ -26,71 +29,147 @@ class SettingsScreen extends StatefulWidget {
   final VoidCallback onOpenAppearance;
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  final _notificationPreferences = NotificationPreferences();
-
-  @override
-  Widget build(BuildContext context) => LifeQuestPage(
-    title: 'Configuración',
-    subtitle: '',
-    trailing: IconButton(
-      onPressed: widget.onBack,
-      tooltip: 'Volver al perfil',
-      visualDensity: VisualDensity.compact,
-      icon: const Icon(Icons.settings_outlined, size: 17),
+  Widget build(
+    BuildContext context,
+  ) => BlocConsumer<SettingsBloc, SettingsState>(
+    listenWhen: (_, state) => state is SettingsSuccess && state.message != null,
+    listener: (context, state) =>
+        showLifeQuestMessage(context, (state as SettingsSuccess).message!),
+    builder: (context, state) => LifeQuestPage(
+      title: 'Configuración',
+      subtitle: 'Tus reglas del juego. Cámbialas cuando quieras.',
+      trailing: IconButton(
+        onPressed: onBack,
+        tooltip: 'Volver al perfil',
+        icon: Icon(Icons.close_rounded, color: context.lq.ink),
+      ),
+      children: [
+        AccountCard(
+          userName: userName,
+          overview: state is SettingsSuccess ? state.overview : null,
+        ),
+        const SizedBox(height: 20),
+        ...switch (state) {
+          SettingsSuccess(:final overview, :final saving) => _gameMaster(
+            context,
+            overview,
+            saving: saving,
+          ),
+          SettingsFailure(:final message) => [
+            _LoadError(
+              message: message,
+              onRetry: () =>
+                  context.read<SettingsBloc>().add(const SettingsRequested()),
+            ),
+          ],
+          _ => [
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: CircularProgressIndicator(color: context.lq.deepGreen),
+              ),
+            ),
+          ],
+        },
+        const SizedBox(height: 12),
+        const LifeQuestSectionHeading('APP'),
+        const SizedBox(height: 8),
+        SettingLink(
+          icon: Icons.palette_outlined,
+          title: 'Apariencia',
+          description: 'Modo claro, oscuro o del sistema.',
+          onTap: onOpenAppearance,
+        ),
+        SettingLink(
+          icon: Icons.shopping_bag_outlined,
+          title: 'Contenido de la Tienda',
+          description: 'Elige qué recompensas aparecen en tu Tienda.',
+          onTap: () => showLifeQuestMessage(
+            context,
+            'La Tienda estará disponible próximamente.',
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Tu progreso está guardado en la nube. Puedes volver a entrar '
+          'cuando quieras.',
+          style: TextStyle(color: context.lq.muted, fontSize: 12),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 48,
+          child: OutlinedButton.icon(
+            onPressed: () => _confirmSignOut(context),
+            icon: const Icon(Icons.logout_rounded, size: 20),
+            label: const Text('Cerrar sesión'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: context.lq.ink,
+              side: BorderSide(color: context.lq.line),
+              textStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ],
     ),
-    children: [
-      AccountCard(userName: widget.userName),
-      const SizedBox(height: 11),
-      GameMasterCard(
-        onOpenNotificationPreferences: _showNotificationPreferences,
-        onOpenAppearance: widget.onOpenAppearance,
-      ),
-      const SizedBox(height: 11),
-      const SignOutCard(),
-      const SizedBox(height: 8),
-      SizedBox(
-        width: double.infinity,
-        height: 40,
-        child: FilledButton.icon(
-          onPressed: widget.onBack,
-          icon: const Icon(Icons.sports_esports_outlined, size: 15),
-          label: const Text('Cancelar y Seguir Jugando'),
-          style: FilledButton.styleFrom(
-            backgroundColor: LifeQuestColors.green,
-            textStyle: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 6),
-      SizedBox(
-        width: double.infinity,
-        height: 36,
-        child: OutlinedButton.icon(
-          onPressed: _confirmSignOut,
-          icon: const Icon(Icons.logout, size: 14),
-          label: const Text('Cerrar Sesión'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: LifeQuestColors.ink,
-            backgroundColor: Colors.white,
-            side: const BorderSide(color: LifeQuestColors.line),
-            textStyle: const TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ),
-    ],
   );
 
-  Future<void> _confirmSignOut() async {
+  List<Widget> _gameMaster(
+    BuildContext context,
+    SettingsOverview overview, {
+    required bool saving,
+  }) {
+    final bloc = context.read<SettingsBloc>();
+    final settings = overview.settings;
+
+    Future<void> edit(
+      Future<GameSettings?> Function(BuildContext, GameSettings) sheet,
+    ) async {
+      final result = await sheet(context, settings);
+      if (result != null) bloc.add(GameSettingsChanged(result));
+    }
+
+    return [
+      const LifeQuestSectionHeading('DIFICULTAD'),
+      const SizedBox(height: 4),
+      if (DifficultyPicker.sameCoins(overview.difficulties))
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            'Cambia la XP que ganas y la vida que pierdes. Las Monedas son '
+            'iguales en las tres.',
+            style: TextStyle(color: context.lq.muted, fontSize: 12),
+          ),
+        ),
+      DifficultyPicker(
+        options: overview.difficulties,
+        selected: settings.difficulty,
+        onSelected: saving
+            ? null
+            : (level) =>
+                  bloc.add(GameSettingsChanged(settings.withDifficulty(level))),
+      ),
+      const SizedBox(height: 12),
+      const LifeQuestSectionHeading('REGLAS DEL JUEGO'),
+      const SizedBox(height: 8),
+      SettingLink(
+        icon: Icons.notifications_active_outlined,
+        title: 'Avisos',
+        description: notificationSummary(settings),
+        onTap: saving ? null : () => edit(showNotificationSheet),
+      ),
+      SettingLink(
+        icon: Icons.timer_outlined,
+        title: 'Descansos de la Mazmorra',
+        description: breaksSummary(settings),
+        onTap: saving ? null : () => edit(showBreaksSheet),
+      ),
+    ];
+  }
+
+  Future<void> _confirmSignOut(BuildContext context) async {
     final shouldSignOut = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -110,13 +189,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
-    if (shouldSignOut == true) widget.onSignOut();
+    if (shouldSignOut == true) onSignOut();
   }
+}
 
-  Future<void> _showNotificationPreferences() => showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (_) =>
-        NotificationPreferencesSheet(preferences: _notificationPreferences),
+class _LoadError extends StatelessWidget {
+  const _LoadError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => LifeQuestSurface(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      children: [
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: context.lq.ink, fontSize: 14),
+        ),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: onRetry,
+          icon: const Icon(Icons.refresh_rounded, size: 20),
+          label: const Text('Reintentar'),
+          style: FilledButton.styleFrom(
+            backgroundColor: context.lq.deepGreen,
+            foregroundColor: context.lq.onDeepGreen,
+            minimumSize: const Size(48, 48),
+          ),
+        ),
+      ],
+    ),
   );
 }
