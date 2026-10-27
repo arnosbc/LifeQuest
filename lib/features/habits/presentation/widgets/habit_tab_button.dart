@@ -22,16 +22,16 @@ class HabitTabButton extends StatelessWidget {
       height: 35,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: selected ? LifeQuestColors.green : Colors.white,
+        color: selected ? context.lq.green : context.lq.surface,
         border: Border.all(
-          color: selected ? LifeQuestColors.green : LifeQuestColors.line,
+          color: selected ? context.lq.green : context.lq.line,
         ),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: selected ? Colors.white : LifeQuestColors.muted,
+          color: selected ? context.lq.onDeepGreen : context.lq.muted,
           fontSize: 10,
           fontWeight: FontWeight.w700,
         ),

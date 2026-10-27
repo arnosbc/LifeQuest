@@ -18,8 +18,8 @@ class DungeonScreen extends StatelessWidget {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as DungeonReady).message!),
     builder: (context, state) => switch (state) {
-      DungeonInitial() || DungeonLoading() => const Center(
-        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+      DungeonInitial() || DungeonLoading() => Center(
+        child: CircularProgressIndicator(color: context.lq.deepGreen),
       ),
       DungeonFailure(:final message) => Center(
         child: Padding(
@@ -155,7 +155,7 @@ class DungeonScreen extends StatelessWidget {
             icon: const Icon(Icons.stop),
             label: const Text('Finalizar sesión'),
             style: FilledButton.styleFrom(
-              backgroundColor: LifeQuestColors.deepGreen,
+              backgroundColor: context.lq.deepGreen,
             ),
           ),
         ),

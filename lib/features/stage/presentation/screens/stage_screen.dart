@@ -26,8 +26,8 @@ class StageScreen extends StatelessWidget {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as StageSuccess).message!),
     builder: (context, state) => switch (state) {
-      StageInitial() || StageLoading() => const Center(
-        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+      StageInitial() || StageLoading() => Center(
+        child: CircularProgressIndicator(color: context.lq.deepGreen),
       ),
       StageFailure(:final message) => Center(
         child: Padding(
@@ -47,7 +47,7 @@ class StageScreen extends StatelessWidget {
         ),
       ),
       StageSuccess() => RefreshIndicator(
-        color: LifeQuestColors.deepGreen,
+        color: context.lq.deepGreen,
         onRefresh: () => _refresh(context.read<StageBloc>()),
         child: _content(context, state),
       ),
@@ -124,7 +124,10 @@ class StageScreen extends StatelessWidget {
         ),
         const SizedBox(height: 7),
         if (board.highlight.isEmpty)
-          _empty('Sin misiones abiertas. Añade una para empezar el día.'),
+          _empty(
+            context,
+            'Sin misiones abiertas. Añade una para empezar el día.',
+          ),
         for (final item in board.highlight)
           LifeQuestListRow(
             icon: switch (item.bucket) {
@@ -144,6 +147,7 @@ class StageScreen extends StatelessWidget {
         const SizedBox(height: 7),
         if (board.goals.isEmpty)
           _empty(
+            context,
             'Sin metas activas. Crea una con + y cada misión vinculada le restará vida al jefe.',
           ),
         for (final goal in board.goals)
@@ -177,6 +181,7 @@ class StageScreen extends StatelessWidget {
         const SizedBox(height: 7),
         if (board.projects.isEmpty)
           _empty(
+            context,
             'Sin proyectos activos. Un proyecto agrupa misiones de semanas.',
           ),
         for (final project in board.projects)
@@ -207,7 +212,7 @@ class StageScreen extends StatelessWidget {
         ),
         const SizedBox(height: 7),
         if (board.areas.isEmpty)
-          _empty('Crea tus áreas como skills desde tu Perfil.'),
+          _empty(context, 'Crea tus áreas como skills desde tu Perfil.'),
         for (final area in board.areas)
           LifeQuestListRow(
             icon: Icons.category_outlined,
@@ -224,7 +229,7 @@ class StageScreen extends StatelessWidget {
         ),
         const SizedBox(height: 7),
         if (board.resources.isEmpty)
-          _empty('Guarda aquí enlaces útiles para tus áreas.'),
+          _empty(context, 'Guarda aquí enlaces útiles para tus áreas.'),
         for (final resource in board.resources)
           StageActionRow(
             icon: Icons.bookmark_border,
@@ -268,12 +273,12 @@ class StageScreen extends StatelessWidget {
     );
   }
 
-  static Widget _empty(String text) => Padding(
+  static Widget _empty(BuildContext context, String text) => Padding(
     padding: const EdgeInsets.only(bottom: 7),
     child: LifeQuestSurface(
       child: Text(
         text,
-        style: const TextStyle(color: LifeQuestColors.muted, fontSize: 11),
+        style: TextStyle(color: context.lq.muted, fontSize: 11),
       ),
     ),
   );

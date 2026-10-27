@@ -41,21 +41,21 @@ class DungeonTimerRing extends StatelessWidget {
                       ? 0
                       : remaining.inSeconds / total.inSeconds,
                   strokeWidth: 5,
-                  backgroundColor: LifeQuestColors.line,
-                  color: LifeQuestColors.deepGreen,
+                  backgroundColor: context.lq.line,
+                  color: context.lq.deepGreen,
                 ),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'TIEMPO RESTANTE',
-                    style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+                    style: TextStyle(color: context.lq.muted, fontSize: 9),
                   ),
                   Text(
                     '$mm:$ss',
-                    style: const TextStyle(
-                      color: LifeQuestColors.ink,
+                    style: TextStyle(
+                      color: context.lq.ink,
                       fontSize: 36,
                       fontWeight: FontWeight.w800,
                     ),
@@ -66,13 +66,13 @@ class DungeonTimerRing extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: LifeQuestColors.softGreen,
+                      color: context.lq.softGreen,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       label,
-                      style: const TextStyle(
-                        color: LifeQuestColors.deepGreen,
+                      style: TextStyle(
+                        color: context.lq.deepGreen,
                         fontSize: 8,
                         fontWeight: FontWeight.w800,
                       ),
@@ -81,10 +81,7 @@ class DungeonTimerRing extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     footer,
-                    style: const TextStyle(
-                      color: LifeQuestColors.muted,
-                      fontSize: 8,
-                    ),
+                    style: TextStyle(color: context.lq.muted, fontSize: 8),
                   ),
                 ],
               ),

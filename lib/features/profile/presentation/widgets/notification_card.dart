@@ -20,8 +20,8 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDigest = item.kind == NotificationKind.informative;
     final accent = item.kind == NotificationKind.critical
-        ? const Color(0xFF44C982)
-        : LifeQuestColors.line;
+        ? context.lq.green
+        : context.lq.line;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 11),
@@ -32,8 +32,8 @@ class NotificationCard extends StatelessWidget {
             padding: const EdgeInsets.only(left: 2, bottom: 5),
             child: Text(
               item.kind.label,
-              style: const TextStyle(
-                color: LifeQuestColors.muted,
+              style: TextStyle(
+                color: context.lq.muted,
                 fontSize: 8,
                 fontWeight: FontWeight.w800,
               ),
@@ -47,11 +47,9 @@ class NotificationCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.lq.surface,
                   border: Border.all(
-                    color: isDigest
-                        ? LifeQuestColors.green
-                        : LifeQuestColors.line,
+                    color: isDigest ? context.lq.green : context.lq.line,
                   ),
                   borderRadius: BorderRadius.circular(11),
                 ),
@@ -67,7 +65,7 @@ class NotificationCard extends StatelessWidget {
                           Text(
                             item.title,
                             style: TextStyle(
-                              color: LifeQuestColors.ink,
+                              color: context.lq.ink,
                               fontSize: 9,
                               fontWeight: isRead
                                   ? FontWeight.w600
@@ -77,8 +75,8 @@ class NotificationCard extends StatelessWidget {
                           const SizedBox(height: 3),
                           Text(
                             item.description,
-                            style: const TextStyle(
-                              color: LifeQuestColors.muted,
+                            style: TextStyle(
+                              color: context.lq.muted,
                               fontSize: 8,
                               height: 1.35,
                             ),
@@ -92,8 +90,8 @@ class NotificationCard extends StatelessWidget {
                       children: [
                         Text(
                           item.time,
-                          style: const TextStyle(
-                            color: LifeQuestColors.muted,
+                          style: TextStyle(
+                            color: context.lq.muted,
                             fontSize: 7,
                           ),
                         ),

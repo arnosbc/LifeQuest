@@ -58,8 +58,8 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
 
   @override
   Widget build(BuildContext context) => Container(
-    decoration: const BoxDecoration(
-      color: LifeQuestColors.background,
+    decoration: BoxDecoration(
+      color: context.lq.background,
       borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
     ),
     padding: EdgeInsets.fromLTRB(
@@ -75,12 +75,12 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Nuevo hábito',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: LifeQuestColors.ink,
+                color: context.lq.ink,
               ),
             ),
             const SizedBox(height: 12),
@@ -109,9 +109,9 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             ),
             const SizedBox(height: 8),
             if (_type == HabitType.good) ...[
-              const Text(
+              Text(
                 '¿Qué días? (ninguno = todos los días)',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 12),
+                style: TextStyle(color: context.lq.muted, fontSize: 12),
               ),
               const SizedBox(height: 6),
               Wrap(
@@ -134,9 +134,9 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                 ],
               ),
             ] else ...[
-              const Text(
+              Text(
                 '¿Cuánto te afecta? Cada registro resta esa vida.',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 12),
+                style: TextStyle(color: context.lq.muted, fontSize: 12),
               ),
               const SizedBox(height: 6),
               SegmentedButton<int>(

@@ -42,8 +42,8 @@ class PriorityMissionCard extends StatelessWidget {
                   children: [
                     Text(
                       mission?.title ?? 'No tienes misiones pendientes',
-                      style: const TextStyle(
-                        color: LifeQuestColors.ink,
+                      style: TextStyle(
+                        color: context.lq.ink,
                         fontSize: 17,
                         height: 1.25,
                         fontWeight: FontWeight.w700,
@@ -51,12 +51,9 @@ class PriorityMissionCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     if (mission == null)
-                      const Text(
+                      Text(
                         'Captura una idea o crea tu próxima misión.',
-                        style: TextStyle(
-                          color: LifeQuestColors.muted,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: context.lq.muted, fontSize: 13),
                       )
                     else
                       Wrap(
@@ -110,8 +107,8 @@ class PriorityMissionCard extends StatelessWidget {
               ),
               label: Text(mission == null ? 'Crear misión' : 'Continuar'),
               style: FilledButton.styleFrom(
-                backgroundColor: LifeQuestColors.deepGreen,
-                foregroundColor: Colors.white,
+                backgroundColor: context.lq.deepGreen,
+                foregroundColor: context.lq.onDeepGreen,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -138,13 +135,13 @@ class _Meta extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(icon, size: 16, color: LifeQuestColors.deepGreen),
+      Icon(icon, size: 16, color: context.lq.deepGreen),
       const SizedBox(width: 4),
       Flexible(
         child: Text(
           label,
-          style: const TextStyle(
-            color: LifeQuestColors.deepGreen,
+          style: TextStyle(
+            color: context.lq.deepGreen,
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
@@ -164,19 +161,19 @@ class _Reward extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     decoration: BoxDecoration(
-      color: LifeQuestColors.softGreen,
+      color: context.lq.softGreen,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: LifeQuestColors.deepGreen),
+        Icon(icon, size: 16, color: context.lq.deepGreen),
         const SizedBox(width: 4),
         Flexible(
           child: Text(
             label,
-            style: const TextStyle(
-              color: LifeQuestColors.ink,
+            style: TextStyle(
+              color: context.lq.ink,
               fontSize: 13,
               fontWeight: FontWeight.w700,
             ),

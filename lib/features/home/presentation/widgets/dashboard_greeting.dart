@@ -57,8 +57,8 @@ class DashboardGreeting extends StatelessWidget {
               Text(
                 '${_weekdays[date.weekday - 1]}, ${date.day} de '
                 '${_months[date.month - 1]}',
-                style: const TextStyle(
-                  color: LifeQuestColors.deepGreen,
+                style: TextStyle(
+                  color: context.lq.deepGreen,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -68,17 +68,17 @@ class DashboardGreeting extends StatelessWidget {
                 '$greeting, $userName',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
+                style: TextStyle(
+                  color: context.lq.ink,
                   fontSize: 24,
                   height: 1.2,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Tu siguiente avance está listo.',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 15),
+                style: TextStyle(color: context.lq.muted, fontSize: 15),
               ),
             ],
           ),
@@ -90,9 +90,9 @@ class DashboardGreeting extends StatelessWidget {
               showLifeQuestMessage(context, 'No tienes notificaciones nuevas.'),
           icon: const Icon(Icons.notifications_none_rounded, size: 22),
           style: IconButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: LifeQuestColors.ink,
-            side: const BorderSide(color: LifeQuestColors.line),
+            backgroundColor: context.lq.surface,
+            foregroundColor: context.lq.ink,
+            side: BorderSide(color: context.lq.line),
             minimumSize: const Size(48, 48),
           ),
         ),
@@ -102,11 +102,11 @@ class DashboardGreeting extends StatelessWidget {
           style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
           icon: CircleAvatar(
             radius: 18,
-            backgroundColor: LifeQuestColors.deepGreen,
+            backgroundColor: context.lq.deepGreen,
             child: Text(
               userName.isEmpty ? 'A' : userName[0].toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: context.lq.onDeepGreen,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),

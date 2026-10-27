@@ -39,8 +39,8 @@ class MissionTile extends StatelessWidget {
                 mission.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
+                style: TextStyle(
+                  color: context.lq.ink,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -50,31 +50,28 @@ class MissionTile extends StatelessWidget {
                 '${MissionsFormat.origin(mission)}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: LifeQuestColors.muted,
-                  fontSize: 9,
-                ),
+                style: TextStyle(color: context.lq.muted, fontSize: 9),
               ),
             ],
           ),
         ),
         Text(
           '${mission.xpReward} XP',
-          style: const TextStyle(
-            color: LifeQuestColors.deepGreen,
+          style: TextStyle(
+            color: context.lq.deepGreen,
             fontSize: 9,
             fontWeight: FontWeight.w700,
           ),
         ),
         if (busy)
-          const SizedBox(
+          SizedBox(
             width: 48,
             height: 48,
             child: Padding(
               padding: EdgeInsets.all(14),
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: LifeQuestColors.deepGreen,
+                color: context.lq.deepGreen,
               ),
             ),
           )
@@ -82,10 +79,7 @@ class MissionTile extends StatelessWidget {
           IconButton(
             onPressed: onComplete,
             tooltip: 'Completar «${mission.title}»',
-            icon: const Icon(
-              Icons.check_circle_outline,
-              color: LifeQuestColors.deepGreen,
-            ),
+            icon: Icon(Icons.check_circle_outline, color: context.lq.deepGreen),
           ),
       ],
     ),

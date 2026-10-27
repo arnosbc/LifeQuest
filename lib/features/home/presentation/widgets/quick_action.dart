@@ -25,8 +25,8 @@ class QuickAction extends StatelessWidget {
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       textAlign: vertical ? TextAlign.center : TextAlign.start,
-      style: const TextStyle(
-        color: LifeQuestColors.ink,
+      style: TextStyle(
+        color: context.lq.ink,
         fontSize: 13,
         height: 1.2,
         fontWeight: FontWeight.w600,
@@ -34,9 +34,9 @@ class QuickAction extends StatelessWidget {
     );
 
     return Material(
-      color: Colors.white,
+      color: context.lq.surface,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: LifeQuestColors.line),
+        side: BorderSide(color: context.lq.line),
         borderRadius: BorderRadius.circular(11),
       ),
       child: InkWell(

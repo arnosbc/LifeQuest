@@ -40,18 +40,18 @@ class HabitCalendar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'CALENDARIO',
               style: TextStyle(
-                color: LifeQuestColors.muted,
+                color: context.lq.muted,
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
               ),
             ),
             Text(
               '${_months[month.month - 1]} ${month.year}',
-              style: const TextStyle(
-                color: LifeQuestColors.ink,
+              style: TextStyle(
+                color: context.lq.ink,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
               ),
@@ -81,7 +81,11 @@ class HabitCalendar extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         for (var col = 0; col < 7; col++)
-                          _day(week * 7 + col - offset + 1, daysInMonth),
+                          _day(
+                            context,
+                            week * 7 + col - offset + 1,
+                            daysInMonth,
+                          ),
                       ],
                     ),
                   ),
@@ -93,7 +97,7 @@ class HabitCalendar extends StatelessWidget {
     );
   }
 
-  Widget _day(int day, int daysInMonth) {
+  Widget _day(BuildContext context, int day, int daysInMonth) {
     if (day < 1 || day > daysInMonth) return const SizedBox(width: 22);
     final active = activeDays.contains(day);
     return Container(
@@ -101,16 +105,16 @@ class HabitCalendar extends StatelessWidget {
       height: 22,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active ? LifeQuestColors.green : Colors.transparent,
+        color: active ? context.lq.green : Colors.transparent,
         border: day == month.day
-            ? Border.all(color: LifeQuestColors.deepGreen, width: 1.5)
+            ? Border.all(color: context.lq.deepGreen, width: 1.5)
             : null,
         shape: BoxShape.circle,
       ),
       child: Text(
         '$day',
         style: TextStyle(
-          color: active ? Colors.white : LifeQuestColors.ink,
+          color: active ? context.lq.onDeepGreen : context.lq.ink,
           fontSize: 8,
           fontWeight: FontWeight.w600,
         ),

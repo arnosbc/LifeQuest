@@ -19,15 +19,19 @@ class NotificationFilterChips extends StatelessWidget {
     scrollDirection: Axis.horizontal,
     child: Row(
       children: [
-        _filterChip('Todas', null),
-        _filterChip('Crítica', NotificationKind.critical),
-        _filterChip('Motivacional', NotificationKind.motivational),
-        _filterChip('Informativa', NotificationKind.informative),
+        _filterChip(context, 'Todas', null),
+        _filterChip(context, 'Crítica', NotificationKind.critical),
+        _filterChip(context, 'Motivacional', NotificationKind.motivational),
+        _filterChip(context, 'Informativa', NotificationKind.informative),
       ],
     ),
   );
 
-  Widget _filterChip(String label, NotificationKind? filter) {
+  Widget _filterChip(
+    BuildContext context,
+    String label,
+    NotificationKind? filter,
+  ) {
     final isSelected = selected == filter;
     return Padding(
       padding: const EdgeInsets.only(right: 6),
@@ -37,14 +41,14 @@ class NotificationFilterChips extends StatelessWidget {
         onSelected: (_) => onSelected(filter),
         showCheckmark: false,
         labelStyle: TextStyle(
-          color: isSelected ? Colors.white : LifeQuestColors.muted,
+          color: isSelected ? context.lq.onDeepGreen : context.lq.muted,
           fontSize: 9,
           fontWeight: FontWeight.w700,
         ),
-        backgroundColor: Colors.white,
-        selectedColor: LifeQuestColors.green,
+        backgroundColor: context.lq.surface,
+        selectedColor: context.lq.green,
         side: BorderSide(
-          color: isSelected ? LifeQuestColors.green : LifeQuestColors.line,
+          color: isSelected ? context.lq.green : context.lq.line,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 2),
         visualDensity: VisualDensity.compact,

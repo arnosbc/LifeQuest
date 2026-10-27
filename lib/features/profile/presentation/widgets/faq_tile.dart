@@ -18,8 +18,8 @@ class FaqTile extends StatelessWidget {
         childrenPadding: const EdgeInsets.fromLTRB(9, 0, 9, 9),
         title: Text(
           question,
-          style: const TextStyle(
-            color: LifeQuestColors.ink,
+          style: TextStyle(
+            color: context.lq.ink,
             fontSize: 9,
             fontWeight: FontWeight.w700,
           ),
@@ -27,11 +27,7 @@ class FaqTile extends StatelessWidget {
         children: [
           Text(
             answer,
-            style: const TextStyle(
-              color: LifeQuestColors.muted,
-              fontSize: 9,
-              height: 1.4,
-            ),
+            style: TextStyle(color: context.lq.muted, fontSize: 9, height: 1.4),
           ),
         ],
       ),

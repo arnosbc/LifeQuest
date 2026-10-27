@@ -114,8 +114,8 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
     maxChildSize: .96,
     expand: false,
     builder: (context, scrollController) => Container(
-      decoration: const BoxDecoration(
-        color: LifeQuestColors.background,
+      decoration: BoxDecoration(
+        color: context.lq.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       child: Form(
@@ -134,24 +134,24 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                 width: 38,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: LifeQuestColors.line,
+                  color: context.lq.line,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
             ),
             const SizedBox(height: 15),
-            const Text(
+            Text(
               'Nueva misión',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: LifeQuestColors.ink,
+                color: context.lq.ink,
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'Define el siguiente paso y deja que LifeQuest calcule tu recompensa.',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 12),
+              style: TextStyle(color: context.lq.muted, fontSize: 12),
             ),
             const SizedBox(height: 16),
             _section('¿QUÉ NECESITAS LOGRAR?'),
@@ -294,30 +294,27 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
             ),
             const SizedBox(height: 8),
             LifeQuestSurface(
-              color: const Color(0xFFEDFBF2),
+              color: context.lq.softGreen,
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.auto_awesome,
-                    color: LifeQuestColors.deepGreen,
-                  ),
+                  Icon(Icons.auto_awesome, color: context.lq.deepGreen),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'RECOMPENSA ESTIMADA',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
-                            color: LifeQuestColors.deepGreen,
+                            color: context.lq.deepGreen,
                           ),
                         ),
                         Text(
                           '$_xp XP · ${MissionsFormat.estimatedCoins(_xp)} monedas',
-                          style: const TextStyle(
-                            color: LifeQuestColors.ink,
+                          style: TextStyle(
+                            color: context.lq.ink,
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                           ),
@@ -345,7 +342,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                 icon: const Icon(Icons.play_arrow),
                 label: const Text('Crear e iniciar Focus'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: LifeQuestColors.deepGreen,
+                  foregroundColor: context.lq.deepGreen,
                 ),
               ),
             ),
@@ -359,8 +356,8 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
     padding: const EdgeInsets.only(bottom: 6),
     child: Text(
       title,
-      style: const TextStyle(
-        color: LifeQuestColors.deepGreen,
+      style: TextStyle(
+        color: context.lq.deepGreen,
         fontSize: 10,
         fontWeight: FontWeight.w800,
       ),

@@ -34,8 +34,8 @@ class LevelCard extends StatelessWidget {
                       d.characterClass == null
                           ? 'Nivel ${d.level}'
                           : 'Nivel ${d.level} · ${d.characterClass}',
-                      style: const TextStyle(
-                        color: LifeQuestColors.ink,
+                      style: TextStyle(
+                        color: context.lq.ink,
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
                       ),
@@ -44,10 +44,7 @@ class LevelCard extends StatelessWidget {
                     Text(
                       'Te faltan ${HomeFormat.number(xpLeft)} XP para el '
                       'nivel ${d.level + 1}',
-                      style: const TextStyle(
-                        color: LifeQuestColors.muted,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: context.lq.muted, fontSize: 13),
                     ),
                   ],
                 ),
@@ -62,22 +59,22 @@ class LevelCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: LifeQuestColors.softGreen,
+                    color: context.lq.softGreen,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.toll_rounded,
                         size: 16,
-                        color: LifeQuestColors.deepGreen,
+                        color: context.lq.deepGreen,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         coins,
-                        style: const TextStyle(
-                          color: LifeQuestColors.deepGreen,
+                        style: TextStyle(
+                          color: context.lq.deepGreen,
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
                         ),
@@ -91,13 +88,13 @@ class LevelCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Progreso de XP',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: LifeQuestColors.muted,
+                    color: context.lq.muted,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -107,8 +104,8 @@ class LevelCard extends StatelessWidget {
               Text(
                 '${HomeFormat.number(d.currentXp)} / '
                 '${HomeFormat.number(d.xpToNextLevel)}',
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
+                style: TextStyle(
+                  color: context.lq.ink,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   fontFeatures: [FontFeature.tabularFigures()],
@@ -123,8 +120,8 @@ class LevelCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              color: LifeQuestColors.green,
-              backgroundColor: LifeQuestColors.softGreen,
+              color: context.lq.green,
+              backgroundColor: context.lq.softGreen,
               borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
           ),
@@ -134,25 +131,22 @@ class LevelCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF8F7),
+                color: context.lq.warning.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(
                     Icons.favorite_border_rounded,
                     size: 18,
-                    color: Color(0xFFE67777),
+                    color: context.lq.warning,
                   ),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Tu héroe está débil por ahora: gana un 10 % menos de '
                       'XP y monedas hasta recuperar su vitalidad.',
-                      style: TextStyle(
-                        color: LifeQuestColors.ink,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: context.lq.ink, fontSize: 13),
                     ),
                   ),
                 ],

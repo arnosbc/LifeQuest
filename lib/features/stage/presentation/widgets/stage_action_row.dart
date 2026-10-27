@@ -45,8 +45,8 @@ class StageActionRow extends StatelessWidget {
                   title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: LifeQuestColors.ink,
+                  style: TextStyle(
+                    color: context.lq.ink,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -56,18 +56,15 @@ class StageActionRow extends StatelessWidget {
                   subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: LifeQuestColors.muted,
-                    fontSize: 10,
-                  ),
+                  style: TextStyle(color: context.lq.muted, fontSize: 10),
                 ),
                 if (progress case final value?) ...[
                   const SizedBox(height: 5),
                   LinearProgressIndicator(
                     value: value,
                     minHeight: 4,
-                    color: LifeQuestColors.deepGreen,
-                    backgroundColor: LifeQuestColors.line,
+                    color: context.lq.deepGreen,
+                    backgroundColor: context.lq.line,
                   ),
                 ],
               ],
@@ -78,8 +75,8 @@ class StageActionRow extends StatelessWidget {
               padding: const EdgeInsets.only(left: 6),
               child: Text(
                 trailing!,
-                style: const TextStyle(
-                  color: LifeQuestColors.deepGreen,
+                style: TextStyle(
+                  color: context.lq.deepGreen,
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                 ),
@@ -88,7 +85,7 @@ class StageActionRow extends StatelessWidget {
           PopupMenuButton<int>(
             enabled: enabled,
             tooltip: 'Opciones de «$title»',
-            icon: const Icon(Icons.more_vert, color: LifeQuestColors.muted),
+            icon: Icon(Icons.more_vert, color: context.lq.muted),
             onSelected: (i) => actions[i].onSelected?.call(),
             itemBuilder: (_) => [
               for (var i = 0; i < actions.length; i++)

@@ -29,16 +29,16 @@ class HabitStrip extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
         child: Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
                 'Hoy no tienes hábitos programados.',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 13),
+                style: TextStyle(color: context.lq.muted, fontSize: 13),
               ),
             ),
             TextButton(
               onPressed: onOpenHabits,
               style: TextButton.styleFrom(
-                foregroundColor: LifeQuestColors.deepGreen,
+                foregroundColor: context.lq.deepGreen,
                 minimumSize: const Size(48, 48),
               ),
               child: const Text('Crear hábito'),
@@ -53,22 +53,22 @@ class HabitStrip extends StatelessWidget {
       children: [
         for (var i = 0; i < visible.length; i++) ...[
           if (i > 0) const SizedBox(width: 8),
-          Expanded(child: _habitChip(visible[i])),
+          Expanded(child: _habitChip(context, visible[i])),
         ],
       ],
     );
   }
 
-  Widget _habitChip(TodayHabit habit) {
+  Widget _habitChip(BuildContext context, TodayHabit habit) {
     final busy = habit.id == busyHabitId;
     return MergeSemantics(
       child: Semantics(
         checked: habit.done,
         child: Material(
-          color: habit.done ? LifeQuestColors.softGreen : Colors.white,
+          color: habit.done ? context.lq.softGreen : context.lq.surface,
           shape: RoundedRectangleBorder(
             side: BorderSide(
-              color: habit.done ? LifeQuestColors.green : LifeQuestColors.line,
+              color: habit.done ? context.lq.green : context.lq.line,
             ),
             borderRadius: BorderRadius.circular(11),
           ),
@@ -84,11 +84,11 @@ class HabitStrip extends StatelessWidget {
                   SizedBox.square(
                     dimension: 24,
                     child: busy
-                        ? const Padding(
+                        ? Padding(
                             padding: EdgeInsets.all(3),
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              color: LifeQuestColors.deepGreen,
+                              color: context.lq.deepGreen,
                             ),
                           )
                         : AnimatedSwitcher(
@@ -99,8 +99,8 @@ class HabitStrip extends StatelessWidget {
                                   : Icons.radio_button_unchecked_rounded,
                               key: ValueKey(habit.done),
                               color: habit.done
-                                  ? LifeQuestColors.deepGreen
-                                  : LifeQuestColors.muted,
+                                  ? context.lq.deepGreen
+                                  : context.lq.muted,
                               size: 24,
                             ),
                           ),
@@ -110,8 +110,8 @@ class HabitStrip extends StatelessWidget {
                     habit.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: LifeQuestColors.ink,
+                    style: TextStyle(
+                      color: context.lq.ink,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),

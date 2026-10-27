@@ -32,27 +32,20 @@ class HelpResourceTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: LifeQuestColors.ink,
+                    style: TextStyle(
+                      color: context.lq.ink,
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: LifeQuestColors.muted,
-                      fontSize: 8,
-                    ),
+                    style: TextStyle(color: context.lq.muted, fontSize: 8),
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: LifeQuestColors.muted,
-              size: 16,
-            ),
+            Icon(Icons.chevron_right, color: context.lq.muted, size: 16),
           ],
         ),
       ),

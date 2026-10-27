@@ -30,8 +30,8 @@ class MissionsScreen extends StatelessWidget {
           if (state.focusRequested) onStartFocus();
         },
         builder: (context, state) => switch (state) {
-          MissionsInitial() || MissionsLoading() => const Center(
-            child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+          MissionsInitial() || MissionsLoading() => Center(
+            child: CircularProgressIndicator(color: context.lq.deepGreen),
           ),
           MissionsFailure(:final message) => _ErrorView(
             message: message,
@@ -39,7 +39,7 @@ class MissionsScreen extends StatelessWidget {
                 context.read<MissionsBloc>().add(const MissionsRequested()),
           ),
           MissionsSuccess() => RefreshIndicator(
-            color: LifeQuestColors.deepGreen,
+            color: context.lq.deepGreen,
             onRefresh: () => _refresh(context.read<MissionsBloc>()),
             child: _content(context, state),
           ),
@@ -81,10 +81,10 @@ class MissionsScreen extends StatelessWidget {
       subtitle: 'Cada paso cuenta para tu siguiente nivel.',
       children: [
         if (missions.isEmpty)
-          const LifeQuestSurface(
+          LifeQuestSurface(
             child: Text(
               'No tienes misiones abiertas. Crea la primera y da el siguiente paso.',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 12),
+              style: TextStyle(color: context.lq.muted, fontSize: 12),
             ),
           )
         else ...[
@@ -152,7 +152,7 @@ class _ErrorView extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: LifeQuestColors.ink),
+            style: TextStyle(color: context.lq.ink),
           ),
           const SizedBox(height: 12),
           FilledButton(onPressed: onRetry, child: const Text('Reintentar')),

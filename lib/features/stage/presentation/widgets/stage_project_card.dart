@@ -52,8 +52,8 @@ class StageProjectCard extends StatelessWidget {
                 project.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
+                style: TextStyle(
+                  color: context.lq.ink,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -63,10 +63,7 @@ class StageProjectCard extends StatelessWidget {
                 children: [
                   Text(
                     '$details\n${project.tasksDone} de ${project.tasksTotal} misiones · $urgencyLabel',
-                    style: const TextStyle(
-                      color: LifeQuestColors.muted,
-                      fontSize: 10,
-                    ),
+                    style: TextStyle(color: context.lq.muted, fontSize: 10),
                   ),
                   const SizedBox(height: 5),
                   LinearProgressIndicator(
@@ -74,21 +71,18 @@ class StageProjectCard extends StatelessWidget {
                         ? 0
                         : project.tasksDone / project.tasksTotal,
                     minHeight: 4,
-                    color: LifeQuestColors.deepGreen,
-                    backgroundColor: LifeQuestColors.line,
+                    color: context.lq.deepGreen,
+                    backgroundColor: context.lq.line,
                   ),
                 ],
               ),
               children: [
                 if (project.tasks.isEmpty)
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Aún no tiene misiones.',
-                      style: TextStyle(
-                        color: LifeQuestColors.muted,
-                        fontSize: 11,
-                      ),
+                      style: TextStyle(color: context.lq.muted, fontSize: 11),
                     ),
                   ),
                 for (final task in project.tasks)
@@ -99,8 +93,8 @@ class StageProjectCard extends StatelessWidget {
                           task.title,
                           style: TextStyle(
                             color: task.done
-                                ? LifeQuestColors.muted
-                                : LifeQuestColors.ink,
+                                ? context.lq.muted
+                                : context.lq.ink,
                             fontSize: 11,
                             decoration: task.done
                                 ? TextDecoration.lineThrough
@@ -109,11 +103,11 @@ class StageProjectCard extends StatelessWidget {
                         ),
                       ),
                       if (task.done)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(12),
                           child: Icon(
                             Icons.check_circle,
-                            color: LifeQuestColors.green,
+                            color: context.lq.green,
                             size: 22,
                             semanticLabel: 'Completada',
                           ),
@@ -124,9 +118,9 @@ class StageProjectCard extends StatelessWidget {
                           onPressed: onCompleteTask == null
                               ? null
                               : () => onCompleteTask!(task.id),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.check_circle_outline,
-                            color: LifeQuestColors.deepGreen,
+                            color: context.lq.deepGreen,
                           ),
                         ),
                     ],

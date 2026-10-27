@@ -24,17 +24,17 @@ class BadHabitsView extends StatelessWidget {
     final todayEvents = habits.fold(0, (sum, h) => sum + h.todayCount);
     return Column(
       children: [
-        const LifeQuestSurface(
-          color: Color(0xFFFFF8F7),
+        LifeQuestSurface(
+          color: context.lq.warning.withValues(alpha: 0.06),
           child: Row(
             children: [
-              Icon(Icons.favorite_border, color: Color(0xFFE67777), size: 23),
+              Icon(Icons.favorite_border, color: context.lq.warning, size: 23),
               SizedBox(width: 9),
               Expanded(
                 child: Text(
                   'Reconocer tus patrones te ayuda a cambiarlos. Registra cada vez que ocurra, sin culpa.',
                   style: TextStyle(
-                    color: LifeQuestColors.muted,
+                    color: context.lq.muted,
                     fontSize: 10,
                     height: 1.4,
                   ),
@@ -50,13 +50,13 @@ class BadHabitsView extends StatelessWidget {
         ),
         const SizedBox(height: 7),
         if (habits.isEmpty)
-          const LifeQuestSurface(
+          LifeQuestSurface(
             child: Text(
               'No tienes hábitos por evitar. Si quieres cambiar alguno, créalo aquí.',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 11),
+              style: TextStyle(color: context.lq.muted, fontSize: 11),
             ),
           ),
-        for (final habit in habits) _badHabit(habit),
+        for (final habit in habits) _badHabit(context, habit),
         const SizedBox(height: 15),
         const LifeQuestSectionHeading('RESUMEN SEMANAL'),
         const SizedBox(height: 6),
@@ -82,15 +82,15 @@ class BadHabitsView extends StatelessWidget {
     );
   }
 
-  Widget _badHabit(Habit habit) => Padding(
+  Widget _badHabit(BuildContext context, Habit habit) => Padding(
     padding: const EdgeInsets.only(bottom: 7),
     child: LifeQuestSurface(
       padding: const EdgeInsets.fromLTRB(9, 4, 4, 4),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.remove_circle_outline,
-            color: Color(0xFFE67777),
+            color: context.lq.warning,
             size: 16,
           ),
           const SizedBox(width: 7),
@@ -102,18 +102,15 @@ class BadHabitsView extends StatelessWidget {
                   habit.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: LifeQuestColors.ink,
+                  style: TextStyle(
+                    color: context.lq.ink,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   'Hoy: ${habit.todayCount} · −${habit.hpPenalty} de vida por registro',
-                  style: const TextStyle(
-                    color: LifeQuestColors.muted,
-                    fontSize: 9,
-                  ),
+                  style: TextStyle(color: context.lq.muted, fontSize: 9),
                 ),
               ],
             ),

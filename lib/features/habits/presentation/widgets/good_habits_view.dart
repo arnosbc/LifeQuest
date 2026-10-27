@@ -31,7 +31,7 @@ class GoodHabitsView extends StatelessWidget {
     return Column(
       children: [
         LifeQuestSurface(
-          color: const Color(0xFFEBF9EF),
+          color: context.lq.softGreen,
           child: Row(
             children: [
               const Text('🔥', style: TextStyle(fontSize: 24)),
@@ -44,17 +44,17 @@ class GoodHabitsView extends StatelessWidget {
                       streak == 0
                           ? 'Empieza tu racha hoy'
                           : 'Racha actual $streak ${streak == 1 ? 'día' : 'días'}',
-                      style: const TextStyle(
-                        color: LifeQuestColors.ink,
+                      style: TextStyle(
+                        color: context.lq.ink,
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 3),
-                    const Text(
+                    Text(
                       'Cada hábito positivo suma XP y monedas. Cada día superado refuerza tu progreso.',
                       style: TextStyle(
-                        color: LifeQuestColors.muted,
+                        color: context.lq.muted,
                         fontSize: 9,
                         height: 1.35,
                       ),
@@ -72,10 +72,10 @@ class GoodHabitsView extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         if (habits.isEmpty)
-          const LifeQuestSurface(
+          LifeQuestSurface(
             child: Text(
               'Aún no tienes hábitos buenos. Crea uno pequeño para empezar.',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 11),
+              style: TextStyle(color: context.lq.muted, fontSize: 11),
             ),
           ),
         for (final habit in habits)

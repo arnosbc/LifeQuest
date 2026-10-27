@@ -43,8 +43,8 @@ class HabitRow extends StatelessWidget {
                     habit.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: LifeQuestColors.ink,
+                    style: TextStyle(
+                      color: context.lq.ink,
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                     ),
@@ -60,9 +60,7 @@ class HabitRow extends StatelessWidget {
                             height: 6,
                             margin: const EdgeInsets.only(right: 3, top: 4),
                             decoration: BoxDecoration(
-                              color: done
-                                  ? LifeQuestColors.green
-                                  : LifeQuestColors.line,
+                              color: done ? context.lq.green : context.lq.line,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -71,8 +69,8 @@ class HabitRow extends StatelessWidget {
                             padding: const EdgeInsets.only(left: 4, top: 4),
                             child: Text(
                               '🔥 ${habit.currentStreak}',
-                              style: const TextStyle(
-                                color: LifeQuestColors.muted,
+                              style: TextStyle(
+                                color: context.lq.muted,
                                 fontSize: 8,
                               ),
                             ),
@@ -86,21 +84,21 @@ class HabitRow extends StatelessWidget {
             Text(
               '$doneDays/7\n$_frequency',
               textAlign: TextAlign.right,
-              style: const TextStyle(
-                color: LifeQuestColors.muted,
+              style: TextStyle(
+                color: context.lq.muted,
                 fontSize: 8,
                 fontWeight: FontWeight.w700,
               ),
             ),
             if (busy)
-              const SizedBox(
+              SizedBox(
                 width: 48,
                 height: 48,
                 child: Padding(
                   padding: EdgeInsets.all(15),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: LifeQuestColors.deepGreen,
+                    color: context.lq.deepGreen,
                   ),
                 ),
               )
@@ -120,9 +118,7 @@ class HabitRow extends StatelessWidget {
                       : habit.scheduledToday
                       ? Icons.circle_outlined
                       : Icons.bedtime_outlined,
-                  color: habit.doneToday
-                      ? LifeQuestColors.green
-                      : LifeQuestColors.muted,
+                  color: habit.doneToday ? context.lq.green : context.lq.muted,
                   size: 22,
                 ),
               ),

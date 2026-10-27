@@ -35,10 +35,10 @@ class CycleDurationCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'DURACIÓN DEL CICLO',
           style: TextStyle(
-            color: LifeQuestColors.muted,
+            color: context.lq.muted,
             fontSize: 9,
             fontWeight: FontWeight.w800,
           ),
@@ -57,10 +57,10 @@ class CycleDurationCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        const Text(
+        Text(
           'DURACIÓN TOTAL',
           style: TextStyle(
-            color: LifeQuestColors.muted,
+            color: context.lq.muted,
             fontSize: 9,
             fontWeight: FontWeight.w800,
           ),
@@ -78,8 +78,8 @@ class CycleDurationCard extends StatelessWidget {
               child: Text(
                 '${hours(totalMinutes)} · ${totalMinutes ~/ cycleMinutes} ciclos',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: LifeQuestColors.ink,
+                style: TextStyle(
+                  color: context.lq.ink,
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                 ),
@@ -96,7 +96,7 @@ class CycleDurationCard extends StatelessWidget {
         ),
         Text(
           breaksNote,
-          style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+          style: TextStyle(color: context.lq.muted, fontSize: 9),
         ),
       ],
     ),

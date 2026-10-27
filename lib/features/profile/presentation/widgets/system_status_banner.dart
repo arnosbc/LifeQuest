@@ -7,16 +7,16 @@ class SystemStatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
-    color: const Color(0xFFEAF8EE),
+    color: context.lq.softGreen,
     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
     child: Row(
       children: [
-        const Icon(Icons.circle, color: LifeQuestColors.green, size: 7),
+        Icon(Icons.circle, color: context.lq.green, size: 7),
         const SizedBox(width: 7),
-        const Expanded(
+        Expanded(
           child: Text(
             'Todos los sistemas operativos',
-            style: TextStyle(color: LifeQuestColors.ink, fontSize: 9),
+            style: TextStyle(color: context.lq.ink, fontSize: 9),
           ),
         ),
         InkWell(
@@ -24,10 +24,10 @@ class SystemStatusBanner extends StatelessWidget {
             context,
             'Todos los sistemas están operativos.',
           ),
-          child: const Text(
+          child: Text(
             'Ver estado',
             style: TextStyle(
-              color: LifeQuestColors.deepGreen,
+              color: context.lq.deepGreen,
               fontSize: 8,
               fontWeight: FontWeight.w800,
             ),

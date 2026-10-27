@@ -6,7 +6,7 @@ class RpGenieTipCard extends StatelessWidget {
   const RpGenieTipCard({super.key});
 
   @override
-  Widget build(BuildContext context) => const LifeQuestSurface(
+  Widget build(BuildContext context) => LifeQuestSurface(
     child: Row(
       children: [
         LifeQuestIconTile(Icons.auto_awesome),
@@ -18,7 +18,7 @@ class RpGenieTipCard extends StatelessWidget {
               Text(
                 'GENIE DE RP',
                 style: TextStyle(
-                  color: LifeQuestColors.deepGreen,
+                  color: context.lq.deepGreen,
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                 ),
@@ -27,7 +27,7 @@ class RpGenieTipCard extends StatelessWidget {
               Text(
                 'He revisado tu campaña, objetivos y plazos. Esta es la misión más importante para ti ahora.',
                 style: TextStyle(
-                  color: LifeQuestColors.muted,
+                  color: context.lq.muted,
                   fontSize: 10,
                   height: 1.35,
                 ),

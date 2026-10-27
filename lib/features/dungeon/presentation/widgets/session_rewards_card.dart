@@ -28,8 +28,8 @@ class SessionRewardsCard extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: LifeQuestColors.muted,
+          style: TextStyle(
+            color: context.lq.muted,
             fontSize: 9,
             fontWeight: FontWeight.w800,
           ),

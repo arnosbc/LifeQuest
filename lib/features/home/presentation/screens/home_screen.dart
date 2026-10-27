@@ -44,15 +44,15 @@ class HomeScreen extends StatelessWidget {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as HomeSuccess).message!),
     builder: (context, state) => switch (state) {
-      HomeInitial() || HomeLoading() => const Center(
-        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+      HomeInitial() || HomeLoading() => Center(
+        child: CircularProgressIndicator(color: context.lq.deepGreen),
       ),
       HomeFailure(:final message) => _ErrorView(
         message: message,
         onRetry: () => context.read<HomeBloc>().add(const HomeRequested()),
       ),
       HomeSuccess() => RefreshIndicator(
-        color: LifeQuestColors.deepGreen,
+        color: context.lq.deepGreen,
         onRefresh: () => _refresh(context.read<HomeBloc>()),
         child: _content(context, state),
       ),
@@ -203,7 +203,7 @@ class _ErrorView extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: LifeQuestColors.ink, fontSize: 15),
+            style: TextStyle(color: context.lq.ink, fontSize: 15),
           ),
           const SizedBox(height: 16),
           FilledButton.icon(
@@ -211,8 +211,8 @@ class _ErrorView extends StatelessWidget {
             icon: const Icon(Icons.refresh_rounded, size: 20),
             label: const Text('Reintentar'),
             style: FilledButton.styleFrom(
-              backgroundColor: LifeQuestColors.deepGreen,
-              foregroundColor: Colors.white,
+              backgroundColor: context.lq.deepGreen,
+              foregroundColor: context.lq.onDeepGreen,
               minimumSize: const Size(48, 48),
             ),
           ),

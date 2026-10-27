@@ -70,19 +70,19 @@ class _HelpScreenState extends State<HelpScreen> {
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 22),
       children: [
         SubpageHeader(title: 'Ayuda', onBack: widget.onBack),
-        const Divider(height: 18, color: LifeQuestColors.line),
-        const Text(
+        Divider(height: 18, color: context.lq.line),
+        Text(
           '¿Cómo podemos ayudarte?',
           style: TextStyle(
-            color: LifeQuestColors.ink,
+            color: context.lq.ink,
             fontSize: 13,
             fontWeight: FontWeight.w800,
           ),
         ),
         const SizedBox(height: 3),
-        const Text(
+        Text(
           'Encuentra respuestas o habla con nuestro equipo.',
-          style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+          style: TextStyle(color: context.lq.muted, fontSize: 9),
         ),
         const SizedBox(height: 9),
         HelpSearchField(
@@ -119,10 +119,10 @@ class _HelpScreenState extends State<HelpScreen> {
           const LifeQuestSectionHeading('RESULTADOS DE AYUDA'),
           const SizedBox(height: 5),
           if (matches.isEmpty)
-            const LifeQuestSurface(
+            LifeQuestSurface(
               child: Text(
                 'No encontramos resultados. Prueba con otra búsqueda.',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 10),
+                style: TextStyle(color: context.lq.muted, fontSize: 10),
               ),
             )
           else
@@ -137,17 +137,17 @@ class _HelpScreenState extends State<HelpScreen> {
         const SizedBox(height: 3),
         const SystemStatusBanner(),
         const SizedBox(height: 9),
-        const Center(
+        Center(
           child: Column(
             children: [
               Text(
                 'Nexo para iOS',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 8),
+                style: TextStyle(color: context.lq.muted, fontSize: 8),
               ),
               SizedBox(height: 2),
               Text(
                 'Versión 6.4.1 (2418)',
-                style: TextStyle(color: LifeQuestColors.muted, fontSize: 8),
+                style: TextStyle(color: context.lq.muted, fontSize: 8),
               ),
             ],
           ),
@@ -163,10 +163,10 @@ class _HelpScreenState extends State<HelpScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
+          Text(
             'Preguntas frecuentes',
             style: TextStyle(
-              color: LifeQuestColors.ink,
+              color: context.lq.ink,
               fontSize: 17,
               fontWeight: FontWeight.w800,
             ),

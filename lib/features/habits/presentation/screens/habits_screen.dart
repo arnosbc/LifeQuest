@@ -27,15 +27,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as HabitsSuccess).message!),
     builder: (context, state) => switch (state) {
-      HabitsInitial() || HabitsLoading() => const Center(
-        child: CircularProgressIndicator(color: LifeQuestColors.deepGreen),
+      HabitsInitial() || HabitsLoading() => Center(
+        child: CircularProgressIndicator(color: context.lq.deepGreen),
       ),
       HabitsFailure(:final message) => _ErrorView(
         message: message,
         onRetry: () => context.read<HabitsBloc>().add(const HabitsRequested()),
       ),
       HabitsSuccess() => RefreshIndicator(
-        color: LifeQuestColors.deepGreen,
+        color: context.lq.deepGreen,
         onRefresh: () => _refresh(context.read<HabitsBloc>()),
         child: _content(context, state),
       ),
@@ -140,7 +140,7 @@ class _ErrorView extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: LifeQuestColors.ink),
+            style: TextStyle(color: context.lq.ink),
           ),
           const SizedBox(height: 12),
           FilledButton(onPressed: onRetry, child: const Text('Reintentar')),

@@ -29,8 +29,8 @@ class HelpQuickAccessCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             title,
-            style: const TextStyle(
-              color: LifeQuestColors.ink,
+            style: TextStyle(
+              color: context.lq.ink,
               fontSize: 9,
               fontWeight: FontWeight.w800,
             ),
@@ -38,11 +38,7 @@ class HelpQuickAccessCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(
-              color: LifeQuestColors.muted,
-              fontSize: 8,
-              height: 1.3,
-            ),
+            style: TextStyle(color: context.lq.muted, fontSize: 8, height: 1.3),
           ),
         ],
       ),

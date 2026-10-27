@@ -18,34 +18,30 @@ class HelpSearchField extends StatelessWidget {
   Widget build(BuildContext context) => TextField(
     controller: controller,
     onChanged: onChanged,
-    style: const TextStyle(color: LifeQuestColors.ink, fontSize: 10),
+    style: TextStyle(color: context.lq.ink, fontSize: 10),
     decoration: InputDecoration(
       hintText: 'Buscar en Ayuda',
-      hintStyle: const TextStyle(color: LifeQuestColors.muted, fontSize: 9),
-      prefixIcon: const Icon(
-        Icons.search,
-        size: 16,
-        color: LifeQuestColors.muted,
-      ),
+      hintStyle: TextStyle(color: context.lq.muted, fontSize: 9),
+      prefixIcon: Icon(Icons.search, size: 16, color: context.lq.muted),
       suffixIcon: IconButton(
         tooltip: 'Buscar',
         onPressed: onShowAll,
-        icon: const Icon(
+        icon: Icon(
           Icons.keyboard_command_key,
           size: 15,
-          color: LifeQuestColors.green,
+          color: context.lq.green,
         ),
       ),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: context.lq.surface,
       contentPadding: const EdgeInsets.symmetric(vertical: 2),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: LifeQuestColors.line),
+        borderSide: BorderSide(color: context.lq.line),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: LifeQuestColors.line),
+        borderSide: BorderSide(color: context.lq.line),
       ),
     ),
   );

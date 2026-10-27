@@ -44,11 +44,10 @@ class AppShell extends StatelessWidget {
         bottomNavigationBar: NavigationBar(
           height: 66,
           selectedIndex: navigationShell.currentIndex,
-          // Tocar la pestaña activa vuelve a su pantalla inicial.
-          onDestinationSelected: (index) => navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          ),
+          // Tocar una pestaña siempre abre su pantalla principal: Misiones,
+          // abierta desde Inicio, no debe quedarse en lugar de Stage.
+          onDestinationSelected: (index) =>
+              navigationShell.goBranch(index, initialLocation: true),
           backgroundColor: lq.surface,
           indicatorColor: lq.softGreen,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

@@ -17,25 +17,25 @@ class NotificationsHeader extends StatelessWidget {
           width: 29,
           height: 29,
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: LifeQuestColors.line),
+            color: context.lq.surface,
+            border: Border.all(color: context.lq.line),
             borderRadius: BorderRadius.circular(9),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.notifications_none,
-            color: LifeQuestColors.green,
+            color: context.lq.green,
             size: 17,
           ),
         ),
       ),
       const SizedBox(width: 8),
-      const Expanded(
+      Expanded(
         child: Text(
           'Notificaciones anti-estrés',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: LifeQuestColors.ink,
+            color: context.lq.ink,
             fontSize: 16,
             fontWeight: FontWeight.w800,
           ),
@@ -45,7 +45,7 @@ class NotificationsHeader extends StatelessWidget {
         onPressed: onBack,
         tooltip: 'Volver al perfil',
         visualDensity: VisualDensity.compact,
-        icon: const Icon(Icons.close, size: 18, color: LifeQuestColors.muted),
+        icon: Icon(Icons.close, size: 18, color: context.lq.muted),
       ),
     ],
   );

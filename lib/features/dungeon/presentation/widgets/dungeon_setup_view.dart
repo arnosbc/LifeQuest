@@ -58,10 +58,10 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
         ),
         const SizedBox(height: 6),
         if (candidates.isEmpty)
-          const LifeQuestSurface(
+          LifeQuestSurface(
             child: Text(
               'No tienes misiones abiertas. Crea una en Misiones y vuelve a entrar.',
-              style: TextStyle(color: LifeQuestColors.muted, fontSize: 11),
+              style: TextStyle(color: context.lq.muted, fontSize: 11),
             ),
           ),
         for (final task in candidates)
@@ -77,14 +77,14 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
                   ),
             title: Text(
               task.title,
-              style: const TextStyle(color: LifeQuestColors.ink, fontSize: 12),
+              style: TextStyle(color: context.lq.ink, fontSize: 12),
             ),
           ),
         const SizedBox(height: 9),
         Text(
           'Recompensa estimada: ${cycles * widget.board.cycleXp} XP por $cycles ciclos',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: LifeQuestColors.muted, fontSize: 11),
+          style: TextStyle(color: context.lq.muted, fontSize: 11),
         ),
         const SizedBox(height: 9),
         SizedBox(
@@ -102,7 +102,7 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
                 : const Icon(Icons.play_arrow_rounded),
             label: const Text('Entrar a la Mazmorra'),
             style: FilledButton.styleFrom(
-              backgroundColor: LifeQuestColors.deepGreen,
+              backgroundColor: context.lq.deepGreen,
             ),
           ),
         ),

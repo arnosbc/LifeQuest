@@ -343,11 +343,11 @@ class _CreateGoalSheetState extends State<CreateGoalSheet> {
           ),
         ),
         if (_missingDate)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 4),
             child: Text(
               'Elige una fecha límite',
-              style: TextStyle(color: LifeQuestColors.error, fontSize: 12),
+              style: TextStyle(color: context.lq.error, fontSize: 12),
             ),
           ),
         TextFormField(
@@ -463,8 +463,8 @@ class _SheetFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    decoration: const BoxDecoration(
-      color: LifeQuestColors.background,
+    decoration: BoxDecoration(
+      color: context.lq.background,
       borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
     ),
     padding: EdgeInsets.fromLTRB(
@@ -480,10 +480,10 @@ class _SheetFrame extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: LifeQuestColors.ink,
+              color: context.lq.ink,
             ),
           ),
           const SizedBox(height: 12),

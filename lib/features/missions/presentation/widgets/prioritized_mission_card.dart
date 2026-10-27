@@ -27,25 +27,25 @@ class PrioritizedMissionCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'MISIÓN PRIORIZADA',
               style: TextStyle(
-                color: LifeQuestColors.deepGreen,
+                color: context.lq.deepGreen,
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            Icon(Icons.shield_outlined, color: LifeQuestColors.green, size: 19),
+            Icon(Icons.shield_outlined, color: context.lq.green, size: 19),
           ],
         ),
         const SizedBox(height: 11),
         Text(
           mission.title,
-          style: const TextStyle(
-            color: LifeQuestColors.ink,
+          style: TextStyle(
+            color: context.lq.ink,
             fontSize: 20,
             height: 1.2,
             fontWeight: FontWeight.w800,
@@ -55,20 +55,26 @@ class PrioritizedMissionCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             description,
-            style: const TextStyle(color: LifeQuestColors.muted, fontSize: 12),
+            style: TextStyle(color: context.lq.muted, fontSize: 12),
           ),
         ],
         const SizedBox(height: 13),
-        _detail('Origen', MissionsFormat.origin(mission)),
-        _detail('Urgencia', MissionsFormat.bucket(mission.bucket)),
-        _detail('Fecha límite', MissionsFormat.due(mission.dueDate, now)),
+        _detail(context, 'Origen', MissionsFormat.origin(mission)),
+        _detail(context, 'Urgencia', MissionsFormat.bucket(mission.bucket)),
+        _detail(
+          context,
+          'Fecha límite',
+          MissionsFormat.due(mission.dueDate, now),
+        ),
         if (mission.subtasksTotal > 0)
           _detail(
+            context,
             'Subtareas',
             '${mission.subtasksDone} de ${mission.subtasksTotal}',
           ),
         const Divider(height: 20),
         _detail(
+          context,
           'Recompensa',
           '${mission.xpReward} XP    ·    ${mission.coinReward} monedas',
         ),
@@ -86,23 +92,21 @@ class PrioritizedMissionCard extends StatelessWidget {
                   )
                 : const Icon(Icons.check_rounded),
             label: Text(busy ? 'Completando…' : 'Completar misión'),
-            style: FilledButton.styleFrom(
-              backgroundColor: LifeQuestColors.green,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: context.lq.green),
           ),
         ),
       ],
     ),
   );
 
-  Widget _detail(String label, String value) => Padding(
+  Widget _detail(BuildContext context, String label, String value) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Row(
       children: [
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(color: LifeQuestColors.muted, fontSize: 11),
+            style: TextStyle(color: context.lq.muted, fontSize: 11),
           ),
         ),
         Flexible(
@@ -110,8 +114,8 @@ class PrioritizedMissionCard extends StatelessWidget {
             value,
             textAlign: TextAlign.end,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: LifeQuestColors.deepGreen,
+            style: TextStyle(
+              color: context.lq.deepGreen,
               fontSize: 11,
               fontWeight: FontWeight.w700,
             ),

@@ -183,6 +183,51 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Preparar la exposición'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
+
+    // Tras ir a otra pestaña, tocar Stage abre Stage, no Misiones.
+    Finder tab(String label) => find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text(label),
+    );
+    await tester.tap(tab('Inicio'));
+    await tester.pumpAndSettle();
+    await tester.tap(tab('Stage'));
+    await tester.pumpAndSettle();
+    expect(find.text('METAS (JEFES)'), findsOneWidget);
+    expect(find.text('Preparar la exposición'), findsNothing);
+  });
+
+  testWidgets('al volver a una pestaña recarga sus datos', (tester) async {
+    final homeBloc = MockHomeBloc();
+    whenListen(
+      homeBloc,
+      const Stream<HomeState>.empty(),
+      initialState: HomeSuccess(dashboard),
+    );
+    sl.unregister<HomeBloc>();
+    sl.registerFactory<HomeBloc>(() => homeBloc);
+    givenAuthState(
+      const AuthSuccess(User(id: 'u1', email: 'alex@example.com')),
+    );
+    await tester.pumpWidget(
+      App(
+        authBloc: authBloc,
+        appearanceBloc: appearanceBloc,
+        onboardingBloc: onboardingBloc,
+      ),
+    );
+    await tester.pumpAndSettle();
+    verify(() => homeBloc.add(const HomeRequested())).called(1);
+
+    Finder tab(String label) => find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text(label),
+    );
+    await tester.tap(tab('Perfil'));
+    await tester.pumpAndSettle();
+    await tester.tap(tab('Inicio'));
+    await tester.pumpAndSettle();
+    verify(() => homeBloc.add(const HomeRequested())).called(1);
   });
 
   testWidgets('con el Onboarding pendiente lo muestra en lugar de Inicio', (

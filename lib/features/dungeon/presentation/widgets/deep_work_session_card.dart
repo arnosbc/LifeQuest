@@ -29,10 +29,10 @@ class DeepWorkSessionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'SESIÓN DEEP WORKING',
             style: TextStyle(
-              color: LifeQuestColors.muted,
+              color: context.lq.muted,
               fontSize: 9,
               fontWeight: FontWeight.w800,
             ),
@@ -60,30 +60,30 @@ class DeepWorkSessionCard extends StatelessWidget {
           const SizedBox(height: 11),
           Text(
             'MOCHILA · ${session.tasks.length} misiones · $done completadas',
-            style: const TextStyle(
-              color: LifeQuestColors.muted,
+            style: TextStyle(
+              color: context.lq.muted,
               fontSize: 9,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const Text(
+          Text(
             'Toca una misión para concentrarte en ella este ciclo.',
-            style: TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+            style: TextStyle(color: context.lq.muted, fontSize: 9),
           ),
-          for (final task in session.tasks) _task(task),
+          for (final task in session.tasks) _task(context, task),
         ],
       ),
     );
   }
 
-  Widget _task(DungeonTask task) {
+  Widget _task(BuildContext context, DungeonTask task) {
     final current = task.id == currentTaskId;
     return Container(
       margin: const EdgeInsets.only(top: 7),
       decoration: BoxDecoration(
-        color: current ? LifeQuestColors.softGreen : LifeQuestColors.background,
+        color: current ? context.lq.softGreen : context.lq.background,
         border: Border.all(
-          color: current ? LifeQuestColors.deepGreen : LifeQuestColors.line,
+          color: current ? context.lq.deepGreen : context.lq.line,
         ),
         borderRadius: BorderRadius.circular(9),
       ),
@@ -98,7 +98,7 @@ class DeepWorkSessionCard extends StatelessWidget {
             title: Text(
               task.title,
               style: TextStyle(
-                color: LifeQuestColors.ink,
+                color: context.lq.ink,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 decoration: task.done ? TextDecoration.lineThrough : null,
@@ -106,18 +106,18 @@ class DeepWorkSessionCard extends StatelessWidget {
             ),
             subtitle: Text(
               '${current ? 'En foco · ' : ''}${task.cycles} ${task.cycles == 1 ? 'ciclo' : 'ciclos'}',
-              style: const TextStyle(color: LifeQuestColors.muted, fontSize: 9),
+              style: TextStyle(color: context.lq.muted, fontSize: 9),
             ),
             trailing: task.done
-                ? const Icon(Icons.check_circle, color: LifeQuestColors.green)
+                ? Icon(Icons.check_circle, color: context.lq.green)
                 : IconButton(
                     tooltip: 'Completar «${task.title}»',
                     onPressed: onComplete == null
                         ? null
                         : () => onComplete!(task.id),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.check_circle_outline,
-                      color: LifeQuestColors.deepGreen,
+                      color: context.lq.deepGreen,
                     ),
                   ),
           ),
