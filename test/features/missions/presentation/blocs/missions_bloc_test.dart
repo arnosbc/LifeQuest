@@ -32,6 +32,8 @@ void main() {
     getMissionsBoard: getBoard,
     createMission: createMission,
     completeMission: completeMission,
+    renameMission: MockRenameMission(),
+    deleteMission: MockDeleteMission(),
   );
 
   void givenBoard(Either<Failure, MissionsBoard> result) =>

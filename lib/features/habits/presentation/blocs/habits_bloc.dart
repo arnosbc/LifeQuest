@@ -8,8 +8,10 @@ import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/complete_good_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/create_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/get_habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/register_bad_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
 
 part 'habits_event.dart';
 part 'habits_state.dart';
@@ -20,6 +22,8 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     required this._createHabit,
     required this._completeGoodHabit,
     required this._registerBadHabit,
+    required this._renameHabit,
+    required this._deleteHabit,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HabitsInitial()) {
@@ -54,12 +58,32 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       ),
       transformer: droppable(),
     );
+    on<HabitRenamed>(
+      (event, emit) => _act(
+        emit,
+        (s) => HabitsSuccess(s.board, busyHabitId: event.habitId),
+        () => _renameHabit(RenameParams(event.habitId, event.name)),
+        'Hábito renombrado.',
+      ),
+      transformer: droppable(),
+    );
+    on<HabitDeleted>(
+      (event, emit) => _act(
+        emit,
+        (s) => HabitsSuccess(s.board, busyHabitId: event.habitId),
+        () => _deleteHabit(event.habitId),
+        'Hábito borrado.',
+      ),
+      transformer: droppable(),
+    );
   }
 
   final GetHabitsBoard _getHabitsBoard;
   final CreateHabit _createHabit;
   final CompleteGoodHabit _completeGoodHabit;
   final RegisterBadHabit _registerBadHabit;
+  final RenameHabit _renameHabit;
+  final DeleteHabit _deleteHabit;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(

@@ -73,6 +73,8 @@ void main() {
       createNpc: MockCreateNpc(),
       acceptMission: accept,
       completeMission: complete,
+      renameNpc: MockRenameNpc(),
+      deleteNpc: MockDeleteNpc(),
     );
 
     blocTest<TavernBloc, TavernState>(

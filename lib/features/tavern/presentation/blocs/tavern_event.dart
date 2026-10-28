@@ -40,3 +40,22 @@ class NpcMissionCompleted extends TavernEvent {
   @override
   List<Object?> get props => [npcId, taskId];
 }
+
+class NpcRenamed extends TavernEvent {
+  const NpcRenamed(this.npcId, this.name);
+
+  final String npcId;
+  final String name;
+
+  @override
+  List<Object?> get props => [npcId, name];
+}
+
+class NpcDeleted extends TavernEvent {
+  const NpcDeleted(this.npcId);
+
+  final String npcId;
+
+  @override
+  List<Object?> get props => [npcId];
+}

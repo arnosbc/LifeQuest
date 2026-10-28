@@ -14,6 +14,10 @@ abstract class MissionsRemoteDataSource {
   Future<void> createMission(NewMission mission);
 
   Future<void> completeMission(String missionId);
+
+  Future<void> renameMission(String missionId, String title);
+
+  Future<void> deleteMission(String missionId);
 }
 
 class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
@@ -51,6 +55,19 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej. `task_not_open`);
   /// se pasa como [ServerException.code].
+  @override
+  Future<void> renameMission(String missionId, String title) => _guard(
+    () => _client.rpc<void>(
+      'rename_task',
+      params: {'p_task_id': missionId, 'p_title': title},
+    ),
+  );
+
+  @override
+  Future<void> deleteMission(String missionId) => _guard(
+    () => _client.rpc<void>('delete_task', params: {'p_task_id': missionId}),
+  );
+
   Future<T> _guard<T>(Future<T> Function() action) async {
     try {
       return await action();

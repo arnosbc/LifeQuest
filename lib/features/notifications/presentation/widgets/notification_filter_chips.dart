@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
-import 'package:proyecto_movil/features/profile/domain/entities/app_notification.dart';
+import 'package:proyecto_movil/features/notifications/domain/entities/app_notification.dart';
 
 /// `null` significa "Todas".
 class NotificationFilterChips extends StatelessWidget {

@@ -67,6 +67,14 @@ class _HabitsScreenState extends State<HabitsScreen> {
   Widget _content(BuildContext context, HabitsSuccess state) {
     final bloc = context.read<HabitsBloc>();
     final idle = state.busyHabitId == null && !state.saving;
+    Widget menu(Habit habit) => LifeQuestItemMenu(
+      name: habit.name,
+      enabled: idle,
+      maxLength: 100,
+      onRename: (name) => bloc.add(HabitRenamed(habit.id, name)),
+      onDelete: () => bloc.add(HabitDeleted(habit.id)),
+      deleteMessage: 'Se borra también su historial y su racha.',
+    );
     return LifeQuestPage(
       title: 'Hábitos',
       subtitle: 'La constancia también es una aventura.',
@@ -96,6 +104,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             board: state.board,
             busyHabitId: state.busyHabitId,
             onRegister: idle ? (id) => bloc.add(BadHabitRegistered(id)) : null,
+            menuFor: menu,
           )
         else
           GoodHabitsView(
@@ -103,6 +112,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             now: DateTime.now(),
             busyHabitId: state.busyHabitId,
             onComplete: idle ? (id) => bloc.add(GoodHabitCompleted(id)) : null,
+            menuFor: menu,
           ),
         const SizedBox(height: 16),
         SizedBox(

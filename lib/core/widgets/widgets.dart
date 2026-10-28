@@ -8,6 +8,7 @@ export 'package:proyecto_movil/core/widgets/lifequest_action_row.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_dates.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_error_view.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_icon_tile.dart';
+export 'package:proyecto_movil/core/widgets/lifequest_item_menu.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_list_row.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_page.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_section_heading.dart';

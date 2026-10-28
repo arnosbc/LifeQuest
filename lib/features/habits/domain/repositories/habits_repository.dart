@@ -19,4 +19,8 @@ abstract class HabitsRepository {
 
   /// Registra un evento del hábito malo; el servidor resta la vida.
   Future<Either<Failure, Unit>> registerBadHabit(String habitId);
+
+  Future<Either<Failure, Unit>> renameHabit(String habitId, String name);
+
+  Future<Either<Failure, Unit>> deleteHabit(String habitId);
 }

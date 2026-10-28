@@ -7,6 +7,7 @@ import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/daily_chest_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/dashboard_greeting.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/level_card.dart';
@@ -90,6 +91,12 @@ class HomeScreen extends StatelessWidget {
           mission: dashboard.priorityMission,
           onContinue: () => context.go(RoutePaths.missions),
           onCreate: () => context.go(RoutePaths.missions),
+        ),
+        const SizedBox(height: 8),
+        DailyChestCard(
+          chest: dashboard.chest,
+          busy: state.claimingChest,
+          onClaim: () => context.read<HomeBloc>().add(const HomeChestClaimed()),
         ),
         _gap,
         const LifeQuestSectionHeading('TU HÉROE'),

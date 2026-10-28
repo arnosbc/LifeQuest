@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node 001_home.test.mjs && node 002_profile.test.mjs && node 003_007.test.mjs && node 008_fix_exploits.test.mjs && node 009_profile_titles.test.mjs && node 010_missions.test.mjs && node 011_habits.test.mjs && node 012_dungeon.test.mjs && node 013_stage.test.mjs && node 014_goals.test.mjs && node 015_onboarding.test.mjs && node 016_settings.test.mjs && node 017_dungeon_breaks.test.mjs && node 018_022.test.mjs && node 023_026.test.mjs"
+    "test": "node 001_home.test.mjs && node 002_profile.test.mjs && node 003_007.test.mjs && node 008_fix_exploits.test.mjs && node 009_profile_titles.test.mjs && node 010_missions.test.mjs && node 011_habits.test.mjs && node 012_dungeon.test.mjs && node 013_stage.test.mjs && node 014_goals.test.mjs && node 015_onboarding.test.mjs && node 016_settings.test.mjs && node 017_dungeon_breaks.test.mjs && node 018_022.test.mjs && node 023_026.test.mjs && node 027_daily_chest.test.mjs && node 028_edit_delete.test.mjs && node 029_notifications.test.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.2.17"

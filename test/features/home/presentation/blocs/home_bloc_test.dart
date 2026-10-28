@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
@@ -14,22 +15,26 @@ import '../../home_fixtures.dart';
 void main() {
   late MockGetHomeDashboard getHomeDashboard;
   late MockCompleteHabit completeHabit;
+  late MockClaimDailyChest claimChest;
   final now = DateTime(2026, 10, 17, 9);
   const failure = ServerFailure('Algo salió mal.');
 
   setUpAll(() {
     registerFallbackValue(now);
+    registerFallbackValue(const NoParams());
     registerFallbackValue(CompleteHabitParams(habitId: 'h', now: now));
   });
 
   setUp(() {
     getHomeDashboard = MockGetHomeDashboard();
     completeHabit = MockCompleteHabit();
+    claimChest = MockClaimDailyChest();
   });
 
   HomeBloc build() => HomeBloc(
     getHomeDashboard: getHomeDashboard,
     completeHabit: completeHabit,
+    claimDailyChest: claimChest,
     clock: () => now,
   );
 
@@ -110,4 +115,36 @@ void main() {
       expect: () => <HomeState>[],
     );
   });
+
+  blocTest<HomeBloc, HomeState>(
+    'abrir el cofre lo cobra, vuelve a leer y celebra',
+    setUp: () {
+      when(() => claimChest(any())).thenAnswer((_) async => const Right(unit));
+      when(
+        () => getHomeDashboard(any()),
+      ).thenAnswer((_) async => Right(dashboard));
+    },
+    build: build,
+    seed: () => HomeSuccess(dashboard),
+    act: (bloc) => bloc.add(const HomeChestClaimed()),
+    expect: () => [
+      HomeSuccess(dashboard, claimingChest: true),
+      HomeSuccess(dashboard, message: '¡Cofre abierto! +15 Monedas.'),
+    ],
+  );
+
+  blocTest<HomeBloc, HomeState>(
+    'si el cofre aún no se abre, conserva el Home y avisa',
+    setUp: () => when(
+      () => claimChest(any()),
+    ).thenAnswer((_) async => const Left(failure)),
+    build: build,
+    seed: () => HomeSuccess(dashboard),
+    act: (bloc) => bloc.add(const HomeChestClaimed()),
+    expect: () => [
+      HomeSuccess(dashboard, claimingChest: true),
+      HomeSuccess(dashboard, message: failure.message),
+    ],
+    verify: (_) => verifyNever(() => getHomeDashboard(any())),
+  );
 }

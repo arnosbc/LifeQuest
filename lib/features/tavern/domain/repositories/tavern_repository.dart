@@ -17,4 +17,8 @@ abstract class TavernRepository {
 
   /// Cumple la misión; el servidor paga XP, Monedas y skill.
   Future<Either<Failure, Unit>> completeMission(String taskId);
+
+  Future<Either<Failure, Unit>> renameNpc(String npcId, String name);
+
+  Future<Either<Failure, Unit>> deleteNpc(String npcId);
 }

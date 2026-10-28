@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
-import 'package:proyecto_movil/features/profile/domain/entities/app_notification.dart';
+import 'package:proyecto_movil/features/notifications/domain/entities/app_notification.dart';
 
 /// Etiqueta de categoría + tarjeta de la notificación.
 class NotificationCard extends StatelessWidget {
@@ -89,7 +89,7 @@ class NotificationCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          item.time,
+                          LifeQuestDates.dayTime(item.createdAt),
                           style: TextStyle(
                             color: context.lq.muted,
                             fontSize: 7,

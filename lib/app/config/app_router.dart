@@ -35,7 +35,8 @@ import 'package:proyecto_movil/features/missions/presentation/screens/missions_s
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
-import 'package:proyecto_movil/features/profile/presentation/screens/notifications_screen.dart';
+import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
+import 'package:proyecto_movil/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
 import 'package:proyecto_movil/features/rpgenie/presentation/blocs/rpgenie_bloc.dart';
 import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_screen.dart';
@@ -245,8 +246,12 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                 routes: [
                   GoRoute(
                     path: 'notifications',
-                    builder: (context, state) =>
-                        NotificationsScreen(onBack: () => context.pop()),
+                    builder: (context, state) => BlocProvider(
+                      create: (_) =>
+                          sl<NotificationsBloc>()
+                            ..add(const NotificationsRequested()),
+                      child: NotificationsScreen(onBack: () => context.pop()),
+                    ),
                   ),
                   GoRoute(
                     path: 'help',

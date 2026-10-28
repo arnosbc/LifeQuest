@@ -10,6 +10,7 @@ class HabitRow extends StatelessWidget {
     required this.habit,
     required this.busy,
     required this.onComplete,
+    this.menu,
   });
 
   final Habit habit;
@@ -17,6 +18,9 @@ class HabitRow extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final VoidCallback? onComplete;
+
+  /// Menú «⋯» (renombrar, borrar).
+  final Widget? menu;
 
   static const _dayLetters = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
 
@@ -122,6 +126,7 @@ class HabitRow extends StatelessWidget {
                   size: 22,
                 ),
               ),
+            ?menu,
           ],
         ),
       ),

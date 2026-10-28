@@ -32,3 +32,22 @@ class MissionCompleted extends MissionsEvent {
   @override
   List<Object?> get props => [missionId];
 }
+
+class MissionRenamed extends MissionsEvent {
+  const MissionRenamed(this.missionId, this.title);
+
+  final String missionId;
+  final String title;
+
+  @override
+  List<Object?> get props => [missionId, title];
+}
+
+class MissionDeleted extends MissionsEvent {
+  const MissionDeleted(this.missionId);
+
+  final String missionId;
+
+  @override
+  List<Object?> get props => [missionId];
+}

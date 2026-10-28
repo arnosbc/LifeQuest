@@ -29,6 +29,14 @@ class TavernRepositoryImpl implements TavernRepository {
   Future<Either<Failure, Unit>> completeMission(String taskId) =>
       _done(() => _remote.completeMission(taskId));
 
+  @override
+  Future<Either<Failure, Unit>> renameNpc(String npcId, String name) =>
+      _done(() => _remote.renameNpc(npcId, name));
+
+  @override
+  Future<Either<Failure, Unit>> deleteNpc(String npcId) =>
+      _done(() => _remote.deleteNpc(npcId));
+
   Future<Either<Failure, Unit>> _done(Future<void> Function() action) =>
       _run(() async {
         await action();

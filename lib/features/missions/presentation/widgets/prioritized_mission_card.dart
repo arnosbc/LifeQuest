@@ -12,6 +12,7 @@ class PrioritizedMissionCard extends StatelessWidget {
     required this.now,
     required this.busy,
     required this.onComplete,
+    this.menu,
   });
 
   final Mission mission;
@@ -20,6 +21,9 @@ class PrioritizedMissionCard extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final VoidCallback? onComplete;
+
+  /// Menú «⋯» (renombrar, borrar).
+  final Widget? menu;
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
@@ -38,7 +42,8 @@ class PrioritizedMissionCard extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            Icon(Icons.shield_outlined, color: context.lq.green, size: 19),
+            menu ??
+                Icon(Icons.shield_outlined, color: context.lq.green, size: 19),
           ],
         ),
         const SizedBox(height: 11),

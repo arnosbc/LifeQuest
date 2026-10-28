@@ -20,6 +20,10 @@ abstract class HabitsRemoteDataSource {
   });
 
   Future<void> registerBadHabit(String habitId);
+
+  Future<void> renameHabit(String habitId, String name);
+
+  Future<void> deleteHabit(String habitId);
 }
 
 class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
@@ -68,6 +72,19 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
       'register_bad_habit',
       params: {'p_habit_id': habitId},
     ),
+  );
+
+  @override
+  Future<void> renameHabit(String habitId, String name) => _guard(
+    () => _client.rpc<void>(
+      'rename_habit',
+      params: {'p_habit_id': habitId, 'p_name': name},
+    ),
+  );
+
+  @override
+  Future<void> deleteHabit(String habitId) => _guard(
+    () => _client.rpc<void>('delete_habit', params: {'p_habit_id': habitId}),
   );
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej.

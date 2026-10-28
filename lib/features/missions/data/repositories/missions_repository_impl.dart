@@ -51,6 +51,22 @@ class MissionsRepositoryImpl implements MissionsRepository {
       'Ese vínculo ya no está disponible. Elige otro o deja la misión sin vincular.',
     'task_not_found' => 'No encontramos esa misión. Desliza para actualizar.',
     'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+    'task_in_use' =>
+      'Esa misión ya tiene Mazmorras jugadas. Complétala en lugar de borrarla.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
+
+  @override
+  Future<Either<Failure, Unit>> renameMission(String missionId, String title) =>
+      _run(() async {
+        await _remote.renameMission(missionId, title);
+        return unit;
+      });
+
+  @override
+  Future<Either<Failure, Unit>> deleteMission(String missionId) =>
+      _run(() async {
+        await _remote.deleteMission(missionId);
+        return unit;
+      });
 }

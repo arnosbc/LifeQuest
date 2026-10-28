@@ -17,6 +17,10 @@ abstract class TavernRemoteDataSource {
   Future<void> acceptMission(String npcId, String title);
 
   Future<void> completeMission(String taskId);
+
+  Future<void> renameNpc(String npcId, String name);
+
+  Future<void> deleteNpc(String npcId);
 }
 
 class TavernRemoteDataSourceImpl implements TavernRemoteDataSource {
@@ -46,6 +50,14 @@ class TavernRemoteDataSourceImpl implements TavernRemoteDataSource {
   @override
   Future<void> completeMission(String taskId) =>
       _rpc('complete_task', {'p_task_id': taskId});
+
+  @override
+  Future<void> renameNpc(String npcId, String name) =>
+      _rpc('rename_npc', {'p_npc_id': npcId, 'p_name': name});
+
+  @override
+  Future<void> deleteNpc(String npcId) =>
+      _rpc('delete_npc', {'p_npc_id': npcId});
 
   Future<void> _rpc(String name, Map<String, dynamic> params) =>
       _guard(() => _client.rpc<void>(name, params: params));

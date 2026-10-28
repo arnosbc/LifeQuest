@@ -41,6 +41,14 @@ class TavernScreen extends StatelessWidget {
     final bloc = context.read<TavernBloc>();
     final idle = state.busyKey == null;
     final now = DateTime.now();
+    Widget menu(Npc npc) => LifeQuestItemMenu(
+      name: npc.name,
+      enabled: idle,
+      maxLength: 60,
+      onRename: (name) => bloc.add(NpcRenamed(npc.id, name)),
+      onDelete: () => bloc.add(NpcDeleted(npc.id)),
+      deleteMessage: 'Sus misiones se conservan como misiones sueltas.',
+    );
 
     Future<void> ask(Npc npc) async {
       final free = npc.isFree(now);
@@ -104,6 +112,7 @@ class TavernScreen extends StatelessWidget {
               subtitle: 'Misión: ${mission.title} · +${mission.xpReward} XP',
               actionLabel: 'Cumplir',
               busy: state.busyKey == npc.id,
+              menu: menu(npc),
               onAction: idle
                   ? () => bloc.add(
                       NpcMissionCompleted(npcId: npc.id, taskId: mission.id),
@@ -122,6 +131,7 @@ class TavernScreen extends StatelessWidget {
                   ? 'Pedir misión'
                   : '${board.instantCost} 🪙',
               busy: state.busyKey == npc.id,
+              menu: menu(npc),
               onAction: idle ? () => ask(npc) : null,
             ),
         ],

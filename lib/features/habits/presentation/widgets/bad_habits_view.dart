@@ -10,6 +10,7 @@ class BadHabitsView extends StatelessWidget {
     required this.board,
     required this.busyHabitId,
     required this.onRegister,
+    this.menuFor,
   });
 
   final HabitsBoard board;
@@ -17,6 +18,9 @@ class BadHabitsView extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final ValueChanged<String>? onRegister;
+
+  /// Menú «⋯» de cada hábito.
+  final Widget Function(Habit habit)? menuFor;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +140,7 @@ class BadHabitsView extends StatelessWidget {
                 child: const Text('Registrar'),
               ),
             ),
+          ?menuFor?.call(habit),
         ],
       ),
     ),

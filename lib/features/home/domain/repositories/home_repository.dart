@@ -13,4 +13,7 @@ abstract class HomeRepository {
     required String habitId,
     required DateTime now,
   });
+
+  /// Cobra el cofre del día; el servidor valida las misiones y paga.
+  Future<Either<Failure, Unit>> claimDailyChest();
 }

@@ -37,6 +37,7 @@ import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.da
 import 'package:proyecto_movil/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:proyecto_movil/features/home/data/repositories/home_repository_impl.dart';
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/claim_daily_chest.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
@@ -141,6 +142,18 @@ import 'package:proyecto_movil/features/inventory/data/repositories/inventory_re
 import 'package:proyecto_movil/features/inventory/domain/repositories/inventory_repository.dart';
 import 'package:proyecto_movil/features/inventory/domain/usecases/get_inventory.dart';
 import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
+import 'package:proyecto_movil/features/notifications/data/datasources/notifications_remote_datasource.dart';
+import 'package:proyecto_movil/features/notifications/data/repositories/notifications_repository_impl.dart';
+import 'package:proyecto_movil/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
+import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
+import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -178,10 +191,15 @@ Future<void> initDependencies() async {
   // ---------- Home ----------
   // Bloc: factory, uno nuevo cada vez que se construye la pantalla.
   sl.registerFactory(
-    () => HomeBloc(getHomeDashboard: sl(), completeHabit: sl()),
+    () => HomeBloc(
+      getHomeDashboard: sl(),
+      completeHabit: sl(),
+      claimDailyChest: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetHomeDashboard(sl()));
   sl.registerLazySingleton(() => CompleteHabit(sl()));
+  sl.registerLazySingleton(() => ClaimDailyChest(sl()));
   sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
   sl.registerLazySingleton<HomeRemoteDataSource>(
     () => HomeRemoteDataSourceImpl(sl()),
@@ -193,9 +211,13 @@ Future<void> initDependencies() async {
       getMissionsBoard: sl(),
       createMission: sl(),
       completeMission: sl(),
+      renameMission: sl(),
+      deleteMission: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetMissionsBoard(sl()));
+  sl.registerLazySingleton(() => RenameMission(sl()));
+  sl.registerLazySingleton(() => DeleteMission(sl()));
   sl.registerLazySingleton(() => CreateMission(sl()));
   sl.registerLazySingleton(() => CompleteMission(sl()));
   sl.registerLazySingleton<MissionsRepository>(
@@ -234,8 +256,12 @@ Future<void> initDependencies() async {
       createHabit: sl(),
       completeGoodHabit: sl(),
       registerBadHabit: sl(),
+      renameHabit: sl(),
+      deleteHabit: sl(),
     ),
   );
+  sl.registerLazySingleton(() => RenameHabit(sl()));
+  sl.registerLazySingleton(() => DeleteHabit(sl()));
   sl.registerLazySingleton(() => GetHabitsBoard(sl()));
   sl.registerLazySingleton(() => CreateHabit(sl()));
   sl.registerLazySingleton(() => CompleteGoodHabit(sl()));
@@ -300,9 +326,13 @@ Future<void> initDependencies() async {
       createNpc: sl(),
       acceptMission: sl(),
       completeMission: sl(),
+      renameNpc: sl(),
+      deleteNpc: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetTavernBoard(sl()));
+  sl.registerLazySingleton(() => RenameNpc(sl()));
+  sl.registerLazySingleton(() => DeleteNpc(sl()));
   sl.registerLazySingleton(() => CreateNpc(sl()));
   sl.registerLazySingleton(() => AcceptNpcMission(sl()));
   sl.registerLazySingleton(() => CompleteNpcMission(sl()));
@@ -396,6 +426,19 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<InventoryRemoteDataSource>(
     () => InventoryRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Avisos ----------
+  sl.registerFactory(
+    () => NotificationsBloc(getNotifications: sl(), markRead: sl()),
+  );
+  sl.registerLazySingleton(() => GetNotifications(sl()));
+  sl.registerLazySingleton(() => MarkNotificationsRead(sl()));
+  sl.registerLazySingleton<NotificationsRepository>(
+    () => NotificationsRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<NotificationsRemoteDataSource>(
+    () => NotificationsRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Onboarding ----------

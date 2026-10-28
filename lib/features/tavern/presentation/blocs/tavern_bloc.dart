@@ -9,7 +9,9 @@ import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart
 import 'package:proyecto_movil/features/tavern/domain/usecases/accept_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
 
 part 'tavern_event.dart';
 part 'tavern_state.dart';
@@ -20,6 +22,8 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
     required this._createNpc,
     required this._acceptMission,
     required this._completeMission,
+    required this._renameNpc,
+    required this._deleteNpc,
   }) : super(const TavernInitial()) {
     // droppable: toques repetidos mientras trabaja se ignoran.
     on<TavernRequested>(_onRequested, transformer: droppable());
@@ -52,12 +56,32 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
       ),
       transformer: droppable(),
     );
+    on<NpcRenamed>(
+      (e, emit) => _act(
+        emit,
+        e.npcId,
+        () => _renameNpc(RenameParams(e.npcId, e.name)),
+        'NPC renombrado.',
+      ),
+      transformer: droppable(),
+    );
+    on<NpcDeleted>(
+      (e, emit) => _act(
+        emit,
+        e.npcId,
+        () => _deleteNpc(e.npcId),
+        'El NPC dejó la Taverna. Sus misiones siguen en tu Stage.',
+      ),
+      transformer: droppable(),
+    );
   }
 
   final GetTavernBoard _getBoard;
   final CreateNpc _createNpc;
   final AcceptNpcMission _acceptMission;
   final CompleteNpcMission _completeMission;
+  final RenameNpc _renameNpc;
+  final DeleteNpc _deleteNpc;
 
   Future<void> _onRequested(
     TavernRequested event,

@@ -1,14 +1,18 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fpdart/fpdart.dart' show Left;
+import 'package:fpdart/fpdart.dart' show Either, Left, Unit;
+
+import 'package:proyecto_movil/core/errors/failures.dart';
 
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/missions_board.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/complete_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/create_mission.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/get_missions_board.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart';
 
 part 'missions_event.dart';
 part 'missions_state.dart';
@@ -18,16 +22,38 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
     required this._getMissionsBoard,
     required this._createMission,
     required this._completeMission,
+    required this._renameMission,
+    required this._deleteMission,
   }) : super(const MissionsInitial()) {
     // droppable: toques repetidos mientras trabaja se ignoran.
     on<MissionsRequested>(_onRequested, transformer: droppable());
     on<MissionCreated>(_onCreated, transformer: droppable());
     on<MissionCompleted>(_onCompleted, transformer: droppable());
+    on<MissionRenamed>(
+      (e, emit) => _change(
+        emit,
+        e.missionId,
+        () => _renameMission(RenameParams(e.missionId, e.title)),
+        'Misión renombrada.',
+      ),
+      transformer: droppable(),
+    );
+    on<MissionDeleted>(
+      (e, emit) => _change(
+        emit,
+        e.missionId,
+        () => _deleteMission(e.missionId),
+        'Misión borrada.',
+      ),
+      transformer: droppable(),
+    );
   }
 
   final GetMissionsBoard _getMissionsBoard;
   final CreateMission _createMission;
   final CompleteMission _completeMission;
+  final RenameMission _renameMission;
+  final DeleteMission _deleteMission;
 
   Future<void> _onRequested(
     MissionsRequested event,
@@ -109,5 +135,21 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
         ),
       ),
     );
+  }
+
+  Future<void> _change(
+    Emitter<MissionsState> emit,
+    String missionId,
+    Future<Either<Failure, Unit>> Function() action,
+    String message,
+  ) async {
+    final current = state;
+    if (current is! MissionsSuccess) return;
+    emit(MissionsSuccess(current.board, busyMissionId: missionId));
+    if (await action() case Left(value: final failure)) {
+      emit(MissionsSuccess(current.board, message: failure.message));
+      return;
+    }
+    await _reload(emit, current.board, message);
   }
 }

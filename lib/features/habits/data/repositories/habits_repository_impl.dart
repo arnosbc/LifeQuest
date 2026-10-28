@@ -38,6 +38,19 @@ class HabitsRepositoryImpl implements HabitsRepository {
         return unit;
       });
 
+  @override
+  Future<Either<Failure, Unit>> renameHabit(String habitId, String name) =>
+      _run(() async {
+        await _remote.renameHabit(habitId, name);
+        return unit;
+      });
+
+  @override
+  Future<Either<Failure, Unit>> deleteHabit(String habitId) => _run(() async {
+    await _remote.deleteHabit(habitId);
+    return unit;
+  });
+
   static String _day(DateTime now) =>
       '${now.year.toString().padLeft(4, '0')}-'
       '${now.month.toString().padLeft(2, '0')}-'

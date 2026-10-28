@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_calendar.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_row.dart';
@@ -12,6 +13,7 @@ class GoodHabitsView extends StatelessWidget {
     required this.now,
     required this.busyHabitId,
     required this.onComplete,
+    this.menuFor,
   });
 
   final HabitsBoard board;
@@ -20,6 +22,9 @@ class GoodHabitsView extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final ValueChanged<String>? onComplete;
+
+  /// Menú «⋯» de cada hábito.
+  final Widget Function(Habit habit)? menuFor;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +88,7 @@ class GoodHabitsView extends StatelessWidget {
             habit: habit,
             busy: busyHabitId == habit.id,
             onComplete: onComplete == null ? null : () => onComplete!(habit.id),
+            menu: menuFor?.call(habit),
           ),
         const SizedBox(height: 9),
         const LifeQuestSectionHeading('RESUMEN SEMANAL'),

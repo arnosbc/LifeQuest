@@ -1,6 +1,7 @@
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 
-/// Respuesta JSON de la RPC `home_dashboard` (supabase/migrations/001_home.sql).
+/// Respuesta JSON de la RPC `home_dashboard` (supabase/migrations/001_home.sql),
+/// con `daily_chest` de `daily_chest_status` (027) cuando viene.
 class HomeDashboardModel {
   const HomeDashboardModel(this.json);
 
@@ -11,6 +12,7 @@ class HomeDashboardModel {
 
   HomeDashboard toEntity() {
     final mission = json['priority_mission'] as Map<String, dynamic>?;
+    final chest = json['daily_chest'] as Map<String, dynamic>?;
     final habits = (json['habits'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
     return HomeDashboard(
@@ -52,6 +54,14 @@ class HomeDashboardModel {
       missionsDone: _int(json['missions_done']),
       missionsTotal: _int(json['missions_total']),
       focusMinutes: _int(json['focus_minutes']),
+      chest: chest == null
+          ? const DailyChest()
+          : DailyChest(
+              progress: _int(chest['progress']),
+              required: _int(chest['required'], 3),
+              coins: _int(chest['coins'], 15),
+              claimed: chest['claimed'] as bool? ?? false,
+            ),
     );
   }
 

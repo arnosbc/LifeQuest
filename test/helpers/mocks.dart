@@ -1,6 +1,20 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
+import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart'
+    as rm;
+import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart'
+    as dm;
+import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart'
+    as rh;
+import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart'
+    as dh;
+import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart'
+    as rn;
+import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart'
+    as dn;
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/get_brain_dump.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/capture_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/file_thought.dart';
@@ -52,6 +66,7 @@ import 'package:proyecto_movil/features/habits/domain/usecases/register_bad_habi
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/claim_daily_chest.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
@@ -153,6 +168,8 @@ class MockHomeRemoteDataSource extends Mock implements HomeRemoteDataSource {}
 class MockGetHomeDashboard extends Mock implements GetHomeDashboard {}
 
 class MockCompleteHabit extends Mock implements CompleteHabit {}
+
+class MockClaimDailyChest extends Mock implements ClaimDailyChest {}
 
 class MockMissionsBloc extends MockBloc<MissionsEvent, MissionsState>
     implements MissionsBloc {}
@@ -302,3 +319,21 @@ class MockSetVisionLink extends Mock implements SetVisionLink {}
 class MockGetStats extends Mock implements GetStats {}
 
 class MockGetInventory extends Mock implements GetInventory {}
+
+// Renombrar y borrar (028).
+class MockRenameMission extends Mock implements rm.RenameMission {}
+
+class MockDeleteMission extends Mock implements dm.DeleteMission {}
+
+class MockRenameHabit extends Mock implements rh.RenameHabit {}
+
+class MockDeleteHabit extends Mock implements dh.DeleteHabit {}
+
+class MockRenameNpc extends Mock implements rn.RenameNpc {}
+
+class MockDeleteNpc extends Mock implements dn.DeleteNpc {}
+
+// Avisos (029).
+class MockGetNotifications extends Mock implements GetNotifications {}
+
+class MockMarkNotificationsRead extends Mock implements MarkNotificationsRead {}

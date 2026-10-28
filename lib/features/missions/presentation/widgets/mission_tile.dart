@@ -11,6 +11,7 @@ class MissionTile extends StatelessWidget {
     required this.now,
     required this.busy,
     required this.onComplete,
+    this.menu,
   });
 
   final Mission mission;
@@ -19,6 +20,9 @@ class MissionTile extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final VoidCallback? onComplete;
+
+  /// Menú «⋯» (renombrar, borrar).
+  final Widget? menu;
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
@@ -81,6 +85,7 @@ class MissionTile extends StatelessWidget {
             tooltip: 'Completar «${mission.title}»',
             icon: Icon(Icons.check_circle_outline, color: context.lq.deepGreen),
           ),
+        ?menu,
       ],
     ),
   );

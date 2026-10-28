@@ -44,6 +44,26 @@ class TodayHabit extends Equatable {
   List<Object?> get props => [id, name, done];
 }
 
+/// Cofre del día: se abre con N misiones que dieron Monedas hoy.
+class DailyChest extends Equatable {
+  const DailyChest({
+    this.progress = 0,
+    this.required = 3,
+    this.coins = 15,
+    this.claimed = false,
+  });
+
+  final int progress;
+  final int required;
+  final int coins;
+  final bool claimed;
+
+  bool get ready => !claimed && progress >= required;
+
+  @override
+  List<Object?> get props => [progress, required, coins, claimed];
+}
+
 /// Todo lo que muestra el Home, leído en una sola consulta.
 class HomeDashboard extends Equatable {
   const HomeDashboard({
@@ -64,6 +84,7 @@ class HomeDashboard extends Equatable {
     this.displayName,
     this.characterClass,
     this.priorityMission,
+    this.chest = const DailyChest(),
   });
 
   final String? displayName;
@@ -89,6 +110,7 @@ class HomeDashboard extends Equatable {
   final int missionsDone;
   final int missionsTotal;
   final int focusMinutes;
+  final DailyChest chest;
 
   @override
   List<Object?> get props => [
@@ -109,5 +131,6 @@ class HomeDashboard extends Equatable {
     missionsDone,
     missionsTotal,
     focusMinutes,
+    chest,
   ];
 }

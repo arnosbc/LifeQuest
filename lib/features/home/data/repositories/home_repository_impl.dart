@@ -30,6 +30,12 @@ class HomeRepositoryImpl implements HomeRepository {
     return unit;
   });
 
+  @override
+  Future<Either<Failure, Unit>> claimDailyChest() => _run(() async {
+    await _remote.claimDailyChest();
+    return unit;
+  });
+
   static String _day(DateTime now) =>
       '${now.year.toString().padLeft(4, '0')}-'
       '${now.month.toString().padLeft(2, '0')}-'
@@ -56,6 +62,8 @@ class HomeRepositoryImpl implements HomeRepository {
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',
     'invalid_day' =>
       'La fecha de tu teléfono no coincide con la de hoy. Revísala y reintenta.',
+    'chest_already_claimed' => 'Ya abriste el cofre de hoy. Mañana habrá otro.',
+    'chest_locked' => 'Cumple tus misiones del día para abrir el cofre.',
     'profile_not_found' =>
       'Estamos preparando tu personaje. Desliza para actualizar en un momento.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',

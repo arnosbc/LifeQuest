@@ -41,3 +41,22 @@ class BadHabitRegistered extends HabitsEvent {
   @override
   List<Object?> get props => [habitId];
 }
+
+class HabitRenamed extends HabitsEvent {
+  const HabitRenamed(this.habitId, this.name);
+
+  final String habitId;
+  final String name;
+
+  @override
+  List<Object?> get props => [habitId, name];
+}
+
+class HabitDeleted extends HabitsEvent {
+  const HabitDeleted(this.habitId);
+
+  final String habitId;
+
+  @override
+  List<Object?> get props => [habitId];
+}

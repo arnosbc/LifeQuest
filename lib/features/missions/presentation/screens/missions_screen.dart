@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/create_mission_sheet.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/mission_importance_card.dart';
@@ -75,6 +76,15 @@ class MissionsScreen extends StatelessWidget {
     final idle = state.busyMissionId == null && !state.saving;
     void complete(String id) =>
         context.read<MissionsBloc>().add(MissionCompleted(id));
+    Widget menu(Mission mission) => LifeQuestItemMenu(
+      name: mission.title,
+      enabled: idle,
+      onRename: (title) =>
+          context.read<MissionsBloc>().add(MissionRenamed(mission.id, title)),
+      onDelete: () =>
+          context.read<MissionsBloc>().add(MissionDeleted(mission.id)),
+      deleteMessage: 'Se borran también sus subtareas. No se puede deshacer.',
+    );
 
     return LifeQuestPage(
       title: 'Misiones',
@@ -95,6 +105,7 @@ class MissionsScreen extends StatelessWidget {
             now: now,
             busy: state.busyMissionId == missions.first.id,
             onComplete: idle ? () => complete(missions.first.id) : null,
+            menu: menu(missions.first),
           ),
           const SizedBox(height: 14),
           const MissionImportanceCard(),
@@ -112,6 +123,7 @@ class MissionsScreen extends StatelessWidget {
               now: now,
               busy: state.busyMissionId == mission.id,
               onComplete: idle ? () => complete(mission.id) : null,
+              menu: menu(mission),
             ),
             const SizedBox(height: 7),
           ],

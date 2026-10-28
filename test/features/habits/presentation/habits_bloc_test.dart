@@ -37,6 +37,8 @@ void main() {
     createHabit: createHabit,
     completeGoodHabit: completeGood,
     registerBadHabit: registerBad,
+    renameHabit: MockRenameHabit(),
+    deleteHabit: MockDeleteHabit(),
     clock: () => now,
   );
 

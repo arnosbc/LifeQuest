@@ -15,6 +15,7 @@ class LifeQuestActionRow extends StatelessWidget {
     required this.actionLabel,
     this.onAction,
     this.busy = false,
+    this.menu,
   });
 
   final IconData icon;
@@ -23,6 +24,9 @@ class LifeQuestActionRow extends StatelessWidget {
   final String actionLabel;
   final VoidCallback? onAction;
   final bool busy;
+
+  /// Menú «⋯» opcional tras el botón.
+  final Widget? menu;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -69,6 +73,7 @@ class LifeQuestActionRow extends StatelessWidget {
                   )
                 : Text(actionLabel, style: const TextStyle(fontSize: 12)),
           ),
+          ?menu,
         ],
       ),
     ),

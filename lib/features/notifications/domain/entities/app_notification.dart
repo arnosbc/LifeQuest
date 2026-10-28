@@ -1,3 +1,6 @@
+import 'package:equatable/equatable.dart';
+
+/// Nivel del aviso (CLAUDE.md §7). En pantalla siempre símbolo + texto.
 enum NotificationKind {
   critical('CRÍTICA'),
   motivational('MOTIVACIONAL'),
@@ -8,18 +11,23 @@ enum NotificationKind {
   final String label;
 }
 
-class AppNotification {
+class AppNotification extends Equatable {
   const AppNotification({
     required this.id,
     required this.kind,
     required this.title,
     required this.description,
-    required this.time,
+    required this.createdAt,
+    this.read = false,
   });
 
-  final int id;
+  final String id;
   final NotificationKind kind;
   final String title;
   final String description;
-  final String time;
+  final DateTime createdAt;
+  final bool read;
+
+  @override
+  List<Object?> get props => [id, kind, title, description, createdAt, read];
 }

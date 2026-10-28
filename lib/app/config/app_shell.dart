@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 
 /// Barra de navegación inferior. Cada pestaña es una rama del router que
@@ -41,6 +42,18 @@ class AppShell extends StatelessWidget {
       child: Scaffold(
         backgroundColor: lq.background,
         body: SafeArea(bottom: false, child: navigationShell),
+        // Brain Dump a un toque desde cualquier pestaña (Modelo de Fogg), salvo
+        // en la Mazmorra: dentro del Deep Working, sin ruido (CLAUDE.md §8).
+        floatingActionButton: navigationShell.currentIndex == 3
+            ? null
+            : FloatingActionButton.small(
+                heroTag: 'brain_dump',
+                tooltip: 'Brain Dump: anota una idea',
+                backgroundColor: lq.deepGreen,
+                foregroundColor: lq.onDeepGreen,
+                onPressed: () => context.push(RoutePaths.brainDump),
+                child: const Icon(Icons.lightbulb_outline),
+              ),
         bottomNavigationBar: NavigationBar(
           height: 66,
           selectedIndex: navigationShell.currentIndex,
