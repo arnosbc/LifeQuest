@@ -14,12 +14,15 @@ import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.d
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
+import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
 import 'package:proyecto_movil/features/goals/presentation/screens/goals_screen.dart';
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
+import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
 import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
+import 'package:proyecto_movil/features/marketplace/presentation/blocs/marketplace_bloc.dart';
 import 'package:proyecto_movil/features/marketplace/presentation/screens/marketplace_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
@@ -30,11 +33,13 @@ import 'package:proyecto_movil/features/profile/presentation/screens/appearance_
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/notifications_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
+import 'package:proyecto_movil/features/rpgenie/presentation/blocs/rpgenie_bloc.dart';
 import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_screen.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
+import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
@@ -270,25 +275,56 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
           ),
         ],
       ),
-      _section(RoutePaths.rpgenie, const RpgenieScreen()),
-      _section(RoutePaths.journal, const JournalScreen()),
-      _section(RoutePaths.goals, const GoalsScreen()),
-      _section(RoutePaths.tavern, const TavernScreen()),
-      _section(RoutePaths.marketplace, const MarketplaceScreen()),
+      _section(
+        RoutePaths.rpgenie,
+        (context) => BlocProvider(
+          create: (_) => sl<RpgenieBloc>()..add(const RpgenieRequested()),
+          child: RpgenieScreen(
+            onStartFocus: () => context.go(RoutePaths.dungeon),
+          ),
+        ),
+      ),
+      _section(
+        RoutePaths.journal,
+        (context) => BlocProvider(
+          create: (_) => sl<JournalBloc>()..add(const JournalRequested()),
+          child: const JournalScreen(),
+        ),
+      ),
+      _section(
+        RoutePaths.goals,
+        (context) => BlocProvider(
+          create: (_) => sl<GoalsBloc>()..add(const GoalsRequested()),
+          child: GoalsScreen(onCreateGoal: () => context.go(RoutePaths.stage)),
+        ),
+      ),
+      _section(
+        RoutePaths.tavern,
+        (context) => BlocProvider(
+          create: (_) => sl<TavernBloc>()..add(const TavernRequested()),
+          child: const TavernScreen(),
+        ),
+      ),
+      _section(
+        RoutePaths.marketplace,
+        (context) => BlocProvider(
+          create: (_) =>
+              sl<MarketplaceBloc>()..add(const MarketplaceRequested()),
+          child: const MarketplaceScreen(),
+        ),
+      ),
     ],
   );
 }
 
 /// Secciones del menú (RF-114) que no caben en la barra inferior: pantalla
-/// completa con botón de volver.
-GoRoute _section(String path, Widget screen) => GoRoute(
+/// completa con botón de volver. Siguen el tema claro/oscuro (`context.lq`).
+GoRoute _section(String path, WidgetBuilder screen) => GoRoute(
   path: path,
-  builder: (context, state) => LifeQuestTheme.lightOnly(
-    Scaffold(
-      backgroundColor: LifeQuestColors.background,
-      appBar: AppBar(backgroundColor: LifeQuestColors.background),
-      body: SafeArea(child: screen),
-    ),
+  builder: (context, state) => Scaffold(
+    backgroundColor: context.lq.background,
+    appBar: AppBar(backgroundColor: context.lq.background),
+    body: SafeArea(child: screen(context)),
   ),
 );
 

@@ -19,6 +19,13 @@ import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart
 import 'package:proyecto_movil/features/dungeon/domain/usecases/get_dungeon_board.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/start_dungeon.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
+import 'package:proyecto_movil/features/goals/data/datasources/goals_remote_datasource.dart';
+import 'package:proyecto_movil/features/goals/data/repositories/goals_repository_impl.dart';
+import 'package:proyecto_movil/features/goals/domain/repositories/goals_repository.dart';
+import 'package:proyecto_movil/features/goals/domain/usecases/archive_goal.dart';
+import 'package:proyecto_movil/features/goals/domain/usecases/attack_boss.dart';
+import 'package:proyecto_movil/features/goals/domain/usecases/get_goals_board.dart';
+import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
 import 'package:proyecto_movil/features/habits/data/datasources/habits_remote_datasource.dart';
 import 'package:proyecto_movil/features/habits/data/repositories/habits_repository_impl.dart';
 import 'package:proyecto_movil/features/habits/domain/repositories/habits_repository.dart';
@@ -33,6 +40,21 @@ import 'package:proyecto_movil/features/home/domain/repositories/home_repository
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/journal/data/datasources/journal_remote_datasource.dart';
+import 'package:proyecto_movil/features/journal/data/repositories/journal_repository_impl.dart';
+import 'package:proyecto_movil/features/journal/domain/repositories/journal_repository.dart';
+import 'package:proyecto_movil/features/journal/domain/usecases/get_journal.dart';
+import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
+import 'package:proyecto_movil/features/marketplace/data/datasources/marketplace_remote_datasource.dart';
+import 'package:proyecto_movil/features/marketplace/data/repositories/marketplace_repository_impl.dart';
+import 'package:proyecto_movil/features/marketplace/domain/repositories/marketplace_repository.dart';
+import 'package:proyecto_movil/features/marketplace/domain/usecases/activate_elixir.dart';
+import 'package:proyecto_movil/features/marketplace/domain/usecases/buy_black_market_item.dart';
+import 'package:proyecto_movil/features/marketplace/domain/usecases/buy_market_item.dart';
+import 'package:proyecto_movil/features/marketplace/domain/usecases/get_market_board.dart';
+import 'package:proyecto_movil/features/marketplace/domain/usecases/upgrade_refuge.dart';
+import 'package:proyecto_movil/features/marketplace/domain/usecases/use_recovery_pass.dart';
+import 'package:proyecto_movil/features/marketplace/presentation/blocs/marketplace_bloc.dart';
 import 'package:proyecto_movil/features/missions/data/datasources/missions_remote_datasource.dart';
 import 'package:proyecto_movil/features/missions/data/repositories/missions_repository_impl.dart';
 import 'package:proyecto_movil/features/missions/domain/repositories/missions_repository.dart';
@@ -62,6 +84,12 @@ import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_prefe
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/rpgenie/data/datasources/rpgenie_remote_datasource.dart';
+import 'package:proyecto_movil/features/rpgenie/data/repositories/rpgenie_repository_impl.dart';
+import 'package:proyecto_movil/features/rpgenie/domain/repositories/rpgenie_repository.dart';
+import 'package:proyecto_movil/features/rpgenie/domain/usecases/complete_current_mission.dart';
+import 'package:proyecto_movil/features/rpgenie/domain/usecases/get_current_mission.dart';
+import 'package:proyecto_movil/features/rpgenie/presentation/blocs/rpgenie_bloc.dart';
 import 'package:proyecto_movil/features/stage/data/datasources/stage_remote_datasource.dart';
 import 'package:proyecto_movil/features/settings/data/datasources/settings_remote_datasource.dart';
 import 'package:proyecto_movil/features/settings/data/repositories/settings_repository_impl.dart';
@@ -79,6 +107,14 @@ import 'package:proyecto_movil/features/stage/domain/usecases/create_project.dar
 import 'package:proyecto_movil/features/stage/domain/usecases/create_resource.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/get_stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
+import 'package:proyecto_movil/features/tavern/data/datasources/tavern_remote_datasource.dart';
+import 'package:proyecto_movil/features/tavern/data/repositories/tavern_repository_impl.dart';
+import 'package:proyecto_movil/features/tavern/domain/repositories/tavern_repository.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/accept_npc_mission.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_mission.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
+import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -205,6 +241,83 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<StageRepository>(() => StageRepositoryImpl(sl()));
   sl.registerLazySingleton<StageRemoteDataSource>(
     () => StageRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Marketplace ----------
+  sl.registerFactory(
+    () => MarketplaceBloc(
+      getBoard: sl(),
+      buyItem: sl(),
+      buyBlackMarket: sl(),
+      usePass: sl(),
+      upgradeRefuge: sl(),
+      activateElixir: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetMarketBoard(sl()));
+  sl.registerLazySingleton(() => BuyMarketItem(sl()));
+  sl.registerLazySingleton(() => BuyBlackMarketItem(sl()));
+  sl.registerLazySingleton(() => UseRecoveryPass(sl()));
+  sl.registerLazySingleton(() => UpgradeRefuge(sl()));
+  sl.registerLazySingleton(() => ActivateElixir(sl()));
+  sl.registerLazySingleton<MarketplaceRepository>(
+    () => MarketplaceRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<MarketplaceRemoteDataSource>(
+    () => MarketplaceRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Taverna ----------
+  sl.registerFactory(
+    () => TavernBloc(
+      getBoard: sl(),
+      createNpc: sl(),
+      acceptMission: sl(),
+      completeMission: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetTavernBoard(sl()));
+  sl.registerLazySingleton(() => CreateNpc(sl()));
+  sl.registerLazySingleton(() => AcceptNpcMission(sl()));
+  sl.registerLazySingleton(() => CompleteNpcMission(sl()));
+  sl.registerLazySingleton<TavernRepository>(() => TavernRepositoryImpl(sl()));
+  sl.registerLazySingleton<TavernRemoteDataSource>(
+    () => TavernRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Diario ----------
+  sl.registerFactory(() => JournalBloc(getJournal: sl()));
+  sl.registerLazySingleton(() => GetJournal(sl()));
+  sl.registerLazySingleton<JournalRepository>(
+    () => JournalRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<JournalRemoteDataSource>(
+    () => JournalRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Objetivos (Boss Fight) ----------
+  sl.registerFactory(
+    () => GoalsBloc(getBoard: sl(), attack: sl(), archive: sl()),
+  );
+  sl.registerLazySingleton(() => GetGoalsBoard(sl()));
+  sl.registerLazySingleton(() => AttackBoss(sl()));
+  sl.registerLazySingleton(() => ArchiveGoal(sl()));
+  sl.registerLazySingleton<GoalsRepository>(() => GoalsRepositoryImpl(sl()));
+  sl.registerLazySingleton<GoalsRemoteDataSource>(
+    () => GoalsRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- RPGenie ----------
+  sl.registerFactory(
+    () => RpgenieBloc(getMission: sl(), completeMission: sl()),
+  );
+  sl.registerLazySingleton(() => GetCurrentMission(sl()));
+  sl.registerLazySingleton(() => CompleteCurrentMission(sl()));
+  sl.registerLazySingleton<RpgenieRepository>(
+    () => RpgenieRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<RpgenieRemoteDataSource>(
+    () => RpgenieRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Onboarding ----------

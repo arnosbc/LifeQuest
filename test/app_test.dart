@@ -12,6 +12,8 @@ import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
+import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
+import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
@@ -79,6 +81,19 @@ void main() {
         initialState: const SettingsSuccess(settingsOverview),
       );
       return settingsBloc;
+    });
+    sl.registerFactory<TavernBloc>(() {
+      final tavernBloc = MockTavernBloc();
+      whenListen(
+        tavernBloc,
+        const Stream<TavernState>.empty(),
+        initialState: const TavernSuccess(
+          TavernBoard(
+            npcs: [Npc(id: 'n1', name: 'Vera', skillName: 'Salud')],
+          ),
+        ),
+      );
+      return tavernBloc;
     });
     sl.registerFactory<ProfileBloc>(() {
       final profileBloc = MockProfileBloc();
@@ -151,7 +166,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Taverna'));
     await tester.pumpAndSettle();
-    expect(find.text('Entrenadora Vera · Salud'), findsOneWidget);
+    expect(find.text('Vera · Salud'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
