@@ -12,6 +12,8 @@ import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
+import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
+import 'package:proyecto_movil/features/brain_dump/presentation/screens/brain_dump_screen.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
 import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
@@ -20,6 +22,8 @@ import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.da
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
+import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
+import 'package:proyecto_movil/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
 import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
 import 'package:proyecto_movil/features/marketplace/presentation/blocs/marketplace_bloc.dart';
@@ -39,8 +43,12 @@ import 'package:proyecto_movil/features/settings/presentation/blocs/settings_blo
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
+import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
+import 'package:proyecto_movil/features/stats/presentation/screens/stats_screen.dart';
 import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
+import 'package:proyecto_movil/features/vision/presentation/blocs/vision_bloc.dart';
+import 'package:proyecto_movil/features/vision/presentation/screens/vision_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 /// Rutas de la app. Aquí se componen las features: cada pantalla recibe por
@@ -228,6 +236,9 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       onOpenMarketplace: () =>
                           context.push(RoutePaths.marketplace),
                       onOpenSettings: () => context.push(RoutePaths.settings),
+                      onOpenStats: () => context.push(RoutePaths.stats),
+                      onOpenVision: () => context.push(RoutePaths.vision),
+                      onOpenInventory: () => context.push(RoutePaths.inventory),
                     ),
                   ),
                 ),
@@ -311,6 +322,38 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
           create: (_) =>
               sl<MarketplaceBloc>()..add(const MarketplaceRequested()),
           child: const MarketplaceScreen(),
+        ),
+      ),
+      _section(
+        RoutePaths.brainDump,
+        (context) => BlocProvider(
+          create: (_) => sl<BrainDumpBloc>()..add(const BrainDumpRequested()),
+          child: BrainDumpScreen(
+            onCreateGoal: () => context.go(RoutePaths.stage),
+          ),
+        ),
+      ),
+      _section(
+        RoutePaths.stats,
+        (context) => BlocProvider(
+          create: (_) => sl<StatsBloc>()..add(const StatsRequested()),
+          child: const StatsScreen(),
+        ),
+      ),
+      _section(
+        RoutePaths.vision,
+        (context) => BlocProvider(
+          create: (_) => sl<VisionBloc>()..add(const VisionRequested()),
+          child: const VisionScreen(),
+        ),
+      ),
+      _section(
+        RoutePaths.inventory,
+        (context) => BlocProvider(
+          create: (_) => sl<InventoryBloc>()..add(const InventoryRequested()),
+          child: InventoryScreen(
+            onOpenMarketplace: () => context.push(RoutePaths.marketplace),
+          ),
         ),
       ),
     ],

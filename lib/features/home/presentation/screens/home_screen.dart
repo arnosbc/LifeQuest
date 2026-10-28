@@ -26,6 +26,7 @@ class HomeScreen extends StatelessWidget {
   final ValueChanged<int> onNavigate;
 
   static const _sections = [
+    (Icons.inbox_outlined, 'Brain Dump', RoutePaths.brainDump),
     (Icons.auto_awesome_outlined, 'RPGenie', RoutePaths.rpgenie),
     (Icons.edit_note_outlined, 'Misiones', RoutePaths.missions),
     (Icons.auto_stories_outlined, 'Diario', RoutePaths.journal),

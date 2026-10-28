@@ -115,6 +115,32 @@ import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_miss
 import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
+import 'package:proyecto_movil/features/brain_dump/data/datasources/brain_dump_remote_datasource.dart';
+import 'package:proyecto_movil/features/brain_dump/data/repositories/brain_dump_repository_impl.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/repositories/brain_dump_repository.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/get_brain_dump.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/capture_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/file_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/delete_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
+import 'package:proyecto_movil/features/vision/data/datasources/vision_remote_datasource.dart';
+import 'package:proyecto_movil/features/vision/data/repositories/vision_repository_impl.dart';
+import 'package:proyecto_movil/features/vision/domain/repositories/vision_repository.dart';
+import 'package:proyecto_movil/features/vision/domain/usecases/get_vision_board.dart';
+import 'package:proyecto_movil/features/vision/domain/usecases/save_vision.dart';
+import 'package:proyecto_movil/features/vision/domain/usecases/set_vision_link.dart';
+import 'package:proyecto_movil/features/vision/presentation/blocs/vision_bloc.dart';
+import 'package:proyecto_movil/features/stats/data/datasources/stats_remote_datasource.dart';
+import 'package:proyecto_movil/features/stats/data/repositories/stats_repository_impl.dart';
+import 'package:proyecto_movil/features/stats/domain/repositories/stats_repository.dart';
+import 'package:proyecto_movil/features/stats/domain/usecases/get_stats.dart';
+import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
+import 'package:proyecto_movil/features/inventory/data/datasources/inventory_remote_datasource.dart';
+import 'package:proyecto_movil/features/inventory/data/repositories/inventory_repository_impl.dart';
+import 'package:proyecto_movil/features/inventory/domain/repositories/inventory_repository.dart';
+import 'package:proyecto_movil/features/inventory/domain/usecases/get_inventory.dart';
+import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -318,6 +344,58 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<RpgenieRemoteDataSource>(
     () => RpgenieRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Brain Dump ----------
+  sl.registerFactory(
+    () => BrainDumpBloc(
+      getBoard: sl(),
+      capture: sl(),
+      file: sl(),
+      convert: sl(),
+      delete: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetBrainDump(sl()));
+  sl.registerLazySingleton(() => CaptureThought(sl()));
+  sl.registerLazySingleton(() => FileThought(sl()));
+  sl.registerLazySingleton(() => ConvertThought(sl()));
+  sl.registerLazySingleton(() => DeleteThought(sl()));
+  sl.registerLazySingleton<BrainDumpRepository>(
+    () => BrainDumpRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<BrainDumpRemoteDataSource>(
+    () => BrainDumpRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Vision Board ----------
+  sl.registerFactory(
+    () => VisionBloc(getBoard: sl(), save: sl(), setLink: sl()),
+  );
+  sl.registerLazySingleton(() => GetVisionBoard(sl()));
+  sl.registerLazySingleton(() => SaveVision(sl()));
+  sl.registerLazySingleton(() => SetVisionLink(sl()));
+  sl.registerLazySingleton<VisionRepository>(() => VisionRepositoryImpl(sl()));
+  sl.registerLazySingleton<VisionRemoteDataSource>(
+    () => VisionRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Estadísticas ----------
+  sl.registerFactory(() => StatsBloc(getStats: sl()));
+  sl.registerLazySingleton(() => GetStats(sl()));
+  sl.registerLazySingleton<StatsRepository>(() => StatsRepositoryImpl(sl()));
+  sl.registerLazySingleton<StatsRemoteDataSource>(
+    () => StatsRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Inventario y logros ----------
+  sl.registerFactory(() => InventoryBloc(getInventory: sl()));
+  sl.registerLazySingleton(() => GetInventory(sl()));
+  sl.registerLazySingleton<InventoryRepository>(
+    () => InventoryRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<InventoryRemoteDataSource>(
+    () => InventoryRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Onboarding ----------

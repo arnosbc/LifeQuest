@@ -1,6 +1,16 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/get_brain_dump.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/capture_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/file_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/delete_thought.dart';
+import 'package:proyecto_movil/features/vision/domain/usecases/get_vision_board.dart';
+import 'package:proyecto_movil/features/vision/domain/usecases/save_vision.dart';
+import 'package:proyecto_movil/features/vision/domain/usecases/set_vision_link.dart';
+import 'package:proyecto_movil/features/stats/domain/usecases/get_stats.dart';
+import 'package:proyecto_movil/features/inventory/domain/usecases/get_inventory.dart';
 import 'package:proyecto_movil/features/goals/domain/usecases/archive_goal.dart';
 import 'package:proyecto_movil/features/goals/domain/usecases/attack_boss.dart';
 import 'package:proyecto_movil/features/goals/domain/usecases/get_goals_board.dart';
@@ -271,3 +281,24 @@ class MockGetCurrentMission extends Mock implements GetCurrentMission {}
 
 class MockCompleteCurrentMission extends Mock
     implements CompleteCurrentMission {}
+
+// Brain Dump, Vision Board, Estadísticas e Inventario (023–026).
+class MockGetBrainDump extends Mock implements GetBrainDump {}
+
+class MockCaptureThought extends Mock implements CaptureThought {}
+
+class MockFileThought extends Mock implements FileThought {}
+
+class MockConvertThought extends Mock implements ConvertThought {}
+
+class MockDeleteThought extends Mock implements DeleteThought {}
+
+class MockGetVisionBoard extends Mock implements GetVisionBoard {}
+
+class MockSaveVision extends Mock implements SaveVision {}
+
+class MockSetVisionLink extends Mock implements SetVisionLink {}
+
+class MockGetStats extends Mock implements GetStats {}
+
+class MockGetInventory extends Mock implements GetInventory {}

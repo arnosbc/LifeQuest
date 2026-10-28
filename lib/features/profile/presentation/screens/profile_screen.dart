@@ -22,6 +22,9 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenJournal,
     required this.onOpenMarketplace,
     required this.onOpenSettings,
+    required this.onOpenStats,
+    required this.onOpenVision,
+    required this.onOpenInventory,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -31,6 +34,9 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenJournal;
   final VoidCallback onOpenMarketplace;
   final VoidCallback onOpenSettings;
+  final VoidCallback onOpenStats;
+  final VoidCallback onOpenVision;
+  final VoidCallback onOpenInventory;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<ProfileBloc, ProfileState>(
@@ -111,9 +117,6 @@ class ProfileScreen extends StatelessWidget {
       }
     }
 
-    void soon(String feature) =>
-        showLifeQuestMessage(context, '$feature llegará pronto.');
-
     return LifeQuestPage(
       title: 'Perfil',
       subtitle: 'Tu progreso, a tu manera.',
@@ -162,19 +165,19 @@ class ProfileScreen extends StatelessWidget {
                   ProfileQuickLink(
                     icon: Icons.insights_outlined,
                     label: 'Estadísticas',
-                    onTap: () => soon('Las Estadísticas'),
+                    onTap: onOpenStats,
                   ),
                   ProfileQuickLink(
                     icon: Icons.visibility_outlined,
                     label: 'Vision Board',
-                    onTap: () => soon('El Vision Board'),
+                    onTap: onOpenVision,
                   ),
                 ],
                 [
                   ProfileQuickLink(
                     icon: Icons.inventory_2_outlined,
                     label: 'Inventario y logros',
-                    onTap: () => soon('El Inventario y los logros'),
+                    onTap: onOpenInventory,
                   ),
                   ProfileQuickLink(
                     icon: Icons.storefront_outlined,

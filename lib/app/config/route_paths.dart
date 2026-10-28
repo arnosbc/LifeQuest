@@ -32,4 +32,10 @@ abstract final class RoutePaths {
   static const goals = '/goals';
   static const tavern = '/tavern';
   static const marketplace = '/marketplace';
+  static const brainDump = '/brain-dump';
+
+  // Desde Perfil (§13).
+  static const stats = '/stats';
+  static const vision = '/vision';
+  static const inventory = '/inventory';
 }

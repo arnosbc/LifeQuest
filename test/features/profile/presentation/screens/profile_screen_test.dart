@@ -19,6 +19,7 @@ void main() {
   late int settingsOpened;
   late int journalOpened;
   late int marketplaceOpened;
+  late int otherOpened;
 
   setUp(() {
     bloc = MockProfileBloc();
@@ -31,6 +32,7 @@ void main() {
     settingsOpened = 0;
     journalOpened = 0;
     marketplaceOpened = 0;
+    otherOpened = 0;
   });
 
   Future<void> pump(
@@ -63,6 +65,9 @@ void main() {
                 onOpenJournal: () => journalOpened++,
                 onOpenMarketplace: () => marketplaceOpened++,
                 onOpenSettings: () => settingsOpened++,
+                onOpenStats: () => otherOpened++,
+                onOpenVision: () => otherOpened++,
+                onOpenInventory: () => otherOpened++,
               ),
             ),
           ),
@@ -208,8 +213,9 @@ void main() {
     expect((journalOpened, marketplaceOpened, settingsOpened), (1, 1, 1));
 
     await tester.tap(find.text('Estadísticas'));
-    await tester.pump();
-    expect(find.text('Las Estadísticas llegará pronto.'), findsOneWidget);
+    await tester.tap(find.text('Vision Board'));
+    await tester.tap(find.text('Inventario y logros'));
+    expect(otherOpened, 3);
   });
 
   testWidgets('editar la identidad envía lo escrito', (tester) async {
