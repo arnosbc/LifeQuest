@@ -82,6 +82,8 @@ import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_prefer
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/set_active_title.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_preference.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_realm.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_realm.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
@@ -498,10 +500,17 @@ Future<void> initDependencies() async {
   // ---------- Apariencia (tema) ----------
   // Bloc: singleton porque el tema es de toda la app.
   sl.registerLazySingleton(
-    () => AppearanceBloc(getThemePreference: sl(), saveThemePreference: sl()),
+    () => AppearanceBloc(
+      getThemePreference: sl(),
+      saveThemePreference: sl(),
+      getThemeRealm: sl(),
+      saveThemeRealm: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetThemePreference(sl()));
   sl.registerLazySingleton(() => SaveThemePreference(sl()));
+  sl.registerLazySingleton(() => GetThemeRealm(sl()));
+  sl.registerLazySingleton(() => SaveThemeRealm(sl()));
   sl.registerLazySingleton<AppearanceRepository>(
     () => AppearanceRepositoryImpl(sl()),
   );

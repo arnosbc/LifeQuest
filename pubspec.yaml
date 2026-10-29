@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.12.0+14
+version: 1.13.0+15
 
 environment:
   sdk: ^3.12.2
@@ -44,6 +44,14 @@ dependencies:
   go_router: ^18.1.0
   # Ya llegaba como dependencia de supabase_flutter; se declara para usarlo.
   shared_preferences: ^2.5.6
+  google_fonts: ^8.2.1
+  flutter_svg: ^2.3.2
+
+# shortcut: path_provider_foundation >= 2.5 compila un hook nativo (objective_c)
+# que falla con espacios en la ruta del usuario en Windows; quitar cuando
+# Dart lo corrija o el proyecto viva en una ruta sin espacios.
+dependency_overrides:
+  path_provider_foundation: 2.4.1
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +76,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Fuentes empaquetadas para google_fonts (sin descarga en runtime).
+  assets:
+    - assets/google_fonts/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

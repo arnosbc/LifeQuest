@@ -383,6 +383,8 @@ Vienen de `docs/ideas-proyecto-productividad-gamificada.md` (versión del paquet
 
 ## 14. Diseño
 
+> **Diseño final entregado (2026-10-28):** sistema «Bosque vivo» (Questly) en `docs/diseño/` (`HANDOFF.md`, `DESIGN.md`, `PRODUCT.md`, tokens y 60 pantallas). El rediseño se hace según **`docs/diseño/PLAN-REDISENO.md`** (solo cambia el diseño; lo que funciona sigue igual) y arranca con `docs/diseño/PROMPT-INICIO.md`. Mientras se migra, lo de abajo aplica a las pantallas aún no revestidas.
+
 > **Reinicio (2026-10-18):** `DESIGN.md`, `PRODUCT.md` y el paquete de pantallas se borraron para empezar de cero. Se rehacen tomando como punto de partida `docs/ideas-proyecto-productividad-gamificada.md`.
 
 Mientras no existan:

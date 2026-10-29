@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/app/app.dart';
@@ -12,6 +13,8 @@ import 'package:proyecto_movil/injection_container.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Las fuentes van en assets/google_fonts: nunca se descargan.
+  GoogleFonts.config.allowRuntimeFetching = false;
   AppConstants.ensureSupabaseConfigured();
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,

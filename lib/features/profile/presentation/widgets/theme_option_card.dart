@@ -54,13 +54,11 @@ class ThemeOptionCard extends StatelessWidget {
                   child: SizedBox(
                     height: 76,
                     child: switch (theme) {
-                      ThemePreference.light => const _Miniature(
+                      ThemePreference.light => _Miniature(
                         LifeQuestPalette.light,
                       ),
-                      ThemePreference.dark => const _Miniature(
-                        LifeQuestPalette.dark,
-                      ),
-                      ThemePreference.system => const Row(
+                      ThemePreference.dark => _Miniature(LifeQuestPalette.dark),
+                      ThemePreference.system => Row(
                         children: [
                           Expanded(child: _Miniature(LifeQuestPalette.light)),
                           Expanded(child: _Miniature(LifeQuestPalette.dark)),

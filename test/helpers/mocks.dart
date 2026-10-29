@@ -87,6 +87,8 @@ import 'package:proyecto_movil/features/profile/domain/usecases/get_character_pr
 import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_preference.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_preference.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/get_theme_realm.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/save_theme_realm.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/set_active_title.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
@@ -217,6 +219,10 @@ class MockAppearanceLocalDataSource extends Mock
 class MockGetThemePreference extends Mock implements GetThemePreference {}
 
 class MockSaveThemePreference extends Mock implements SaveThemePreference {}
+
+class MockGetThemeRealm extends Mock implements GetThemeRealm {}
+
+class MockSaveThemeRealm extends Mock implements SaveThemeRealm {}
 
 class MockStageBloc extends MockBloc<StageEvent, StageState>
     implements StageBloc {}

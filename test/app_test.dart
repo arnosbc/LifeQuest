@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/app/app.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly_nav_bar.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
@@ -160,7 +161,7 @@ void main() {
 
     // El saludo cambia con la hora; el nombre sale del perfil.
     expect(find.textContaining(', Ana'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(QuestlyNavBar), findsOneWidget);
 
     await tester.scrollUntilVisible(find.text('Taverna'), 200);
     await tester.pumpAndSettle();
@@ -176,7 +177,7 @@ void main() {
     for (final tab in ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil']) {
       expect(
         find.descendant(
-          of: find.byType(NavigationBar),
+          of: find.byType(QuestlyNavBar),
           matching: find.text(tab),
         ),
         findsOneWidget,
@@ -184,7 +185,7 @@ void main() {
     }
     await tester.tap(
       find.descendant(
-        of: find.byType(NavigationBar),
+        of: find.byType(QuestlyNavBar),
         matching: find.text('Stage'),
       ),
     );
@@ -197,11 +198,11 @@ void main() {
     await tester.tap(find.text('Ver misiones (1)'));
     await tester.pumpAndSettle();
     expect(find.text('Preparar la exposición'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(QuestlyNavBar), findsOneWidget);
 
     // Tras ir a otra pestaña, tocar Stage abre Stage, no Misiones.
     Finder tab(String label) => find.descendant(
-      of: find.byType(NavigationBar),
+      of: find.byType(QuestlyNavBar),
       matching: find.text(label),
     );
     await tester.tap(tab('Inicio'));
@@ -235,7 +236,7 @@ void main() {
     verify(() => homeBloc.add(const HomeRequested())).called(1);
 
     Finder tab(String label) => find.descendant(
-      of: find.byType(NavigationBar),
+      of: find.byType(QuestlyNavBar),
       matching: find.text(label),
     );
     await tester.tap(tab('Perfil'));
@@ -266,7 +267,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Paso 1 de 5'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(QuestlyNavBar), findsNothing);
     verify(() => onboardingBloc.add(const OnboardingRequested())).called(1);
   });
 

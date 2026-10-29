@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
+import 'package:proyecto_movil/app/config/design_preview_screen.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
@@ -32,6 +33,8 @@ import 'package:proyecto_movil/features/missions/presentation/blocs/missions_blo
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/screens/missions_screen.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/theme_realm.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
@@ -202,15 +205,26 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     onShown: (c) =>
                         c.read<DungeonBloc>().add(const DungeonRequested()),
                     // La Mazmorra siempre es oscura (CLAUDE.md §14).
-                    child: Theme(
-                      data: LifeQuestTheme.dark,
-                      child: Builder(
-                        builder: (context) => ColoredBox(
-                          color: context.lq.background,
-                          child: const DungeonScreen(),
+                    child:
+                        BlocSelector<
+                          AppearanceBloc,
+                          AppearanceState,
+                          ThemeRealm
+                        >(
+                          selector: (state) => state.realm,
+                          builder: (context, realm) => Theme(
+                            data: LifeQuestTheme.build(
+                              questlyRealmOf(realm),
+                              dark: true,
+                            ),
+                            child: Builder(
+                              builder: (context) => ColoredBox(
+                                color: context.lq.background,
+                                child: const DungeonScreen(),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                   ),
                 ),
               ),
@@ -285,10 +299,21 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             path: 'appearance',
             builder: (context, state) => Scaffold(
               body: SafeArea(
-                child: AppearanceScreen(onBack: () => context.pop()),
+                child: AppearanceScreen(
+                  onBack: () => context.pop(),
+                  onOpenDesignPreview: kDebugMode
+                      ? () => context.push(RoutePaths.designPreview)
+                      : null,
+                ),
               ),
             ),
           ),
+          // Galería de componentes Questly: solo en desarrollo.
+          if (kDebugMode)
+            GoRoute(
+              path: 'diseno',
+              builder: (context, state) => const DesignPreviewScreen(),
+            ),
         ],
       ),
       _section(

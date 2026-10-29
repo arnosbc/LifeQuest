@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
@@ -10,9 +11,16 @@ import 'package:proyecto_movil/features/profile/presentation/widgets/theme_optio
 
 /// Elige el tema de la app. Necesita el [AppearanceBloc] global por encima.
 class AppearanceScreen extends StatelessWidget {
-  const AppearanceScreen({super.key, required this.onBack});
+  const AppearanceScreen({
+    super.key,
+    required this.onBack,
+    this.onOpenDesignPreview,
+  });
 
   final VoidCallback onBack;
+
+  /// Solo en desarrollo: abre la galería de componentes Questly.
+  final VoidCallback? onOpenDesignPreview;
 
   @override
   Widget build(
@@ -92,6 +100,14 @@ class AppearanceScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onOpenDesignPreview != null) ...[
+                  const SizedBox(height: 28),
+                  QuestlyButton(
+                    label: 'Galería de diseño (desarrollo)',
+                    variant: QuestlyButtonVariant.tonal,
+                    onPressed: onOpenDesignPreview,
+                  ),
+                ],
               ],
             ),
           ),

@@ -27,6 +27,8 @@ abstract final class RoutePaths {
 
   // Subpáginas de Configuración.
   static const appearance = '/settings/appearance';
+  // Galería de componentes Questly (solo en modo debug).
+  static const designPreview = '/settings/diseno';
   static const rpgenie = '/rpgenie';
   static const journal = '/journal';
   static const goals = '/goals';

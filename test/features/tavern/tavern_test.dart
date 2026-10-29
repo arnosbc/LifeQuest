@@ -128,9 +128,9 @@ void main() {
 
     blocTest<TavernBloc, TavernState>(
       'si RPGenie falla, avisa y no crea ni cobra nada',
-      setUp: () => when(() => suggest('n1')).thenAnswer(
-        (_) async => const Left(ServerFailure('sin cupo')),
-      ),
+      setUp: () => when(
+        () => suggest('n1'),
+      ).thenAnswer((_) async => const Left(ServerFailure('sin cupo'))),
       build: build,
       seed: () => const TavernSuccess(board),
       act: (bloc) => bloc.add(const NpcMissionRequested(vera)),

@@ -126,7 +126,8 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
           current.board,
           message: suggested.match(
             (failure) => failure.message,
-            (_) => 'RPGenie no logró idear una misión ahora. '
+            (_) =>
+                'RPGenie no logró idear una misión ahora. '
                 'Inténtalo en un rato.',
           ),
         ),
