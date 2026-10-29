@@ -6,58 +6,58 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Colores del paisaje de la cabecera (Hero.dc.html).
+/// Colores de las formas de la cabecera (DESIGN.md v2 §5; tonos de Hero.dc.html).
 @immutable
 class QHeroTone {
   const QHeroTone({
     required this.bg,
-    required this.sun,
-    required this.hill1,
-    required this.hill2,
-    required this.trees,
+    required this.dot,
+    required this.shape1,
+    required this.shape2,
+    required this.shape3,
     required this.kicker,
   });
 
-  final Color bg, sun, hill1, hill2, trees, kicker;
+  final Color bg, dot, shape1, shape2, shape3, kicker;
 
   static const forest = QHeroTone(
     bg: Color(0xFF1F5C39),
-    sun: Color(0xFFF2C66B),
-    hill1: Color(0xFF2E7D4F),
-    hill2: Color(0xFF276B44),
-    trees: Color(0xFF174A2E),
+    dot: Color(0xFFF2C66B),
+    shape1: Color(0xFF2E7D4F),
+    shape2: Color(0xFF276B44),
+    shape3: Color(0xFF174A2E),
     kicker: Color(0xFFCFE8D7),
   );
   static const river = QHeroTone(
     bg: Color(0xFF24396B),
-    sun: Color(0xFFF2C66B),
-    hill1: Color(0xFF3C5BA8),
-    hill2: Color(0xFF31498A),
-    trees: Color(0xFF1A2A52),
+    dot: Color(0xFFF2C66B),
+    shape1: Color(0xFF3C5BA8),
+    shape2: Color(0xFF31498A),
+    shape3: Color(0xFF1A2A52),
     kicker: Color(0xFFD3DDF4),
   );
   static const ember = QHeroTone(
     bg: Color(0xFF7A2716),
-    sun: Color(0xFFF2C66B),
-    hill1: Color(0xFFA8361F),
-    hill2: Color(0xFF922F1B),
-    trees: Color(0xFF5A1C10),
+    dot: Color(0xFFF2C66B),
+    shape1: Color(0xFFA8361F),
+    shape2: Color(0xFF922F1B),
+    shape3: Color(0xFF5A1C10),
     kicker: Color(0xFFF7D5CC),
   );
   static const gold = QHeroTone(
     bg: Color(0xFF5C4100),
-    sun: Color(0xFFFBF0D3),
-    hill1: Color(0xFF8A6200),
-    hill2: Color(0xFF765400),
-    trees: Color(0xFF3F2D00),
+    dot: Color(0xFFFBF0D3),
+    shape1: Color(0xFF8A6200),
+    shape2: Color(0xFF765400),
+    shape3: Color(0xFF3F2D00),
     kicker: Color(0xFFF5E3B0),
   );
   static const night = QHeroTone(
     bg: Color(0xFF0E1B14),
-    sun: Color(0xFFE9EFE6),
-    hill1: Color(0xFF1C2C24),
-    hill2: Color(0xFF16241D),
-    trees: Color(0xFF0B140F),
+    dot: Color(0xFFE9EFE6),
+    shape1: Color(0xFF1C2C24),
+    shape2: Color(0xFF16241D),
+    shape3: Color(0xFF0B140F),
     kicker: Color(0xFF9FDCB4),
   );
 

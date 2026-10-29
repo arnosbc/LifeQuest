@@ -6,6 +6,7 @@ import 'package:fpdart/fpdart.dart' show Either, Left, Unit;
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
+import 'package:proyecto_movil/features/stage/domain/entities/new_resource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/archive_stage_item.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_project.dart';
@@ -13,6 +14,7 @@ import 'package:proyecto_movil/features/stage/domain/usecases/complete_stage_tas
 import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_resource.dart';
+import 'package:proyecto_movil/features/stage/domain/usecases/get_resource_url.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/get_stage_board.dart';
 
 part 'stage_event.dart';
@@ -25,6 +27,7 @@ class StageBloc extends Bloc<StageEvent, StageState> {
     required this._createGoal,
     required this._completeTask,
     required this._createResource,
+    required this._resourceUrl,
     required this._archive,
     required this._completeProject,
     DateTime Function()? clock,
@@ -59,13 +62,16 @@ class StageBloc extends Bloc<StageEvent, StageState> {
     on<StageResourceCreated>(
       (event, emit) => _act(
         emit,
-        () => _createResource(
-          CreateResourceParams(title: event.title, url: event.url),
-        ),
-        'Recurso guardado.',
+        () => _createResource(event.resource),
+        switch (event.resource.kind) {
+          ResourceKind.link => 'Enlace guardado en tus Recursos.',
+          ResourceKind.note => 'Nota guardada en tus Recursos.',
+          ResourceKind.document => 'Documento guardado en tus Recursos.',
+        },
       ),
       transformer: droppable(),
     );
+    on<StageResourceOpened>(_onResourceOpened, transformer: droppable());
     on<StageItemArchived>(
       (event, emit) => _act(
         emit,
@@ -89,6 +95,7 @@ class StageBloc extends Bloc<StageEvent, StageState> {
   final CreateGoal _createGoal;
   final CompleteStageTask _completeTask;
   final CreateResource _createResource;
+  final GetResourceUrl _resourceUrl;
   final ArchiveStageItem _archive;
   final CompleteProject _completeProject;
   final DateTime Function() _clock;
@@ -110,6 +117,24 @@ class StageBloc extends Bloc<StageEvent, StageState> {
             ? StageSuccess(current.board, message: failure.message)
             : StageFailure(failure.message),
         StageSuccess.new,
+      ),
+    );
+  }
+
+  /// Pide el enlace temporal del documento; la pantalla lo abre al ver
+  /// [StageSuccess.openUrl].
+  Future<void> _onResourceOpened(
+    StageResourceOpened event,
+    Emitter<StageState> emit,
+  ) async {
+    final current = state;
+    if (current is! StageSuccess || current.busy) return;
+    emit(StageSuccess(current.board, busy: true));
+    final result = await _resourceUrl(event.resource);
+    emit(
+      result.match(
+        (failure) => StageSuccess(current.board, message: failure.message),
+        (url) => StageSuccess(current.board, openUrl: url),
       ),
     );
   }

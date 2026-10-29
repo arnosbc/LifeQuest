@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:proyecto_movil/app/background/notifications_worker.dart';
+import 'package:proyecto_movil/app/config/constants.dart';
 import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:proyecto_movil/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:proyecto_movil/features/auth/domain/repositories/auth_repository.dart';
@@ -108,12 +110,15 @@ import 'package:proyecto_movil/features/stage/domain/usecases/complete_stage_tas
 import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_resource.dart';
+import 'package:proyecto_movil/features/stage/domain/usecases/get_resource_url.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/get_stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/tavern/data/datasources/tavern_remote_datasource.dart';
 import 'package:proyecto_movil/features/tavern/data/repositories/tavern_repository_impl.dart';
 import 'package:proyecto_movil/features/tavern/domain/repositories/tavern_repository.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/accept_npc_mission.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/add_npc_document.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/remove_npc_document.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
@@ -125,6 +130,7 @@ import 'package:proyecto_movil/features/brain_dump/domain/usecases/get_brain_dum
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/capture_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/file_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought_to_goal.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/delete_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
 import 'package:proyecto_movil/features/vision/data/datasources/vision_remote_datasource.dart';
@@ -151,9 +157,13 @@ import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart
 import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
+import 'package:proyecto_movil/features/notifications/data/datasources/notifications_local_datasource.dart';
 import 'package:proyecto_movil/features/notifications/data/datasources/notifications_remote_datasource.dart';
 import 'package:proyecto_movil/features/notifications/data/repositories/notifications_repository_impl.dart';
 import 'package:proyecto_movil/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:proyecto_movil/features/notifications/domain/usecases/deliver_device_notifications.dart';
+import 'package:proyecto_movil/features/notifications/domain/usecases/disable_device_notifications.dart';
+import 'package:proyecto_movil/features/notifications/domain/usecases/enable_device_notifications.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
 import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
@@ -282,11 +292,13 @@ Future<void> initDependencies() async {
       createGoal: sl(),
       completeTask: sl(),
       createResource: sl(),
+      resourceUrl: sl(),
       archive: sl(),
       completeProject: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetStageBoard(sl()));
+  sl.registerLazySingleton(() => GetResourceUrl(sl()));
   sl.registerLazySingleton(() => CreateProject(sl()));
   sl.registerLazySingleton(() => CreateGoal(sl()));
   sl.registerLazySingleton(() => CompleteStageTask(sl()));
@@ -332,9 +344,13 @@ Future<void> initDependencies() async {
       completeMission: sl(),
       renameNpc: sl(),
       deleteNpc: sl(),
+      addDocument: sl(),
+      removeDocument: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetTavernBoard(sl()));
+  sl.registerLazySingleton(() => AddNpcDocument(sl()));
+  sl.registerLazySingleton(() => RemoveNpcDocument(sl()));
   sl.registerLazySingleton(() => RenameNpc(sl()));
   sl.registerLazySingleton(() => DeleteNpc(sl()));
   sl.registerLazySingleton(() => CreateNpc(sl()));
@@ -389,9 +405,11 @@ Future<void> initDependencies() async {
       file: sl(),
       convert: sl(),
       delete: sl(),
+      convertToGoal: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetBrainDump(sl()));
+  sl.registerLazySingleton(() => ConvertThoughtToGoal(sl()));
   sl.registerLazySingleton(() => CaptureThought(sl()));
   sl.registerLazySingleton(() => FileThought(sl()));
   sl.registerLazySingleton(() => ConvertThought(sl()));
@@ -439,12 +457,7 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton(() => GetNotifications(sl()));
   sl.registerLazySingleton(() => MarkNotificationsRead(sl()));
-  sl.registerLazySingleton<NotificationsRepository>(
-    () => NotificationsRepositoryImpl(sl()),
-  );
-  sl.registerLazySingleton<NotificationsRemoteDataSource>(
-    () => NotificationsRemoteDataSourceImpl(sl()),
-  );
+  _registerDeviceNotifications();
 
   // ---------- Onboarding ----------
   // Bloc: singleton porque el router lo consulta en toda la app.
@@ -516,5 +529,37 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<AppearanceLocalDataSource>(
     () => AppearanceLocalDataSourceImpl(SharedPreferencesAsync()),
+  );
+}
+
+/// Lo mínimo para la revisión de avisos en segundo plano (notifications_worker):
+/// corre en otro isolate, sin `Supabase.initialize` ni la sesión del usuario.
+/// Lo protege el código del dispositivo (036); así nunca compite con la app
+/// abierta al refrescar el token de la sesión.
+Future<void> initBackgroundDependencies() async {
+  sl.registerLazySingleton<SupabaseClient>(
+    () => SupabaseClient(
+      AppConstants.supabaseUrl,
+      AppConstants.supabaseKey,
+      authOptions: const AuthClientOptions(autoRefreshToken: false),
+    ),
+  );
+  _registerDeviceNotifications();
+}
+
+void _registerDeviceNotifications() {
+  sl.registerLazySingleton(() => EnableDeviceNotifications(sl()));
+  sl.registerLazySingleton(() => DisableDeviceNotifications(sl()));
+  sl.registerLazySingleton(() => DeliverDeviceNotifications(sl()));
+  sl.registerLazySingleton<NotificationsRepository>(
+    () => NotificationsRepositoryImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<NotificationsRemoteDataSource>(
+    () => NotificationsRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<NotificationsLocalDataSource>(
+    () => NotificationsLocalDataSourceImpl(
+      backgroundDispatcher: notificationsWorker,
+    ),
   );
 }

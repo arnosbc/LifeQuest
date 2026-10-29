@@ -28,6 +28,10 @@ class BrainDumpRepositoryImpl implements BrainDumpRepository {
       _done(() => _remote.convert(conversion));
 
   @override
+  Future<Either<Failure, Unit>> convertToGoal(GoalConversion conversion) =>
+      _done(() => _remote.convertToGoal(conversion));
+
+  @override
   Future<Either<Failure, Unit>> delete(String thoughtId) =>
       _done(() => _remote.delete(thoughtId));
 
@@ -57,7 +61,11 @@ class BrainDumpRepositoryImpl implements BrainDumpRepository {
     'invalid_title' => 'Dale un nombre de hasta 200 caracteres.',
     'thought_not_found' =>
       'Esa idea ya no está en la bandeja. Desliza para actualizar.',
-    'invalid_end_date' => 'La fecha no puede quedar en el pasado.',
+    'invalid_end_date' ||
+    'invalid_due_date' => 'La fecha no puede quedar en el pasado.',
+    'smart_incomplete' =>
+      'Responde las preguntas S.M.A.R.T. para darle forma a tu meta.',
+    'skill_not_found' => 'Esa skill ya no existe. Elige otra o ninguna.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

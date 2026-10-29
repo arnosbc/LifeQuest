@@ -60,7 +60,16 @@ class StageBoardModel {
           StageResource(
             id: r['id'] as String,
             title: r['title'] as String,
-            url: r['url'] as String,
+            kind:
+                ResourceKind.values.asNameMap()[r['kind']] ?? ResourceKind.link,
+            url: r['url'] as String?,
+            content: r['content'] as String?,
+            path: r['path'] as String?,
+            bucket: r['bucket'] as String?,
+            projectTitle: r['project_title'] as String?,
+            goalTitle: r['goal_title'] as String?,
+            skillName: r['skill_name'] as String?,
+            npcName: r['npc_name'] as String?,
           ),
       ],
       archive: StageArchive(

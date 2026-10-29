@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/core/theme/questly_palette.dart';
+import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
+/// Campo de Acceso (Auth.dc.html): etiqueta encima, 52 px de alto, radio 14
+/// y borde de 1,5 px.
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String label;
-  final IconData prefixIcon;
+  final String? hint;
   final bool isPassword;
   final TextInputType keyboardType;
   final TextInputAction? textInputAction;
@@ -19,7 +22,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     required this.controller,
     required this.label,
-    required this.prefixIcon,
+    this.hint,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.textInputAction,
@@ -38,26 +41,20 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = context.lq.outline;
-    final errorColor = context.lq.error;
-    final iconColor = context.lq.muted;
+    final q = context.q;
     final isEmail = widget.keyboardType == TextInputType.emailAddress;
+    OutlineInputBorder border(Color color, [double width = 1.5]) =>
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(QRadius.button),
+          borderSide: BorderSide(color: color, width: width),
+        );
 
     // TalkBack lee la etiqueta en el campo; la visible se excluye para no
     // duplicarla, y el botón de ver contraseña queda como nodo propio.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ExcludeSemantics(
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              color: context.lq.muted,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
+        ExcludeSemantics(child: Text(widget.label, style: QText.label(q.text))),
         const SizedBox(height: 6),
         Semantics(
           label: widget.label,
@@ -74,14 +71,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
             inputFormatters: widget.maxLength == null
                 ? null
                 : [LengthLimitingTextInputFormatter(widget.maxLength)],
-            cursorColor: context.lq.deepGreen,
-            style: TextStyle(color: context.lq.ink, fontSize: 15),
+            cursorColor: q.ink,
+            style: QText.body(q.text).copyWith(fontSize: 16),
             decoration: InputDecoration(
-              prefixIcon: Icon(widget.prefixIcon, size: 20, color: iconColor),
-              prefixIconConstraints: const BoxConstraints(
-                minWidth: 44,
-                minHeight: 48,
-              ),
+              hintText: widget.hint,
+              hintStyle: QText.body(q.text2).copyWith(fontSize: 16),
               suffixIcon: widget.isPassword
                   ? IconButton(
                       tooltip: _obscureText
@@ -94,38 +88,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         _obscureText
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        size: 20,
-                        color: iconColor,
+                        size: 22,
+                        color: q.text2,
                       ),
                     )
                   : null,
               filled: true,
-              fillColor: context.lq.surface,
+              fillColor: q.card,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 14,
+                horizontal: 14,
+                vertical: 16,
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: borderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: context.lq.deepGreen, width: 1.5),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: errorColor),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: errorColor, width: 1.5),
-              ),
-              errorStyle: TextStyle(
-                color: errorColor,
-                fontSize: 12,
-                height: 1.3,
-              ),
+              enabledBorder: border(q.inputBorder),
+              focusedBorder: border(q.ink, 2),
+              errorBorder: border(q.coralInk),
+              focusedErrorBorder: border(q.coralInk, 2),
+              errorStyle: QText.body(
+                q.coralInk,
+              ).copyWith(fontSize: 13, height: 1.3),
               errorMaxLines: 2,
             ),
           ),

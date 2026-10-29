@@ -93,6 +93,8 @@ void main() {
         completeMission: MockCompleteNpcMission(),
         renameNpc: MockRenameNpc(),
         deleteNpc: delete,
+        addDocument: MockAddNpcDocument(),
+        removeDocument: MockRemoveNpcDocument(),
       );
     },
     seed: () => const TavernSuccess(tavern),

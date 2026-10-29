@@ -17,6 +17,8 @@ abstract class BrainDumpRemoteDataSource {
 
   Future<void> convert(Conversion conversion);
 
+  Future<void> convertToGoal(GoalConversion conversion);
+
   Future<void> delete(String thoughtId);
 }
 
@@ -49,6 +51,25 @@ class BrainDumpRemoteDataSourceImpl implements BrainDumpRemoteDataSource {
     'p_due_date': c.dueDate?.toUtc().toIso8601String(),
     'p_delegated_to': c.delegatedTo,
   });
+
+  @override
+  Future<void> convertToGoal(GoalConversion c) =>
+      _rpc('convert_thought_to_goal', {
+        'p_id': c.thoughtId,
+        'p_title': c.goal.title,
+        'p_specific': c.goal.specific,
+        'p_measurable': c.goal.measurable,
+        'p_achievable': c.goal.achievable,
+        'p_relevant': c.goal.relevant,
+        'p_due_date': _date(c.goal.dueDate),
+        'p_timebound': c.goal.timebound,
+        'p_skill_id': c.goal.skillId,
+      });
+
+  static String _date(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
 
   @override
   Future<void> delete(String thoughtId) =>

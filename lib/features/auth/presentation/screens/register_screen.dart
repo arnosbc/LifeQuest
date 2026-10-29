@@ -4,11 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
-import 'package:proyecto_movil/core/widgets/widgets.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
+import 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_footer_link.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
+import 'package:proyecto_movil/features/auth/presentation/widgets/auth_header.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_primary_button.dart';
+import 'package:proyecto_movil/features/auth/presentation/widgets/auth_tabs.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/terms_checkbox.dart';
 
@@ -59,11 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  void _showMessage(String message) => ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: context.lq.ink),
-    );
+  void _showMessage(String message) => showLifeQuestMessage(context, message);
 
   /// Lleva a la vista el primer campo con error y lo anuncia en TalkBack.
   void _revealFirstError(Set<FormFieldState<Object?>> invalid) {
@@ -112,6 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) => BlocListener<AuthBloc, AuthState>(
     // Solo reacciona si esta pantalla es la visible (login también escucha).
@@ -119,65 +119,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
     listener: _onAuthStateChanged,
     child: AuthFormLayout(
       formKey: _formKey,
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
+      header: const AuthHeader(),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
       children: [
-        Text(
-          'LifeQuest',
-          style: TextStyle(
-            color: context.lq.deepGreen,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
+        const AuthTabs(register: true),
+        const SizedBox(height: 14),
+        const AuthTitle(
+          title: 'Crea tu cuenta',
+          lead: 'Guarda tu progreso y úsalo desde cualquier dispositivo.',
         ),
-        const SizedBox(height: 40),
-        Semantics(
-          header: true,
-          child: Text(
-            'Crea tu Héroe',
-            style: TextStyle(
-              color: context.lq.ink,
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Comienza tu viaje completando tus datos.',
-          style: TextStyle(color: context.lq.muted, fontSize: 15),
-        ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 14),
         CustomTextField(
           controller: _nameController,
-          label: 'Nombre de usuario',
-          prefixIcon: Icons.person_outline,
+          label: 'Tu nombre',
+          hint: 'Ej.: Jose',
           maxLength: 30,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.newUsername],
           validator: (value) => value == null || value.trim().isEmpty
-              ? 'Ingresa un nombre de usuario.'
+              ? 'Dinos cómo te llamas.'
               : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: QSpace.m),
         CustomTextField(
           controller: _emailController,
           label: 'Correo electrónico',
-          prefixIcon: Icons.mail_outline,
+          hint: 'tu@correo.com',
           maxLength: 254,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.email],
           validator: (value) =>
               value == null || !_emailPattern.hasMatch(value.trim())
-              ? 'Ingresa un correo válido, como nombre@correo.com.'
+              ? 'Revisa el correo: parece que falta algo (ej.: tu@correo.com).'
               : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: QSpace.m),
         CustomTextField(
           controller: _passwordController,
-          label: 'Contraseña',
-          prefixIcon: Icons.lock_outline,
+          label: 'Crea una contraseña',
+          hint: 'Mínimo 6 caracteres',
           isPassword: true,
           maxLength: 128,
           textInputAction: TextInputAction.next,
@@ -186,11 +167,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ? 'Usa al menos 6 caracteres.'
               : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: QSpace.m),
         CustomTextField(
           controller: _confirmPasswordController,
-          label: 'Confirmar contraseña',
-          prefixIcon: Icons.lock_outline,
+          label: 'Confirma la contraseña',
           isPassword: true,
           textInputAction: TextInputAction.done,
           autofillHints: const [AutofillHints.newPassword],
@@ -199,21 +179,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ? 'Las contraseñas no coinciden.'
               : null,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: QSpace.s),
         TermsCheckbox(),
-        const Spacer(),
-        const SizedBox(height: 24),
+        const SizedBox(height: QSpace.s),
         AuthPrimaryButton(
           label: 'Crear cuenta',
-          icon: const Icon(Icons.auto_awesome, size: 18),
           onPressed: _onRegisterPressed,
           isLoading: context.watch<AuthBloc>().state is AuthLoading,
         ),
-        const SizedBox(height: 4),
+        const Spacer(),
+        const SizedBox(height: 14),
         AuthFooterLink(
-          question: '¿Ya tienes cuenta? ',
+          question: '¿Ya tienes cuenta?',
           linkLabel: 'Inicia sesión',
-          onTap: () => context.pop(),
+          onTap: () => AuthTabs.backToLogin(context),
         ),
       ],
     ),

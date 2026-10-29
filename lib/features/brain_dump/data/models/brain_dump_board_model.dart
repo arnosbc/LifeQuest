@@ -1,3 +1,4 @@
+import 'package:proyecto_movil/core/entities/smart_goal.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/entities/brain_dump_board.dart';
 
 /// Respuesta JSON de la RPC `brain_dump_overview`
@@ -15,6 +16,12 @@ class BrainDumpBoardModel {
     someday: _thoughts('someday'),
     reference: _thoughts('reference'),
     convertedToday: (json['converted_today'] as num?)?.toInt() ?? 0,
+    skills: [
+      for (final s
+          in (json['skills'] as List<dynamic>? ?? const [])
+              .cast<Map<String, dynamic>>())
+        SkillChoice(id: s['id'] as String, name: s['name'] as String),
+    ],
   );
 
   List<Thought> _thoughts(String key) => [

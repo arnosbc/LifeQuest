@@ -5,6 +5,7 @@ import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_footer_link.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
+import 'package:proyecto_movil/features/auth/presentation/widgets/auth_header.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_primary_button.dart';
 
 /// Tras crear la cuenta, cuando Supabase pide confirmar el correo antes de
@@ -21,16 +22,9 @@ class CheckEmailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AuthFormLayout(
+    header: const AuthHeader(height: 170),
     padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
     children: [
-      Text(
-        'LifeQuest',
-        style: TextStyle(
-          color: context.lq.deepGreen,
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
       const Spacer(),
       const SizedBox(height: 32),
       const Center(child: _MailSeal()),
@@ -50,8 +44,8 @@ class CheckEmailScreen extends StatelessWidget {
       ),
       const SizedBox(height: 8),
       Text(
-        'Tu Héroe «$username» ya existe. Solo falta activarlo con el enlace '
-        'que enviamos a:',
+        'Tu cuenta «$username» ya está creada. Solo falta activarla con el '
+        'enlace que enviamos a:',
         textAlign: TextAlign.center,
         style: TextStyle(color: context.lq.muted, fontSize: 15, height: 1.4),
       ),
@@ -74,7 +68,6 @@ class CheckEmailScreen extends StatelessWidget {
       const SizedBox(height: 32),
       AuthPrimaryButton(
         label: 'Ir a iniciar sesión',
-        icon: const Icon(Icons.arrow_forward, size: 18),
         onPressed: () => context.go(RoutePaths.login),
       ),
       const SizedBox(height: 4),

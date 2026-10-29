@@ -20,8 +20,8 @@ abstract class DungeonRepository {
     required String taskId,
   });
 
-  /// Completa una misión de la mochila.
-  Future<Either<Failure, Unit>> completeTask(String taskId);
+  /// Completa una misión de la mochila; devuelve lo que pagó el servidor.
+  Future<Either<Failure, DungeonReward>> completeTask(String taskId);
 
   /// Cierra la sesión sin perder lo ganado.
   Future<Either<Failure, DungeonSummary>> end(String sessionId);

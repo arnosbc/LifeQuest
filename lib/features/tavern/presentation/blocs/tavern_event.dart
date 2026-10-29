@@ -61,6 +61,26 @@ class NpcRenamed extends TavernEvent {
   List<Object?> get props => [npcId, name];
 }
 
+/// Adjuntar un documento de contexto: RPGenie lo resume antes de guardarlo.
+class NpcDocumentAdded extends TavernEvent {
+  const NpcDocumentAdded(this.document);
+
+  final NewNpcDocument document;
+
+  @override
+  List<Object?> get props => [document];
+}
+
+class NpcDocumentRemoved extends TavernEvent {
+  const NpcDocumentRemoved({required this.npcId, required this.documentId});
+
+  final String npcId;
+  final String documentId;
+
+  @override
+  List<Object?> get props => [npcId, documentId];
+}
+
 class NpcDeleted extends TavernEvent {
   const NpcDeleted(this.npcId);
 

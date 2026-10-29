@@ -8,6 +8,7 @@ import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/entities/brain_dump_board.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/capture_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought_to_goal.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/delete_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/file_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/get_brain_dump.dart';
@@ -22,6 +23,7 @@ class BrainDumpBloc extends Bloc<BrainDumpEvent, BrainDumpState> {
     required this._file,
     required this._convert,
     required this._delete,
+    required this._convertToGoal,
   }) : super(const BrainDumpInitial()) {
     // droppable: toques repetidos mientras trabaja se ignoran.
     on<BrainDumpRequested>(_onRequested, transformer: droppable());
@@ -61,6 +63,15 @@ class BrainDumpBloc extends Bloc<BrainDumpEvent, BrainDumpState> {
       ),
       transformer: droppable(),
     );
+    on<ThoughtConvertedToGoal>(
+      (e, emit) => _act(
+        emit,
+        e.conversion.thoughtId,
+        () => _convertToGoal(e.conversion),
+        '¡Meta creada! Ya te espera como jefe en tu Stage.',
+      ),
+      transformer: droppable(),
+    );
     on<ThoughtDeleted>(
       (e, emit) =>
           _act(emit, e.thoughtId, () => _delete(e.thoughtId), 'Idea borrada.'),
@@ -73,6 +84,7 @@ class BrainDumpBloc extends Bloc<BrainDumpEvent, BrainDumpState> {
   final FileThought _file;
   final ConvertThought _convert;
   final DeleteThought _delete;
+  final ConvertThoughtToGoal _convertToGoal;
 
   Future<void> _onRequested(
     BrainDumpRequested event,

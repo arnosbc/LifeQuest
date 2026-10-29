@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/cycle_duration_card.dart';
 
-/// Lo ganado en la sesión (o el botín final al cerrarla).
+/// Lo ganado en la sesión (o el botín final al cerrarla): ciclos y misiones
+/// de la mochila. [minutes] es el tiempo efectivo, sin descansos ni pausas.
 class SessionRewardsCard extends StatelessWidget {
   const SessionRewardsCard({
     super.key,
@@ -12,6 +13,7 @@ class SessionRewardsCard extends StatelessWidget {
     required this.coins,
     required this.cycles,
     required this.minutes,
+    this.missions = 0,
   });
 
   final String title;
@@ -19,6 +21,7 @@ class SessionRewardsCard extends StatelessWidget {
   final int coins;
   final int cycles;
   final int minutes;
+  final int missions;
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
@@ -63,6 +66,16 @@ class SessionRewardsCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 7),
+        Text(
+          [
+            if (missions > 0)
+              '$missions ${missions == 1 ? 'misión completada' : 'misiones completadas'}',
+            'Tiempo efectivo: solo los ciclos de concentración superados, '
+                'sin descansos ni pausas.',
+          ].join(' · '),
+          style: TextStyle(color: context.lq.muted, fontSize: 10),
         ),
       ],
     ),

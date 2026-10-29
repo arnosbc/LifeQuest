@@ -14,5 +14,8 @@ abstract class BrainDumpRepository {
   /// Crea la tarea o el proyecto y marca la idea como convertida.
   Future<Either<Failure, Unit>> convert(Conversion conversion);
 
+  /// Crea la Meta S.M.A.R.T. y marca la idea como convertida (034).
+  Future<Either<Failure, Unit>> convertToGoal(GoalConversion conversion);
+
   Future<Either<Failure, Unit>> delete(String thoughtId);
 }

@@ -125,22 +125,22 @@ void main() {
         ),
       ),
     );
-    for (final label in ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil']) {
+    for (final label in ['Inicio', 'Planificador', 'Hábitos', 'Foco', 'Perfil']) {
       expect(find.text(label), findsOneWidget);
     }
     expect(
-      tester.getSemantics(find.text('Stage')),
+      tester.getSemantics(find.text('Planificador')),
       matchesSemantics(
         isButton: true,
         isSelected: true,
         hasSelectedState: true,
-        label: 'Stage',
+        label: 'Planificador',
         hasTapAction: true,
         isFocusable: true,
         hasFocusAction: true,
       ),
     );
-    await tester.tap(find.text('Mazmorra'));
+    await tester.tap(find.text('Foco'));
     expect(tapped, 3);
     // La barra mide lo suyo y deja ver la pantalla.
     expect(tester.getSize(find.byType(QuestlyNavBar)).height, lessThan(100));

@@ -7,10 +7,12 @@ import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/accept_npc_mission.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/add_npc_document.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/remove_npc_document.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
 
@@ -26,6 +28,8 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
     required this._completeMission,
     required this._renameNpc,
     required this._deleteNpc,
+    required this._addDocument,
+    required this._removeDocument,
   }) : super(const TavernInitial()) {
     // droppable: toques repetidos mientras trabaja se ignoran.
     on<TavernRequested>(_onRequested, transformer: droppable());
@@ -77,6 +81,25 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
       ),
       transformer: droppable(),
     );
+    on<NpcDocumentAdded>(
+      (e, emit) => _act(
+        emit,
+        e.document.npcId,
+        () => _addDocument(e.document),
+        'RPGenie leyó «${e.document.title}». '
+        'Las próximas misiones saldrán de sus temas.',
+      ),
+      transformer: droppable(),
+    );
+    on<NpcDocumentRemoved>(
+      (e, emit) => _act(
+        emit,
+        e.npcId,
+        () => _removeDocument(e.documentId),
+        'Documento quitado.',
+      ),
+      transformer: droppable(),
+    );
   }
 
   final GetTavernBoard _getBoard;
@@ -86,6 +109,8 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
   final CompleteNpcMission _completeMission;
   final RenameNpc _renameNpc;
   final DeleteNpc _deleteNpc;
+  final AddNpcDocument _addDocument;
+  final RemoveNpcDocument _removeDocument;
 
   Future<void> _onRequested(
     TavernRequested event,
@@ -119,8 +144,8 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
     final npc = event.npc;
     emit(TavernSuccess(current.board, busyKey: npc.id));
     final suggested = await _suggestMission(npc.id);
-    final title = suggested.getOrElse((_) => null);
-    if (title == null) {
+    final suggestion = suggested.getOrElse((_) => null);
+    if (suggestion == null) {
       emit(
         TavernSuccess(
           current.board,
@@ -137,8 +162,14 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
     await _act(
       emit,
       npc.id,
-      () => _acceptMission(AcceptNpcMissionParams(npcId: npc.id, title: title)),
-      'Nueva misión de ${npc.name}: $title',
+      () => _acceptMission(
+        AcceptNpcMissionParams(
+          npcId: npc.id,
+          title: suggestion.title,
+          description: suggestion.guide,
+        ),
+      ),
+      'Nueva misión de ${npc.name}: ${suggestion.title}',
     );
   }
 

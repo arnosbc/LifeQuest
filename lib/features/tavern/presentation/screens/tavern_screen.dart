@@ -5,6 +5,8 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/tavern/presentation/widgets/create_npc_sheet.dart';
+import 'package:proyecto_movil/features/tavern/presentation/widgets/npc_documents_sheet.dart';
+import 'package:proyecto_movil/features/tavern/presentation/widgets/npc_mission_guide_sheet.dart';
 
 /// Taverna: NPCs que piden misiones reales. Necesita un [TavernBloc] encima.
 class TavernScreen extends StatelessWidget {
@@ -78,6 +80,38 @@ class TavernScreen extends StatelessWidget {
       if (npc != null) bloc.add(NpcCreated(npc));
     }
 
+    Future<void> documents(Npc npc) async {
+      final action = await showModalBottomSheet<NpcDocumentsAction>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => NpcDocumentsSheet(npc: npc),
+      );
+      if (!context.mounted) return;
+      switch (action) {
+        case AttachNpcDocument(:final document):
+          showLifeQuestMessage(
+            context,
+            'RPGenie está leyendo «${document.title}». Puede tardar un minuto.',
+          );
+          bloc.add(NpcDocumentAdded(document));
+        case RemoveNpcDocumentAction(document: final doc):
+          if (await confirmLifeQuest(
+                context,
+                title: 'Quitar documento',
+                message:
+                    '${npc.name} dejará de usar «${doc.title}» para sus misiones.',
+                confirmLabel: 'Quitar',
+              ) &&
+              context.mounted) {
+            bloc.add(NpcDocumentRemoved(npcId: npc.id, documentId: doc.id));
+          }
+        case null:
+          break;
+      }
+    }
+
     return LifeQuestPage(
       title: 'Taverna',
       subtitle: 'Los personajes de tu reino tienen encargos para ti.',
@@ -94,7 +128,7 @@ class TavernScreen extends StatelessWidget {
                 'Invita a tu primer NPC: te pedirá misiones de una de tus skills.',
           ),
         for (final npc in board.npcs) ...[
-          if (npc.openMission case final mission?)
+          if (npc.openMission case final mission?) ...[
             LifeQuestActionRow(
               icon: Icons.person_outline,
               title: '${npc.name} · ${npc.skillName}',
@@ -107,8 +141,8 @@ class TavernScreen extends StatelessWidget {
                       NpcMissionCompleted(npcId: npc.id, taskId: mission.id),
                     )
                   : null,
-            )
-          else
+            ),
+          ] else
             LifeQuestActionRow(
               icon: Icons.person_outline,
               title: '${npc.name} · ${npc.skillName}',
@@ -123,6 +157,35 @@ class TavernScreen extends StatelessWidget {
               menu: menu(npc),
               onAction: idle ? () => ask(npc) : null,
             ),
+          Wrap(
+            children: [
+              if (npc.openMission case final mission?
+                  when mission.description != null)
+                _link(
+                  context,
+                  icon: Icons.menu_book_outlined,
+                  label: 'Ver guía: pasos y pistas',
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => NpcMissionGuideSheet(
+                      npcName: npc.name,
+                      mission: mission,
+                    ),
+                  ),
+                ),
+              _link(
+                context,
+                icon: Icons.description_outlined,
+                label: npc.documents.isEmpty
+                    ? 'Adjuntar plan o documento'
+                    : 'Documentos (${npc.documents.length})',
+                onPressed: idle ? () => documents(npc) : null,
+              ),
+            ],
+          ),
         ],
         const SizedBox(height: 16),
         if (board.skills.isEmpty)
@@ -153,6 +216,22 @@ class TavernScreen extends StatelessWidget {
       ],
     );
   }
+
+  /// Enlace de texto bajo la fila del NPC (guía, documentos).
+  static Widget _link(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+  }) => TextButton.icon(
+    onPressed: onPressed,
+    icon: Icon(icon, size: 18),
+    label: Text(label),
+    style: TextButton.styleFrom(
+      foregroundColor: context.lq.deepGreen,
+      minimumSize: const Size(48, 44),
+    ),
+  );
 
   static String _frequency(NpcFrequency f) => switch (f) {
     NpcFrequency.daily => 'Te visita a diario',

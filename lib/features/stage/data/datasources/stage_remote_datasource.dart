@@ -7,6 +7,7 @@ import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/stage/data/models/stage_board_model.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
+import 'package:proyecto_movil/features/stage/domain/entities/new_resource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 
 /// RPCs de Stage · P.A.R.A. en Supabase. Lanza [ServerException] o
@@ -21,7 +22,12 @@ abstract class StageRemoteDataSource {
 
   Future<void> completeTask(String taskId);
 
-  Future<void> createResource({required String title, required String url});
+  /// Un documento se sube primero al bucket `resources`; si el servidor lo
+  /// rechaza, se borra el archivo (035).
+  Future<void> createResource(NewResource resource);
+
+  /// Enlace firmado (temporal) para abrir un archivo de un bucket privado.
+  Future<String> signedUrl({required String bucket, required String path});
 
   Future<void> archive({required StageItemKind kind, required String id});
 
@@ -88,14 +94,86 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
       '${d.month.toString().padLeft(2, '0')}-'
       '${d.day.toString().padLeft(2, '0')}';
 
+  static const _contentTypes = {
+    'pdf': 'application/pdf',
+    'docx':
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'pptx':
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'md': 'text/markdown',
+    'txt': 'text/plain',
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+  };
+
   @override
-  Future<void> createResource({required String title, required String url}) =>
-      _guard(
-        () => _client.rpc<void>(
-          'create_resource',
-          params: {'p_title': title, 'p_url': url},
-        ),
+  Future<void> createResource(NewResource r) => _guard(() async {
+    String? path;
+    if (r.kind == ResourceKind.document) {
+      final uid = _client.auth.currentUser?.id;
+      if (uid == null) throw const ServerException(code: 'not_authenticated');
+      // Storage no admite tildes ni espacios en la ruta.
+      final safe = (r.fileName ?? 'documento').replaceAll(
+        RegExp(r'[^A-Za-z0-9._-]'),
+        '_',
       );
+      path = '$uid/${DateTime.now().millisecondsSinceEpoch}_$safe';
+      try {
+        await _client.storage
+            .from('resources')
+            .uploadBinary(
+              path,
+              r.bytes!,
+              fileOptions: FileOptions(contentType: _contentTypes[r.extension]),
+            );
+      } on StorageException catch (error) {
+        throw ServerException(
+          code: 'upload_failed',
+          statusCode: error.statusCode,
+        );
+      }
+    }
+    try {
+      await _client.rpc<void>(
+        'create_resource',
+        params: {
+          'p_title': r.title.trim(),
+          'p_kind': r.kind.name,
+          'p_url': r.url?.trim(),
+          'p_content': r.content?.trim(),
+          'p_path': path,
+          'p_project_id': r.projectId,
+          'p_goal_id': r.goalId,
+          'p_skill_id': r.skillId,
+        },
+      );
+    } catch (_) {
+      // Sin fila que lo use, el archivo sobra.
+      if (path != null) {
+        await _client.storage
+            .from('resources')
+            .remove([path])
+            .catchError((_) => <FileObject>[]);
+      }
+      rethrow;
+    }
+  });
+
+  @override
+  Future<String> signedUrl({required String bucket, required String path}) =>
+      _guard(() async {
+        try {
+          // 10 min: lo justo para abrirlo; el bucket sigue siendo privado.
+          return await _client.storage.from(bucket).createSignedUrl(path, 600);
+        } on StorageException catch (error) {
+          throw ServerException(
+            code: 'item_not_found',
+            statusCode: error.statusCode,
+          );
+        }
+      });
 
   @override
   Future<void> archive({required StageItemKind kind, required String id}) =>

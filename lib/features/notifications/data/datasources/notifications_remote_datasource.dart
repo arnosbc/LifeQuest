@@ -13,6 +13,20 @@ abstract class NotificationsRemoteDataSource {
   Future<NotificationsModel> getNotifications(String day);
 
   Future<void> markRead(List<String>? ids);
+
+  /// Registra este dispositivo (036) y devuelve su código.
+  Future<String> registerDevice();
+
+  /// Da de baja el código; funciona también sin sesión.
+  Future<void> unregisterDevice(String token);
+
+  /// Avisos que toca mostrar ahora en el dispositivo de [token] (036).
+  /// [day] es `yyyy-MM-dd` y [time] `HH:mm`, ambos locales.
+  Future<NotificationsModel> takeDeviceNotifications(
+    String token,
+    String day,
+    String time,
+  );
 }
 
 class NotificationsRemoteDataSourceImpl
@@ -34,6 +48,29 @@ class NotificationsRemoteDataSourceImpl
   @override
   Future<void> markRead(List<String>? ids) => _guard(
     () => _client.rpc<void>('mark_notifications_read', params: {'p_ids': ids}),
+  );
+
+  @override
+  Future<String> registerDevice() =>
+      _guard(() => _client.rpc<String>('register_device'));
+
+  @override
+  Future<void> unregisterDevice(String token) => _guard(
+    () => _client.rpc<void>('unregister_device', params: {'p_token': token}),
+  );
+
+  @override
+  Future<NotificationsModel> takeDeviceNotifications(
+    String token,
+    String day,
+    String time,
+  ) => _guard(
+    () async => NotificationsModel.fromJson(
+      await _client.rpc<Map<String, dynamic>>(
+        'device_notifications',
+        params: {'p_token': token, 'p_day': day, 'p_time': time},
+      ),
+    ),
   );
 
   Future<T> _guard<T>(Future<T> Function() action) async {

@@ -23,6 +23,7 @@ class DungeonBoardModel {
               cyclesDone: _int(s['cycles_done']),
               xpEarned: _int(s['xp_earned']),
               coinsEarned: _int(s['coins_earned']),
+              missionsDone: _int(s['missions_done']),
               tasks: [for (final t in _list(s['tasks'])) _task(t)],
             ),
       candidates: [for (final t in _list(json['candidates'])) _task(t)],
@@ -59,5 +60,21 @@ class DungeonSummaryModel {
     xp: (json['xp'] as num?)?.toInt() ?? 0,
     coins: (json['coins'] as num?)?.toInt() ?? 0,
     minutes: (json['minutes'] as num?)?.toInt() ?? 0,
+    missions: (json['missions'] as num?)?.toInt() ?? 0,
+  );
+}
+
+/// Respuesta JSON de `complete_task` (005): `coins` va a la bolsa y
+/// `treasury` es lo que no cupo y pasó al Tesoro.
+class DungeonRewardModel {
+  const DungeonRewardModel(this.json);
+
+  final Map<String, dynamic> json;
+
+  DungeonReward toEntity() => DungeonReward(
+    xp: (json['xp'] as num?)?.toInt() ?? 0,
+    coins:
+        ((json['coins'] as num?)?.toInt() ?? 0) +
+        ((json['treasury'] as num?)?.toInt() ?? 0),
   );
 }

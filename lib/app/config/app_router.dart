@@ -123,17 +123,35 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             routes: [
               GoRoute(
                 path: RoutePaths.home,
-                builder: (context, state) => BlocProvider(
-                  create: (_) => sl<HomeBloc>()..add(const HomeRequested()),
+                builder: (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (_) => sl<HomeBloc>()..add(const HomeRequested()),
+                    ),
+                    // Solo para el contador de la campana.
+                    BlocProvider(
+                      create: (_) =>
+                          sl<NotificationsBloc>()
+                            ..add(const NotificationsRequested()),
+                    ),
+                  ],
                   child: _ReloadOnShow(
                     location: shellLocation,
                     path: RoutePaths.home,
-                    onShown: (c) =>
-                        c.read<HomeBloc>().add(const HomeRequested()),
-                    child: HomeScreen(
-                      userName: _userName(context),
-                      onNavigate: (tab) =>
-                          StatefulNavigationShell.of(context).goBranch(tab),
+                    onShown: (c) {
+                      c.read<HomeBloc>().add(const HomeRequested());
+                      c.read<NotificationsBloc>().add(
+                        const NotificationsRequested(),
+                      );
+                    },
+                    child: BlocBuilder<NotificationsBloc, NotificationsState>(
+                      buildWhen: (a, b) => _unread(a) != _unread(b),
+                      builder: (context, notifications) => HomeScreen(
+                        userName: _userName(context),
+                        unreadNotifications: _unread(notifications),
+                        onNavigate: (tab) =>
+                            StatefulNavigationShell.of(context).goBranch(tab),
+                      ),
                     ),
                   ),
                 ),
@@ -358,9 +376,7 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         RoutePaths.brainDump,
         (context) => BlocProvider(
           create: (_) => sl<BrainDumpBloc>()..add(const BrainDumpRequested()),
-          child: BrainDumpScreen(
-            onCreateGoal: () => context.go(RoutePaths.stage),
-          ),
+          child: const BrainDumpScreen(),
         ),
       ),
       _section(
@@ -406,6 +422,9 @@ String _userName(BuildContext context) =>
       AuthSuccess(:final user) => user.displayName,
       _ => 'Héroe',
     };
+
+int _unread(NotificationsState state) =>
+    state is NotificationsSuccess ? state.unread : 0;
 
 /// Las pestañas viven todo el tiempo (indexedStack): sin esto, lo que cambia en
 /// otra (XP, vida, Monedas, misiones) no se vería hasta reiniciar la app.

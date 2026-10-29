@@ -15,6 +15,11 @@ class ServerFailure extends Failure {
   const ServerFailure(super.message);
 }
 
+/// Los datos no cumplen las reglas antes de enviarlos (tipo, tamaño…).
+class ValidationFailure extends Failure {
+  const ValidationFailure(super.message);
+}
+
 /// No hubo conexión con el servidor.
 class NetworkFailure extends Failure {
   const NetworkFailure(super.message);

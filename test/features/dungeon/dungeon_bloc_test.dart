@@ -87,6 +87,51 @@ void main() {
   );
 
   blocTest<DungeonBloc, DungeonState>(
+    'completar una misión dice lo ganado y el total de la sesión',
+    setUp: () {
+      when(
+        () => completeTask('t1'),
+      ).thenAnswer((_) async => const Right(DungeonReward(xp: 25, coins: 8)));
+      givenBoard(
+        DungeonBoard(
+          session: DungeonSession(
+            id: 's1',
+            totalMinutes: 60,
+            cycleMinutes: 25,
+            cyclesDone: 1,
+            xpEarned: 35,
+            coinsEarned: 11,
+            missionsDone: 1,
+            tasks: const [
+              DungeonTask(id: 't1', title: 'Estudiar', done: true),
+              _t2,
+            ],
+          ),
+        ),
+      );
+    },
+    build: build,
+    seed: () => focus(_board(cycles: 1)),
+    act: (bloc) => bloc.add(const DungeonTaskCompleted('t1')),
+    skip: 1,
+    expect: () => [
+      isA<DungeonReady>()
+          .having((s) => s.currentTaskId, 'siguiente misión', 't2')
+          .having((s) => s.board.session!.missionsDone, 'misiones', 1)
+          .having(
+            (s) => s.message,
+            'aviso',
+            '¡Misión completada! +25 XP · +8 Monedas. '
+                'En esta sesión llevas 35 XP y 11 Monedas.',
+          ),
+    ],
+  );
+
+  test('el tiempo efectivo cuenta solo los ciclos cobrados', () {
+    expect(_board(cycles: 2).session!.focusMinutes, 50);
+  });
+
+  blocTest<DungeonBloc, DungeonState>(
     'sin sesión abierta muestra la preparación de la mochila',
     setUp: () => givenBoard(_setupBoard),
     build: build,

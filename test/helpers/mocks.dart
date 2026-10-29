@@ -19,6 +19,7 @@ import 'package:proyecto_movil/features/brain_dump/domain/usecases/get_brain_dum
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/capture_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/file_thought.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought.dart';
+import 'package:proyecto_movil/features/brain_dump/domain/usecases/convert_thought_to_goal.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/usecases/delete_thought.dart';
 import 'package:proyecto_movil/features/vision/domain/usecases/get_vision_board.dart';
 import 'package:proyecto_movil/features/vision/domain/usecases/save_vision.dart';
@@ -38,6 +39,9 @@ import 'package:proyecto_movil/features/marketplace/domain/usecases/use_recovery
 import 'package:proyecto_movil/features/rpgenie/domain/usecases/complete_current_mission.dart';
 import 'package:proyecto_movil/features/rpgenie/domain/usecases/get_current_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/accept_npc_mission.dart';
+import 'package:proyecto_movil/features/tavern/domain/repositories/tavern_repository.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/add_npc_document.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/remove_npc_document.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
@@ -111,6 +115,7 @@ import 'package:proyecto_movil/features/settings/presentation/blocs/settings_blo
 import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_resource.dart';
+import 'package:proyecto_movil/features/stage/domain/usecases/get_resource_url.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/get_stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 
@@ -237,6 +242,8 @@ class MockCreateProject extends Mock implements CreateProject {}
 
 class MockCreateResource extends Mock implements CreateResource {}
 
+class MockGetResourceUrl extends Mock implements GetResourceUrl {}
+
 class MockArchiveStageItem extends Mock implements ArchiveStageItem {}
 
 class MockCompleteProject extends Mock implements CompleteProject {}
@@ -295,6 +302,12 @@ class MockAcceptNpcMission extends Mock implements AcceptNpcMission {}
 
 class MockCompleteNpcMission extends Mock implements CompleteNpcMission {}
 
+class MockAddNpcDocument extends Mock implements AddNpcDocument {}
+
+class MockRemoveNpcDocument extends Mock implements RemoveNpcDocument {}
+
+class MockTavernRepository extends Mock implements TavernRepository {}
+
 class MockGetJournal extends Mock implements GetJournal {}
 
 class MockGetGoalsBoard extends Mock implements GetGoalsBoard {}
@@ -316,6 +329,8 @@ class MockCaptureThought extends Mock implements CaptureThought {}
 class MockFileThought extends Mock implements FileThought {}
 
 class MockConvertThought extends Mock implements ConvertThought {}
+
+class MockConvertThoughtToGoal extends Mock implements ConvertThoughtToGoal {}
 
 class MockDeleteThought extends Mock implements DeleteThought {}
 

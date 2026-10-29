@@ -5,6 +5,7 @@ import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/stage/data/datasources/stage_remote_datasource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
+import 'package:proyecto_movil/features/stage/domain/entities/new_resource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 import 'package:proyecto_movil/features/stage/domain/repositories/stage_repository.dart';
 
@@ -37,13 +38,21 @@ class StageRepositoryImpl implements StageRepository {
   });
 
   @override
-  Future<Either<Failure, Unit>> createResource({
-    required String title,
-    required String url,
-  }) => _run(() async {
-    await _remote.createResource(title: title, url: url);
-    return unit;
-  });
+  Future<Either<Failure, Unit>> createResource(NewResource resource) =>
+      _run(() async {
+        await _remote.createResource(resource);
+        return unit;
+      });
+
+  @override
+  Future<Either<Failure, String>> resourceUrl(StageResource resource) =>
+      _run(() async {
+        final (bucket, path) = (resource.bucket, resource.path);
+        if (bucket == null || path == null) {
+          throw const ServerException(code: 'item_not_found');
+        }
+        return _remote.signedUrl(bucket: bucket, path: path);
+      });
 
   @override
   Future<Either<Failure, Unit>> archive({
@@ -90,6 +99,9 @@ class StageRepositoryImpl implements StageRepository {
     'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
     'task_not_found' => 'No encontramos esa misión. Desliza para actualizar.',
     'invalid_url' => 'Escribe un enlace que empiece por http:// o https://.',
+    'invalid_content' => 'Escribe la nota (hasta 10 000 caracteres).',
+    'invalid_path' || 'upload_failed' =>
+      'No se pudo subir el documento. Revisa tu conexión y reintenta.',
     'skill_not_found' || 'goal_not_found' =>
       'Ese vínculo ya no está disponible. Elige otro o déjalo sin vincular.',
     'item_not_found' ||

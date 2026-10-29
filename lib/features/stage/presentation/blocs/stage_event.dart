@@ -41,13 +41,22 @@ class StageTaskCompleted extends StageEvent {
 }
 
 class StageResourceCreated extends StageEvent {
-  const StageResourceCreated({required this.title, required this.url});
+  const StageResourceCreated(this.resource);
 
-  final String title;
-  final String url;
+  final NewResource resource;
 
   @override
-  List<Object?> get props => [title, url];
+  List<Object?> get props => [resource];
+}
+
+/// Abrir un documento guardado (necesita un enlace temporal del servidor).
+class StageResourceOpened extends StageEvent {
+  const StageResourceOpened(this.resource);
+
+  final StageResource resource;
+
+  @override
+  List<Object?> get props => [resource];
 }
 
 class StageItemArchived extends StageEvent {

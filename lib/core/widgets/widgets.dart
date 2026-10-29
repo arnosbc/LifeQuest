@@ -15,3 +15,5 @@ export 'package:proyecto_movil/core/widgets/lifequest_section_heading.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_stat.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_surface.dart';
 export 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';
+export 'package:proyecto_movil/core/widgets/smart_goal_sheet.dart';
+export 'package:proyecto_movil/core/entities/smart_goal.dart';

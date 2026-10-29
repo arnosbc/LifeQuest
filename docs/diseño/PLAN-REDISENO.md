@@ -24,8 +24,15 @@ Aplicar el diseño final «Bosque vivo» (Questly) a la app que **ya funciona** 
 
 ## 2. Decisiones ya tomadas (no volver a preguntar)
 
+> **Sin fantasía (2026-10-29):** `DESIGN.md` v2 y `PRODUCT.md` v2 mandan sobre los `.dc.html`. De las
+> pantallas se toman la estructura, las medidas y el estilo. Los textos de fantasía se cambian por el
+> vocabulario de `docs/plan-funcionalidades-asistente.md` §3.1, los iconos según `DESIGN.md` §5 y el
+> paisaje del Hero por formas geométricas. La mascota RPGenie no se dibuja. Los identificadores del
+> código (`dungeon`, `tavern`, `ThemeRealm.bosque`…) no cambian.
+
 | Tema | Decisión |
 |---|---|
+| Vocabulario | Pestañas: **Inicio · Planificador · Hábitos · Foco · Perfil**. Temas de color: **Verde · Azul · Coral · Ámbar**. El resto según el plan §3.1. Las palabras prohibidas están en `DESIGN.md` §7. |
 | Integración | **Convivir.** `MaterialApp` usa el tema Questly. La paleta vieja (`LifeQuestPalette`, `context.lq`) se **recalcula desde los tokens Questly**, así las ~91 pantallas actuales toman los colores nuevos sin romperse. Se migran a los componentes nuevos una por una. |
 | Navegación | La barra nueva de 5 pestañas (Inicio · Stage · Hábitos · Mazmorra · Perfil) **reemplaza** a la `NavigationBar` de `lib/app/config/app_shell.dart`. Cada pestaña sigue mostrando **su pantalla real**, no una vacía. Se conservan el botón de Brain Dump y el comportamiento `goBranch(initialLocation: true)`. |
 | Carpetas | Tema en `lib/core/theme/`. Componentes en `lib/core/widgets/questly/`. Lo compartido vive en `core/` (CLAUDE.md §8). |
@@ -102,7 +109,8 @@ Las medidas salen de `SistemaDiseno.dc.html`, `Hero.dc.html` y `Main.dc.html`. T
 | Paso | Contenido | Estado |
 |---|---|---|
 | **1** | Tema y tokens + paleta, fuentes, Hero, barra de 5 pestañas sobre las pantallas reales, tarjeta, botones, chips, segmentadas, hoja, diálogo, toast y galería `/diseno` (`/settings/diseno`, se abre desde Configuración → Apariencia en debug). Modo y tema del reino guardados. | **Hecho (2026-10-28)** |
-| 2 | Revestir Acceso (Login, Registro) y Onboarding. | **Siguiente** |
+| 1b | Ajuste sin fantasía del paso 1: Hero con formas geométricas, iconos `focus`/`flag`/`trophy`/`users`/`spark`, etiquetas de la barra y de los temas. | **Hecho (2026-10-29)** |
+| 2 | Revestir Acceso (Login, Registro) y Onboarding, con los textos nuevos. | **En curso:** Acceso hecho (2026-10-29: cabecera `AuthHeader`, pestañas, campos y botones Questly; «Revisa tu correo» sin «Héroe»). Falta Onboarding. |
 | 3 | Revestir Inicio, Stage (Hoy), Crear (tarea, proyecto, meta) y Hábitos. | Pendiente |
 | 4 | Revestir la Mazmorra (preparar, mochila, sesión), Perfil, Diario y Configuración (selector de tema del reino aquí). | Pendiente |
 | 5 | Revestir Proyectos y Áreas, Boss Fight, Marketplace, Taverna, Misión actual, Estadísticas, Avisos, Brain Dump, Vision Board e Inventario. | Pendiente |

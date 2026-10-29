@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
+import 'package:proyecto_movil/features/stage/domain/entities/new_resource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
+import 'package:proyecto_movil/features/stage/presentation/widgets/create_resource_sheet.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/quick_add_sheets.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/stage_action_row.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/stage_project_card.dart';
@@ -22,9 +25,14 @@ class StageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocConsumer<StageBloc, StageState>(
-    listenWhen: (_, state) => state is StageSuccess && state.message != null,
-    listener: (context, state) =>
-        showLifeQuestMessage(context, (state as StageSuccess).message!),
+    listenWhen: (_, state) =>
+        state is StageSuccess &&
+        (state.message != null || state.openUrl != null),
+    listener: (context, state) {
+      final s = state as StageSuccess;
+      if (s.message case final message?) showLifeQuestMessage(context, message);
+      if (s.openUrl case final url?) _open(context, url);
+    },
     builder: (context, state) => switch (state) {
       StageInitial() || StageLoading() => Center(
         child: CircularProgressIndicator(color: context.lq.deepGreen),
@@ -54,6 +62,86 @@ class StageScreen extends StatelessWidget {
     },
   );
 
+  /// Abre un enlace o un documento (enlace temporal) fuera de la app.
+  static Future<void> _open(BuildContext context, String url) async {
+    final uri = Uri.tryParse(url);
+    final opened =
+        uri != null &&
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      showLifeQuestMessage(
+        context,
+        'No pudimos abrirlo. Revisa que tengas una app para este tipo de archivo.',
+      );
+    }
+  }
+
+  /// Muestra una nota guardada, con el texto seleccionable para copiarlo.
+  static Future<void> _showNote(BuildContext context, StageResource note) =>
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+          ),
+          decoration: BoxDecoration(
+            color: context.lq.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 8, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        note.title,
+                        style: TextStyle(
+                          color: context.lq.ink,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Cerrar',
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close, color: context.lq.ink),
+                  ),
+                ],
+              ),
+              if (note.links.isNotEmpty)
+                Text(
+                  note.links.join(' · '),
+                  style: TextStyle(color: context.lq.muted, fontSize: 12),
+                ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: SelectableText(
+                    note.content ?? '',
+                    style: TextStyle(
+                      color: context.lq.ink,
+                      fontSize: 14,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
   static Future<void> _refresh(StageBloc bloc) {
     bloc.add(const StageRequested());
     return bloc.stream.firstWhere(
@@ -79,19 +167,41 @@ class StageScreen extends StatelessWidget {
         );
         if (project != null) bloc.add(StageProjectCreated(project));
       case QuickAddKind.goal:
-        final goal = await sheet<NewGoal>(
-          CreateGoalSheet(skills: board.skills),
+        final goal = await sheet<SmartGoal>(
+          SmartGoalSheet(
+            skills: [
+              for (final s in board.skills) SkillChoice(id: s.id, name: s.name),
+            ],
+          ),
         );
-        if (goal != null) bloc.add(StageGoalCreated(goal));
-      case QuickAddKind.resource:
-        final resource = await sheet<({String title, String url})>(
-          const CreateResourceSheet(),
-        );
-        if (resource != null) {
+        if (goal != null) {
           bloc.add(
-            StageResourceCreated(title: resource.title, url: resource.url),
+            StageGoalCreated(
+              NewGoal(
+                title: goal.title,
+                specific: goal.specific,
+                measurable: goal.measurable,
+                achievable: goal.achievable,
+                relevant: goal.relevant,
+                dueDate: goal.dueDate,
+                timebound: goal.timebound,
+                skillId: goal.skillId,
+              ),
+            ),
           );
         }
+      case QuickAddKind.resource:
+        final resource = await sheet<NewResource>(
+          CreateResourceSheet(
+            projects: [
+              for (final p in board.projects)
+                StageLink(id: p.id, name: p.title),
+            ],
+            goals: board.goalLinks,
+            skills: board.skills,
+          ),
+        );
+        if (resource != null) bloc.add(StageResourceCreated(resource));
       case null:
         break;
     }
@@ -229,23 +339,55 @@ class StageScreen extends StatelessWidget {
         ),
         const SizedBox(height: 7),
         if (board.resources.isEmpty)
-          _empty(context, 'Guarda aquí enlaces útiles para tus áreas.'),
+          _empty(
+            context,
+            'Guarda aquí enlaces, notas y documentos para tus proyectos, '
+            'metas y áreas.',
+          ),
         for (final resource in board.resources)
           StageActionRow(
-            icon: Icons.bookmark_border,
+            icon: switch (resource.kind) {
+              ResourceKind.link => Icons.link,
+              ResourceKind.note => Icons.notes,
+              ResourceKind.document => Icons.description_outlined,
+            },
             title: resource.title,
-            subtitle: resource.url,
+            subtitle: [
+              switch (resource.kind) {
+                ResourceKind.link => resource.url ?? 'Enlace',
+                ResourceKind.note => 'Nota',
+                ResourceKind.document => 'Documento',
+              },
+              ...resource.links,
+            ].join(' · '),
             enabled: idle,
             actions: [
-              (
-                label: 'Copiar enlace',
-                onSelected: () async {
-                  await Clipboard.setData(ClipboardData(text: resource.url));
-                  if (context.mounted) {
-                    showLifeQuestMessage(context, 'Enlace copiado.');
-                  }
-                },
-              ),
+              switch (resource.kind) {
+                ResourceKind.link => (
+                  label: 'Abrir enlace',
+                  onSelected: () => _open(context, resource.url ?? ''),
+                ),
+                ResourceKind.note => (
+                  label: 'Ver nota',
+                  onSelected: () => _showNote(context, resource),
+                ),
+                ResourceKind.document => (
+                  label: 'Abrir documento',
+                  onSelected: () => bloc.add(StageResourceOpened(resource)),
+                ),
+              },
+              if (resource.kind == ResourceKind.link)
+                (
+                  label: 'Copiar enlace',
+                  onSelected: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: resource.url ?? ''),
+                    );
+                    if (context.mounted) {
+                      showLifeQuestMessage(context, 'Enlace copiado.');
+                    }
+                  },
+                ),
               (
                 label: 'Archivar',
                 onSelected: () => bloc.add(

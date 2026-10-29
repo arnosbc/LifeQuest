@@ -23,6 +23,7 @@ class StageSuccess extends StageState {
     this.refreshing = false,
     this.busy = false,
     this.message,
+    this.openUrl,
   });
 
   final StageBoard board;
@@ -36,8 +37,11 @@ class StageSuccess extends StageState {
   /// Aviso puntual para mostrar en un snackbar.
   final String? message;
 
+  /// Enlace temporal de un documento que la pantalla debe abrir una vez.
+  final String? openUrl;
+
   @override
-  List<Object?> get props => [board, refreshing, busy, message];
+  List<Object?> get props => [board, refreshing, busy, message, openUrl];
 }
 
 /// La primera carga falló; no hay datos que mostrar.

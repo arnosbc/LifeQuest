@@ -29,11 +29,16 @@ class TavernBoardModel {
             final Map<String, dynamic> m => NpcMission(
               id: m['id'] as String,
               title: m['title'] as String,
+              description: m['description'] as String?,
               xpReward: _int(m['xp_reward']),
             ),
             _ => null,
           },
           completed: _int(n['completed']),
+          documents: [
+            for (final d in _list(n['documents']))
+              NpcDocument(id: d['id'] as String, title: d['title'] as String),
+          ],
         ),
     ],
     npcLimit: _int(json['npc_limit'], 3),

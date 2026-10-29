@@ -7,11 +7,17 @@ class DashboardGreeting extends StatelessWidget {
     super.key,
     required this.userName,
     required this.onOpenProfile,
+    required this.onOpenNotifications,
+    this.unreadNotifications = 0,
     this.now,
   });
 
   final String userName;
   final VoidCallback onOpenProfile;
+  final VoidCallback onOpenNotifications;
+
+  /// Avisos sin leer; con 0 no se muestra el contador.
+  final int unreadNotifications;
   final DateTime? now;
 
   static const _weekdays = [
@@ -85,10 +91,24 @@ class DashboardGreeting extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         IconButton(
-          tooltip: 'Notificaciones',
-          onPressed: () =>
-              showLifeQuestMessage(context, 'No tienes notificaciones nuevas.'),
-          icon: const Icon(Icons.notifications_none_rounded, size: 22),
+          tooltip: switch (unreadNotifications) {
+            0 => 'Notificaciones',
+            1 => 'Notificaciones, 1 sin leer',
+            final n => 'Notificaciones, $n sin leer',
+          },
+          onPressed: onOpenNotifications,
+          icon: Badge(
+            isLabelVisible: unreadNotifications > 0,
+            label: Text(
+              unreadNotifications > 9 ? '9+' : '$unreadNotifications',
+            ),
+            child: Icon(
+              unreadNotifications > 0
+                  ? Icons.notifications_rounded
+                  : Icons.notifications_none_rounded,
+              size: 22,
+            ),
+          ),
           style: IconButton.styleFrom(
             backgroundColor: context.lq.surface,
             foregroundColor: context.lq.ink,

@@ -30,6 +30,7 @@ class DungeonSession extends Equatable {
     this.cyclesDone = 0,
     this.xpEarned = 0,
     this.coinsEarned = 0,
+    this.missionsDone = 0,
   });
 
   final String id;
@@ -37,11 +38,20 @@ class DungeonSession extends Equatable {
   final int cycleMinutes;
   final List<DungeonTask> tasks;
   final int cyclesDone;
+
+  /// Lo ganado en la sesión: ciclos y misiones de la mochila (033).
   final int xpEarned;
   final int coinsEarned;
 
+  /// Misiones de la mochila completadas durante la sesión.
+  final int missionsDone;
+
   /// Ciclos que caben en la sesión; el servidor no paga más.
   int get maxCycles => totalMinutes ~/ cycleMinutes;
+
+  /// Tiempo efectivo: solo los ciclos de concentración cobrados, sin
+  /// descansos ni pausas (igual que `end_dungeon`, 033).
+  int get focusMinutes => cyclesDone * cycleMinutes;
 
   @override
   List<Object?> get props => [
@@ -52,7 +62,21 @@ class DungeonSession extends Equatable {
     cyclesDone,
     xpEarned,
     coinsEarned,
+    missionsDone,
   ];
+}
+
+/// Lo que pagó el servidor al completar una misión.
+class DungeonReward extends Equatable {
+  const DungeonReward({this.xp = 0, this.coins = 0});
+
+  final int xp;
+
+  /// Monedas a la bolsa más las que pasaron al Tesoro.
+  final int coins;
+
+  @override
+  List<Object?> get props => [xp, coins];
 }
 
 /// Todo lo que muestra la pantalla Mazmorra, en una sola carga.
@@ -108,13 +132,21 @@ class DungeonSummary extends Equatable {
     required this.xp,
     required this.coins,
     required this.minutes,
+    this.missions = 0,
   });
 
   final int cycles;
+
+  /// Botín completo: ciclos y misiones de la mochila (033).
   final int xp;
   final int coins;
+
+  /// Tiempo efectivo: ciclos cobrados × duración del ciclo.
   final int minutes;
 
+  /// Misiones de la mochila completadas en la sesión.
+  final int missions;
+
   @override
-  List<Object?> get props => [cycles, xp, coins, minutes];
+  List<Object?> get props => [cycles, xp, coins, minutes, missions];
 }

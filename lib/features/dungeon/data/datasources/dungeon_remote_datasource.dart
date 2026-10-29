@@ -22,7 +22,7 @@ abstract class DungeonRemoteDataSource {
     required String taskId,
   });
 
-  Future<void> completeTask(String taskId);
+  Future<DungeonRewardModel> completeTask(String taskId);
 
   Future<DungeonSummaryModel> end(String sessionId);
 }
@@ -67,8 +67,13 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
   );
 
   @override
-  Future<void> completeTask(String taskId) => _guard(
-    () => _client.rpc<void>('complete_task', params: {'p_task_id': taskId}),
+  Future<DungeonRewardModel> completeTask(String taskId) => _guard(
+    () async => DungeonRewardModel(
+      await _client.rpc<Map<String, dynamic>>(
+        'complete_task',
+        params: {'p_task_id': taskId},
+      ),
+    ),
   );
 
   @override

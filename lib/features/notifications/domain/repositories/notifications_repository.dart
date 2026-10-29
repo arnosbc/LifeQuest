@@ -10,4 +10,15 @@ abstract class NotificationsRepository {
 
   /// Marca leídos los avisos de [ids]; si es null, todos.
   Future<Either<Failure, Unit>> markRead(List<String>? ids);
+
+  /// Activa los avisos en este dispositivo: pide permiso, lo registra y
+  /// programa la revisión periódica. [onOpened] se llama al tocar un aviso.
+  Future<Either<Failure, Unit>> enableOnDevice(void Function() onOpened);
+
+  /// Detiene la revisión periódica y da de baja el dispositivo.
+  Future<Either<Failure, Unit>> disableOnDevice();
+
+  /// Trae lo que toca mostrar ahora ([now] es la hora local) y lo muestra
+  /// como notificación del sistema. Devuelve cuántas mostró.
+  Future<Either<Failure, int>> deliverToDevice(DateTime now);
 }

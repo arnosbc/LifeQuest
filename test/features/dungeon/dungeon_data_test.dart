@@ -73,6 +73,34 @@ void main() {
     expect(board.candidates.single.id, 't2');
   });
 
+  test('DungeonRewardModel suma a las Monedas lo que pasó al Tesoro', () {
+    expect(
+      const DungeonRewardModel({
+        'xp': 25,
+        'coins': 5,
+        'treasury': 3,
+        'level_up': false,
+      }).toEntity(),
+      const DungeonReward(xp: 25, coins: 8),
+    );
+    expect(
+      const DungeonSummaryModel({
+        'cycles': 1,
+        'xp': 35,
+        'coins': 11,
+        'missions': 1,
+        'minutes': 25,
+      }).toEntity(),
+      const DungeonSummary(
+        cycles: 1,
+        xp: 35,
+        coins: 11,
+        minutes: 25,
+        missions: 1,
+      ),
+    );
+  });
+
   test('sin sesión queda null', () {
     expect(
       DungeonBoardModel.fromJson({'session': null}).toEntity(),

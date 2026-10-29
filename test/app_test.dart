@@ -9,6 +9,8 @@ import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/notifications/domain/entities/app_notification.dart';
+import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
@@ -26,6 +28,10 @@ import 'features/profile/profile_fixtures.dart';
 import 'features/settings/settings_fixtures.dart';
 import 'features/stage/stage_fixtures.dart';
 import 'helpers/mocks.dart';
+
+class _MockNotificationsBloc
+    extends MockBloc<NotificationsEvent, NotificationsState>
+    implements NotificationsBloc {}
 
 void main() {
   late MockAuthBloc authBloc;
@@ -55,6 +61,25 @@ void main() {
         initialState: HomeSuccess(dashboard),
       );
       return homeBloc;
+    });
+    // La campana del Home cuenta los avisos sin leer.
+    sl.registerFactory<NotificationsBloc>(() {
+      final notificationsBloc = _MockNotificationsBloc();
+      whenListen(
+        notificationsBloc,
+        const Stream<NotificationsState>.empty(),
+        initialState: NotificationsSuccess([
+          for (final id in ['a', 'b'])
+            AppNotification(
+              id: id,
+              kind: NotificationKind.critical,
+              title: 't',
+              description: 'd',
+              createdAt: DateTime(2026, 10, 29),
+            ),
+        ]),
+      );
+      return notificationsBloc;
     });
     sl.registerFactory<MissionsBloc>(() {
       final missionsBloc = MockMissionsBloc();
@@ -128,13 +153,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Continuar'), findsOneWidget);
+    expect(find.text('Bienvenido de vuelta'), findsOneWidget);
     expect(find.text('Google'), findsOneWidget);
 
-    await tester.tap(find.text('Crea tu perfil'));
+    await tester.tap(find.text('Regístrate'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Crea tu Héroe'), findsOneWidget);
+    expect(find.text('Crea tu cuenta'), findsOneWidget);
     expect(find.text('Crear cuenta'), findsOneWidget);
   });
 
@@ -162,6 +187,7 @@ void main() {
     // El saludo cambia con la hora; el nombre sale del perfil.
     expect(find.textContaining(', Ana'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
+    expect(find.byTooltip('Notificaciones, 2 sin leer'), findsOneWidget);
 
     await tester.scrollUntilVisible(find.text('Taverna'), 200);
     await tester.pumpAndSettle();
@@ -173,8 +199,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('EXPLORA EL REINO'), findsOneWidget);
 
-    // La barra sigue el diseño: Inicio · Stage · Hábitos · Mazmorra · Perfil.
-    for (final tab in ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil']) {
+    // La barra sigue el diseño: Inicio · Planificador · Hábitos · Foco · Perfil.
+    for (final tab in ['Inicio', 'Planificador', 'Hábitos', 'Foco', 'Perfil']) {
       expect(
         find.descendant(
           of: find.byType(QuestlyNavBar),
@@ -186,7 +212,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(QuestlyNavBar),
-        matching: find.text('Stage'),
+        matching: find.text('Planificador'),
       ),
     );
     await tester.pumpAndSettle();
@@ -200,14 +226,14 @@ void main() {
     expect(find.text('Preparar la exposición'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
 
-    // Tras ir a otra pestaña, tocar Stage abre Stage, no Misiones.
+    // Tras ir a otra pestaña, tocar Planificador abre Stage, no Misiones.
     Finder tab(String label) => find.descendant(
       of: find.byType(QuestlyNavBar),
       matching: find.text(label),
     );
     await tester.tap(tab('Inicio'));
     await tester.pumpAndSettle();
-    await tester.tap(tab('Stage'));
+    await tester.tap(tab('Planificador'));
     await tester.pumpAndSettle();
     expect(find.text('METAS (JEFES)'), findsOneWidget);
     expect(find.text('Preparar la exposición'), findsNothing);

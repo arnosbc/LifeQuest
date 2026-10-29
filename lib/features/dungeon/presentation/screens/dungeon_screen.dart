@@ -57,6 +57,7 @@ class DungeonScreen extends StatelessWidget {
               coins: summary.coins,
               cycles: summary.cycles,
               minutes: summary.minutes,
+              missions: summary.missions,
             ),
             TextButton(
               onPressed: () => bloc.add(const DungeonSummaryDismissed()),
@@ -121,7 +122,8 @@ class DungeonScreen extends StatelessWidget {
           xp: session.xpEarned,
           coins: session.coinsEarned,
           cycles: session.cyclesDone,
-          minutes: session.cyclesDone * session.cycleMinutes,
+          minutes: session.focusMinutes,
+          missions: session.missionsDone,
         ),
         const SizedBox(height: 11),
         if (!done)

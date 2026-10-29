@@ -40,6 +40,16 @@ class ThoughtConverted extends BrainDumpEvent {
   List<Object?> get props => [conversion];
 }
 
+/// El G.T.D. dijo «resultado de meses» y se llenó el S.M.A.R.T.
+class ThoughtConvertedToGoal extends BrainDumpEvent {
+  const ThoughtConvertedToGoal(this.conversion);
+
+  final GoalConversion conversion;
+
+  @override
+  List<Object?> get props => [conversion];
+}
+
 class ThoughtDeleted extends BrainDumpEvent {
   const ThoughtDeleted(this.thoughtId);
 

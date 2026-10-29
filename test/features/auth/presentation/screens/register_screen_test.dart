@@ -71,7 +71,7 @@ void main() {
     await tapCreateAccount(tester);
 
     expect(
-      find.text('Ingresa un correo válido, como nombre@correo.com.'),
+      find.text('Revisa el correo: parece que falta algo (ej.: tu@correo.com).'),
       findsOneWidget,
     );
     expect(find.text('Acepta los términos para continuar.'), findsOneWidget);

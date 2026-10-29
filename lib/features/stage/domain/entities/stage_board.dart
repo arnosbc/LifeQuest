@@ -139,19 +139,69 @@ class StageArea extends Equatable {
   List<Object?> get props => [id, name, level, openTasks, projects, habits];
 }
 
+/// Tipo de Recurso (035): un enlace, una nota escrita o un documento subido.
+enum ResourceKind { link, note, document }
+
+/// Recurso de P.A.R.A.: enlace, nota o documento, con vínculos opcionales a
+/// un Proyecto, una Meta o una Skill (Área).
 class StageResource extends Equatable {
   const StageResource({
     required this.id,
     required this.title,
-    required this.url,
+    this.kind = ResourceKind.link,
+    this.url,
+    this.content,
+    this.path,
+    this.bucket,
+    this.projectTitle,
+    this.goalTitle,
+    this.skillName,
+    this.npcName,
   });
 
   final String id;
   final String title;
-  final String url;
+  final ResourceKind kind;
+
+  /// Enlace (solo [ResourceKind.link]).
+  final String? url;
+
+  /// Texto de la nota (solo [ResourceKind.note]).
+  final String? content;
+
+  /// Archivo en Storage (solo [ResourceKind.document]).
+  final String? path;
+  final String? bucket;
+
+  final String? projectTitle;
+  final String? goalTitle;
+  final String? skillName;
+
+  /// NPC que usa este documento de contexto (032).
+  final String? npcName;
+
+  /// «Proyecto: X · Meta: Y · Área: Z» o vacío si no tiene vínculos.
+  List<String> get links => [
+    if (projectTitle case final p?) 'Proyecto: $p',
+    if (goalTitle case final g?) 'Meta: $g',
+    if (skillName case final s?) 'Área: $s',
+    if (npcName case final n?) 'NPC: $n',
+  ];
 
   @override
-  List<Object?> get props => [id, title, url];
+  List<Object?> get props => [
+    id,
+    title,
+    kind,
+    url,
+    content,
+    path,
+    bucket,
+    projectTitle,
+    goalTitle,
+    skillName,
+    npcName,
+  ];
 }
 
 /// Cuántas cosas hay en el Archivo (terminadas, vencidas o archivadas).

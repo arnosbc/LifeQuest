@@ -5,14 +5,14 @@ import 'package:proyecto_movil/core/theme/questly_icons.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Cabecera ilustrada (Hero.dc.html): paisaje de colinas, sol y árboles que
-/// cambia con el tema. Con [onBack] muestra «volver» y el kicker baja.
+/// Cabecera (Hero.dc.html, DESIGN.md v2 §5): banda de color con formas
+/// geométricas del tema. Con [onBack] muestra «volver» y el kicker baja.
 class QuestlyHero extends StatelessWidget {
   const QuestlyHero({
     super.key,
     required this.kicker,
     required this.heading,
-    this.icon = QIcons.sword,
+    this.icon = QIcons.focus,
     this.tone,
     this.onBack,
     this.backLabel = 'Volver',
@@ -66,7 +66,7 @@ class QuestlyHero extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: ExcludeSemantics(
-                  child: SvgPicture.string(_landscape(t), fit: BoxFit.fill),
+                  child: SvgPicture.string(shapesSvg(t), fit: BoxFit.cover),
                 ),
               ),
               Padding(
@@ -132,19 +132,20 @@ class QuestlyHero extends StatelessWidget {
   static String _hex(Color c) =>
       '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
-  static String _landscape(QHeroTone t) =>
+  // Círculos concéntricos a la derecha y un arco abajo: quedan fuera del
+  // ancho del título (20 + 260 px), así no bajan el contraste del texto.
+  /// También la usa la cabecera de Acceso (auth_header.dart).
+  static String shapesSvg(QHeroTone t) =>
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 156" '
-      'preserveAspectRatio="none">'
-      '<circle cx="332" cy="40" r="16" fill="${_hex(t.sun)}" opacity=".85"/>'
-      '<circle cx="296" cy="22" r="2" fill="${_hex(t.sun)}" opacity=".6"/>'
-      '<circle cx="364" cy="66" r="1.6" fill="${_hex(t.sun)}" opacity=".5"/>'
-      '<path d="M150 126 L196 96 L230 114 L268 92 L318 116 L354 98 L390 110 '
-      'L390 156 L150 156Z" fill="${_hex(t.hill1)}"/>'
-      '<path d="M0 140 Q100 122 200 138 T390 132 L390 156 L0 156Z" '
-      'fill="${_hex(t.hill2)}"/>'
-      '<path d="M300 150 L312 118 L324 150Z M326 152 L340 112 L354 152Z '
-      'M356 150 L368 122 L380 150Z M206 152 L216 128 L226 152Z" '
-      'fill="${_hex(t.trees)}"/></svg>';
+      'preserveAspectRatio="xMaxYMid slice">'
+      '<circle cx="356" cy="134" r="96" fill="${_hex(t.shape1)}"/>'
+      '<circle cx="356" cy="134" r="58" fill="${_hex(t.shape2)}"/>'
+      '<circle cx="356" cy="134" r="24" fill="${_hex(t.shape3)}"/>'
+      '<path d="M-10 156 Q120 128 250 156Z" fill="${_hex(t.shape3)}" '
+      'opacity=".55"/>'
+      '<circle cx="292" cy="30" r="5" fill="${_hex(t.dot)}" opacity=".85"/>'
+      '<circle cx="270" cy="52" r="2.4" fill="${_hex(t.dot)}" opacity=".6"/>'
+      '</svg>';
 }
 
 class _HeroButton extends StatelessWidget {

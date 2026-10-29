@@ -295,6 +295,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
       emit(_latest(current).copyWith(busy: false, message: failure.message));
       return;
     }
+    final reward = completed.getRight().toNullable()!;
     final reloaded = await _getBoard(const NoParams());
     final latest = _latest(current);
     final board = reloaded.getOrElse((_) => latest.board);
@@ -305,9 +306,22 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         currentTaskId: () => board.session == null
             ? latest.currentTaskId
             : _nextTask(board.session!, latest.currentTaskId),
-        message: '¡Misión completada! Tu héroe se hace más fuerte.',
+        message: _taskMessage(reward, board.session),
       ),
     );
+  }
+
+  /// «+12 XP · +4 Monedas» y, si se pudo leer, el total de la sesión.
+  static String _taskMessage(DungeonReward reward, DungeonSession? session) {
+    final gained = [
+      '+${reward.xp} XP',
+      if (reward.coins > 0) '+${reward.coins} Monedas',
+    ].join(' · ');
+    final total = session == null
+        ? ''
+        : ' En esta sesión llevas ${session.xpEarned} XP '
+              'y ${session.coinsEarned} Monedas.';
+    return '¡Misión completada! $gained.$total';
   }
 
   /// El estado actual si sigue listo (los tics lo avanzan mientras esperamos).

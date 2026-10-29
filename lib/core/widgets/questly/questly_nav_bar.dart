@@ -18,9 +18,9 @@ class QuestlyNavBar extends StatelessWidget {
 
   static const _items = [
     (QIcons.home, 'Inicio'),
-    (QIcons.stage, 'Stage'),
+    (QIcons.stage, 'Planificador'),
     (QIcons.habits, 'Hábitos'),
-    (QIcons.sword, 'Mazmorra'),
+    (QIcons.focus, 'Foco'),
     (QIcons.profile, 'Perfil'),
   ];
 
@@ -101,13 +101,17 @@ class _NavItem extends StatelessWidget {
                 child: QIcon(icon, color: color),
               ),
               const SizedBox(height: 3),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: QText.label(color).copyWith(
-                  fontSize: 12,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+              // «Planificador» no cabe a 12 px en 360 de ancho: se encoge un
+              // poco en vez de cortarse.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: QText.label(color).copyWith(
+                    fontSize: 12,
+                    fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+                  ),
                 ),
               ),
             ],

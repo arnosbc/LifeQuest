@@ -4,12 +4,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/dashboard_greeting.dart';
 
 void main() {
-  Future<void> pumpAt(WidgetTester tester, DateTime now) => tester.pumpWidget(
+  Future<void> pumpAt(
+    WidgetTester tester,
+    DateTime now, {
+    int unread = 0,
+    VoidCallback? onOpenNotifications,
+  }) => tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
         body: DashboardGreeting(
           userName: 'Alex',
           onOpenProfile: () {},
+          onOpenNotifications: onOpenNotifications ?? () {},
+          unreadNotifications: unread,
           now: now,
         ),
       ),
@@ -29,5 +36,29 @@ void main() {
 
     await pumpAt(tester, DateTime(2026, 10, 17, 21));
     expect(find.text('Buenas noches, Alex'), findsOneWidget);
+  });
+
+  testWidgets('la campana abre los avisos y cuenta los no leídos', (
+    tester,
+  ) async {
+    var opened = 0;
+    await pumpAt(
+      tester,
+      DateTime(2026, 10, 29, 9),
+      onOpenNotifications: () {
+        opened++;
+      },
+    );
+    expect(find.byTooltip('Notificaciones'), findsOneWidget);
+    expect(find.text('0'), findsNothing);
+    await tester.tap(find.byTooltip('Notificaciones'));
+    expect(opened, 1);
+
+    await pumpAt(tester, DateTime(2026, 10, 29, 9), unread: 3);
+    expect(find.byTooltip('Notificaciones, 3 sin leer'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+
+    await pumpAt(tester, DateTime(2026, 10, 29, 9), unread: 12);
+    expect(find.text('9+'), findsOneWidget);
   });
 }

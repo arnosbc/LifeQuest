@@ -20,11 +20,15 @@ class HomeScreen extends StatelessWidget {
     super.key,
     required this.userName,
     required this.onNavigate,
+    this.unreadNotifications = 0,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
   final String userName;
   final ValueChanged<int> onNavigate;
+
+  /// Avisos sin leer para la campana (los trae el router).
+  final int unreadNotifications;
 
   static const _sections = [
     (Icons.inbox_outlined, 'Brain Dump', RoutePaths.brainDump),
@@ -78,6 +82,8 @@ class HomeScreen extends StatelessWidget {
         DashboardGreeting(
           userName: dashboard.displayName ?? userName,
           onOpenProfile: () => onNavigate(4),
+          onOpenNotifications: () => context.go(RoutePaths.notifications),
+          unreadNotifications: unreadNotifications,
         ),
         const SizedBox(height: 20),
         // La misión va primero: es la única acción primaria de la pantalla.

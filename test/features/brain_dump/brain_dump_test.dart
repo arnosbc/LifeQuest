@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/core/entities/smart_goal.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/brain_dump/data/models/brain_dump_board_model.dart';
@@ -35,29 +36,47 @@ void main() {
         {'id': 'b', 'content': 'y', 'created_at': '2026-10-26T10:00:00+00:00'},
       ],
       'converted_today': 2,
+      'skills': [
+        {'id': 's1', 'name': 'Salud'},
+      ],
     }).toEntity();
     expect(
       [entity.inbox.single.id, entity.reference.single.id, entity.someday],
       ['a', 'b', isEmpty],
     );
     expect(entity.convertedToday, 2);
+    expect(entity.skills, const [SkillChoice(id: 's1', name: 'Salud')]);
   });
 
   group('BrainDumpBloc', () {
     late MockGetBrainDump getBoard;
     late MockFileThought file;
     late MockConvertThought convert;
+    late MockConvertThoughtToGoal convertToGoal;
+    final goal = GoalConversion(
+      thoughtId: 't1',
+      goal: SmartGoal(
+        title: 'Correr 21 km',
+        specific: 'Terminar una media maratón',
+        measurable: 'Cruzar la meta',
+        achievable: 'Entreno 3 veces por semana',
+        relevant: 'Quiero más energía',
+        dueDate: DateTime(2027, 6, 1),
+      ),
+    );
 
     setUpAll(() {
       registerFallbackValue(const NoParams());
       registerFallbackValue(const FileThoughtParams('x', ThoughtShelf.someday));
       registerFallbackValue(conversion);
+      registerFallbackValue(goal);
     });
 
     setUp(() {
       getBoard = MockGetBrainDump();
       file = MockFileThought();
       convert = MockConvertThought();
+      convertToGoal = MockConvertThoughtToGoal();
       when(() => getBoard(any())).thenAnswer((_) async => Right(board));
     });
 
@@ -67,6 +86,39 @@ void main() {
       file: file,
       convert: convert,
       delete: MockDeleteThought(),
+      convertToGoal: convertToGoal,
+    );
+
+    blocTest<BrainDumpBloc, BrainDumpState>(
+      'una idea de meses se convierte en Meta tras el S.M.A.R.T.',
+      setUp: () => when(
+        () => convertToGoal(any()),
+      ).thenAnswer((_) async => const Right(unit)),
+      build: build,
+      seed: () => BrainDumpSuccess(board),
+      act: (bloc) => bloc.add(ThoughtConvertedToGoal(goal)),
+      expect: () => [
+        BrainDumpSuccess(board, busyKey: 't1'),
+        BrainDumpSuccess(
+          board,
+          message: '¡Meta creada! Ya te espera como jefe en tu Stage.',
+        ),
+      ],
+      verify: (_) => verify(() => convertToGoal(goal)).called(1),
+    );
+
+    blocTest<BrainDumpBloc, BrainDumpState>(
+      'si el S.M.A.R.T. no pasa la validación, la idea sigue y avisa',
+      setUp: () => when(() => convertToGoal(any())).thenAnswer(
+        (_) async => const Left(ServerFailure('Responde las preguntas.')),
+      ),
+      build: build,
+      seed: () => BrainDumpSuccess(board),
+      act: (bloc) => bloc.add(ThoughtConvertedToGoal(goal)),
+      expect: () => [
+        BrainDumpSuccess(board, busyKey: 't1'),
+        BrainDumpSuccess(board, message: 'Responde las preguntas.'),
+      ],
     );
 
     blocTest<BrainDumpBloc, BrainDumpState>(

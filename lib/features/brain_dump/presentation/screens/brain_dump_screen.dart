@@ -9,10 +9,7 @@ import 'package:proyecto_movil/features/brain_dump/presentation/widgets/gtd_shee
 /// Brain Dump: capturar sin fricción y diagnosticar con G.T.D. Necesita un
 /// [BrainDumpBloc] por encima.
 class BrainDumpScreen extends StatefulWidget {
-  const BrainDumpScreen({super.key, required this.onCreateGoal});
-
-  /// Una Meta pasa por S.M.A.R.T. en Stage (RF-014).
-  final VoidCallback onCreateGoal;
+  const BrainDumpScreen({super.key});
 
   @override
   State<BrainDumpScreen> createState() => _BrainDumpScreenState();
@@ -34,18 +31,34 @@ class _BrainDumpScreenState extends State<BrainDumpScreen> {
     _input.clear();
   }
 
-  Future<void> _diagnose(BrainDumpBloc bloc, Thought thought) async {
-    final outcome = await showModalBottomSheet<GtdOutcome>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => GtdSheet(thought: thought),
-    );
-    if (outcome == null) return;
-    if (outcome.goal) {
-      // La idea sigue en la bandeja hasta que la Meta exista en Stage.
-      widget.onCreateGoal();
+  Future<T?> _sheet<T>(Widget child) => showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => child,
+  );
+
+  Future<void> _diagnose(
+    BrainDumpBloc bloc,
+    Thought thought,
+    List<SkillChoice> skills,
+  ) async {
+    final outcome = await _sheet<GtdOutcome>(GtdSheet(thought: thought));
+    if (outcome == null || !mounted) return;
+    if (outcome.goalTitle case final title?) {
+      // Una Meta pasa por S.M.A.R.T. (RF-014). Si se cierra sin guardar, la
+      // idea sigue en la bandeja.
+      final goal = await _sheet<SmartGoal>(
+        SmartGoalSheet(skills: skills, initialTitle: title),
+      );
+      if (goal != null) {
+        bloc.add(
+          ThoughtConvertedToGoal(
+            GoalConversion(thoughtId: thought.id, goal: goal),
+          ),
+        );
+      }
     } else if (outcome.shelf case final shelf?) {
       bloc.add(ThoughtFiled(thought.id, shelf));
     } else if (outcome.conversion case final conversion?) {
@@ -138,7 +151,7 @@ class _BrainDumpScreenState extends State<BrainDumpScreen> {
             subtitle: 'Capturada el ${LifeQuestDates.dayTime(t.createdAt)}',
             actionLabel: 'Decidir',
             busy: state.busyKey == t.id,
-            onAction: idle ? () => _diagnose(bloc, t) : null,
+            onAction: idle ? () => _diagnose(bloc, t, board.skills) : null,
           ),
         _shelf(context, state, 'ALGÚN DÍA', board.someday),
         _shelf(context, state, 'REFERENCIA', board.reference),

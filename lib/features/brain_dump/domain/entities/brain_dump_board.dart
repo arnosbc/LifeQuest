@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:proyecto_movil/core/entities/smart_goal.dart';
+
 /// Brain Dump: la bandeja de captura y lo que el G.T.D. dejó en Algún día o
 /// Referencia (CLAUDE.md §5).
 class BrainDumpBoard extends Equatable {
@@ -8,17 +10,38 @@ class BrainDumpBoard extends Equatable {
     this.someday = const [],
     this.reference = const [],
     this.convertedToday = 0,
+    this.skills = const [],
   });
 
   final List<Thought> inbox;
   final List<Thought> someday;
   final List<Thought> reference;
 
-  /// Ideas convertidas hoy en tareas o proyectos.
+  /// Ideas convertidas hoy en tareas, proyectos o metas.
   final int convertedToday;
 
+  /// Skills para vincular una Meta creada desde aquí (034).
+  final List<SkillChoice> skills;
+
   @override
-  List<Object?> get props => [inbox, someday, reference, convertedToday];
+  List<Object?> get props => [
+    inbox,
+    someday,
+    reference,
+    convertedToday,
+    skills,
+  ];
+}
+
+/// Idea que el G.T.D. diagnosticó como Meta, con su formulario S.M.A.R.T.
+class GoalConversion extends Equatable {
+  const GoalConversion({required this.thoughtId, required this.goal});
+
+  final String thoughtId;
+  final SmartGoal goal;
+
+  @override
+  List<Object?> get props => [thoughtId, goal];
 }
 
 class Thought extends Equatable {

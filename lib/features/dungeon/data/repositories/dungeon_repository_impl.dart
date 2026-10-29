@@ -38,10 +38,8 @@ class DungeonRepositoryImpl implements DungeonRepository {
   });
 
   @override
-  Future<Either<Failure, Unit>> completeTask(String taskId) => _run(() async {
-    await _remote.completeTask(taskId);
-    return unit;
-  });
+  Future<Either<Failure, DungeonReward>> completeTask(String taskId) =>
+      _run(() async => (await _remote.completeTask(taskId)).toEntity());
 
   @override
   Future<Either<Failure, DungeonSummary>> end(String sessionId) =>

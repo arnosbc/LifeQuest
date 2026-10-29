@@ -4,19 +4,21 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/entities/brain_dump_board.dart';
 
 /// Lo que decidió el Diagnosis Tool: guardarla, convertirla o llevarla a
-/// S.M.A.R.T. (una Meta se crea en Stage).
+/// S.M.A.R.T. con [goalTitle] como nombre de la Meta (RF-014).
 class GtdOutcome {
   const GtdOutcome.shelf(ThoughtShelf this.shelf)
     : conversion = null,
-      goal = false;
+      goalTitle = null;
   const GtdOutcome.convert(Conversion this.conversion)
     : shelf = null,
-      goal = false;
-  const GtdOutcome.goal() : shelf = null, conversion = null, goal = true;
+      goalTitle = null;
+  const GtdOutcome.goal(String this.goalTitle)
+    : shelf = null,
+      conversion = null;
 
   final ThoughtShelf? shelf;
   final Conversion? conversion;
-  final bool goal;
+  final String? goalTitle;
 }
 
 /// Diagnosis Tool G.T.D. (CLAUDE.md §5): checklist cerrado, sin IA.
@@ -101,7 +103,10 @@ class _GtdSheetState extends State<GtdSheet> {
           ('Varios, en semanas: Proyecto', () => _convert(ThoughtKind.project)),
           (
             'Un resultado de meses: Meta',
-            () => _finish(const GtdOutcome.goal()),
+            () {
+              final title = _title.text.trim();
+              if (title.isNotEmpty) _finish(GtdOutcome.goal(title));
+            },
           ),
         ],
       ),
