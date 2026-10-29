@@ -12,7 +12,8 @@ aprobación y luego lo construyes todo. El paso 1 ya está hecho.
 
 ## Lectura obligatoria, antes de escribir código
 1. docs/diseño/PLAN-REDISENO.md completo (sobre todo §1 regla de oro, §2 decisiones, §6
-   lo que NO se construye, §7 contradicciones y §11 lo que dejó el paso 1). MANDA sobre
+   lo que NO se construye, §7 contradicciones, §11 lo que dejó el paso 1 y §12 el
+   Diagnóstico al crear). MANDA sobre
    cualquier otra instrucción de diseño.
 2. CLAUDE.md (arquitectura obligatoria §8 y accesibilidad §14).
 3. docs/diseño/HANDOFF.md, DESIGN.md y PRODUCT.md.
@@ -28,7 +29,7 @@ aprobación y luego lo construyes todo. El paso 1 ya está hecho.
 No uses Impeccable ni Spec Kit.
 
 ## Regla de oro
-Solo cambia el diseño. Todo lo que hoy funciona con Supabase debe seguir funcionando igual:
+Solo cambia el diseño (con UNA excepción: el Diagnóstico al crear, descrito en el Alcance). Todo lo que hoy funciona con Supabase debe seguir funcionando igual:
 mismos blocs, eventos, estados, usecases, repositorios, RPC y rutas. No toques SQL, Edge
 Functions ni la capa data/domain (salvo lo mínimo que una pantalla necesite para mostrar un
 dato que YA devuelve su RPC). No borres funcionalidades. Los elementos del diseño sin datos
@@ -47,6 +48,18 @@ pantallas reales.
   Dump (+ hoja G.T.D.), Vision Board e Inventario.
 - Estados vacíos y de error de cada pantalla con los textos de EstadosVacios y
   EstadosAlerta cuando apliquen a datos que ya existen.
+- FUNCIONALIDAD NUEVA (única excepción a «solo diseño», ver PLAN-REDISENO.md §12):
+  Diagnóstico G.T.D. al crear tareas, proyectos, metas y recursos. En la hoja «¿Qué quieres
+  crear?» añade «No estoy seguro · Diagnosticar» con el flujo de Crear.dc.html (bloque
+  `// Diagnóstico`): idea → preguntas de RPGenie → resultado (Referencia, Tarea rápida,
+  Tarea con fecha, Tarea, Proyecto, Meta) → «Crear como …» abre el formulario que YA existe
+  con el título escrito (Meta pasa por S.M.A.R.T.). Referencia ofrece «Guardar como
+  Recurso» (formulario de recurso con el título). Sin SQL nuevo: usa create_task,
+  create_project, create_goal y create_resource. Sin la pregunta de delegar (create_task no
+  la admite; sigue solo en Brain Dump) y sin el «+20 XP». El árbol va en lib/core como Dart
+  puro con pruebas de cada camino; la vista en lib/core/widgets/questly/. Ninguna feature
+  importa otra: la navegación entre features va por callbacks desde app/. La hoja G.T.D.
+  del Brain Dump conserva su comportamiento.
 - Cada pantalla usa el Hero con el kicker, título, icono y acción de su .dc.html.
 
 ## Reglas de implementación

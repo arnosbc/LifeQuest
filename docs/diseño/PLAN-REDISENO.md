@@ -106,7 +106,7 @@ Las medidas salen de `SistemaDiseno.dc.html`, `Hero.dc.html` y `Main.dc.html`. T
 | 3 | Revestir Inicio, Stage (Hoy), Crear (tarea, proyecto, meta) y Hábitos. | Pendiente |
 | 4 | Revestir la Mazmorra (preparar, mochila, sesión), Perfil, Diario y Configuración (selector de tema del reino aquí). | Pendiente |
 | 5 | Revestir Proyectos y Áreas, Boss Fight, Marketplace, Taverna, Misión actual, Estadísticas, Avisos, Brain Dump, Vision Board e Inventario. | Pendiente |
-| 6 | Funcionalidades nuevas de la sección 6, **una por una y con aprobación**. | Pendiente |
+| 6 | Funcionalidades nuevas de la sección 6, **una por una y con aprobación**. Primero las de IA de §13 (documentos de contexto del NPC). | Pendiente |
 
 Después de cada paso: `flutter analyze`, `flutter test`, resumen, y **parar** hasta la revisión.
 
@@ -126,7 +126,8 @@ Cada una necesita RPC, columna o lógica nueva. En la fase visual **se omiten**.
 - **Detalle de Área**: XP semanal por skill, proyectos y metas con su porcentaje.
 - Recursos: favorito, grupo (Bandeja / Por revisar / Revisados) y área.
 - Crear proyecto con fecha de inicio y tareas iniciales. Meta con «probabilidad %» y letras «sin verificar».
-- Brain Dump: pestaña «Ordenadas» con destino. Diagnóstico G.T.D. suelto desde Crear.
+- Brain Dump: pestaña «Ordenadas» con destino.
+- ~~Diagnóstico G.T.D. suelto desde Crear~~ → **pasó al alcance del rediseño** (ver §12). Queda fuera solo el «+20 XP · paso de bienvenida» (sin regla ni RPC).
 - Misión actual: varias razones, cola de 2 siguientes, motivos de «Ahora no» (cansado, poco tiempo, ya no quiero).
 - Boss Fight: consejo de RPGenie según los ataques y título al vencer.
 
@@ -228,6 +229,71 @@ test/core/widgets/questly/questly_widgets_test.dart
 - **`dependency_overrides: path_provider_foundation: 2.4.1`** (`pubspec.yaml`): `google_fonts` trae `path_provider`, y desde la 2.5 `path_provider_foundation` compila un hook nativo (`objective_c`) que falla con espacios en la ruta del usuario de Windows («Jhon Bermudez») y rompe `flutter test`. Quitarlo cuando Dart lo corrija o el proyecto viva en una ruta sin espacios.
 - El botón desactivado (blanco sobre `#7D8A80`) da unos 3,6:1, por debajo del 4,5:1 de texto normal. Es el valor del diseño; revisarlo con quien diseña.
 - Zona táctil: se valida la regla del diseño (44 px, como iOS). La guía de Android pide 48 px.
+
+## 12. Diagnóstico al crear (entra en el rediseño, 2026-10-28)
+
+Pedido del usuario: el diagnóstico G.T.D. también al crear tareas, proyectos, metas y recursos.
+Es lógica de la app (CLAUDE.md §5, RF-014): **no necesita SQL**; termina en los formularios
+y RPC que ya existen (`create_task`, `create_project`, `create_goal`, `create_resource`).
+
+- **Entrada:** en la hoja «¿Qué quieres crear?» (hoy `stage/presentation/widgets/quick_add_sheets.dart`
+  y `missions/presentation/widgets/create_mission_sheet.dart`), el botón del diseño
+  «No estoy seguro · Diagnosticar» (`Crear.dc.html`: borde discontinuo río, icono de ayuda).
+- **Flujo** (`Crear.dc.html`, bloque `// Diagnóstico`): campo «¿Qué tienes en mente?»,
+  conversación con RPGenie y respuestas en botones:
+  1. ¿Es accionable? → No: **Referencia**.
+  2. ¿Un solo paso o varios? → Varios: 3b.
+  3. ¿Lo haces en 2 minutos? → Sí: **Tarea rápida** («¡Hazla ya!»).
+  4. ¿Tiene fecha? → Sí: **Tarea con fecha** / No: **Tarea**.
+  3b. ¿Semanas o meses? → **Proyecto** / **Meta** (pasa por S.M.A.R.T.).
+  Resultado con «Es una …», su texto, «Crear como …» (abre el formulario con el título ya
+  escrito) y «Empezar de nuevo».
+- **Recursos:** el resultado **Referencia** ofrece «Guardar como Recurso» (abre el formulario
+  de recurso con el título; `create_resource` sigue pidiendo su URL) y explica la opción del
+  Brain Dump (Referencia / «Algún día»). Si se ofrece ir al Brain Dump, solo navega con un
+  callback desde `app/` (ninguna feature importa otra).
+- **Sin delegar:** la pregunta «¿Soy la persona correcta?» (RF-011) no está en este flujo
+  porque `create_task` no crea tareas delegadas; sigue solo en el Brain Dump.
+- **Arquitectura:** el árbol de preguntas es lógica compartida y pura (sin Flutter) en
+  `lib/core/` (p. ej. `core/gtd/gtd_diagnosis.dart`, con prueba de cada camino) y la vista en
+  `core/widgets/questly/`. La hoja G.T.D. del Brain Dump conserva su comportamiento
+  (incluido delegar); puede reutilizar el árbol si no cambia lo que hace.
+- **Fuera:** el «+20 XP · paso de bienvenida».
+
+## 13. Funcionalidades con IA (después del rediseño, 2026-10-28)
+
+No entran en el prompt del rediseño. Se construyen después, una por una y con aprobación.
+Proveedor actual: Gemini capa gratis vía Edge Function (`supabase/functions/npc-mission`,
+secrets `GEMINI_API_KEY` / `GEMINI_MODEL`).
+
+**Reglas para toda función con IA**
+- La IA solo **escribe y sugiere**; nunca decide XP, Monedas ni vida (anti-trampa, CLAUDE.md §8).
+- El usuario confirma lo que propone. Si la IA falla, la app sigue con sus reglas y avisa sin culpa.
+- Una llamada por acción del usuario; nada en segundo plano ni reintentos en bucle.
+- **Sin costos:** solo capa gratis sin facturación (si se agota, responde 429 y se avisa).
+- **Privacidad:** en la capa gratis Google puede usar el texto para entrenar → enviar solo lo
+  necesario (nunca correo, id ni datos personales) y avisarlo en la UI.
+
+**Prioridad 1 · Documentos de contexto del NPC** (p. ej. el plan de la asignatura para un NPC de programación móvil)
+- El esquema ya lo prevé: `resources.npc_id` + `file_url` (CLAUDE.md glosario: «documento de contexto en `resources`»).
+- Subida: PDF o texto, máx. 10 MB, a un bucket privado de **Supabase Storage** con RLS por usuario
+  (ruta `<user_id>/<npc_id>/…`). Fila en `resources` con `npc_id`.
+- Al subir, **una sola vez**, una Edge Function pide a Gemini un resumen útil (temas, unidades,
+  fechas, entregas, ~1–2 k tokens) y lo guarda (columna nueva, p. ej. `resources.ai_summary`).
+- `npc-mission` añade ese resumen al prompt junto a la noble misión y las últimas 5 misiones,
+  para proponer misiones en el orden de la asignatura.
+- UI: «Adjuntar documento» en la ficha / creación del NPC, lista de documentos con quitar, y el
+  aviso «No subas documentos personales».
+- Necesita: migración (bucket + políticas de Storage + columna), Edge Function nueva o ampliada,
+  datasource/usecase en `tavern`, RF/UC nuevos y pruebas SQL de aislamiento entre usuarios.
+
+**Prioridad 2 · Otras funciones (elegidas por el usuario)**
+| Función | Dónde | Qué hace la IA |
+|---|---|---|
+| Ordenar Brain Dump | Brain Dump (`BrainDumpOrdenar.dc.html`) | Propone si cada idea es tarea, proyecto, meta o referencia; el usuario confirma con el G.T.D. de siempre |
+| Dividir proyecto | Crear proyecto | Propone la lista de tareas iniciales a partir del título y la descripción |
+| Revisar S.M.A.R.T. | Crear meta / Resumen | Marca cada letra «verificada» o «por mejorar» y sugiere cómo reescribirla |
+| Observaciones y consejos | Estadísticas, Boss Fight, Misión actual, Taverna | Las 3 observaciones de la semana, el consejo contra el jefe, el «Ahora no» que propone algo más ligero y el «por qué» de cada misión de NPC |
 
 ## 11. Notas del paso 1 (2026-10-28)
 
