@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Proyecto — Detalle</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Proyecto" heading="{{projName}}" icon="board" back-href="StageProyectos.dc.html" back-label="Volver a Proyectos" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+
+      <sc-if value="{{noArea}}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="background: #FBF0D3; border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E4D00" stroke-width="2.2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px;"><path d="M12 9v4M12 17v.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+            <span style="font-size: 14px; color: #6E4D00; line-height: 1.4;"><strong>Sin área asignada.</strong> La XP de este proyecto no hará subir ninguna skill hasta que elijas un Área.</span>
+          </div>
+          <label style="display: flex; gap: 8px; align-items: center;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Elegir área</span>
+            <select onChange="{{pickArea}}" style="flex-grow: 1; min-height: 48px; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 10px; font-size: 15px; background: #FFFFFF; color: #1E2A22;">
+              <option value="">Elegir área…</option><option>Inglés</option><option>Carrera</option><option>Salud</option><option>Creatividad</option>
+            </select>
+          </label>
+        </div>
+      </sc-if>
+
+      <section aria-label="Resumen del proyecto" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <sc-if value="{{hasArea}}" hint-placeholder-val="{{ true }}"><a href="AreaDetalle.dc.html" style="min-height: 44px; padding: 0 10px; border-radius: 99px; background: #E1F0E6; color: #1F5C39; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">Área · {{area}}</a></sc-if>
+          <a href="BossFight.dc.html" style="min-height: 44px; padding: 0 10px; border-radius: 99px; background: #FBE4DF; color: #A8361F; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">Meta · Inglés B2</a>
+          <span style="min-height: 32px; padding: 0 10px; border-radius: 99px; background: #E7EDE1; color: #3E4A42; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center;">Vence 15 nov</span>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 10px;">
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 800; line-height: 1;">{{pct}}%</span>
+          <span style="font-size: 13px; color: #4E5C52; padding-bottom: 4px;">{{doneCount}} de {{total}} tareas completadas</span>
+        </div>
+        <div role="progressbar" aria-label="Avance del proyecto" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{pct}}" style="height: 12px; border-radius: 99px; background: #E7EDE1; overflow: hidden; display: flex;">
+          <span style="width: {{pctDone}}; background: #2E7D4F; transition: width .4s ease;"></span><span style="width: {{pctProg}}; background: #D9A21B; transition: width .4s ease;"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+          <sc-for list="{{counts}}" as="ct" hint-placeholder-count="3">
+            <div style="background: #F3F6EF; border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 2px;">
+              <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #4E5C52;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: {{ct.radius}}; background: {{ct.dot}};"></span>{{ct.label}}</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 18px;">{{ct.n}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-top: 1px solid #EEF2EA; padding-top: 10px;">
+          <span style="color: #4E5C52;">Al completarlo ganas</span>
+          <span style="font-weight: 700;"><span style="color: #1F5C39;">+120 XP</span> · <span style="color: #6E4D00;">+36 Monedas</span> · <span style="color: #A8361F;">−28 al jefe</span></span>
+        </div>
+      </section>
+
+      <sc-if value="{{hasNext}}" hint-placeholder-val="{{ true }}">
+        <section aria-label="Siguiente acción" style="background: #1F5C39; color: #F3F6EF; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <svg aria-hidden="true" width="36" height="36" viewBox="0 0 48 48" style="flex-shrink: 0;"><ellipse cx="24" cy="30" rx="14" ry="12" fill="#7CC79A"></ellipse><path d="M24 18 C20 8 12 8 12 8 C14 14 18 17 24 18 C30 17 34 14 36 8 C36 8 28 8 24 18Z" fill="#A8E0BE"></path><circle cx="19" cy="29" r="2.4" fill="#1A1F1B"></circle><circle cx="29" cy="29" r="2.4" fill="#1A1F1B"></circle></svg>
+            <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #CFE8D7;">Siguiente acción</span><span style="font-size: 16px; font-weight: 700; line-height: 1.3;">{{nextName}}</span></span>
+          </div>
+          <a href="Mazmorra.dc.html" class="q-press" style="min-height: 48px; border-radius: 14px; background: #F2C66B; color: #1A1F1B; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; box-shadow: 0 3px 0 #A8862F;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4"></path></svg>Iniciar sesión en la Mazmorra</a>
+        </section>
+      </sc-if>
+
+      <section aria-labelledby="sub-t" style="display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="sub-t" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Tareas del proyecto</h2>
+        <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+          <sc-for list="{{tasks}}" as="t" hint-placeholder-count="5">
+            <li style="display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; border-bottom: 1px solid #EEF2EA; background: {{t.rowBg}};">
+              <button type="button" role="checkbox" aria-checked="{{t.checked}}" aria-label="{{t.aria}}" onClick="{{t.toggle}}" style="width: 44px; height: 44px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                <span style="width: 24px; height: 24px; border-radius: 8px; border: 2px solid {{t.boxBorder}}; background: {{t.boxBg}}; display: flex; align-items: center; justify-content: center; color: #FFFFFF;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: {{t.tick}};"><path d="M5 12l5 5 9-10"></path></svg></span>
+              </button>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 15px; color: {{t.fg}}; text-decoration: {{t.strike}};">{{t.name}}</span>
+                <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4E5C52;"><span style="font-weight: 700; padding: 1px 6px; border-radius: 6px; background: {{t.stBg}}; color: {{t.stFg}};">{{t.status}}</span>{{t.when}}</span>
+              </span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #1F5C39;">+{{t.xp}}</span>
+            </li>
+          </sc-for>
+        </ul>
+        <form onSubmit="{{addTask}}" style="display: flex; gap: 8px;">
+          <label style="flex-grow: 1; display: flex;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Nueva tarea del proyecto</span>
+            <input value="{{draft}}" onInput="{{setDraft}}" placeholder="Añadir una tarea…" style="width: 100%; min-height: 48px; border: 1.5px dashed #2E7D4F; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+          </label>
+          <button type="submit" aria-label="Añadir tarea" disabled="{{noDraft}}" style="width: 48px; height: 48px; border: none; border-radius: 14px; background: {{addBg}}; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+        </form>
+        <span style="font-size: 12px; color: #4E5C52;">RPGenie calcula la XP de cada tarea nueva al añadirla.</span>
+      </section>
+
+      <button type="button" onClick="{{archive}}" style="min-height: 48px; border-radius: 14px; border: 1.5px solid #C9D3C2; background: transparent; color: #3E4A42; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"></path></svg>Mover al Archivo</button>
+    </div>
+  </main>
+
+  <sc-if value="{{complete}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.7); display: flex; align-items: center; justify-content: center; padding: 24px;">
+      <div role="dialog" aria-modal="true" aria-labelledby="pc-t" class="q-pop" style="background: #FFFFFF; border-radius: 24px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; width: 100%;">
+        <svg aria-hidden="true" width="64" height="64" viewBox="0 0 24 24" fill="#D9A21B" stroke="#6E4D00" stroke-width="1.2" stroke-linejoin="round"><path d="M3 7h6l2 2h10v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><path d="M9 14l2 2 4-4" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"></path></svg>
+        <h2 id="pc-t" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800;">¡Proyecto completado!</h2>
+        <p style="margin: 0; font-size: 15px; color: #4E5C52; line-height: 1.45;">+120 XP para tu skill {{area}} y el jefe «Inglés B2» pierde 28 de vida.</p>
+        <a href="BossFight.dc.html" class="q-press" style="margin-top: 6px; min-height: 52px; width: 100%; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 0 #1F5C39;">Ver al jefe herido</a>
+        <button type="button" onClick="{{closeComplete}}" style="min-height: 44px; border: none; background: transparent; color: #1F5C39; font-size: 14px; font-weight: 700; cursor: pointer;">Seguir aquí</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 84px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22);">{{toast}}</div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"noArea":{"editor":"boolean","default":false,"section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const na = props.noArea === true || props.noArea === 'true';
+    this.state = {
+      area: na ? '' : 'Inglés', draft: '', toast: '', complete: false, shown: false,
+      tasks: [
+        { name: 'Elegir el tema de los 4 primeros episodios', st: 'done', when: '2 oct', xp: 15 },
+        { name: 'Escribir el guion del episodio 1', st: 'done', when: '6 oct', xp: 20 },
+        { name: 'Grabar el episodio 1', st: 'prog', when: 'Hoy', xp: 25 },
+        { name: 'Editar el audio y añadir música', st: 'todo', when: 'Mañana', xp: 20 },
+        { name: 'Publicar y compartir con 3 amigos', st: 'todo', when: '15 nov', xp: 15 }
+      ]
+    };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.tt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  flash(m) { clearTimeout(this.tt); this.setState({ toast: m }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const total = s.tasks.length;
+    const nDone = s.tasks.filter(t => t.st === 'done').length;
+    const nProg = s.tasks.filter(t => t.st === 'prog').length;
+    const nTodo = total - nDone - nProg;
+    const pct = total ? Math.round(nDone / total * 100) : 0;
+    const look = { done: ['Hecha', '#E1F0E6', '#1F5C39'], prog: ['En curso', '#FBF0D3', '#6E4D00'], todo: ['Sin empezar', '#E7EDE1', '#3E4A42'] };
+    const nextIdx = s.tasks.findIndex(t => t.st !== 'done');
+    const tasks = s.tasks.map((t, i) => {
+      const done = t.st === 'done';
+      return { ...t, status: look[t.st][0], stBg: look[t.st][1], stFg: look[t.st][2], checked: done ? 'true' : 'false',
+        aria: (done ? 'Desmarcar ' : 'Completar ') + t.name, boxBorder: done ? '#2E7D4F' : '#7D8A80', boxBg: done ? '#2E7D4F' : 'transparent', tick: done ? 1 : 0,
+        fg: done ? '#4E5C52' : '#1E2A22', strike: done ? 'line-through' : 'none', rowBg: i === nextIdx ? '#F3F6EF' : 'transparent',
+        toggle: () => {
+          const list = this.state.tasks.map((x, j) => j === i ? { ...x, st: done ? 'todo' : 'done', when: done ? x.when : 'Hoy' } : x);
+          const all = list.every(x => x.st === 'done');
+          this.setState({ tasks: list, complete: all && !this.state.shown, shown: this.state.shown || all });
+          if (!done && !all) this.flash('+' + t.xp + ' XP · ' + (this.state.area || 'sin área'));
+        } };
+    });
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Stage'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? '#1F5C39' : '#4E5C52', weight: on ? 700 : 400, pill: on ? '#E1F0E6' : 'transparent' }; });
+    const noDraft = !s.draft.trim();
+    return {
+      projName: 'Podcast semanal', area: s.area || 'sin área', noArea: !s.area, hasArea: !!s.area,
+      pickArea: (e) => { const v = e.target.value; if (!v) return; this.setState({ area: v }); this.flash('Proyecto vinculado al Área ' + v); },
+      pct, pctDone: pct + '%', pctProg: (total ? Math.round(nProg / total * 100) : 0) + '%', doneCount: nDone, total,
+      counts: [
+        { label: 'Sin empezar', n: nTodo, dot: '#7D8A80', radius: '2px' },
+        { label: 'En curso', n: nProg, dot: '#D9A21B', radius: '99px' },
+        { label: 'Hechas', n: nDone, dot: '#2E7D4F', radius: '3px' }
+      ],
+      hasNext: nextIdx >= 0, nextName: nextIdx >= 0 ? s.tasks[nextIdx].name : '',
+      tasks, draft: s.draft, setDraft: (e) => this.setState({ draft: e.target.value }), noDraft, addBg: noDraft ? '#7D8A80' : '#2E7D4F',
+      addTask: (e) => { if (e && e.preventDefault) e.preventDefault(); const v = this.state.draft.trim(); if (!v) return;
+        const xp = 10 + (v.split(/\s+/).length >= 5 ? 10 : 0);
+        this.setState({ draft: '', shown: false, tasks: [...this.state.tasks, { name: v, st: 'todo', when: 'Sin fecha', xp }] }); this.flash('Tarea añadida · RPGenie estima +' + xp + ' XP'); },
+      archive: () => this.flash('Proyecto movido al Archivo (demo)'),
+      complete: s.complete, closeComplete: () => this.setState({ complete: false }),
+      navItems, toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

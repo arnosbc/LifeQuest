@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Crear hábito</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(18,34,24,.55);"></div>
+  <div role="dialog" aria-modal="true" aria-labelledby="ch-t" class="q-sheet" style="position: absolute; left: 0; right: 0; bottom: 0; top: 44px; background: #FFFFFF; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; overflow: hidden;">
+    <div style="padding: 10px 20px 8px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;">
+      <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <h2 id="ch-t" style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">{{sheetTitle}}</h2>
+        <a href="Habitos.dc.html" aria-label="Cerrar" style="width: 44px; height: 44px; background: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+      </div>
+    </div>
+
+    <sc-if value="{{editing}}" hint-placeholder-val="{{ true }}">
+      <form onSubmit="{{create}}" novalidate style="flex-grow: 1; overflow-y: auto; padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 18px;">
+
+        <div role="radiogroup" aria-label="Tipo de hábito" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+          <sc-for list="{{types}}" as="ty" hint-placeholder-count="2">
+            <button type="button" role="radio" aria-checked="{{ty.sel}}" onClick="{{ty.pick}}" class="q-press" style="text-align: left; border-radius: 16px; border: 2px solid {{ty.border}}; background: {{ty.bg}}; padding: 12px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; color: #1E2A22; box-shadow: 0 3px 0 {{ty.border}};">
+              <span style="display: flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 9px; background: {{ty.iconBg}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="{{ty.icon}}"></path></svg></span><span style="font-size: 15px; font-weight: 700;">{{ty.label}}</span></span>
+              <span style="font-size: 12px; color: #3E4A42; line-height: 1.35;">{{ty.hint}}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <label for="h-name" style="font-size: 14px; font-weight: 700;">{{nameLabel}}</label>
+          <input id="h-name" value="{{name}}" onInput="{{setName}}" maxlength="40" placeholder="{{namePh}}" aria-invalid="{{nameInvalid}}" aria-describedby="h-name-err" style="min-height: 52px; border: 1.5px solid {{nameBorder}}; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+          <sc-if value="{{nameErr}}" hint-placeholder-val="{{ false }}"><span id="h-name-err" style="font-size: 13px; color: #A8361F;">Ponle un nombre a tu hábito.</span></sc-if>
+          <div role="group" aria-label="Ideas" style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{ideas}}" as="id" hint-placeholder-count="4">
+              <button type="button" onClick="{{id.use}}" style="min-height: 44px; padding: 0 12px; border-radius: 99px; border: 1.5px solid #DCE4D4; background: #F3F6EF; color: #3E4A42; font-size: 13px; font-weight: 500; cursor: pointer;; display: inline-flex; align-items: center">{{id.t}}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 700;">Skill / Área
+          <select onChange="{{setSkill}}" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 12px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+            <option selected="{{sk0}}">Salud</option><option selected="{{sk1}}">Inglés</option><option selected="{{sk2}}">Carrera</option><option selected="{{sk3}}">Creatividad</option>
+          </select>
+        </label>
+
+        <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;">
+          <legend style="font-size: 14px; font-weight: 700; padding-bottom: 8px;">{{freqLegend}}</legend>
+          <div role="radiogroup" aria-label="Frecuencia" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+            <sc-for list="{{freqs}}" as="fq" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{fq.sel}}" onClick="{{fq.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{fq.bg}}; color: {{fq.fg}}; font-size: 13px; font-weight: 700; box-shadow: {{fq.shadow}}; cursor: pointer;">{{fq.label}}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{isDays}}" hint-placeholder-val="{{ false }}">
+            <div role="group" aria-label="Días de la semana" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;">
+              <sc-for list="{{days}}" as="dy" hint-placeholder-count="7">
+                <button type="button" aria-pressed="{{dy.sel}}" aria-label="{{dy.full}}" onClick="{{dy.toggle}}" style="height: 44px; border-radius: 12px; border: 1.5px solid {{dy.border}}; background: {{dy.bg}}; color: {{dy.fg}}; font-size: 14px; font-weight: 700; cursor: pointer;">{{dy.d}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{isTimes}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button type="button" onClick="{{dec}}" aria-label="Una vez menos" style="width: 48px; height: 48px; border: none; border-radius: 14px; background: #F3F6EF; color: #1E2A22; font-size: 22px; cursor: pointer;">−</button>
+              <span aria-live="polite" style="flex-grow: 1; text-align: center; font-size: 15px;"><span style="font-family: 'DM Mono', monospace; font-size: 22px;">{{times}}</span> veces por semana</span>
+              <button type="button" onClick="{{inc}}" aria-label="Una vez más" style="width: 48px; height: 48px; border: none; border-radius: 14px; background: #F3F6EF; color: #1E2A22; font-size: 22px; cursor: pointer;">+</button>
+            </div>
+          </sc-if>
+        </fieldset>
+
+        <sc-if value="{{isBad}}" hint-placeholder-val="{{ false }}">
+          <div role="radiogroup" aria-labelledby="sev-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <span id="sev-l" style="font-size: 14px; font-weight: 700;">¿Cuánto te afecta?</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+              <sc-for list="{{sevs}}" as="sv" hint-placeholder-count="3">
+                <button type="button" role="radio" aria-checked="{{sv.sel}}" onClick="{{sv.pick}}" style="min-height: 64px; border-radius: 14px; border: 2px solid {{sv.border}}; background: {{sv.bg}}; color: #1E2A22; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer;"><span style="font-size: 14px; font-weight: 700;">{{sv.label}}</span><span style="font-size: 12px; color: #A8361F;">{{sv.hp}}</span></button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="background: #F3F6EF; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span id="rem-l" style="font-size: 15px; font-weight: 700;">Recordatorio</span><span style="font-size: 12px; color: #4E5C52;">{{remHint}}</span></span>
+            <button type="button" role="switch" aria-checked="{{remOn}}" aria-labelledby="rem-l" onClick="{{toggleRem}}" style="width: 52px; height: 32px; border: none; border-radius: 99px; background: {{remTrack}}; padding: 3px; display: flex; justify-content: {{remJustify}}; cursor: pointer; flex-shrink: 0;"><span style="width: 26px; height: 26px; border-radius: 99px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,.25);"></span></button>
+          </div>
+          <sc-if value="{{rem}}" hint-placeholder-val="{{ true }}">
+            <label style="display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px;">Hora<input type="time" value="{{remTime}}" onInput="{{setTime}}" style="height: 46px; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 10px; font-size: 15px; background: #FFFFFF; color: #1E2A22;"></label>
+          </sc-if>
+        </div>
+
+        <div aria-live="polite" style="display: flex; gap: 10px; align-items: center; border-radius: 16px; padding: 12px; background: {{estBg}};">
+          <svg aria-hidden="true" width="36" height="36" viewBox="0 0 48 48" style="flex-shrink: 0;"><ellipse cx="24" cy="30" rx="14" ry="12" fill="#2E7D4F"></ellipse><path d="M24 18 C20 8 12 8 12 8 C14 14 18 17 24 18 C30 17 34 14 36 8 C36 8 28 8 24 18Z" fill="#3F9563"></path><circle cx="19" cy="29" r="2.4" fill="#FFFFFF"></circle><circle cx="29" cy="29" r="2.4" fill="#FFFFFF"></circle></svg>
+          <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; font-weight: 700; color: {{estInk}};">RPGenie estima</span><span style="font-size: 15px; font-weight: 700; color: {{estInk}};">{{estimate}}</span><span style="font-size: 12px; color: {{estInk}};">{{estWhy}}</span></span>
+        </div>
+
+        <button type="submit" class="q-press" style="min-height: 56px; border: none; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; font-size: 17px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">{{cta}}</button>
+      </form>
+    </sc-if>
+
+    <sc-if value="{{created}}" hint-placeholder-val="{{ false }}">
+      <div class="q-pop" style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center;">
+        <svg aria-hidden="true" width="96" height="96" viewBox="0 0 120 120" class="q-bob"><path d="M60 40 C50 14 26 14 26 14 C30 30 42 38 60 40 C78 38 90 30 94 14 C94 14 70 14 60 40Z" fill="#7CC79A"></path><ellipse cx="60" cy="76" rx="38" ry="34" fill="#3F9563"></ellipse><circle cx="46" cy="72" r="7" fill="#FFFFFF"></circle><circle cx="74" cy="72" r="7" fill="#FFFFFF"></circle><circle cx="47" cy="73" r="3.4" fill="#1A1F1B"></circle><circle cx="75" cy="73" r="3.4" fill="#1A1F1B"></circle><path d="M50 88 Q60 96 70 88" fill="none" stroke="#1A1F1B" stroke-width="3" stroke-linecap="round"></path></svg>
+        <h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800;">{{doneTitle}}</h3>
+        <div style="width: 100%; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 12px 14px; display: flex; align-items: center; gap: 12px; text-align: left;">
+          <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 12px; background: {{doneTint}}; color: {{doneInk}}; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="{{doneIcon}}"></path></svg></span>
+          <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{finalName}}</span><span style="font-size: 12px; color: #4E5C52;">{{summary}}</span></span>
+        </div>
+        <p style="margin: 0; font-size: 14px; color: #4E5C52; line-height: 1.45;">{{doneText}}</p>
+        <a href="Habitos.dc.html" class="q-press" style="width: 100%; min-height: 52px; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 0 #1F5C39;">Ver mis hábitos</a>
+        <button type="button" onClick="{{again}}" style="min-height: 44px; border: none; background: transparent; color: #1F5C39; font-size: 14px; font-weight: 700; cursor: pointer;">Crear otro hábito</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["bueno","malo"],"default":"bueno","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { kind: props.kind || 'bueno', name: '', skill: 0, freq: 'diario', days: [true, false, true, false, true, false, false], times: 3, sev: 1, rem: true, time: '08:00', tried: false, created: false };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const bad = s.kind === 'malo';
+    const skills = ['Salud', 'Inglés', 'Carrera', 'Creatividad'];
+    const types = [
+      { id: 'bueno', label: 'Bueno', hint: 'Lo quieres hacer más. Te da XP y racha.', icon: 'M12 5v14M5 12h14', on: '#2E7D4F', tint: '#E1F0E6' },
+      { id: 'malo', label: 'Malo', hint: 'Lo quieres dejar. Si cae, pierdes vida.', icon: 'M5 12h14', on: '#A8361F', tint: '#FBE4DF' }
+    ].map(t => { const on = s.kind === t.id; return { ...t, sel: on ? 'true' : 'false', border: on ? t.on : '#DCE4D4', bg: on ? t.tint : '#FFFFFF', iconBg: t.on, pick: () => this.setState({ kind: t.id, name: '' }) }; });
+    const ideaList = bad ? ['Revisar el móvil en la cama', 'Comer comida rápida', 'Dejar tareas para mañana', 'Saltarme el desayuno'] : ['Beber 2 L de agua', 'Leer 10 páginas', 'Caminar 20 minutos', 'Meditar 5 minutos'];
+    const ideas = ideaList.map(t => ({ t, use: () => this.setState({ name: t }) }));
+    const freqDefs = bad ? [['diario', 'Cada día'], ['dias', 'Ciertos días'], ['veces', 'Máx. por semana']] : [['diario', 'Cada día'], ['dias', 'Ciertos días'], ['veces', 'X por semana']];
+    const freqs = freqDefs.map(([id, label]) => { const on = s.freq === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => this.setState({ freq: id }) }; });
+    const dn = [['L', 'Lunes'], ['M', 'Martes'], ['X', 'Miércoles'], ['J', 'Jueves'], ['V', 'Viernes'], ['S', 'Sábado'], ['D', 'Domingo']];
+    const days = dn.map(([d, full], i) => { const on = s.days[i]; return { d, full, sel: on ? 'true' : 'false', bg: on ? '#2E7D4F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#2E7D4F' : '#C9D3C2', toggle: () => { const a = [...this.state.days]; a[i] = !a[i]; if (a.some(Boolean)) this.setState({ days: a }); } }; });
+    const sevDefs = [['Leve', 3], ['Media', 5], ['Alta', 8]];
+    const sevs = sevDefs.map(([label, hp], i) => { const on = s.sev === i; return { label, hp: '−' + hp + ' vida', sel: on ? 'true' : 'false', border: on ? '#A8361F' : '#DCE4D4', bg: on ? '#FBE4DF' : '#FFFFFF', pick: () => this.setState({ sev: i }) }; });
+    const perWeek = s.freq === 'diario' ? 7 : (s.freq === 'dias' ? s.days.filter(Boolean).length : s.times);
+    const xp = 5 + (perWeek <= 3 ? 5 : 0) + (s.name.trim().split(/\s+/).length >= 3 ? 3 : 0);
+    const hp = sevDefs[s.sev][1];
+    const freqText = s.freq === 'diario' ? 'cada día' : (s.freq === 'dias' ? dn.filter((_, i) => s.days[i]).map(x => x[0]).join(' · ') : (bad ? 'máx. ' : '') + s.times + ' veces por semana');
+    const nm = s.name.trim();
+    const nameErr = s.tried && !nm;
+    return {
+      sheetTitle: bad ? 'Nuevo hábito a dejar' : 'Nuevo hábito', editing: !s.created, created: s.created,
+      types, ideas, isBad: bad,
+      nameLabel: bad ? '¿Qué quieres dejar de hacer?' : '¿Qué quieres hacer?', namePh: bad ? 'Ej.: Revisar el móvil en la cama' : 'Ej.: Leer 10 páginas',
+      name: s.name, setName: (e) => this.setState({ name: e.target.value }), nameErr, nameInvalid: nameErr ? 'true' : 'false', nameBorder: nameErr ? '#A8361F' : '#C9D3C2',
+      setSkill: (e) => this.setState({ skill: e.target.selectedIndex }), sk0: s.skill === 0, sk1: s.skill === 1, sk2: s.skill === 2, sk3: s.skill === 3,
+      freqLegend: bad ? '¿Cuándo cuenta?' : '¿Con qué frecuencia?', freqs, isDays: s.freq === 'dias', isTimes: s.freq === 'veces', days, times: s.times,
+      dec: () => this.setState({ times: Math.max(1, this.state.times - 1) }), inc: () => this.setState({ times: Math.min(6, this.state.times + 1) }),
+      sevs,
+      rem: s.rem, remOn: s.rem ? 'true' : 'false', remTrack: s.rem ? '#2E7D4F' : '#7D8A80', remJustify: s.rem ? 'flex-end' : 'flex-start',
+      toggleRem: () => this.setState({ rem: !this.state.rem }), remTime: s.time, setTime: (e) => this.setState({ time: e.target.value }),
+      remHint: bad ? 'Un aviso amable en tu momento de riesgo' : 'Un aviso para no olvidarlo',
+      estBg: bad ? '#FBE4DF' : '#E1F0E6', estInk: bad ? '#A8361F' : '#1F5C39',
+      estimate: bad ? '−' + hp + ' de vida si cae · +2 XP por cada día limpio' : '+' + xp + ' XP y +' + Math.round(xp * 0.3) + ' Monedas por día cumplido',
+      estWhy: bad ? 'Según cuánto te afecta. Puedes recuperarla en el Hotel.' : (perWeek <= 3 ? 'Pocas veces por semana: cada una vale más.' : 'Hábito frecuente: pequeño pero constante.'),
+      cta: bad ? 'Crear hábito a dejar' : 'Crear hábito',
+      create: (e) => { if (e && e.preventDefault) e.preventDefault(); if (!nm) { this.setState({ tried: true }); return; } this.setState({ created: true }); },
+      finalName: nm, summary: skills[s.skill] + ' · ' + freqText + (s.rem ? ' · aviso ' + s.time : ''),
+      doneTitle: bad ? '¡Hábito bajo vigilancia!' : '¡Nuevo hábito en tu ritual!',
+      doneText: bad ? 'Cada día limpio suma a tu racha. Si un día cae, márcalo con honestidad: no hay culpa, solo un reinicio.' : 'Aparecerá en tu Ritual de hoy. Cada día cumplido alimenta tu racha y tu skill ' + skills[s.skill] + '.',
+      doneTint: bad ? '#FBE4DF' : '#E1F0E6', doneInk: bad ? '#A8361F' : '#1F5C39', doneIcon: bad ? 'M5 12h14' : 'M12 5v14M5 12h14',
+      again: () => this.setState({ created: false, name: '', tried: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

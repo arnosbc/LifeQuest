@@ -53,6 +53,7 @@ void main() {
     late MockGetTavernBoard getBoard;
     late MockAcceptNpcMission accept;
     late MockCompleteNpcMission complete;
+    late MockSuggestNpcMission suggest;
 
     setUpAll(() {
       registerFallbackValue(const NoParams());
@@ -65,12 +66,14 @@ void main() {
       getBoard = MockGetTavernBoard();
       accept = MockAcceptNpcMission();
       complete = MockCompleteNpcMission();
+      suggest = MockSuggestNpcMission();
       when(() => getBoard(any())).thenAnswer((_) async => const Right(board));
     });
 
     TavernBloc build() => TavernBloc(
       getBoard: getBoard,
       createNpc: MockCreateNpc(),
+      suggestMission: suggest,
       acceptMission: accept,
       completeMission: complete,
       renameNpc: MockRenameNpc(),
@@ -96,6 +99,46 @@ void main() {
         () =>
             accept(const AcceptNpcMissionParams(npcId: 'n1', title: 'Correr')),
       ).called(1),
+    );
+
+    blocTest<TavernBloc, TavernState>(
+      'pedir misión: RPGenie la redacta y se acepta sola',
+      setUp: () {
+        when(
+          () => suggest('n1'),
+        ).thenAnswer((_) async => const Right('Diseña 3 logos'));
+        when(() => accept(any())).thenAnswer((_) async => const Right(unit));
+      },
+      build: build,
+      seed: () => const TavernSuccess(board),
+      act: (bloc) => bloc.add(const NpcMissionRequested(vera)),
+      expect: () => [
+        const TavernSuccess(board, busyKey: 'n1'),
+        const TavernSuccess(
+          board,
+          message: 'Nueva misión de Vera: Diseña 3 logos',
+        ),
+      ],
+      verify: (_) => verify(
+        () => accept(
+          const AcceptNpcMissionParams(npcId: 'n1', title: 'Diseña 3 logos'),
+        ),
+      ).called(1),
+    );
+
+    blocTest<TavernBloc, TavernState>(
+      'si RPGenie falla, avisa y no crea ni cobra nada',
+      setUp: () => when(() => suggest('n1')).thenAnswer(
+        (_) async => const Left(ServerFailure('sin cupo')),
+      ),
+      build: build,
+      seed: () => const TavernSuccess(board),
+      act: (bloc) => bloc.add(const NpcMissionRequested(vera)),
+      expect: () => [
+        const TavernSuccess(board, busyKey: 'n1'),
+        const TavernSuccess(board, message: 'sin cupo'),
+      ],
+      verify: (_) => verifyNever(() => accept(any())),
     );
 
     blocTest<TavernBloc, TavernState>(

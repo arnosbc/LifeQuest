@@ -12,6 +12,7 @@ import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
 
 part 'tavern_event.dart';
 part 'tavern_state.dart';
@@ -20,6 +21,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
   TavernBloc({
     required this._getBoard,
     required this._createNpc,
+    required this._suggestMission,
     required this._acceptMission,
     required this._completeMission,
     required this._renameNpc,
@@ -36,6 +38,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
       ),
       transformer: droppable(),
     );
+    on<NpcMissionRequested>(_onMissionRequested, transformer: droppable());
     on<NpcMissionAccepted>(
       (e, emit) => _act(
         emit,
@@ -78,6 +81,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
 
   final GetTavernBoard _getBoard;
   final CreateNpc _createNpc;
+  final SuggestNpcMission _suggestMission;
   final AcceptNpcMission _acceptMission;
   final CompleteNpcMission _completeMission;
   final RenameNpc _renameNpc;
@@ -101,6 +105,39 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
             : TavernFailure(failure.message),
         TavernSuccess.new,
       ),
+    );
+  }
+
+  /// RPGenie redacta la misión y se acepta (cobra si no es gratis). Si la IA
+  /// falla no se crea nada ni se cobra: solo se avisa.
+  Future<void> _onMissionRequested(
+    NpcMissionRequested event,
+    Emitter<TavernState> emit,
+  ) async {
+    final current = state;
+    if (current is! TavernSuccess) return;
+    final npc = event.npc;
+    emit(TavernSuccess(current.board, busyKey: npc.id));
+    final suggested = await _suggestMission(npc.id);
+    final title = suggested.getOrElse((_) => null);
+    if (title == null) {
+      emit(
+        TavernSuccess(
+          current.board,
+          message: suggested.match(
+            (failure) => failure.message,
+            (_) => 'RPGenie no logró idear una misión ahora. '
+                'Inténtalo en un rato.',
+          ),
+        ),
+      );
+      return;
+    }
+    await _act(
+      emit,
+      npc.id,
+      () => _acceptMission(AcceptNpcMissionParams(npcId: npc.id, title: title)),
+      'Nueva misión de ${npc.name}: $title',
     );
   }
 

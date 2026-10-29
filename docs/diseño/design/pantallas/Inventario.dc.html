@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inventario y logros</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Inventario" heading="Cofre del héroe" icon="crown" back-href="Perfil.dc.html" back-label="Volver al perfil" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+
+      <div role="tablist" aria-label="Contenido del cofre" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+          <button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{tb.bg}}; color: {{tb.fg}}; font-size: 14px; font-weight: 700; box-shadow: {{tb.shadow}}; cursor: pointer;">{{tb.label}}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{isLogros}}" hint-placeholder-val="{{ true }}">
+        <section role="tabpanel" aria-label="Logros" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; align-items: center; gap: 12px;">
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 800; color: #6E4D00;">{{unlocked}}/{{total}}</span>
+            <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 14px; font-weight: 700;">Logros desbloqueados</span><span role="progressbar" aria-label="Logros desbloqueados" aria-valuemin="0" aria-valuemax="{{total}}" aria-valuenow="{{unlocked}}" style="height: 10px; border-radius: 99px; background: #E7EDE1; overflow: hidden;"><span style="display: block; height: 100%; width: {{pct}}; background: #D9A21B; border-radius: 99px;"></span></span></span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+            <sc-for list="{{badges}}" as="b" hint-placeholder-count="9">
+              <button type="button" onClick="{{b.open}}" aria-label="{{b.aria}}" class="q-press" style="border: none; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 12px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; color: #1E2A22;">
+                <svg aria-hidden="true" width="58" height="64" viewBox="0 0 58 64" style="opacity: {{b.op}};">
+                  <path d="M29 2 L55 17 V47 L29 62 L3 47 V17Z" fill="{{b.fill}}" stroke="{{b.stroke}}" stroke-width="2.5"></path>
+                  <g transform="translate(17 20)" fill="none" stroke="{{b.ink}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{b.icon}}"></path></g>
+                </svg>
+                <span style="font-size: 12px; font-weight: 700; text-align: center; line-height: 1.25;">{{b.name}}</span>
+                <span style="font-size: 11px; color: #4E5C52;">{{b.state}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isObjetos}}" hint-placeholder-val="{{ false }}">
+        <section role="tabpanel" aria-label="Objetos" style="display: flex; flex-direction: column; gap: 14px;">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Consumibles</h2>
+          <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+            <sc-for list="{{items}}" as="it" hint-placeholder-count="2">
+              <li style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #EEF2EA;">
+                <span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 12px; background: #FBF0D3; color: #6E4D00; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg></span>
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{it.name}} <span style="font-family: 'DM Mono', monospace; font-weight: 500; color: #4E5C52;">×{{it.qty}}</span></span><span style="font-size: 12px; color: #4E5C52; line-height: 1.35;">{{it.desc}}</span></span>
+                <button type="button" onClick="{{it.use}}" disabled="{{it.empty}}" aria-label="Usar {{it.name}}" style="min-width: 64px; min-height: 44px; border: none; border-radius: 12px; background: {{it.btnBg}}; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer;">Usar</button>
+              </li>
+            </sc-for>
+          </ul>
+          <a href="Marketplace.dc.html" style="min-height: 44px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #1F5C39;">Conseguir más en el Marketplace</a>
+
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Títulos de prestigio</h2>
+          <p style="margin: -6px 0 0; font-size: 14px; color: #4E5C52;">Se muestran bajo tu nombre en el perfil y en la Taverna.</p>
+          <div role="radiogroup" aria-label="Título activo" style="display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{titles}}" as="ti" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{ti.sel}}" onClick="{{ti.pick}}" disabled="{{ti.locked}}" style="min-height: 56px; padding: 0 14px; border-radius: 16px; border: 2px solid {{ti.border}}; background: #FFFFFF; color: #1E2A22; display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer; opacity: {{ti.op}};">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="{{ti.crown}}" stroke="#6E4D00" stroke-width="1.4" stroke-linejoin="round"><path d="M3 18h18M4 18L3 7l5 4 4-7 4 7 5-4-1 11z"></path></svg>
+                <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{ti.name}}</span><span style="font-size: 12px; color: #4E5C52;">{{ti.from}}</span></span>
+                <span style="font-size: 12px; font-weight: 700; color: #1F5C39;">{{ti.tag}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+    </div>
+  </main>
+
+  <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.55); display: flex; align-items: flex-end;">
+      <div role="dialog" aria-modal="true" aria-labelledby="bd-t" class="q-sheet" style="width: 100%; background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 12px 20px 22px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
+        <span aria-hidden="true" style="width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+        <svg aria-hidden="true" width="84" height="92" viewBox="0 0 58 64" class="q-pop" style="opacity: {{bd.op}};"><path d="M29 2 L55 17 V47 L29 62 L3 47 V17Z" fill="{{bd.fill}}" stroke="{{bd.stroke}}" stroke-width="2.5"></path><g transform="translate(17 20)" fill="none" stroke="{{bd.ink}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{bd.icon}}"></path></g></svg>
+        <h2 id="bd-t" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">{{bd.name}}</h2>
+        <p style="margin: 0; font-size: 15px; color: #3E4A42; line-height: 1.45;">{{bd.req}}</p>
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px;"><span style="font-weight: 700;">Progreso</span><span style="font-family: 'DM Mono', monospace;">{{bd.progText}}</span></div>
+          <div style="height: 10px; border-radius: 99px; background: #E7EDE1; overflow: hidden;"><div style="height: 100%; width: {{bd.progPct}}; background: #2E7D4F; border-radius: 99px;"></div></div>
+        </div>
+        <span style="font-size: 14px; font-weight: 700; color: #6E4D00; background: #FBF0D3; padding: 6px 12px; border-radius: 99px;">Recompensa: {{bd.reward}}</span>
+        <button type="button" onClick="{{closeBadge}}" style="margin-top: 4px; width: 100%; min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; background: #FFFFFF; color: #1E2A22; font-size: 16px; font-weight: 700; cursor: pointer;">Cerrar</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 84px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22);">{{toast}}</div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tab":{"editor":"enum","options":["logros","objetos"],"default":"logros","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: props.tab || 'logros', badge: -1, title: 1, toast: '', items: { pase: 1, siesta: 2 } };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.tt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  flash(m) { clearTimeout(this.tt); this.setState({ toast: m }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const I = {
+      sprout: 'M12 22V12M12 12C12 7 8 5 4 5c0 4 3 7 8 7zM12 12c0-4 3-7 8-7 0 4-3 7-8 7',
+      flame: 'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 3-6 0 2.5 1 4 2.5 4C11.5 9 10 5 12 2z',
+      sword: 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2',
+      book: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11',
+      mug: 'M5 8h11v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2',
+      boss: 'M6 9L4 3l5 3M18 9l2-6-5 3M5 11c0-5 14-5 14 0v8c0 2-2 3-4 2l-3-2-3 2c-2 1-4 0-4-2z',
+      moon: 'M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z',
+      q: 'M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5v.01'
+    };
+    const list = [
+      { name: 'Primer brote', icon: I.sprout, st: 'won', req: 'Completa tu primera misión.', cur: 1, max: 1, reward: '+20 XP' },
+      { name: 'Racha de 7', icon: I.flame, st: 'won', req: 'Mantén una racha de 7 días seguidos.', cur: 7, max: 7, reward: '+50 Monedas' },
+      { name: 'Mazmorrero', icon: I.sword, st: 'won', req: 'Termina 10 sesiones de Deep Working.', cur: 10, max: 10, reward: 'Título «Explorador de mazmorras»' },
+      { name: 'Racha de 30', icon: I.flame, st: 'prog', req: 'Mantén una racha de 30 días seguidos.', cur: 12, max: 30, reward: '+200 Monedas' },
+      { name: 'Bibliotecario', icon: I.book, st: 'prog', req: 'Guarda 25 recursos en la Biblioteca.', cur: 9, max: 25, reward: '+80 XP' },
+      { name: 'Amigo de la Taverna', icon: I.mug, st: 'prog', req: 'Completa 15 misiones de NPC.', cur: 6, max: 15, reward: 'Marco de NPC dorado' },
+      { name: 'Cazajefes', icon: I.boss, st: 'locked', req: 'Derrota a tu primer jefe (cumple una meta).', cur: 0, max: 1, reward: 'Título «Domador de dragones»' },
+      { name: 'Noctámbulo', icon: I.moon, st: 'locked', req: 'Completa una sesión después de las 22:00.', cur: 0, max: 1, reward: '+30 XP' },
+      { name: '???', icon: I.q, st: 'hidden', req: 'Logro secreto. Sigue explorando el reino para descubrirlo.', cur: 0, max: 1, reward: 'Sorpresa' }
+    ];
+    const look = {
+      won: { fill: '#FBF0D3', stroke: '#D9A21B', ink: '#6E4D00', op: 1, label: 'Conseguido' },
+      prog: { fill: '#E1F0E6', stroke: '#2E7D4F', ink: '#1F5C39', op: 1, label: 'En curso' },
+      locked: { fill: '#E7EDE1', stroke: '#7D8A80', ink: '#4E5C52', op: 0.75, label: 'Bloqueado' },
+      hidden: { fill: '#E7EDE1', stroke: '#7D8A80', ink: '#4E5C52', op: 0.75, label: 'Secreto' }
+    };
+    const badges = list.map((b, i) => {
+      const L = look[b.st];
+      const prog = b.st === 'prog' ? b.cur + '/' + b.max : L.label;
+      return { ...b, ...L, state: prog, aria: b.name + ', ' + L.label + (b.st === 'prog' ? ', ' + b.cur + ' de ' + b.max : ''),
+        progText: b.cur + ' / ' + b.max, progPct: Math.round(b.cur / b.max * 100) + '%', open: () => this.setState({ badge: i }) };
+    });
+    const unlocked = list.filter(b => b.st === 'won').length;
+    const tabs = [['logros', 'Logros'], ['objetos', 'Objetos']].map(([id, label]) => { const on = s.tab === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => this.setState({ tab: id }) }; });
+    const defs = [
+      { id: 'pase', name: 'Pase de Recuperación', icon: 'M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4zM10 7v12', desc: 'Protege tu racha si fallas un día.', msg: 'Pase activado: tu racha está protegida hoy.' },
+      { id: 'siesta', name: 'Siesta reparadora', icon: 'M3 18v-6h18v6M3 14h18M7 12V9h4v3', desc: '+10 de vida al usarla.', msg: '¡Descansaste! +10 de vida.' }
+    ];
+    const items = defs.map(d => { const q = s.items[d.id]; return { ...d, qty: q, empty: q <= 0, btnBg: q <= 0 ? '#7D8A80' : '#2E7D4F',
+      use: () => { if (this.state.items[d.id] <= 0) return; this.setState({ items: { ...this.state.items, [d.id]: this.state.items[d.id] - 1 } }); this.flash(d.msg); } }; });
+    const tdefs = [
+      { name: 'Aprendiz del bosque', from: 'Por llegar a nivel 5' },
+      { name: 'Explorador de mazmorras', from: 'Logro «Mazmorrero»' },
+      { name: 'Domador de dragones', from: 'Derrota a tu primer jefe', locked: true }
+    ];
+    const titles = tdefs.map((t, i) => { const on = s.title === i; return { ...t, locked: !!t.locked, sel: on ? 'true' : 'false', border: on ? '#2E7D4F' : '#DCE4D4', crown: t.locked ? '#E7EDE1' : '#D9A21B', op: t.locked ? 0.6 : 1, tag: on ? 'En uso' : (t.locked ? 'Bloqueado' : 'Usar como título'),
+      pick: () => { if (t.locked) return; this.setState({ title: i }); this.flash('Ahora eres «' + t.name + '».'); } }; });
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Perfil'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? '#1F5C39' : '#4E5C52', weight: on ? 700 : 400, pill: on ? '#E1F0E6' : 'transparent' }; });
+    return {
+      tabs, isLogros: s.tab === 'logros', isObjetos: s.tab === 'objetos',
+      badges, unlocked, total: list.length, pct: Math.round(unlocked / list.length * 100) + '%',
+      hasBadge: s.badge >= 0, bd: badges[s.badge >= 0 ? s.badge : 0], closeBadge: () => this.setState({ badge: -1 }),
+      items, titles, navItems, toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -9,8 +9,8 @@
 --    la misión como una tarea real (source = 'npc'). Se completa con
 --    complete_task, que ya paga como 'npc'.
 --
--- shortcut: RPGenie v1 no redacta la misión; el usuario la escribe partiendo
--- de la noble misión del NPC. Generarla cuando exista RPGenie avanzado.
+-- RPGenie sugiere el título con la Edge Function npc-mission (Gemini); el
+-- usuario lo edita o acepta y la misión entra siempre por aquí.
 
 begin;
 

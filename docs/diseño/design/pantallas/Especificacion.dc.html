@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Questly — Especificación para desarrollo</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1240px; box-sizing: border-box; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; padding: 48px 56px 64px; display: flex; flex-direction: column; gap: 32px;">
+  <header style="display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid #DCE4D4; padding-bottom: 24px;">
+    <span style="font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #2C4580;">Entrega a desarrollo · v1.0</span>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: -0.02em;">Especificación para desarrollo</h1>
+    <p style="margin: 0; font-size: 17px; color: #4E5C52; max-width: 860px; line-height: 1.5;">Todo lo necesario para construir la app a partir de este lienzo: mapa de pantallas, medidas, componentes, estados, reglas del juego y resultados de accesibilidad. Los colores y la tipografía están en el tablero «Sistema de diseño» y las fórmulas de Monedas en «Economía del reino».</p>
+  </header>
+
+  <section style="display: flex; flex-direction: column; gap: 14px;">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800;">1 · Mapa de pantallas ({{screenCount}})</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="9">
+        <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 3px; background: {{g.c}};"></span>{{g.name}}</span>
+          <span style="font-size: 12px; color: #4E5C52;">Entrada: {{g.entry}}</span>
+          <ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; font-size: 13px; line-height: 1.4; color: #3E4A42;">
+            <sc-for list="{{g.items}}" as="it" hint-placeholder-count="4"><li>{{it}}</li></sc-for>
+          </ul>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin: 0; font-size: 13px; color: #4E5C52; line-height: 1.5;">Navegación inferior fija de 5 pestañas (Inicio, Stage, Hábitos, Mazmorra, Perfil). El resto se abre desde estas pantallas y vuelve con el botón ‹ de la cabecera. Los pop-ups de creación son hojas inferiores sobre la pantalla actual.</p>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">2 · Medidas de pantalla</h2>
+      <dl style="margin: 0; display: grid; grid-template-columns: 190px 1fr; gap: 8px 14px; font-size: 14px; line-height: 1.4;">
+        <sc-for list="{{layout}}" as="l" hint-placeholder-count="10"><dt style="font-weight: 700;">{{l.k}}</dt><dd style="margin: 0; color: #3E4A42; font-family: {{l.font}};">{{l.v}}</dd></sc-for>
+      </dl>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">3 · Componente Hero (cabecera)</h2>
+      <table style="border-collapse: collapse; font-size: 13px;">
+        <thead><tr><th scope="col" style="text-align: left; padding: 6px 0; border-bottom: 1px solid #DCE4D4; color: #4E5C52;">Prop</th><th scope="col" style="text-align: left; padding: 6px 0; border-bottom: 1px solid #DCE4D4; color: #4E5C52;">Valores</th><th scope="col" style="text-align: left; padding: 6px 0; border-bottom: 1px solid #DCE4D4; color: #4E5C52;">Notas</th></tr></thead>
+        <tbody><sc-for list="{{heroProps}}" as="hp" hint-placeholder-count="8"><tr><td style="padding: 6px 10px 6px 0; border-bottom: 1px solid #EEF2EA; font-family: 'DM Mono', monospace;">{{hp.p}}</td><td style="padding: 6px 10px 6px 0; border-bottom: 1px solid #EEF2EA; font-family: 'DM Mono', monospace; color: #2C4580;">{{hp.v}}</td><td style="padding: 6px 0; border-bottom: 1px solid #EEF2EA; color: #3E4A42;">{{hp.n}}</td></tr></sc-for></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">4 · Estados de interacción</h2>
+    <table style="border-collapse: collapse; font-size: 13px;">
+      <thead><tr><sc-for list="{{stateHead}}" as="h" hint-placeholder-count="6"><th scope="col" style="text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid #DCE4D4; color: #4E5C52;">{{h}}</th></sc-for></tr></thead>
+      <tbody><sc-for list="{{states}}" as="r" hint-placeholder-count="6"><tr><sc-for list="{{r}}" as="cell" hint-placeholder-count="6"><td style="padding: 8px 10px 8px 0; border-bottom: 1px solid #EEF2EA; color: #3E4A42; line-height: 1.4; vertical-align: top;">{{cell}}</td></sc-for></tr></sc-for></tbody>
+    </table>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">5 · Constantes del juego</h2>
+      <pre style="margin: 0; background: #1E2A22; color: #EEF3EC; border-radius: 14px; padding: 16px; font-family: 'DM Mono', monospace; font-size: 12.5px; line-height: 1.6; white-space: pre-wrap;">{{constants}}</pre>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">6 · Datos principales</h2>
+      <sc-for list="{{entities}}" as="en" hint-placeholder-count="8">
+        <div style="display: flex; flex-direction: column; gap: 2px; padding-bottom: 8px; border-bottom: 1px solid #EEF2EA;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 14px; color: #2C4580;">{{en.n}}</span>
+          <span style="font-size: 13px; color: #3E4A42; line-height: 1.45;">{{en.f}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">7 · Revisión de accesibilidad (WCAG 2.1 AA)</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
+      <sc-for list="{{audit}}" as="a" hint-placeholder-count="4">
+        <div style="background: {{a.bg}}; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800; color: {{a.ink}};">{{a.big}}</span>
+          <span style="font-size: 14px; font-weight: 700; color: {{a.ink}};">{{a.t}}</span>
+          <span style="font-size: 12px; color: {{a.ink}}; line-height: 1.4;">{{a.d}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; line-height: 1.5; color: #3E4A42;">
+      <sc-for list="{{auditNotes}}" as="an" hint-placeholder-count="6"><li>{{an}}</li></sc-for>
+    </ul>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">8 · Casos límite</h2>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; line-height: 1.5;">
+        <sc-for list="{{edges}}" as="e" hint-placeholder-count="8"><li>{{e}}</li></sc-for>
+      </ul>
+    </div>
+    <div style="background: #FBF0D3; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; color: #6E4D00;">9 · Decisiones por confirmar</h2>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; line-height: 1.5; color: #6E4D00;">
+        <sc-for list="{{open}}" as="o" hint-placeholder-count="6"><li>{{o}}</li></sc-for>
+      </ul>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":3000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const groups = [
+      { name: 'Acceso y primeros pasos', c: '#2E7D4F', entry: 'abrir la app sin sesión', items: ['Iniciar sesión · Registrarse · Recuperar contraseña', 'Onboarding (5 pasos)', 'Cerrar sesión (Configuración)'] },
+      { name: 'Inicio', c: '#2E7D4F', entry: 'pestaña Inicio', items: ['Personaje, misión principal, Taverna, Brain Dump, Boss', 'Campana → Avisos', '¿Por qué esta? → Misión actual de RPGenie', 'Momentos: subida de nivel, ¿Cómo funciona? XP / Vida'] },
+      { name: 'Stage · P.A.R.A.', c: '#3C5BA8', entry: 'pestaña Stage', items: ['Hoy · Calendario · Biblioteca', 'Proyectos → Detalle de Proyecto', 'Metas · Áreas → Detalle de Área · Recursos', 'Eventos · Archivo'] },
+      { name: 'Crear (hojas)', c: '#3C5BA8', entry: 'botón + de Stage e Inicio', items: ['Menú · Tarea · Proyecto', 'Meta S.M.A.R.T. + Resumen', 'Diagnóstico GTD', 'Brain Dump → Ordenar'] },
+      { name: 'Hábitos', c: '#E0573F', entry: 'pestaña Hábitos', items: ['Buenos / Malos, ritual, mapa de calor', 'Crear hábito (bueno / malo)'] },
+      { name: 'Mazmorra (Deep Working)', c: '#1E2A22', entry: 'pestaña Mazmorra', items: ['Preparar incursión', 'Llenar la mochila (selector)', 'Sesión en curso + resumen'] },
+      { name: 'Perfil', c: '#D9A21B', entry: 'pestaña Perfil', items: ['Estadísticas (semana / mes)', 'Vision Board · Inventario y logros', 'Marketplace (Hotel, Mercado, Refugio, Compras)', 'Diario · Configuración'] },
+      { name: 'Metas en combate', c: '#E0573F', entry: 'Boss del momento (Inicio)', items: ['Boss Fight', 'El jefe escapó (estado)'] },
+      { name: 'Taverna', c: '#D9A21B', entry: 'Inicio o Perfil', items: ['Salón de NPCs · Ficha del NPC', 'Crear NPC (4 pasos)'] }
+    ];
+    return {
+      screenCount: '60 tableros', groups,
+      layout: [
+        { k: 'Marco', v: '390 × 844 px (iPhone 14/15); fluido de 360 a 430 px', font: "'DM Sans', sans-serif" },
+        { k: 'Márgenes laterales', v: '20 px', font: "'DM Mono', monospace" },
+        { k: 'Separación entre bloques', v: '16 px (14 en listas densas)', font: "'DM Mono', monospace" },
+        { k: 'Cabecera Hero', v: '156 px de alto, esquinas inferiores 26 px', font: "'DM Mono', monospace" },
+        { k: 'Navegación inferior', v: '70 px + zona segura; 5 pestañas de 56 px', font: "'DM Mono', monospace" },
+        { k: 'Tarjeta', v: 'radio 20 · padding 14 · borde 1 + sombra sólida 4', font: "'DM Mono', monospace" },
+        { k: 'Hoja inferior', v: 'radio 24 arriba · tirador 40 × 5 · máx. 80–90 % alto', font: "'DM Mono', monospace" },
+        { k: 'Diálogo centrado', v: 'margen 24 · radio 24 · fondo rgba(18,34,24,.6)', font: "'DM Mono', monospace" },
+        { k: 'Toast', v: 'a 84 px del borde inferior · 2,2 s · role=status', font: "'DM Mono', monospace" },
+        { k: 'Zona táctil mínima', v: '44 × 44 px (botones principales 52–56)', font: "'DM Mono', monospace" }
+      ],
+      heroProps: [
+        { p: 'kicker', v: 'texto', n: 'Línea pequeña en mayúsculas sobre el título.' },
+        { p: 'heading', v: 'texto', n: 'Título de la pantalla, máx. 2 líneas.' },
+        { p: 'icon', v: 'sword · home · board · leaf · user · book · gear · mug · flame · coin · crown · star · boss · inbox · calendar · archive', n: 'Icono del kicker.' },
+        { p: 'tone', v: 'forest · river · ember · gold · night', n: 'Sale del tema; night = modo oscuro.' },
+        { p: 'backHref / backLabel', v: 'ruta · texto', n: 'Si existe, muestra ‹ y el kicker baja.' },
+        { p: 'actionHref / actionLabel', v: 'ruta · texto', n: 'Botón de 44 px a la derecha.' },
+        { p: 'actionIcon', v: 'plus · gear · edit · bell', n: 'Icono del botón de acción.' },
+        { p: 'badge', v: 'texto corto', n: 'Contador sobre el botón (avisos sin leer).' }
+      ],
+      stateHead: ['Elemento', 'Normal', 'Pulsado', 'Foco (teclado)', 'Desactivado', 'Cargando / error'],
+      states: [
+        ['Botón principal', 'acento + sombra 4 px', 'baja 3 px, sin sombra (80 ms)', 'anillo 3 px #3C5BA8, separación 2', '#7D8A80 + texto que explica', 'texto «…ando» o RPGenie pensando'],
+        ['Tarjeta tocable', 'blanco + sombra sólida', 'baja 3 px', 'anillo de foco', '—', 'esqueleto con la forma'],
+        ['Campo', 'borde #C9D3C2', '—', 'anillo de foco', 'fondo pista', 'borde #A8361F + mensaje debajo'],
+        ['Pestaña / filtro', 'transparente', '—', 'anillo', '—', '—'],
+        ['Interruptor', 'acento / #7D8A80', '—', 'anillo', 'opacidad 50 %', '—'],
+        ['Fila de tarea', 'casilla vacía', 'casilla llena + «+XP» flotante', 'anillo', 'tachada', 'deshacer en toast']
+      ],
+      constants: 'COIN_RATE        = 0.30   // Monedas por XP\nDAILY_FULL       = 50     // Monedas a ritmo completo\nDAILY_HALF       = 25     // siguientes, a la mitad\nWALLET_CAP(lvl)  = min(400 + 25*lvl, 1000)\nXP_TO_LEVEL(l)   = 100 * l^1.5\nTASK_XP          = 10..40 // estimado por RPGenie\nMIN_TASK_AGE     = 2 min  // menos: XP mínima, 0 Monedas\nMAX_TASKS_COINS  = 15 / día\nHP_WEAK          = 30     // debajo: −25 % XP\nHP_REGEN_HABIT   = +4 / día (+1 por nivel de Huerto)\nHP_LOSS          = malo 3|5|8 · vencida 5 · día perdido 5\nDIFF_XP          = fácil 1.2 · normal 1 · difícil 0.85\nDIFF_HP_LOSS     = fácil 0.75 · normal 1 · difícil 1.25\nSTREAK_GRACE     = 48 h\nREFUGIO_COST(n)  = round5(120 * 1.35^n)\nNPC_FREE_COOLDOWN= 3 h · extra 15 Monedas',
+      entities: [
+        { n: 'Usuario', f: 'nombre, correo, emblema, nivel, XP, Monedas, vida, racha, dificultad, tema, modo, Tesoro.' },
+        { n: 'Área (skill)', f: 'nombre, color, nivel, XP. Es la misma entidad en Stage y en el Perfil.' },
+        { n: 'Tarea', f: 'título, área, prioridad, fecha, vínculo (proyecto | meta | ninguno), XP estimada, estado. Sin tiempo estimado.' },
+        { n: 'Proyecto', f: 'título, área, meta opcional, fecha límite, tareas[], estado, archivado.' },
+        { n: 'Meta', f: 'título, área, respuestas S.M.A.R.T., fecha, vida del jefe, pilar del Vision Board.' },
+        { n: 'Hábito', f: 'tipo (bueno | malo), nombre, área, frecuencia, gravedad, recordatorio, historial diario.' },
+        { n: 'Evento · Recurso', f: 'evento: fecha, hora, prioridad, contacto, área. Recurso: título, enlace, área.' },
+        { n: 'NPC · Misión', f: 'NPC: forma, color, papel, frecuencia, enfoque. Misión: texto, motivo, XP, Monedas, caducidad.' },
+        { n: 'Compra · Objeto', f: 'catálogo fijo (precio, límite mensual), inventario del usuario, mejoras del Refugio.' },
+        { n: 'Registro (Bitácora)', f: 'evento de juego con fecha, origen, recompensa o penalización. Fuente de Estadísticas.' }
+      ],
+      audit: [
+        { big: '0', t: 'Fallos de contraste', d: 'Texto revisado en claro y oscuro; los 2 casos en oscuro ya se corrigieron.', bg: '#E1F0E6', ink: '#1F5C39' },
+        { big: '13 → 0', t: 'Zonas táctiles pequeñas', d: 'Enlaces y botones de 24–40 px subidos a 44 px.', bg: '#E1F0E6', ink: '#1F5C39' },
+        { big: '0', t: 'Botones sin nombre', d: 'Todos los botones de icono tienen aria-label.', bg: '#E1F0E6', ink: '#1F5C39' },
+        { big: '1', t: 'Aviso de color', d: 'Mostaza #D9A21B tiene 2,3:1 como relleno: siempre va con su valor escrito.', bg: '#FBF0D3', ink: '#6E4D00' }
+      ],
+      auditNotes: [
+        'Revisión automática de los 60 tableros: pares texto/fondo, alto de zonas táctiles, botones de icono, campos sin etiqueta y SVG informativos sin texto.',
+        'La prioridad, el estado de los logros y los niveles de aviso usan símbolo + texto, no solo color.',
+        'Diálogos con role=dialog o alertdialog, título enlazado y botón de cierre de 44 px. En desarrollo: atrapar el foco y devolverlo al cerrar.',
+        'Gráficos de Estadísticas con alternativa en tabla y etiquetas de valor.',
+        'Todas las animaciones se anulan con prefers-reduced-motion.',
+        'Pendiente de probar en dispositivo real: lector de pantalla (VoiceOver / TalkBack), texto grande al 200 % y teclado externo.'
+      ],
+      edges: [
+        'Nombres largos: títulos a 2 líneas máx. y recorte con «…»; chips sin salto de línea.',
+        'Sin conexión: todo funciona en local y se sincroniza al volver (ver Estados).',
+        'Cambio de día con la app abierta: se cierra el día, se aplican vida y racha, y se avisa con un toast.',
+        'Vida en 0: no se pierde nivel; solo estado «debilitado» y la invitación al Hotel.',
+        'Bolsa llena: las Monedas extra van al Tesoro y se muestra una vez por día.',
+        'Mochila de Mazmorra sin tareas: se puede entrar a «enfoque libre» sin XP por tareas.',
+        'Meta vencida con el jefe vivo: estado «El jefe escapó», sin castigo extra.',
+        'Zona horaria y horario de verano: los días se cuentan en la hora local del usuario.'
+      ],
+      open: [
+        'Confirmar los valores provisionales: umbral de debilitado (30), −25 % de XP y 48 h para recuperar la racha.',
+        'Validar la economía con usuarios reales durante el primer mes (ver métricas en «Economía del reino»).',
+        'GTD, pregunta 4 («¿soy la persona correcta?»): si es «no», proponemos convertirla en Evento con contacto.',
+        '¿El usuario puede escribir notas propias en la Bitácora?',
+        'Duración del descanso largo en ciclos de 30 y 45 min.',
+        'Catálogo del Mercado negro para los próximos 6 meses.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

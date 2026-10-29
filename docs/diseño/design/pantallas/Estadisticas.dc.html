@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estadísticas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Estadísticas" heading="{{heading}}" icon="board" back-href="Perfil.dc.html" back-label="Volver al perfil" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+
+      <div role="radiogroup" aria-label="Periodo" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+        <sc-for list="{{ranges}}" as="rg" hint-placeholder-count="2">
+          <button type="button" role="radio" aria-checked="{{rg.sel}}" onClick="{{rg.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{rg.bg}}; color: {{rg.fg}}; font-size: 14px; font-weight: 700; box-shadow: {{rg.shadow}}; cursor: pointer;">{{rg.label}}</button>
+        </sc-for>
+      </div>
+
+      <section aria-label="Resumen" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+        <sc-for list="{{tiles}}" as="tl" hint-placeholder-count="4">
+          <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+            <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #4E5C52;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{tl.icon}}"></path></svg>{{tl.label}}</span>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.1;">{{tl.value}}</span>
+            <span style="font-size: 12px; font-weight: 700; color: {{tl.dFg}};"><span aria-hidden="true">{{tl.arrow}}</span> {{tl.delta}}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <section aria-labelledby="xp-t" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <h2 id="xp-t" style="margin: 0; flex-grow: 1; font-size: 15px; font-weight: 700;">{{xpTitle}}</h2>
+          <button type="button" onClick="{{toggleTable}}" aria-pressed="{{tableStr}}" style="min-height: 44px; padding: 0 10px; border: none; border-radius: 10px; background: #F3F6EF; color: #1F5C39; font-size: 12px; font-weight: 700; cursor: pointer;; display: inline-flex; align-items: center">{{tableLabel}}</button>
+        </div>
+        <sc-if value="{{showChart}}" hint-placeholder-val="{{ true }}">
+          <div style="position: relative; padding-top: 30px;">
+            <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 30px; height: 120px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;">
+              <span style="border-top: 1px solid #EEF2EA;"></span><span style="border-top: 1px solid #EEF2EA;"></span><span style="border-top: 1px solid #DCE4D4;"></span>
+            </div>
+            <div role="group" aria-label="{{xpTitle}}" style="position: relative; height: 120px; display: flex; align-items: flex-end; gap: {{barGap}};">
+              <sc-for list="{{bars}}" as="b" hint-placeholder-count="7">
+                <button type="button" onClick="{{b.pick}}" onMouseEnter="{{b.pick}}" onFocus="{{b.pick}}" aria-label="{{b.aria}}" aria-pressed="{{b.selStr}}" style="flex: 1; height: 100%; border: none; padding: 0; background: transparent; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; position: relative; min-width: 0;">
+                  <sc-if value="{{b.sel}}" hint-placeholder-val="{{ false }}"><span class="q-fade" style="position: absolute; bottom: calc({{b.h}} + 6px); left: 50%; transform: translateX(-50%); background: #1E2A22; color: #F3F6EF; font-family: 'DM Mono', monospace; font-size: 12px; padding: 3px 7px; border-radius: 8px; white-space: nowrap; z-index: 1;">{{b.v}} XP</span></sc-if>
+                  <span style="display: block; width: 100%; max-width: 28px; height: {{b.h}}; background: {{b.bg}}; border-radius: 4px 4px 0 0; transition: height .35s ease;"></span>
+                </button>
+              </sc-for>
+            </div>
+            <div aria-hidden="true" style="display: flex; gap: {{barGap}}; margin-top: 6px;">
+              <sc-for list="{{bars}}" as="b" hint-placeholder-count="7"><span style="flex: 1; text-align: center; font-size: 11px; color: {{b.lblFg}}; font-weight: {{b.lblW}}; min-width: 0;">{{b.d}}</span></sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{showTable}}" hint-placeholder-val="{{ false }}">
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <caption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{xpTitle}}</caption>
+            <thead><tr><th scope="col" style="text-align: left; padding: 6px 0; font-size: 12px; color: #4E5C52; border-bottom: 1px solid #DCE4D4;">{{tableHead}}</th><th scope="col" style="text-align: right; padding: 6px 0; font-size: 12px; color: #4E5C52; border-bottom: 1px solid #DCE4D4;">XP</th></tr></thead>
+            <tbody>
+              <sc-for list="{{bars}}" as="b" hint-placeholder-count="7"><tr><td style="padding: 6px 0; border-bottom: 1px solid #EEF2EA;">{{b.full}}</td><td style="padding: 6px 0; border-bottom: 1px solid #EEF2EA; text-align: right; font-family: 'DM Mono', monospace;">{{b.v}}</td></tr></sc-for>
+            </tbody>
+          </table>
+        </sc-if>
+        <span style="font-size: 13px; color: #4E5C52;">{{xpNote}}</span>
+      </section>
+
+      <section aria-labelledby="ar-t" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        <h2 id="ar-t" style="margin: 0; font-size: 15px; font-weight: 700;">¿En qué Área creciste?</h2>
+        <div aria-hidden="true" style="display: flex; gap: 2px; height: 16px;">
+          <sc-for list="{{areas}}" as="a" hint-placeholder-count="4"><span style="width: {{a.pct}}; background: {{a.c}}; border-radius: {{a.radius}};"></span></sc-for>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px;">
+          <sc-for list="{{areas}}" as="a" hint-placeholder-count="4">
+            <li style="display: flex; align-items: center; gap: 8px; font-size: 14px;"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: {{a.c}}; flex-shrink: 0;"></span><span style="flex-grow: 1;">{{a.name}}</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #3E4A42;">{{a.xp}}</span></li>
+          </sc-for>
+        </ul>
+      </section>
+
+      <section aria-labelledby="cm-t" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="cm-t" style="margin: 0; font-size: 15px; font-weight: 700;">Cumplimiento de misiones</h2>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <svg role="img" aria-label="{{rate}}% de misiones cumplidas" width="76" height="76" viewBox="0 0 76 76" style="flex-shrink: 0;">
+            <circle cx="38" cy="38" r="30" fill="none" stroke="#E7EDE1" stroke-width="10"></circle>
+            <circle cx="38" cy="38" r="30" fill="none" stroke="#2E7D4F" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{ringDash}} 188.5" transform="rotate(-90 38 38)"></circle>
+            <text x="38" y="43" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-size="17" font-weight="800" fill="currentColor">{{rate}}%</text>
+          </svg>
+          <dl style="margin: 0; flex-grow: 1; display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; font-size: 14px;">
+            <dt style="display: flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 3px; background: #2E7D4F;"></span>Cumplidas</dt><dd style="margin: 0; font-family: 'DM Mono', monospace;">{{done}}</dd>
+            <dt style="display: flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 99px; border: 2px solid #A8361F; box-sizing: border-box;"></span>Vencidas</dt><dd style="margin: 0; font-family: 'DM Mono', monospace;">{{missed}}</dd>
+            <dt style="color: #4E5C52;">Mazmorras vencidas</dt><dd style="margin: 0; font-family: 'DM Mono', monospace;">{{dungeons}}</dd>
+          </dl>
+        </div>
+      </section>
+
+      <section aria-labelledby="hb-t" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: baseline;">
+          <h2 id="hb-t" style="margin: 0; flex-grow: 1; font-size: 15px; font-weight: 700;">Hábitos más constantes</h2>
+          <a href="Habitos.dc.html" style="min-height: 44px; display: flex; align-items: center; font-size: 13px; font-weight: 700; color: #1F5C39;">Ver mapa de calor</a>
+        </div>
+        <sc-for list="{{habits}}" as="h" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; font-weight: 700;">{{h.name}}</span><span style="font-size: 12px; color: #4E5C52;">{{h.n}} de 7 días</span></span>
+            <span role="img" aria-label="{{h.aria}}" style="display: flex; gap: 3px;">
+              <sc-for list="{{h.week}}" as="w" hint-placeholder-count="7"><span style="width: 14px; height: 14px; border-radius: 4px; background: {{w.bg}}; box-shadow: {{w.ring}};"></span></sc-for>
+            </span>
+          </div>
+        </sc-for>
+      </section>
+
+      <div style="display: flex; gap: 10px; align-items: flex-start; background: #E1F0E6; border-radius: 16px; padding: 12px;">
+        <svg aria-hidden="true" width="36" height="36" viewBox="0 0 48 48" style="flex-shrink: 0;"><ellipse cx="24" cy="30" rx="14" ry="12" fill="#2E7D4F"></ellipse><path d="M24 18 C20 8 12 8 12 8 C14 14 18 17 24 18 C30 17 34 14 36 8 C36 8 28 8 24 18Z" fill="#3F9563"></path><circle cx="19" cy="29" r="2.4" fill="#FFFFFF"></circle><circle cx="29" cy="29" r="2.4" fill="#FFFFFF"></circle></svg>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <strong style="font-size: 14px; color: #1F5C39;">Lo que RPGenie notó</strong>
+          <sc-for list="{{insights}}" as="ins" hint-placeholder-count="3"><p style="margin: 0; font-size: 14px; line-height: 1.45; color: #1F5C39;">• {{ins}}</p></sc-for>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"range":{"editor":"enum","options":["semana","mes"],"default":"semana","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { range: props.range || 'semana', sel: -1, table: false }; }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const wk = s.range === 'semana';
+    const D = wk
+      ? [['L', 'Lunes', 40], ['M', 'Martes', 75], ['X', 'Miércoles', 30], ['J', 'Jueves', 90], ['V', 'Viernes', 75], ['S', 'Sábado', 55], ['D', 'Domingo', 55]]
+      : [['S1', 'Semana 1 (15–21 sep)', 310], ['S2', 'Semana 2 (22–28 sep)', 365], ['S3', 'Semana 3 (29 sep–5 oct)', 280], ['S4', 'Semana 4 (6–12 oct)', 420]];
+    const max = Math.max(...D.map(x => x[2]));
+    const best = D.findIndex(x => x[2] === max);
+    const bars = D.map(([d, full, v], i) => {
+      const on = s.sel === i;
+      return { d, full, v, h: Math.round(v / max * 100) + '%', sel: on, selStr: on ? 'true' : 'false', aria: full + ': ' + v + ' XP' + (i === best ? ', tu mejor ' + (wk ? 'día' : 'semana') : ''),
+        bg: on || (s.sel < 0 && i === best) ? '#1F5C39' : '#2E7D4F', lblFg: i === best ? '#1E2A22' : '#4E5C52', lblW: i === best ? 700 : 400,
+        pick: () => this.setState({ sel: i }) };
+    });
+    const total = D.reduce((a, x) => a + x[2], 0);
+    const A = wk ? [['Inglés', 160], ['Carrera', 130], ['Salud', 90], ['Creatividad', 40]] : [['Inglés', 520], ['Carrera', 430], ['Salud', 300], ['Creatividad', 125]];
+    const colors = ['#3C5BA8', '#2F7E50', '#E0573F', '#D9A21B'];
+    const aTot = A.reduce((a, x) => a + x[1], 0);
+    const areas = A.map(([name, xp], i) => ({ name, xp: xp + ' XP', c: colors[i], pct: (xp / aTot * 100).toFixed(1) + '%', radius: i === 0 ? '4px 0 0 4px' : (i === A.length - 1 ? '0 4px 4px 0' : '0') }));
+    const done = wk ? 18 : 71, missed = wk ? 3 : 9;
+    const rate = Math.round(done / (done + missed) * 100);
+    const H = [['Leer 20 minutos', [1, 1, 1, 1, 0, 1, 1]], ['Ejercicio', [1, 0, 1, 1, 1, 0, 1]], ['Beber 2 L de agua', [1, 1, 0, 1, 0, 1, 0]]];
+    const dn = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    const habits = H.map(([name, w]) => ({ name, n: w.filter(Boolean).length, aria: name + ': cumplido ' + dn.filter((_, i) => w[i]).join(', '),
+      week: w.map(x => ({ bg: x ? '#2E7D4F' : '#FFFFFF', ring: x ? 'none' : 'inset 0 0 0 1.5px #C9D3C2' })) }));
+    const tiles = [
+      { label: 'XP ganada', value: '+' + total, delta: wk ? '12 % vs. semana pasada' : '8 % vs. mes pasado', arrow: '▲', dFg: '#1F5C39', icon: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z' },
+      { label: 'Misiones', value: String(done), delta: wk ? '3 más que la anterior' : '6 más que el anterior', arrow: '▲', dFg: '#1F5C39', icon: 'M9 11l3 3 8-8' },
+      { label: 'En la Mazmorra', value: wk ? '4 h 30' : '17 h', delta: wk ? '40 min menos' : '2 h más', arrow: wk ? '▼' : '▲', dFg: wk ? '#A8361F' : '#1F5C39', icon: 'M12 6v6l4 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z' },
+      { label: 'Racha actual', value: '12 días', delta: 'Récord: 19 días', arrow: '', dFg: '#4E5C52', icon: 'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 3-6 0 2.5 1 4 2.5 4C11.5 9 10 5 12 2z' }
+    ];
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Perfil'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? '#1F5C39' : '#4E5C52', weight: on ? 700 : 400, pill: on ? '#E1F0E6' : 'transparent' }; });
+    const ranges = [['semana', 'Esta semana'], ['mes', 'Último mes']].map(([id, label]) => { const on = s.range === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => this.setState({ range: id, sel: -1 }) }; });
+    return {
+      heading: wk ? 'Tu semana en números' : 'Tu mes en números', ranges, tiles,
+      xpTitle: wk ? 'XP por día' : 'XP por semana', tableHead: wk ? 'Día' : 'Semana', bars, barGap: wk ? '8px' : '18px',
+      xpNote: (wk ? 'Tu mejor día fue el ' + D[best][1].toLowerCase() : 'Tu mejor semana fue la ' + D[best][1].toLowerCase()) + ', con ' + max + ' XP. Toca una barra para ver su valor.',
+      showChart: !s.table, showTable: s.table, tableStr: s.table ? 'true' : 'false', tableLabel: s.table ? 'Ver gráfico' : 'Ver tabla',
+      toggleTable: () => this.setState({ table: !this.state.table }),
+      areas, done, missed, rate, ringDash: (rate / 100 * 188.5).toFixed(1), dungeons: wk ? 4 : 15,
+      habits,
+      insights: wk
+        ? ['Rindes más los jueves: guarda ahí tus misiones difíciles.', 'Creatividad solo recibió 40 XP. ¿Una misión corta mañana?', 'Te concentras mejor entre las 10:00 y las 12:00.']
+        : ['Tu XP creció 8 % respecto al mes pasado.', 'Las 3 misiones vencidas eran de Carrera y sin fecha clara.', 'Llevas 4 semanas sin romper tu hábito de lectura.'],
+      navItems
+    };
+  }
+}
+</script>
+</body>
+</html>

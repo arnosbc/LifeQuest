@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Configuración — Game Master</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: {{c.bg}}; color: {{c.text}}; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden; position: relative; transition: background .3s, color .3s;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" kicker="Game Master" heading="Configuración" icon="gear" tone="{{heroTone}}" back-href="Perfil.dc.html" back-label="Volver al perfil" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 22px;">
+
+      <section aria-labelledby="ap-title" style="display: flex; flex-direction: column; gap: 12px;">
+        <h2 id="ap-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Apariencia</h2>
+
+        <div aria-label="Vista previa del tema" role="img" style="border-radius: 20px; overflow: hidden; box-shadow: 0 0 0 1px {{c.border}}, 0 4px 0 {{c.border}}; background: {{c.bg}};">
+          <div style="height: 56px; background: {{p.heroBg}}; position: relative; overflow: hidden;">
+            <svg aria-hidden="true" width="390" height="56" viewBox="0 0 390 56" style="position: absolute; left: 0; top: 0;"><circle cx="320" cy="18" r="8" fill="{{p.sun}}" opacity=".85"></circle><path d="M150 44 L196 26 L230 38 L268 22 L318 40 L354 28 L390 36 L390 56 L150 56Z" fill="{{p.hill}}"></path></svg>
+            <span style="position: absolute; left: 14px; top: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800; color: #F3F6EF;">Hola, Jose</span>
+          </div>
+          <div style="padding: 12px; display: flex; gap: 10px; align-items: center;">
+            <span style="flex-grow: 1; background: {{c.card}}; border-radius: 12px; box-shadow: 0 0 0 1px {{c.border}}; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 13px; font-weight: 700;">Misión principal</span>
+              <span aria-hidden="true" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px;"><span style="height: 6px; border-radius: 2px; background: {{a.bar}};"></span><span style="height: 6px; border-radius: 2px; background: {{a.bar}};"></span><span style="height: 6px; border-radius: 2px; background: {{a.bar}};"></span><span style="height: 6px; border-radius: 2px; background: {{a.bar}};"></span><span style="height: 6px; border-radius: 2px; background: {{c.track}};"></span><span style="height: 6px; border-radius: 2px; background: {{c.track}};"></span></span>
+            </span>
+            <span style="min-height: 44px; padding: 0 14px; border-radius: 12px; background: {{a.btnBg}}; color: {{a.btnFg}}; box-shadow: 0 3px 0 {{a.btnShadow}}; display: flex; align-items: center; font-size: 13px; font-weight: 700;">Empezar</span>
+          </div>
+        </div>
+
+        <div role="radiogroup" aria-labelledby="mode-l" style="display: flex; flex-direction: column; gap: 8px;">
+          <span id="mode-l" style="font-size: 14px; font-weight: 700;">Modo</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+            <sc-for list="{{modes}}" as="m" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{m.checked}}" onClick="{{m.pick}}" class="q-press" style="min-height: 72px; border-radius: 16px; border: 1.5px solid {{m.border}}; background: {{m.bg}}; color: {{c.text}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 0 {{m.border}};">
+                <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{m.icon}}"></path></svg>
+                <span style="font-size: 14px; font-weight: 700;">{{m.label}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <span style="font-size: 13px; color: {{c.text2}};">{{modeHint}}</span>
+        </div>
+
+        <div role="radiogroup" aria-labelledby="th-l" style="display: flex; flex-direction: column; gap: 8px;">
+          <span id="th-l" style="font-size: 14px; font-weight: 700;">Tema del reino</span>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+            <sc-for list="{{themes}}" as="t" hint-placeholder-count="4">
+              <button type="button" role="radio" aria-checked="{{t.checked}}" onClick="{{t.pick}}" class="q-press" style="min-height: 64px; border-radius: 16px; border: 1.5px solid {{t.border}}; background: {{c.card}}; color: {{c.text}}; padding: 0 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; text-align: left; box-shadow: 0 3px 0 {{t.border}};">
+                <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 12px; background: {{t.swatch}}; position: relative; overflow: hidden; flex-shrink: 0;"><span style="position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: {{t.swatch2}};"></span></span>
+                <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 14px; font-weight: 700;">{{t.label}}</span><span style="font-size: 12px; color: {{c.text2}};">{{t.hint}}</span></span>
+                <sc-if value="{{t.on}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{a.ink}}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="dif-title" style="display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="dif-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Dificultad del juego</h2>
+        <div role="radiogroup" aria-labelledby="dif-title" style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{levels}}" as="d" hint-placeholder-count="3">
+            <button type="button" role="radio" aria-checked="{{d.checked}}" onClick="{{d.pick}}" class="q-press" style="min-height: 64px; border-radius: 16px; border: 1.5px solid {{d.border}}; background: {{d.bg}}; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: {{c.text}}; box-shadow: 0 3px 0 {{d.border}};">
+              <span aria-hidden="true" style="display: flex; gap: 2px; width: 54px;"><sc-for list="{{d.swords}}" as="sw" hint-placeholder-count="3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{sw}}" stroke-width="2.4" stroke-linecap="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4"></path></svg></sc-for></span>
+              <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 700;">{{d.label}}</span><span style="font-size: 13px; color: {{c.text2}};">{{d.hint}}</span></span>
+              <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 99px; border: 2px solid {{d.dotBorder}}; display: flex; align-items: center; justify-content: center;"><span style="width: 10px; height: 10px; border-radius: 99px; background: {{d.dot}};"></span></span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-labelledby="not-title" style="display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="not-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Notificaciones</h2>
+        <ul style="list-style: none; margin: 0; padding: 0; background: {{c.card}}; border-radius: 20px; box-shadow: 0 0 0 1px {{c.border}}, 0 4px 0 {{c.border}}; overflow: hidden;">
+          <sc-for list="{{toggles}}" as="tg" hint-placeholder-count="4">
+            <li style="border-bottom: 1px solid {{c.line}};">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 56px;">
+                <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span id="tg-{{tg.id}}" style="font-size: 15px; font-weight: 500;">{{tg.label}}</span><span style="font-size: 12px; color: {{c.text2}};">{{tg.hint}}</span></span>
+                <button type="button" role="switch" aria-checked="{{tg.onStr}}" aria-labelledby="tg-{{tg.id}}" onClick="{{tg.toggle}}" style="width: 52px; height: 32px; border: none; border-radius: 99px; background: {{tg.track}}; padding: 3px; display: flex; justify-content: {{tg.justify}}; cursor: pointer; flex-shrink: 0; transition: background .2s;"><span style="width: 26px; height: 26px; border-radius: 99px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,.25);"></span></button>
+              </div>
+              <sc-if value="{{tg.showQuiet}}" hint-placeholder-val="{{ false }}">
+                <div class="q-fade" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 14px 14px;">
+                  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">Desde<input type="time" value="22:00" style="height: 46px; box-sizing: border-box; border: 1.5px solid {{c.inputBorder}}; border-radius: 12px; padding: 0 10px; font-size: 15px; color: {{c.text}}; background: {{c.bg}}; color-scheme: {{c.scheme}};"></label>
+                  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">Hasta<input type="time" value="07:00" style="height: 46px; box-sizing: border-box; border: 1.5px solid {{c.inputBorder}}; border-radius: 12px; padding: 0 10px; font-size: 15px; color: {{c.text}}; background: {{c.bg}}; color-scheme: {{c.scheme}};"></label>
+                </div>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+
+      <section aria-labelledby="acc-title" style="display: flex; flex-direction: column; gap: 10px;">
+        <h2 id="acc-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Cuenta</h2>
+        <div style="background: {{c.card}}; border-radius: 20px; box-shadow: 0 0 0 1px {{c.border}}, 0 4px 0 {{c.border}}; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px; border-bottom: 1px solid {{c.line}};">
+            <span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 14px; background: {{a.tint}}; color: {{a.ink}}; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">J</span>
+            <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">Jose</span><span style="font-size: 13px; color: {{c.text2}}; overflow: hidden; text-overflow: ellipsis;">jose@correo.com</span></span>
+            <span style="font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: {{a.tint}}; color: {{a.ink}};">Sincronizado</span>
+          </div>
+          <a href="AuthRecuperar.dc.html" style="min-height: 52px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: {{c.text}}; font-size: 15px; border-bottom: 1px solid {{c.line}};"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h12v10H6zM9 10V7a3 3 0 0 1 6 0v3"></path></svg><span style="flex-grow: 1;">Cambiar contraseña</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+          <div style="padding: 12px 14px 14px;">
+            <button type="button" onClick="{{askLogout}}" class="q-press" style="width: 100%; min-height: 52px; border-radius: 14px; border: 1.5px solid {{lo.border}}; background: {{lo.bg}}; color: {{lo.fg}}; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"></path></svg>Cerrar sesión</button>
+          </div>
+        </div>
+        <span style="font-size: 12px; color: {{c.text2}}; text-align: center;">Questly v0.1 · Tu progreso se guarda en la nube</span>
+      </section>
+    </div>
+  </main>
+
+  <sc-if value="{{showLogout}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.6); display: flex; align-items: center; justify-content: center; padding: 24px;">
+      <div role="alertdialog" aria-modal="true" aria-labelledby="lo-t" aria-describedby="lo-d" class="q-pop" style="width: 100%; background: {{c.card}}; color: {{c.text}}; border-radius: 24px; padding: 22px 20px 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
+        <svg aria-hidden="true" width="64" height="64" viewBox="0 0 120 120"><path d="M60 40 C50 14 26 14 26 14 C30 30 42 38 60 40 C78 38 90 30 94 14 C94 14 70 14 60 40Z" fill="#7CC79A"></path><ellipse cx="60" cy="76" rx="38" ry="34" fill="#3F9563"></ellipse><circle cx="46" cy="72" r="7" fill="#FFFFFF"></circle><circle cx="74" cy="72" r="7" fill="#FFFFFF"></circle><circle cx="47" cy="74" r="3.4" fill="#1A1F1B"></circle><circle cx="75" cy="74" r="3.4" fill="#1A1F1B"></circle><path d="M50 92 Q60 86 70 92" fill="none" stroke="#1A1F1B" stroke-width="3" stroke-linecap="round"></path></svg>
+        <h2 id="lo-t" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">¿Cerrar sesión?</h2>
+        <p id="lo-d" style="margin: 0; font-size: 15px; color: {{c.text2}}; line-height: 1.45;">Tu progreso está guardado. Al volver a entrar con tu correo encontrarás tu héroe, tu racha y tus misiones tal como los dejaste.</p>
+        <a href="Auth.dc.html" class="q-press" style="margin-top: 6px; width: 100%; min-height: 52px; border-radius: 14px; background: #A8361F; color: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 0 #7A2716;">Sí, cerrar sesión</a>
+        <button type="button" onClick="{{cancelLogout}}" style="width: 100%; min-height: 52px; border-radius: 14px; border: 1.5px solid {{c.inputBorder}}; background: transparent; color: {{c.text}}; font-size: 16px; font-weight: 700; cursor: pointer;">Seguir jugando</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: {{c.nav}}; border-top: 1px solid {{c.border}}; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["claro","oscuro","auto"],"default":"claro","section":"Estado inicial"},"theme":{"editor":"enum","options":["bosque","rio","brasa","oro"],"default":"bosque","section":"Estado inicial"},"logout":{"editor":"boolean","default":false,"section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let sm = null, st = null;
+    try { sm = localStorage.getItem('questly-mode'); st = localStorage.getItem('questly-theme'); } catch (e) {}
+    this.state = { mode: props.mode || sm || 'claro', theme: props.theme || st || 'bosque', diff: 'Normal', logout: !!props.logout, t: { limit: false, quiet: false, streak: true, digest: true } };
+  }
+  renderVals() {
+    const s = this.state;
+    let dark = s.mode === 'oscuro';
+    if (s.mode === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    const c = dark
+      ? { bg: '#13201A', card: '#1C2C24', border: '#2C4036', line: '#24362C', text: '#EEF3EC', text2: '#A9B8AD', track: '#2C4036', nav: '#13201A', inputBorder: '#3A5446', scheme: 'dark', navIdle: '#A9B8AD' }
+      : { bg: '#F3F6EF', card: '#FFFFFF', border: '#DCE4D4', line: '#EEF2EA', text: '#1E2A22', text2: '#4E5C52', track: '#E7EDE1', nav: '#FFFFFF', inputBorder: '#C9D3C2', scheme: 'light', navIdle: '#4E5C52' };
+    const themeDefs = {
+      bosque: { label: 'Bosque', hint: 'Verde, el reino original', tone: 'forest', light: { bar: '#2E7D4F', btnBg: '#2E7D4F', btnFg: '#FFFFFF', btnShadow: '#1F5C39', ink: '#1F5C39', tint: '#E1F0E6' }, dark: { bar: '#7FD3A0', btnBg: '#7FD3A0', btnFg: '#0E1B14', btnShadow: '#3F9563', ink: '#9FDCB4', tint: '#1F3A2C' }, sw: ['#1F5C39', '#2E7D4F'] },
+      rio: { label: 'Río', hint: 'Azul sereno', tone: 'river', light: { bar: '#3C5BA8', btnBg: '#3C5BA8', btnFg: '#FFFFFF', btnShadow: '#24396B', ink: '#2C4580', tint: '#E3E9F7' }, dark: { bar: '#9FB8E8', btnBg: '#9FB8E8', btnFg: '#101A33', btnShadow: '#5C78B8', ink: '#B9CBF0', tint: '#1E2A44' }, sw: ['#24396B', '#3C5BA8'] },
+      brasa: { label: 'Brasa', hint: 'Cálido y enérgico', tone: 'ember', light: { bar: '#A8361F', btnBg: '#A8361F', btnFg: '#FFFFFF', btnShadow: '#7A2716', ink: '#8A2C19', tint: '#FBE4DF' }, dark: { bar: '#F2A08C', btnBg: '#F2A08C', btnFg: '#2A0F08', btnShadow: '#B9614E', ink: '#F5B8A8', tint: '#3A1F1A' }, sw: ['#7A2716', '#A8361F'] },
+      oro: { label: 'Oro', hint: 'Tesoro y gloria', tone: 'gold', light: { bar: '#D9A21B', btnBg: '#D9A21B', btnFg: '#3D2B00', btnShadow: '#8A6200', ink: '#6E4D00', tint: '#FBF0D3' }, dark: { bar: '#F2C66B', btnBg: '#F2C66B', btnFg: '#2B1E00', btnShadow: '#A8862F', ink: '#F5D896', tint: '#3A3016' }, sw: ['#5C4100', '#D9A21B'] }
+    };
+    const th = themeDefs[s.theme];
+    const a = dark ? th.dark : th.light;
+    const heroColors = { forest: ['#1F5C39', '#2E7D4F'], river: ['#24396B', '#3C5BA8'], ember: ['#7A2716', '#A8361F'], gold: ['#5C4100', '#8A6200'], night: ['#0E1B14', '#1C2C24'] };
+    const heroTone = dark ? 'night' : th.tone;
+    const p = { heroBg: heroColors[heroTone][0], hill: heroColors[heroTone][1], sun: dark ? '#E9EFE6' : '#F2C66B' };
+
+    const modeDefs = [['claro', 'Claro', 'M12 4V2M12 22v-2M4 12H2M22 12h-2M5 5L4 4M20 20l-1-1M5 19l-1 1M20 4l-1 1M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z'], ['oscuro', 'Oscuro', 'M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z'], ['auto', 'Automático', 'M3 5h18v11H3zM8 20h8M12 16v4']];
+    const modes = modeDefs.map(([id, label, icon]) => { const on = s.mode === id; return { label, icon, checked: on ? 'true' : 'false', bg: on ? a.tint : c.card, border: on ? a.bar : c.border, pick: () => { this.setState({ mode: id }); try { localStorage.setItem('questly-mode', id); } catch (e) {} } }; });
+    const modeHint = s.mode === 'auto' ? 'Sigue el modo de tu teléfono: claro de día, oscuro de noche.' : (dark ? 'Ideal para sesiones nocturnas: menos brillo, mismos colores del reino.' : 'Colores luminosos para el día.');
+    const themes = Object.keys(themeDefs).map(id => { const t = themeDefs[id]; const on = s.theme === id; return { label: t.label, hint: t.hint, on, checked: on ? 'true' : 'false', swatch: t.sw[0], swatch2: t.sw[1], border: on ? a.bar : c.border, pick: () => { this.setState({ theme: id }); try { localStorage.setItem('questly-theme', id); } catch (e) {} } }; });
+
+    const defs = [['Fácil', 1, 'Más XP y menos vida perdida. Ideal para empezar.'], ['Normal', 2, 'Equilibrado. Recomendado.'], ['Difícil', 3, 'Menos recompensa por misión; cada nivel vale más.']];
+    const levels = defs.map(([label, n, hint]) => {
+      const on = s.diff === label;
+      const sw = []; for (let i = 0; i < 3; i++) sw.push(i < n ? c.text : c.inputBorder);
+      return { label, hint, swords: sw, checked: on ? 'true' : 'false', bg: on ? a.tint : c.card, border: on ? a.bar : c.border, dot: on ? a.bar : 'transparent', dotBorder: on ? a.bar : c.inputBorder, pick: () => this.setState({ diff: label }) };
+    });
+    const tdefs = [['streak', 'Aviso de racha en riesgo', 'Una sola vez, en tono amable'], ['digest', 'Resumen diario', 'Agrupa los avisos informativos'], ['limit', 'Límite diario de avisos', 'Desactivado por defecto'], ['quiet', 'Ventana de silencio', 'Solo pasan los avisos críticos']];
+    const toggles = tdefs.map(([id, label, hint]) => { const on = !!s.t[id]; return { id, label, hint, on, onStr: on ? 'true' : 'false', track: on ? (dark ? a.btnShadow : a.bar) : '#7D8A80', justify: on ? 'flex-end' : 'flex-start', showQuiet: id === 'quiet' && on, toggle: () => this.setState({ t: { ...this.state.t, [id]: !on } }) }; });
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Perfil'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? a.ink : c.navIdle, weight: on ? 700 : 400, pill: on ? a.tint : 'transparent' }; });
+    const lo = dark ? { border: '#6B3A30', bg: 'transparent', fg: '#F5B8A8' } : { border: '#F0C3B9', bg: '#FBE4DF', fg: '#A8361F' };
+    return { lo, showLogout: s.logout, askLogout: () => this.setState({ logout: true }), cancelLogout: () => this.setState({ logout: false }), c, a, p, heroTone, modes, modeHint, themes, levels, toggles, navItems };
+  }
+}
+</script>
+</body>
+</html>

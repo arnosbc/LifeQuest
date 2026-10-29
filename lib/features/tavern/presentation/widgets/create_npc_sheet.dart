@@ -35,9 +35,7 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
         name: _name.text.trim(),
         skillId: _skillId!,
         frequency: _frequency,
-        nobleMission: _mission.text.trim().isEmpty
-            ? null
-            : _mission.text.trim(),
+        nobleMission: _mission.text.trim(),
       ),
     );
   }
@@ -100,9 +98,13 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
               maxLength: 300,
               maxLines: 2,
               decoration: const InputDecoration(
-                labelText: 'Noble misión (opcional)',
-                hintText: 'Ej.: que entrenes sin lesionarte',
+                labelText: 'Noble misión',
+                hintText: 'Ej.: fundamentos de diseño gráfico',
+                helperText: 'RPGenie te propondrá misiones sobre este tema.',
               ),
+              validator: (v) => (v ?? '').trim().isEmpty
+                  ? 'Cuéntale a RPGenie sobre qué serán sus misiones.'
+                  : null,
             ),
             const SizedBox(height: 8),
             Text(

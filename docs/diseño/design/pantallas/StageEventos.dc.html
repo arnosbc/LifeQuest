@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Stage — Eventos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 96px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Biblioteca" heading="Eventos" icon="calendar" back-href="StageBiblioteca.dc.html" back-label="Volver a la Biblioteca" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 14px;">
+
+      <sc-if value="{{hasSoon}}" hint-placeholder-val="{{ true }}">
+        <button type="button" onClick="{{openSoon}}" aria-label="Abrir próximo evento: {{soon.title}}" style="width: 100%; border: none; text-align: left; cursor: pointer; background: #1F5C39; color: #F3F6EF; border-radius: 20px; padding: 14px; display: flex; gap: 12px; align-items: center; text-decoration: none;">
+          <span aria-hidden="true" style="width: 56px; height: 60px; border-radius: 14px; background: #FFFDF6; color: #1A1F1B; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #A8361F;">{{soon.mon}}</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; line-height: 1;">{{soon.day}}</span></span>
+          <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #CFE8D7;">Próximo evento · {{soon.rel}}</span>
+            <span style="font-size: 16px; font-weight: 700; line-height: 1.3;">{{soon.title}}</span>
+            <span style="font-size: 13px; color: #CFE8D7;">{{soon.time}} · con {{soon.contact}}</span>
+          </span>
+        </button>
+      </sc-if>
+
+      <div role="tablist" aria-label="Periodo" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+          <button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{tb.bg}}; color: {{tb.fg}}; font-size: 14px; font-weight: 700; box-shadow: {{tb.shadow}}; cursor: pointer;">{{tb.label}}</button>
+        </sc-for>
+      </div>
+
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+        <section style="display: flex; flex-direction: column; gap: 8px;">
+          <h2 style="margin: 4px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">{{g.name}}</h2>
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{g.items}}" as="ev" hint-placeholder-count="2">
+              <li>
+                <button type="button" onClick="{{ev.open}}" class="q-press" style="width: 100%; text-align: left; border: none; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; color: #1E2A22; opacity: {{ev.op}};">
+                  <span aria-hidden="true" style="width: 48px; height: 52px; border-radius: 12px; background: #F3F6EF; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;"><span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #A8361F;">{{ev.mon}}</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800; line-height: 1;">{{ev.day}}</span></span>
+                  <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 15px; font-weight: 700; line-height: 1.3;">{{ev.title}}</span>
+                    <span style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: #4E5C52;">
+                      <span style="font-family: 'DM Mono', monospace;">{{ev.time}}</span>
+                      <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: {{ev.pBg}}; color: {{ev.pFg}};"><span aria-hidden="true">{{ev.pMark}}</span>{{ev.prio}}</span>
+                      <span style="display: inline-flex; align-items: center; gap: 4px;"><span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 99px; background: #E3E9F7; color: #2C4580; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center;">{{ev.initial}}</span>{{ev.contact}}</span>
+                    </span>
+                  </span>
+                  <sc-if value="{{ev.attended}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 700; color: #1F5C39;">Asistido</span></sc-if>
+                </button>
+              </li>
+            </sc-for>
+          </ul>
+        </section>
+      </sc-for>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}"><p style="margin: 12px 0; text-align: center; font-size: 14px; color: #4E5C52;">No hay eventos aquí todavía.</p></sc-if>
+    </div>
+  </main>
+
+  <button type="button" onClick="{{openNew}}" class="q-press" style="position: absolute; right: 20px; bottom: 88px; min-height: 56px; padding: 0 20px; border: none; border-radius: 18px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 0 #1F5C39, 0 10px 20px rgba(30,42,34,.2); cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Nuevo evento</button>
+
+  <sc-if value="{{showDetail}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.55); display: flex; align-items: flex-end;">
+      <div role="dialog" aria-modal="true" aria-labelledby="ev-t" class="q-sheet" style="width: 100%; background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 10px 20px 22px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+        <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+        <div style="display: flex; gap: 8px; align-items: flex-start;">
+          <h2 id="ev-t" style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.2;">{{d.title}}</h2>
+          <button type="button" onClick="{{closeDetail}}" aria-label="Cerrar" style="width: 44px; height: 44px; flex-shrink: 0; border: none; background: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <dl style="margin: 0; display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 14px;">
+          <dt style="color: #4E5C52;">Cuándo</dt><dd style="margin: 0; font-weight: 700;">{{d.full}} · {{d.time}}</dd>
+          <dt style="color: #4E5C52;">Prioridad</dt><dd style="margin: 0;"><span style="font-weight: 700; padding: 2px 8px; border-radius: 6px; background: {{d.pBg}}; color: {{d.pFg}};">{{d.pMark}} {{d.prio}}</span></dd>
+          <dt style="color: #4E5C52;">Área</dt><dd style="margin: 0;">{{d.area}}</dd>
+          <dt style="color: #4E5C52;">Notas</dt><dd style="margin: 0; color: #3E4A42; line-height: 1.4;">{{d.notes}}</dd>
+        </dl>
+        <div style="background: #F3F6EF; border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+          <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 99px; background: #E3E9F7; color: #2C4580; font-weight: 800; display: flex; align-items: center; justify-content: center;">{{d.initial}}</span>
+          <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{d.contact}}</span><span style="font-size: 12px; color: #4E5C52;">{{d.role}}</span></span>
+          <a href="#" aria-label="Escribir a {{d.contact}}" style="width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; color: #1E2A22; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4z"></path></svg></a>
+        </div>
+        <a href="CrearTarea.dc.html" class="q-press" style="min-height: 52px; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 0 #1F5C39;">Crear tarea para prepararlo</a>
+        <sc-if value="{{d.canAttend}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{attend}}" style="min-height: 52px; border-radius: 14px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 16px; font-weight: 700; cursor: pointer;">Marcar como asistido · +10 XP</button>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{showNew}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.55); display: flex; align-items: flex-end;">
+      <form role="dialog" aria-modal="true" aria-labelledby="ne-t" onSubmit="{{save}}" novalidate class="q-sheet" style="width: 100%; max-height: 90%; overflow-y: auto; background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 10px 20px 22px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px;">
+        <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h2 id="ne-t" style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">Nuevo evento</h2>
+          <button type="button" onClick="{{closeNew}}" aria-label="Cerrar" style="width: 44px; height: 44px; border: none; background: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">¿Qué evento es?
+          <input value="{{nTitle}}" onInput="{{setTitle}}" placeholder="Ej.: Entrevista de trabajo" aria-invalid="{{titleInvalid}}" style="min-height: 52px; border: 1.5px solid {{titleBorder}}; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+        </label>
+        <sc-if value="{{titleErr}}" hint-placeholder-val="{{ false }}"><span style="margin-top: -8px; font-size: 13px; color: #A8361F;">Escribe el nombre del evento.</span></sc-if>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Fecha<input type="date" value="{{nDate}}" onInput="{{setDate}}" style="min-height: 48px; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 10px; font-size: 15px; background: #FFFFFF; color: #1E2A22;"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Hora<input type="time" value="{{nTime}}" onInput="{{setTime}}" style="min-height: 48px; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 10px; font-size: 15px; background: #FFFFFF; color: #1E2A22;"></label>
+        </div>
+        <div role="radiogroup" aria-labelledby="pr-l" style="display: flex; flex-direction: column; gap: 6px;">
+          <span id="pr-l" style="font-size: 14px; font-weight: 700;">Prioridad</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+            <sc-for list="{{prios}}" as="pr" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{pr.sel}}" onClick="{{pr.pick}}" style="min-height: 48px; border-radius: 12px; border: 2px solid {{pr.border}}; background: {{pr.bg}}; color: {{pr.fg}}; font-size: 14px; font-weight: 700; cursor: pointer;"><span aria-hidden="true">{{pr.mark}}</span> {{pr.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Contacto (opcional)
+          <input value="{{nContact}}" onInput="{{setContact}}" placeholder="Ej.: Laura, RR. HH." autocomplete="name" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Área
+          <select onChange="{{setArea}}" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 12px; font-size: 16px; background: #FFFFFF; color: #1E2A22;"><option>Carrera</option><option>Inglés</option><option>Salud</option><option>Relaciones</option></select>
+        </label>
+        <span style="font-size: 13px; color: #4E5C52;">Te avisaremos el día anterior y 1 hora antes. Los eventos no dan XP por crearlos, solo por asistir.</span>
+        <button type="submit" class="q-press" style="min-height: 56px; border: none; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; font-size: 17px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">Guardar evento</button>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 156px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22);">{{toast}}</div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"view":{"editor":"enum","options":["lista","nuevo"],"default":"lista","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'prox', detail: -1, newOpen: props.view === 'nuevo', toast: '', tried: false,
+      nTitle: '', nDate: '2026-10-20', nTime: '10:00', nPrio: 1, nContact: '', nArea: 'Carrera',
+      events: [
+        { title: 'Entrevista con Estudio Norte', date: '2026-10-14', time: '11:00', prio: 0, contact: 'Laura Méndez', role: 'Recursos humanos', area: 'Carrera', notes: 'Llevar portafolio impreso y 3 preguntas preparadas.' },
+        { title: 'Clase de conversación', date: '2026-10-15', time: '19:00', prio: 1, contact: 'Mr. Daniels', role: 'Profesor de inglés', area: 'Inglés', notes: 'Tema: viajes. Repasar el vocabulario del proyecto.' },
+        { title: 'Revisión médica anual', date: '2026-10-22', time: '08:30', prio: 1, contact: 'Clínica Central', role: 'Recepción', area: 'Salud', notes: 'Ir en ayunas.' },
+        { title: 'Cumpleaños de mamá', date: '2026-10-28', time: '20:00', prio: 2, contact: 'Familia', role: 'Cena en casa', area: 'Relaciones', notes: 'Comprar el regalo antes del 25.' },
+        { title: 'Reunión del equipo de Questly', date: '2026-10-08', time: '17:00', prio: 1, contact: 'Equipo', role: 'Videollamada', area: 'Carrera', notes: 'Se revisó el diseño del Stage.', attended: true },
+        { title: 'Webinar de productividad', date: '2026-10-03', time: '18:00', prio: 2, contact: 'Online', role: 'Evento abierto', area: 'Carrera', notes: '' }
+      ]
+    };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.tt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  flash(m) { clearTimeout(this.tt); this.setState({ toast: m }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const today = '2026-10-12';
+    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const P = [{ label: 'Alta', mark: '▲', bg: '#FBE4DF', fg: '#A8361F', border: '#A8361F' }, { label: 'Media', mark: '●', bg: '#FBF0D3', fg: '#6E4D00', border: '#B9890F' }, { label: 'Baja', mark: '▼', bg: '#E7EDE1', fg: '#3E4A42', border: '#7D8A80' }];
+    const dayDiff = (d) => Math.round((new Date(d + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000);
+    const decorate = (e, i) => {
+      const [y, m, dd] = e.date.split('-').map(Number);
+      const diff = dayDiff(e.date);
+      const p = P[e.prio];
+      return { ...e, idx: i, mon: months[m - 1], day: dd, full: dd + ' ' + months[m - 1], diff, prio: p.label, pMark: p.mark, pBg: p.bg, pFg: p.fg,
+        initial: (e.contact || '?').charAt(0).toUpperCase(), contact: e.contact || 'Sin contacto', rel: diff === 0 ? 'hoy' : (diff === 1 ? 'mañana' : 'en ' + diff + ' días'),
+        attended: !!e.attended, op: diff < 0 && !e.attended ? 0.75 : 1, open: () => this.setState({ detail: i }) };
+    };
+    const all = s.events.map(decorate);
+    const future = all.filter(e => e.diff >= 0).sort((a, b) => a.diff - b.diff || a.time.localeCompare(b.time));
+    const past = all.filter(e => e.diff < 0).sort((a, b) => b.diff - a.diff);
+    const list = s.tab === 'prox' ? future : past;
+    const bucket = (e) => s.tab === 'prox' ? (e.diff <= 6 ? 'Esta semana' : 'Más adelante') : 'Pasados';
+    const names = s.tab === 'prox' ? ['Esta semana', 'Más adelante'] : ['Pasados'];
+    const groups = names.map(name => ({ name, items: list.filter(e => bucket(e) === name) })).filter(g => g.items.length);
+    const soon = future[0];
+    const d = s.detail >= 0 ? all[s.detail] : (all[0]);
+    const tabs = [['prox', 'Próximos · ' + future.length], ['past', 'Pasados · ' + past.length]].map(([id, label]) => { const on = s.tab === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => this.setState({ tab: id }) }; });
+    const prios = P.map((p, i) => { const on = s.nPrio === i; return { ...p, sel: on ? 'true' : 'false', bg: on ? p.bg : '#FFFFFF', fg: on ? p.fg : '#1E2A22', border: on ? p.border : '#DCE4D4', pick: () => this.setState({ nPrio: i }) }; });
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Stage'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? '#1F5C39' : '#4E5C52', weight: on ? 700 : 400, pill: on ? '#E1F0E6' : 'transparent' }; });
+    const titleErr = s.tried && !s.nTitle.trim();
+    return {
+      hasSoon: !!soon, soon: soon || {}, soonHref: '#', openSoon: (e) => { if (e && e.preventDefault) e.preventDefault(); if (soon) this.setState({ detail: soon.idx }); },
+      tabs, groups, empty: groups.length === 0,
+      showDetail: s.detail >= 0, closeDetail: () => this.setState({ detail: -1 }),
+      d: { ...d, canAttend: d.diff <= 0 && !d.attended },
+      attend: () => { const ev = this.state.events.map((x, i) => i === this.state.detail ? { ...x, attended: true } : x); this.setState({ events: ev, detail: -1 }); this.flash('¡Asististe! +10 XP para ' + d.area); },
+      openNew: () => this.setState({ newOpen: true, tried: false }), closeNew: () => this.setState({ newOpen: false }), showNew: s.newOpen,
+      nTitle: s.nTitle, setTitle: (e) => this.setState({ nTitle: e.target.value }), titleErr, titleInvalid: titleErr ? 'true' : 'false', titleBorder: titleErr ? '#A8361F' : '#C9D3C2',
+      nDate: s.nDate, setDate: (e) => this.setState({ nDate: e.target.value }), nTime: s.nTime, setTime: (e) => this.setState({ nTime: e.target.value }),
+      prios, nContact: s.nContact, setContact: (e) => this.setState({ nContact: e.target.value }), setArea: (e) => this.setState({ nArea: e.target.value }),
+      save: (e) => { if (e && e.preventDefault) e.preventDefault(); if (!this.state.nTitle.trim()) { this.setState({ tried: true }); return; }
+        const n = { title: this.state.nTitle.trim(), date: this.state.nDate || today, time: this.state.nTime || '09:00', prio: this.state.nPrio, contact: this.state.nContact.trim(), role: 'Contacto', area: this.state.nArea, notes: '' };
+        this.setState({ events: [...this.state.events, n], newOpen: false, tab: 'prox', nTitle: '', nContact: '' }); this.flash('Evento guardado. Aparecerá también en tu Calendario.'); },
+      navItems, toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

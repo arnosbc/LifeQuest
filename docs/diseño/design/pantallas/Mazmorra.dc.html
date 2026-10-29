@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Deep Working — Mazmorra</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #13201A; color: #EEF3EC; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden; position: relative;">
+
+  <sc-if value="{{isSetup}}" hint-placeholder-val="{{ true }}">
+    <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+      <dc-import name="Hero" kicker="Deep Working" heading="Prepara tu incursión" icon="sword" tone="night" hint-size="390px,156px"></dc-import>
+      <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 20px;">
+
+        <section aria-labelledby="bag-l" style="background: #1C2C24; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 id="bag-l" style="margin: 0; display: flex; align-items: center; gap: 8px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F2C66B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5zM9 8V6a3 3 0 0 1 6 0v2M9 13h6"></path></svg>Mochila de misiones</h2>
+            <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #A9B8AD;">{{selCount}}/5</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;">
+            <sc-for list="{{slots}}" as="sl" hint-placeholder-count="5">
+              <sc-if value="{{sl.filled}}" hint-placeholder-val="{{ false }}">
+                <button type="button" onClick="{{sl.remove}}" aria-label="Quitar de la mochila: {{sl.title}}" class="q-pop" style="aspect-ratio: 1; border: none; border-radius: 14px; background: {{sl.bg}}; color: #0E1B14; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; position: relative;">
+                  {{sl.initial}}
+                  <span style="font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;">+{{sl.xp}}</span>
+                </button>
+              </sc-if>
+              <sc-if value="{{sl.empty}}" hint-placeholder-val="{{ true }}">
+                <button type="button" onClick="{{openPicker}}" aria-label="Añadir misión a la mochila" style="aspect-ratio: 1; border: 1.5px dashed #3A5446; border-radius: 14px; background: transparent; color: #A9B8AD; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+              </sc-if>
+            </sc-for>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px;">
+            <sc-for list="{{chosen}}" as="ch" hint-placeholder-count="2">
+              <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 28px;"><span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 7px; background: {{ch.bg}}; color: #0E1B14; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">{{ch.initial}}</span><span style="flex-grow: 1;">{{ch.title}}</span></li>
+            </sc-for>
+          </ul>
+          <button type="button" onClick="{{openPicker}}" style="min-height: 44px; border: none; border-radius: 12px; background: #2C4036; color: #EEF3EC; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Elegir misiones</button>
+        </section>
+
+        <section aria-labelledby="dur-l" style="display: flex; flex-direction: column; gap: 10px;">
+          <h2 id="dur-l" style="margin: 0; display: flex; align-items: center; gap: 8px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F2C66B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6M10 21V11h4v10M12 11c-3 0-3-4 0-8 3 4 3 8 0 8z"></path></svg>Duración de la incursión</h2>
+          <div style="display: flex; align-items: center; gap: 12px; background: #1C2C24; border-radius: 16px; padding: 8px;">
+            <button type="button" onClick="{{lessTime}}" aria-label="Quitar 30 minutos" style="width: 48px; height: 48px; border: none; border-radius: 12px; background: #2C4036; color: #EEF3EC; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+            <span aria-live="polite" style="flex-grow: 1; text-align: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800;">{{blockLabel}}</span>
+            <button type="button" onClick="{{moreTime}}" aria-label="Añadir 30 minutos" style="width: 48px; height: 48px; border: none; border-radius: 12px; background: #2C4036; color: #EEF3EC; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+          </div>
+          <div role="radiogroup" aria-label="Duración de cada mazmorra" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #1C2C24; border-radius: 12px; padding: 4px;">
+            <sc-for list="{{lengths}}" as="l" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{l.checked}}" onClick="{{l.pick}}" style="min-height: 44px; border: none; border-radius: 9px; background: {{l.bg}}; color: {{l.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{l.label}}</button>
+            </sc-for>
+          </div>
+        </section>
+
+        <section aria-label="Mapa de la incursión" aria-live="polite" style="display: flex; flex-direction: column; gap: 10px;">
+          <div aria-hidden="true" style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+            <sc-for list="{{route}}" as="rt" hint-placeholder-count="9">
+              <span style="height: 14px; width: {{rt.w}}px; border-radius: 4px; background: {{rt.bg}};"></span>
+            </sc-for>
+          </div>
+          <span style="font-size: 13px; color: #A9B8AD;">{{cyclesPlanned}} mazmorras de {{len}} min con {{breaksPlanned}} descansos · botín posible <strong style="color: #9FDCB4;">+{{lootXp}} XP</strong></span>
+        </section>
+
+        <button type="button" onClick="{{start}}" disabled="{{cantStart}}" class="q-press" style="min-height: 56px; border: none; border-radius: 16px; background: {{startBg}}; color: #0E1B14; font-size: 17px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 0 {{startShadow}};">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg>{{startLabel}}
+        </button>
+      </div>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{isSession}}" hint-placeholder-val="{{ false }}">
+    <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 24px; display: flex; flex-direction: column;">
+      <dc-import name="Hero" kicker="{{sessKicker}}" heading="{{sessHeading}}" icon="sword" tone="night" hint-size="390px,156px"></dc-import>
+      <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+        <section aria-label="Tarea actual" style="display: flex; align-items: center; gap: 12px; background: #1C2C24; border-radius: 16px; padding: 12px 14px;">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 64 64" style="flex-shrink: 0; opacity: {{guardOpacity}};"><path d="M14 22 L10 8 L22 16 Z" fill="#E0573F"></path><path d="M50 22 L54 8 L42 16Z" fill="#E0573F"></path><path d="M12 30 C12 16 52 16 52 30 L52 50 C52 56 46 58 40 56 L32 52 L24 56 C18 58 12 56 12 50Z" fill="#4A3636"></path><ellipse cx="24" cy="34" rx="4" ry="3" fill="#F2C66B"></ellipse><ellipse cx="40" cy="34" rx="4" ry="3" fill="#F2C66B"></ellipse></svg>
+          <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 12px; color: #A9B8AD;">Trabajando en</span>
+            <span style="font-size: 16px; font-weight: 700;">{{curTask}}</span>
+          </div>
+          <button type="button" onClick="{{nextTask}}" aria-label="Cambiar a la siguiente tarea" style="width: 44px; height: 44px; border: none; border-radius: 12px; background: #2C4036; color: #EEF3EC; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5v14l9-7zM18 5v14"></path></svg></button>
+        </section>
+
+        <section aria-label="Temporizador" style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+          <div style="position: relative; width: 220px; height: 220px;">
+            <svg aria-hidden="true" width="220" height="220" viewBox="0 0 240 240" style="transform: rotate(-90deg);">
+              <circle cx="120" cy="120" r="110" fill="none" stroke="#24362C" stroke-width="12"></circle>
+              <circle cx="120" cy="120" r="110" fill="none" stroke="{{ringColor}}" stroke-width="12" stroke-linecap="round" stroke-dasharray="691.15" stroke-dashoffset="{{dashOffset}}" style="transition: stroke-dashoffset 1s linear;"></circle>
+            </svg>
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+              <span role="timer" aria-live="off" aria-label="Tiempo restante {{timeLabel}}" style="font-family: 'DM Mono', monospace; font-size: 48px;">{{timeLabel}}</span>
+              <span style="font-size: 13px; color: #A9B8AD;">{{subLabel}}</span>
+            </div>
+          </div>
+          <ol aria-label="Mazmorras del bloque" style="list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
+            <sc-for list="{{dots}}" as="d" hint-placeholder-count="5"><li aria-label="{{d.label}}" style="width: 26px; height: 10px; border-radius: 99px; background: {{d.bg}}; box-shadow: {{d.ring}};"></li></sc-for>
+          </ol>
+        </section>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" onClick="{{toggleRun}}" class="q-press" style="flex-grow: 1; min-height: 56px; border: none; border-radius: 16px; background: #7FD3A0; color: #0E1B14; font-size: 17px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #3F9563;">{{runLabel}}</button>
+          <sc-if value="{{isBreak}}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{skipBreak}}" style="min-height: 56px; padding: 0 16px; border: 1.5px solid #3A5446; border-radius: 16px; background: transparent; color: #EEF3EC; font-size: 14px; font-weight: 700; cursor: pointer;">Saltar descanso</button>
+          </sc-if>
+        </div>
+
+        <section aria-labelledby="st-l" style="display: flex; flex-direction: column; gap: 6px;">
+          <h2 id="st-l" style="margin: 0 0 2px; font-size: 15px; font-weight: 700;">Mochila · {{doneTasks}}/{{totalTasks}} cumplidas</h2>
+          <sc-for list="{{sessTasks}}" as="t" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 52px; background: {{t.bg}}; border-radius: 12px; padding: 0 12px; box-shadow: inset 0 0 0 1.5px {{t.border}};">
+              <input type="checkbox" id="ss-{{t.id}}" checked="{{t.done}}" onChange="{{t.toggle}}" style="width: 22px; height: 22px; margin: 0; accent-color: #7FD3A0; flex-shrink: 0; cursor: pointer;">
+              <label for="ss-{{t.id}}" style="flex-grow: 1; font-size: 15px; color: {{t.color}}; text-decoration: {{t.deco}}; cursor: pointer; padding: 12px 0;">{{t.title}}</label>
+              <span style="font-family: 'DM Mono', monospace; font-size: 12px; color: #9FDCB4;">+{{t.xp}}</span>
+            </div>
+          </sc-for>
+        </section>
+
+        <div style="display: flex; gap: 8px;">
+          <button type="button" onClick="{{backSetup}}" style="flex: 1; min-height: 48px; border: 1.5px solid #3A5446; border-radius: 14px; background: transparent; color: #EEF3EC; font-size: 14px; font-weight: 700; cursor: pointer;">Ajustar incursión</button>
+          <button type="button" onClick="{{finish}}" style="flex: 1; min-height: 48px; border: none; border-radius: 14px; background: #2C4036; color: #EEF3EC; font-size: 14px; font-weight: 700; cursor: pointer;">Terminar</button>
+        </div>
+      </div>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{showPicker}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: flex-end;">
+      <div role="dialog" aria-modal="true" aria-labelledby="pk-title" class="q-sheet" style="width: 100%; height: 78%; background: #F3F6EF; color: #1E2A22; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; overflow: hidden;">
+        <div style="flex-shrink: 0; padding: 10px 18px 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #DCE4D4;">
+          <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 id="pk-title" style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">Llena tu mochila</h2>
+            <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4E5C52;">{{selCount}}/5</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 0 0 1px #DCE4D4; padding: 0 12px;">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+            <label for="pk-q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Buscar misión</label>
+            <input id="pk-q" type="search" value="{{query}}" onChange="{{onQuery}}" placeholder="Buscar misión" style="flex-grow: 1; min-width: 0; height: 44px; border: none; outline-offset: -2px; font-size: 15px; color: #1E2A22; background: transparent;">
+          </div>
+          <div role="radiogroup" aria-label="Filtro" style="display: flex; gap: 6px; overflow-x: auto;">
+            <sc-for list="{{pickFilters}}" as="pf" hint-placeholder-count="4">
+              <button type="button" role="radio" aria-checked="{{pf.checked}}" onClick="{{pf.pick}}" style="flex-shrink: 0; min-height: 40px; padding: 0 12px; border-radius: 99px; border: 1.5px solid {{pf.border}}; background: {{pf.bg}}; color: {{pf.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{pf.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 10px 18px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <sc-for list="{{pickList}}" as="pt" hint-placeholder-count="5">
+            <li>
+              <button type="button" aria-pressed="{{pt.pressed}}" onClick="{{pt.toggle}}" disabled="{{pt.locked}}" style="width: 100%; min-height: 56px; border: none; border-radius: 14px; background: {{pt.bg}}; box-shadow: inset 0 0 0 1.5px {{pt.border}}; padding: 8px 12px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: #1E2A22; opacity: {{pt.opacity}};">
+                <span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 8px; border: 2px solid {{pt.ring}}; background: {{pt.fill}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{pt.tick}}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px;">{{pt.title}}</span><span style="font-size: 12px; color: #4E5C52;">{{pt.meta}}</span></span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 12px; color: #1F5C39; background: #E1F0E6; padding: 2px 6px; border-radius: 6px;">+{{pt.xp}}</span>
+              </button>
+            </li>
+          </sc-for>
+          <sc-if value="{{pickEmpty}}" hint-placeholder-val="{{ false }}"><li style="text-align: center; padding: 20px; font-size: 14px; color: #4E5C52;">Ninguna misión coincide.</li></sc-if>
+        </ul>
+        <div style="flex-shrink: 0; padding: 12px 18px 18px; border-top: 1px solid #DCE4D4;">
+          <button type="button" onClick="{{closePicker}}" class="q-press" style="width: 100%; min-height: 52px; border: none; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">Listo · {{selCount}} en la mochila</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{showSummary}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: flex-end;">
+      <div role="dialog" aria-modal="true" aria-labelledby="sum-title" class="q-sheet" style="width: 100%; background: #F3F6EF; color: #1E2A22; border-radius: 24px 24px 0 0; padding: 24px 20px 26px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #1F5C39;">Fin de la incursión</span>
+        <h2 id="sum-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800;">{{summaryTitle}}</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+          <div style="background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #4E5C52;">Mazmorras</span><span style="font-family: 'DM Mono', monospace; font-size: 22px;">{{doneCycles}}</span></div>
+          <div style="background: #E1F0E6; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #1F5C39;">XP</span><span style="font-family: 'DM Mono', monospace; font-size: 22px; color: #1F5C39;">+{{earnedXp}}</span></div>
+          <div style="background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #4E5C52;">Tareas</span><span style="font-family: 'DM Mono', monospace; font-size: 22px;">{{doneTasks}}/{{totalTasks}}</span></div>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.5; background: {{noteBg}}; color: {{noteFg}}; border-radius: 12px; padding: 12px;">{{summaryNote}}</p>
+        <button type="button" onClick="{{closeSummary}}" class="q-press" style="min-height: 52px; border: none; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">Volver</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #13201A; border-top: 1px solid #2C4036; padding: 4px 4px 10px;">
+    <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #A9B8AD; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Inicio</a>
+    <a href="Stage.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #A9B8AD; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span>Stage</a>
+    <a href="Habitos.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #A9B8AD; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"></path></svg></span>Hábitos</a>
+    <a href="Mazmorra.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #9FDCB4; font-size: 12px; font-weight: 700;"><span style="width: 44px; height: 28px; border-radius: 99px; background: #24362C; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg></span>Mazmorra</a>
+    <a href="Perfil.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #A9B8AD; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["setup","picker","session"],"default":"setup","section":"Estado inicial"},"demoSpeed":{"editor":"boolean","default":true,"section":"Prototipo"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const ph = props.phase || 'setup';
+    this.state = {
+      phase: ph === 'session' ? 'session' : 'setup', picker: ph === 'picker',
+      blockMin: 150, len: 25, query: '', pickFilter: 'Sugeridas',
+      mode: 'work', remaining: 25 * 60, running: false, elapsed: 0,
+      cycle: 1, doneCycles: 0, summary: false, curIdx: 0,
+      selected: [1, 4],
+      tasks: [
+        { id: 1, title: 'Entregar informe de laboratorio', link: 'Proyecto del semestre', prio: 'Urgente', day: 0, xp: 40, done: false, sug: true },
+        { id: 2, title: 'Responder correos del tutor', link: 'Sin vincular', prio: 'Urgente', day: 0, xp: 10, done: false, sug: false },
+        { id: 3, title: 'Pagar la factura de internet', link: 'Sin vincular', prio: 'Urgente', day: 0, xp: 10, done: false, sug: false },
+        { id: 4, title: 'Escribir la introducción', link: 'Ensayo final de Historia', prio: 'Alta', day: 0, xp: 30, done: false, sug: true },
+        { id: 5, title: 'Repasar 20 palabras de inglés', link: 'Meta · Hablar inglés', prio: 'Media', day: 0, xp: 15, done: false, sug: true },
+        { id: 6, title: 'Ordenar apuntes de la semana', link: 'Sin vincular', prio: 'Baja', day: 0, xp: 10, done: false, sug: false },
+        { id: 7, title: 'Comprar comida para el perro', link: 'Sin vincular', prio: 'Media', day: 1, xp: 10, done: false, sug: false },
+        { id: 8, title: 'Diseñar portada del ensayo', link: 'Ensayo final de Historia', prio: 'Alta', day: 2, xp: 25, done: false, sug: false },
+        { id: 9, title: 'Preparar exposición de Historia', link: 'Ensayo final de Historia', prio: 'Alta', day: 3, xp: 40, done: false, sug: true },
+        { id: 10, title: 'Buscar 5 fuentes para el ensayo', link: 'Ensayo final de Historia', prio: 'Media', day: 5, xp: 20, done: false, sug: false },
+        { id: 11, title: 'Resolver guía de estequiometría', link: 'Proyecto del semestre', prio: 'Alta', day: 4, xp: 30, done: false, sug: false },
+        { id: 12, title: 'Grabar un audio hablando en inglés', link: 'Meta · Hablar inglés', prio: 'Media', day: 6, xp: 25, done: false, sug: false }
+      ]
+    };
+  }
+  componentDidMount() { this.iv = setInterval(() => this.tick(), 1000); }
+  componentWillUnmount() { clearInterval(this.iv); }
+  total() { return Math.max(1, Math.floor(this.state.blockMin / (this.state.len + 5))); }
+  tick() {
+    const s = this.state;
+    if (s.phase !== 'session' || !s.running || s.summary) return;
+    const step = (this.props.demoSpeed ?? true) ? 60 : 1;
+    const elapsed = s.elapsed + step;
+    if (elapsed >= s.blockMin * 60) { this.setState({ elapsed: s.blockMin * 60, running: false, summary: true, doneCycles: s.mode === 'work' ? s.doneCycles + 1 : s.doneCycles }); return; }
+    const left = s.remaining - step;
+    if (left > 0) { this.setState({ remaining: left, elapsed }); return; }
+    if (s.mode === 'work') this.setState({ mode: 'break', remaining: (((s.doneCycles + 1) % 4 === 0) ? 15 : 5) * 60, doneCycles: s.doneCycles + 1, elapsed });
+    else this.setState({ mode: 'work', remaining: s.len * 60, cycle: Math.min(s.cycle + 1, this.total()), elapsed });
+  }
+  fmt(min) { const h = Math.floor(min / 60), m = min % 60; return (h ? h + ' h' : '') + (h && m ? ' ' : '') + (m ? m + ' min' : ''); }
+  renderVals() {
+    const s = this.state;
+    const total = this.total();
+    const sel = s.selected.map(id => s.tasks.find(t => t.id === id)).filter(Boolean);
+    const colors = ['#7FD3A0', '#F2C66B', '#9FB8E8', '#F2A08C', '#C9B6E8'];
+    const slots = [];
+    for (let i = 0; i < 5; i++) {
+      const t = sel[i];
+      slots.push(t ? { filled: true, empty: false, title: t.title, initial: t.title.charAt(0), xp: t.xp, bg: colors[i], remove: () => this.setState({ selected: this.state.selected.filter(x => x !== t.id) }) } : { filled: false, empty: true });
+    }
+    const chosen = sel.map((t, i) => ({ title: t.title, initial: t.title.charAt(0), bg: colors[i] }));
+    const lengths = [25, 30, 45].map(n => { const on = s.len === n; return { label: n + ' min', checked: on ? 'true' : 'false', bg: on ? '#2C4036' : 'transparent', fg: on ? '#FFFFFF' : '#A9B8AD', pick: () => this.setState({ len: n, remaining: n * 60 }) }; });
+    const route = [];
+    for (let i = 0; i < total; i++) { route.push({ w: 28, bg: '#7FD3A0' }); if (i < total - 1) route.push({ w: 8, bg: ((i + 1) % 4 === 0) ? '#F2C66B' : '#3A5446' }); }
+    const cantStart = sel.length === 0;
+
+    const filters = { Sugeridas: t => t.sug, Hoy: t => t.day === 0, Urgentes: t => t.prio === 'Urgente' || t.prio === 'Alta', Todas: () => true };
+    const q = s.query.trim().toLowerCase();
+    const full = sel.length >= 5;
+    const pickList = s.tasks.filter(filters[s.pickFilter]).filter(t => !q || t.title.toLowerCase().indexOf(q) >= 0).map(t => {
+      const on = s.selected.indexOf(t.id) >= 0;
+      const locked = !on && full;
+      return {
+        ...t, meta: t.link + (t.day === 0 ? ' · hoy' : ' · en ' + t.day + (t.day === 1 ? ' día' : ' días')),
+        pressed: on ? 'true' : 'false', locked, opacity: locked ? 0.5 : 1,
+        bg: on ? '#E1F0E6' : '#FFFFFF', border: on ? '#2E7D4F' : '#DCE4D4',
+        ring: on ? '#2E7D4F' : '#B7C4AE', fill: on ? '#2E7D4F' : '#FFFFFF', tick: on ? '#FFFFFF' : 'transparent',
+        toggle: () => this.setState({ selected: on ? this.state.selected.filter(x => x !== t.id) : [...this.state.selected, t.id] })
+      };
+    });
+    const pickFilters = ['Sugeridas', 'Hoy', 'Urgentes', 'Todas'].map(f => { const on = s.pickFilter === f; return { label: f === 'Sugeridas' ? 'Sugeridas por RPGenie' : f, checked: on ? 'true' : 'false', bg: on ? '#1E2A22' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#1E2A22' : '#C9D3C2', pick: () => this.setState({ pickFilter: f }) }; });
+
+    const isBreak = s.mode === 'break';
+    const fullT = isBreak ? ((s.doneCycles % 4 === 0) ? 15 : 5) * 60 : s.len * 60;
+    const progress = 1 - s.remaining / fullT;
+    const doneTasks = sel.filter(t => t.done);
+    const pendingSel = sel.filter(t => !t.done);
+    const cur = pendingSel.length ? pendingSel[s.curIdx % pendingSel.length] : null;
+    const dots = [];
+    for (let i = 1; i <= total; i++) { const done = i <= s.doneCycles, current = i === s.cycle && !done; dots.push({ bg: done ? '#7FD3A0' : (current ? '#3A5446' : '#24362C'), ring: current ? '0 0 0 2px #7FD3A0' : 'none', label: 'Mazmorra ' + i + (done ? ', superada' : current ? ', en curso' : ', pendiente') }); }
+    const sessTasks = sel.map(t => { const isCur = cur && cur.id === t.id; return { ...t, color: t.done ? '#A9B8AD' : '#EEF3EC', deco: t.done ? 'line-through' : 'none', bg: isCur ? '#1F3A2C' : '#1C2C24', border: isCur ? '#7FD3A0' : 'transparent', toggle: () => this.setState({ tasks: this.state.tasks.map(x => x.id === t.id ? { ...x, done: !x.done } : x) }) }; });
+    const pending = sel.length - doneTasks.length;
+    const blockLeft = Math.max(0, Math.round((s.blockMin * 60 - s.elapsed) / 60));
+    return {
+      isSetup: s.phase === 'setup', isSession: s.phase === 'session',
+      slots, chosen, selCount: sel.length,
+      openPicker: () => this.setState({ picker: true }), closePicker: () => this.setState({ picker: false }),
+      showPicker: s.picker, query: s.query, onQuery: (e) => this.setState({ query: e.target.value }),
+      pickFilters, pickList, pickEmpty: pickList.length === 0,
+      blockLabel: this.fmt(s.blockMin),
+      lessTime: () => this.setState({ blockMin: Math.max(30, s.blockMin - 30) }),
+      moreTime: () => this.setState({ blockMin: Math.min(360, s.blockMin + 30) }),
+      lengths, route, len: s.len,
+      cyclesPlanned: total, breaksPlanned: Math.max(0, total - 1),
+      lootXp: total * 25 + sel.reduce((a, t) => a + t.xp, 0),
+      cantStart, startBg: cantStart ? '#3A5446' : '#7FD3A0', startShadow: cantStart ? '#2C4036' : '#3F9563',
+      startLabel: cantStart ? 'Llena la mochila para entrar' : 'Entrar a la mazmorra',
+      start: () => { if (!cantStart) this.setState({ phase: 'session', mode: 'work', remaining: s.len * 60, elapsed: 0, cycle: 1, doneCycles: 0, running: true, curIdx: 0 }); },
+      sessKicker: 'Quedan ' + (this.fmt(blockLeft) || '0 min'), sessHeading: 'Mazmorra ' + Math.min(s.cycle, total) + ' de ' + total,
+      curTask: cur ? cur.title : '¡Mochila vacía: todo cumplido!',
+      nextTask: () => this.setState({ curIdx: s.curIdx + 1 }),
+      ringColor: isBreak ? '#F2C66B' : '#7FD3A0', dashOffset: (691.15 * (1 - progress)).toFixed(2),
+      timeLabel: String(Math.floor(s.remaining / 60)).padStart(2, '0') + ':' + String(s.remaining % 60).padStart(2, '0'),
+      subLabel: isBreak ? 'Descanso · respira y estira' : (s.running ? 'Venciendo al guardián' : 'En pausa'),
+      guardOpacity: isBreak ? 0.35 : 1, dots, sessTasks,
+      runLabel: s.running ? 'Pausar' : 'Reanudar', isBreak,
+      toggleRun: () => this.setState({ running: !s.running }),
+      skipBreak: () => this.setState({ mode: 'work', remaining: s.len * 60, cycle: Math.min(s.cycle + 1, total) }),
+      backSetup: () => this.setState({ phase: 'setup', running: false }),
+      earnedXp: s.doneCycles * 25 + doneTasks.reduce((a, t) => a + t.xp, 0),
+      doneCycles: s.doneCycles, doneTasks: doneTasks.length, totalTasks: sel.length,
+      summaryTitle: s.doneCycles > 0 ? '¡Incursión superada!' : 'Retirada a tiempo',
+      summaryNote: pending === 0 ? 'Cumpliste todas las misiones de la mochila: sin penalización de vida.' : 'Quedaron ' + pending + ' misiones en la mochila. La penalización de vida se reduce según lo que avanzaste.',
+      noteBg: pending === 0 ? '#E1F0E6' : '#FBF0D3', noteFg: pending === 0 ? '#1F5C39' : '#6E4D00',
+      showSummary: s.summary,
+      finish: () => this.setState({ summary: true, running: false }),
+      closeSummary: () => this.setState({ summary: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

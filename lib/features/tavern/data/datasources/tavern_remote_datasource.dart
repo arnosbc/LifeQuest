@@ -14,6 +14,8 @@ abstract class TavernRemoteDataSource {
 
   Future<void> createNpc(NewNpc npc);
 
+  Future<String?> suggestMission(String npcId);
+
   Future<void> acceptMission(String npcId, String title);
 
   Future<void> completeMission(String taskId);
@@ -41,6 +43,29 @@ class TavernRemoteDataSourceImpl implements TavernRemoteDataSource {
     'p_skill_id': npc.skillId,
     'p_frequency': npc.frequency.name,
     'p_noble_mission': npc.nobleMission,
+  });
+
+  @override
+  Future<String?> suggestMission(String npcId) => _guard(() async {
+    try {
+      final response = await _client.functions.invoke(
+        'npc-mission',
+        body: {'npc_id': npcId},
+      );
+      final data = response.data as Map?;
+      final title = data?['title'];
+      if (title is String && title.isNotEmpty) return title;
+      // Motivo de la Edge Function (p. ej. gemini_429) para el aviso.
+      if (data?['reason'] case final String reason) {
+        throw ServerException(code: 'suggestion_failed', statusCode: reason);
+      }
+      return null;
+    } on FunctionException catch (error) {
+      throw ServerException(
+        code: 'suggestion_failed',
+        statusCode: '${error.status}',
+      );
+    }
   });
 
   @override

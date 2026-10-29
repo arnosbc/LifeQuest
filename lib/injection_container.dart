@@ -147,6 +147,7 @@ import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
 import 'package:proyecto_movil/features/notifications/data/datasources/notifications_remote_datasource.dart';
 import 'package:proyecto_movil/features/notifications/data/repositories/notifications_repository_impl.dart';
@@ -324,6 +325,7 @@ Future<void> initDependencies() async {
     () => TavernBloc(
       getBoard: sl(),
       createNpc: sl(),
+      suggestMission: sl(),
       acceptMission: sl(),
       completeMission: sl(),
       renameNpc: sl(),
@@ -334,6 +336,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => RenameNpc(sl()));
   sl.registerLazySingleton(() => DeleteNpc(sl()));
   sl.registerLazySingleton(() => CreateNpc(sl()));
+  sl.registerLazySingleton(() => SuggestNpcMission(sl()));
   sl.registerLazySingleton(() => AcceptNpcMission(sl()));
   sl.registerLazySingleton(() => CompleteNpcMission(sl()));
   sl.registerLazySingleton<TavernRepository>(() => TavernRepositoryImpl(sl()));

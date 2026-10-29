@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Hábitos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden;">
+
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 24px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Rutinas del héroe" heading="Hábitos" icon="leaf" action-href="CrearHabito.dc.html" action-label="Crear hábito" action-icon="plus" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+    <section aria-label="Progreso de hoy" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800;">Ritual de hoy</span>
+        <p style="margin: 0; font-size: 14px; color: #4E5C52;">{{doneToday}} de {{goodTotal}} buenos hábitos cumplidos</p>
+      </div>
+      <div aria-label="Progreso de hoy {{doneToday}} de {{goodTotal}}" role="img" style="position: relative; width: 56px; height: 56px;">
+        <svg aria-hidden="true" width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="23" fill="none" stroke="#DCE4D4" stroke-width="7"></circle><circle cx="28" cy="28" r="23" fill="none" stroke="#2E7D4F" stroke-width="7" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="{{ringOffset}}" transform="rotate(-90 28 28)" style="transition: stroke-dashoffset .4s;"></circle></svg>
+        <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 14px;">{{doneToday}}/{{goodTotal}}</span>
+      </div>
+    </section>
+
+    <div role="tablist" aria-label="Tipo de hábito" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 12px; padding: 4px;">
+      <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+        <button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="min-height: 44px; border: none; border-radius: 9px; background: {{tb.bg}}; color: {{tb.fg}}; font-size: 14px; font-weight: 700; box-shadow: {{tb.shadow}}; cursor: pointer;">{{tb.label}}</button>
+      </sc-for>
+    </div>
+
+    <section role="tabpanel" aria-label="{{panelLabel}}" style="display: flex; flex-direction: column; gap: 8px;">
+      <sc-for list="{{habits}}" as="h" hint-placeholder-count="3">
+        <div style="position: relative; display: flex; align-items: center; gap: 12px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px #DCE4D4; padding: 10px 10px 10px 14px; min-height: 64px;">
+          <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 15px; font-weight: 700;">{{h.name}}</span>
+            <span style="font-size: 12px; color: #4E5C52; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <sc-if value="{{h.good}}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; gap: 3px; font-weight: 700; color: #A8361F;"><svg aria-hidden="true" class="q-flame" width="13" height="13" viewBox="0 0 24 24" fill="#E0573F" stroke="#A8361F" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 3-6 0 2.5 1 4 2.5 4C11.5 9 10 5 12 2z"></path></svg>{{h.streak}} días</span></sc-if>
+              <span>{{h.meta}}</span>
+            </span>
+          </div>
+          <span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{h.rewardFg}}; background: {{h.rewardBg}}; padding: 3px 6px; border-radius: 6px; flex-shrink: 0;">{{h.reward}}</span>
+          <button type="button" aria-pressed="{{h.pressed}}" onClick="{{h.act}}" class="q-press" style="min-width: 100px; min-height: 44px; border-radius: 12px; border: 1.5px solid {{h.btnBorder}}; background: {{h.btnBg}}; color: {{h.btnFg}}; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 0 {{h.btnShadow}};">
+            <sc-if value="{{h.on}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+            {{h.btnLabel}}
+          </button>
+          <sc-if value="{{h.floating}}" hint-placeholder-val="{{ false }}">
+            <span aria-hidden="true" class="q-float" style="position: absolute; right: 18px; top: -8px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 16px; color: {{h.floatFg}}; background: #FFFFFF; padding: 2px 8px; border-radius: 99px; box-shadow: 0 4px 12px rgba(30,42,34,.18);">{{h.reward}}</span>
+          </sc-if>
+        </div>
+      </sc-for>
+      <div style="display: flex; gap: 10px; align-items: flex-start; background: #E3E9F7; border-radius: 14px; padding: 12px;">
+        <svg aria-hidden="true" width="36" height="36" viewBox="0 0 64 64" style="flex-shrink: 0;"><path d="M32 16 C27 5 15 6 17 15 C23 16 28 16 32 16Z" fill="#5FAE7A"></path><path d="M32 16 C37 5 49 6 47 15 C41 16 36 16 32 16Z" fill="#3F9563"></path><ellipse cx="32" cy="40" rx="21" ry="19" fill="#2E7D4F"></ellipse><ellipse cx="32" cy="45" rx="13" ry="10" fill="#CDE8D5"></ellipse><circle cx="24.5" cy="35" r="3.4" fill="#1E2A22"></circle><circle cx="39.5" cy="35" r="3.4" fill="#1E2A22"></circle><path d="M28 42 q4 4 8 0" fill="none" stroke="#1E2A22" stroke-width="2" stroke-linecap="round"></path></svg>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #2C4580;">{{tabTip}}</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="st-title" style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 id="st-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">Estadísticas de crecimiento</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+        <div style="background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #4E5C52;">Esta semana</span><span style="font-family: 'DM Mono', monospace; font-size: 24px;">{{week}}</span></div>
+        <div style="background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #4E5C52;">Este mes</span><span style="font-family: 'DM Mono', monospace; font-size: 24px;">{{month}}</span></div>
+        <div style="background: #E1F0E6; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #1F5C39;">Este año</span><span style="font-family: 'DM Mono', monospace; font-size: 24px; color: #1F5C39;">{{year}}</span></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="hm-title" style="display: flex; flex-direction: column; gap: 12px; background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px #DCE4D4; padding: 12px 14px 14px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <button type="button" onClick="{{prevMonth}}" aria-label="Mes anterior" style="width: 44px; height: 44px; border: none; background: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <h2 id="hm-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800;">Mapa de calor · {{monthName}}</h2>
+        <button type="button" onClick="{{nextMonth}}" aria-label="Mes siguiente" style="width: 44px; height: 44px; border: none; background: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></button>
+      </div>
+      <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; font-size: 12px; color: #4E5C52; text-align: center;">
+        <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+      </div>
+      <div role="list" aria-label="Días de {{monthName}}" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;">
+        <sc-for list="{{cells}}" as="c" hint-placeholder-count="31">
+          <div role="{{c.role}}" aria-label="{{c.label}}" style="aspect-ratio: 1; border-radius: 8px; background: {{c.bg}}; border: {{c.border}}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: {{c.fg}};">{{c.day}}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+        <div aria-hidden="true" style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #4E5C52;">Menos
+          <sc-for list="{{legend}}" as="lg" hint-placeholder-count="4"><span style="width: 14px; height: 14px; border-radius: 4px; background: {{lg}}; display: inline-block;"></span></sc-for>
+          Más</div>
+        <div role="radiogroup" aria-label="Color del mapa" style="display: flex; gap: 2px;">
+          <sc-for list="{{themes}}" as="th" hint-placeholder-count="3">
+            <button type="button" role="radio" aria-checked="{{th.checked}}" aria-label="{{th.name}}" onClick="{{th.pick}}" style="width: 44px; height: 44px; border: none; background: transparent; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><span style="width: 22px; height: 22px; border-radius: 99px; background: {{th.color}}; box-shadow: {{th.ring}}; display: block;"></span></button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Inicio</a>
+    <a href="Stage.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span>Stage</a>
+    <a href="Habitos.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #1F5C39; font-size: 12px; font-weight: 700;"><span style="width: 44px; height: 28px; border-radius: 99px; background: #E1F0E6; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"></path></svg></span>Hábitos</a>
+    <a href="Mazmorra.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg></span>Mazmorra</a>
+    <a href="Perfil.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'good', monthIdx: 2, theme: 'Bosque', floatId: 0,
+      good: [
+        { id: 1, name: 'Leer 20 minutos', meta: 'Diario', xp: 10, streak: 12, on: true },
+        { id: 2, name: 'Ejercicio', meta: 'L, M, V', xp: 15, streak: 4, on: false },
+        { id: 3, name: 'Beber 2 L de agua', meta: 'Diario', xp: 5, streak: 7, on: false }
+      ],
+      bad: [
+        { id: 11, name: 'Posponer la alarma', meta: '2 veces este mes', hp: 5, count: 0 },
+        { id: 12, name: 'Redes después de las 23:00', meta: '5 veces este mes', hp: 5, count: 0 }
+      ]
+    };
+  }
+  componentWillUnmount() { clearTimeout(this.ft); }
+  pop(id) { clearTimeout(this.ft); this.setState({ floatId: id }); this.ft = setTimeout(() => this.setState({ floatId: 0 }), 1300); }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const ramps = {
+      Bosque: ['#E7EDE1', '#BFD9C7', '#5FAE7A', '#1F5C39'],
+      Mostaza: ['#E7EDE1', '#F3DE9F', '#D9A21B', '#6E4D00'],
+      'Río': ['#E7EDE1', '#C3CFEA', '#7590CF', '#2C4580']
+    };
+    const ramp = ramps[s.theme];
+    const months = [
+      { name: 'agosto', days: 31, offset: 5, upto: 31 },
+      { name: 'septiembre', days: 30, offset: 1, upto: 30 },
+      { name: 'octubre', days: 31, offset: 3, upto: 11 }
+    ];
+    const m = months[s.monthIdx];
+    const doneToday = s.good.filter(h => h.on).length;
+    const cells = [];
+    for (let i = 0; i < m.offset; i++) cells.push({ day: '', bg: 'transparent', border: 'none', fg: 'transparent', role: 'presentation', label: '' });
+    for (let d = 1; d <= m.days; d++) {
+      if (d > m.upto) { cells.push({ day: d, bg: '#FFFFFF', border: '1.5px dashed #C9D3C2', fg: '#4E5C52', role: 'listitem', label: d + ' de ' + m.name + ': sin registros todavía' }); continue; }
+      let lvl = ((d * 7 + s.monthIdx * 3) % 11) % 4;
+      if (s.monthIdx === 2 && d === 11) lvl = doneToday;
+      cells.push({ day: d, bg: ramp[lvl], border: 'none', fg: lvl >= 3 ? '#FFFFFF' : (lvl === 0 ? '#1E2A22' : '#1A1F1B'), role: 'listitem', label: d + ' de ' + m.name + ': ' + lvl + (lvl === 1 ? ' hábito completado' : ' hábitos completados') });
+    }
+    const tabs = [['good', 'Buenos'], ['bad', 'Malos']].map(([id, label]) => {
+      const on = s.tab === id;
+      return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.14)' : 'none', pick: () => this.setState({ tab: id }) };
+    });
+    const habits = s.tab === 'good'
+      ? s.good.map(h => ({
+          name: h.name, meta: h.meta, good: true, on: h.on, streak: h.streak + (h.on ? 1 : 0),
+          reward: '+' + h.xp + ' XP', rewardFg: '#1F5C39', rewardBg: '#E1F0E6', floatFg: '#1F5C39',
+          pressed: h.on ? 'true' : 'false', btnLabel: h.on ? 'Hecho' : 'Completar',
+          btnBg: h.on ? '#E1F0E6' : '#2E7D4F', btnFg: h.on ? '#1F5C39' : '#FFFFFF',
+          btnBorder: h.on ? '#BFD9C7' : '#2E7D4F', btnShadow: h.on ? '#BFD9C7' : '#1F5C39',
+          floating: s.floatId === h.id,
+          act: () => { const nowOn = !h.on; this.setState({ good: this.state.good.map(x => x.id === h.id ? { ...x, on: nowOn } : x) }); if (nowOn) this.pop(h.id); }
+        }))
+      : s.bad.map(h => ({
+          name: h.name, meta: h.count ? h.meta + ' · hoy ' + h.count : h.meta, good: false, on: false, streak: 0,
+          reward: '−' + h.hp + ' HP', rewardFg: '#A8361F', rewardBg: '#FBE4DF', floatFg: '#A8361F',
+          pressed: 'false', btnLabel: 'Registrar',
+          btnBg: '#FFFFFF', btnFg: '#1E2A22', btnBorder: '#C9D3C2', btnShadow: '#DCE4D4',
+          floating: s.floatId === h.id,
+          act: () => { this.setState({ bad: this.state.bad.map(x => x.id === h.id ? { ...x, count: x.count + 1 } : x) }); this.pop(h.id); }
+        }));
+    const themes = Object.keys(ramps).map(name => ({
+      name, color: ramps[name][2], checked: s.theme === name ? 'true' : 'false',
+      ring: s.theme === name ? '0 0 0 2px #FFFFFF, 0 0 0 4px #1E2A22' : 'none',
+      pick: () => this.setState({ theme: name })
+    }));
+    return {
+      tabs, habits, cells, themes, legend: ramp,
+      panelLabel: s.tab === 'good' ? 'Buenos hábitos' : 'Malos hábitos',
+      tabTip: s.tab === 'good'
+        ? 'Completar un hábito alarga tu racha y suma XP. Si fallas un día, un Pase de Recuperación puede proteger la racha.'
+        : 'Registrar un mal hábito no es un castigo: es información honesta. Cuesta 5 de vida, y la recuperas con constancia.',
+      doneToday, goodTotal: s.good.length,
+      ringOffset: (144.5 * (1 - doneToday / s.good.length)).toFixed(1),
+      week: 9 + doneToday, month: 24 + doneToday, year: 268 + doneToday,
+      monthName: m.name,
+      prevMonth: () => this.setState({ monthIdx: Math.max(0, s.monthIdx - 1) }),
+      nextMonth: () => this.setState({ monthIdx: Math.min(2, s.monthIdx + 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>

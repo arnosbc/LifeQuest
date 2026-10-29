@@ -64,18 +64,7 @@ class TavernScreen extends StatelessWidget {
           )) {
         return;
       }
-      if (!context.mounted) return;
-      final title = await askLifeQuestText(
-        context,
-        title: '¿Qué te propone ${npc.name}?',
-        label: npc.nobleMission == null
-            ? 'Misión'
-            : 'Misión para: ${npc.nobleMission}',
-        confirmLabel: 'Aceptar misión',
-      );
-      if (title != null) {
-        bloc.add(NpcMissionAccepted(npcId: npc.id, title: title));
-      }
+      bloc.add(NpcMissionRequested(npc));
     }
 
     Future<void> create() async {

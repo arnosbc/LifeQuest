@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Iniciar sesión y registro</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+
+  <header style="position: relative; height: {{headH}}; flex-shrink: 0; background: #1F5C39; border-radius: 0 0 32px 32px; overflow: hidden;">
+    <svg aria-hidden="true" width="390" height="260" viewBox="0 0 390 260" preserveAspectRatio="xMidYMax slice" style="position: absolute; left: 0; bottom: 0;">
+      <circle cx="320" cy="64" r="22" fill="#F2C66B" opacity=".9"></circle>
+      <circle cx="268" cy="36" r="2.2" fill="#F2C66B" opacity=".6"></circle><circle cx="64" cy="54" r="2" fill="#F2C66B" opacity=".5"></circle>
+      <path d="M0 190 L70 146 L120 172 L190 120 L260 168 L320 138 L390 160 V260 H0Z" fill="#2E7D4F"></path>
+      <path d="M0 222 Q110 198 210 216 T390 210 V260 H0Z" fill="#276B44"></path>
+      <path d="M24 232 L40 190 L56 232Z M60 236 L78 182 L96 236Z M300 232 L316 194 L332 232Z M334 236 L352 186 L370 236Z" fill="#174A2E"></path>
+      <path d="M186 120 L186 88 M186 88 L206 96 L186 104" fill="#F2C66B" stroke="#F2C66B" stroke-width="3" stroke-linejoin="round"></path>
+    </svg>
+    <div style="position: relative; padding: 12px 12px 0 8px; min-height: 44px; display: flex; align-items: center;">
+      <sc-if value="{{isRecover}}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{toLogin}}" aria-label="Volver a iniciar sesión" style="width: 44px; height: 44px; border: none; background: transparent; color: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+      </sc-if>
+    </div>
+    <div style="position: relative; padding: 4px 24px 0; display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 800; color: #F3F6EF; letter-spacing: -0.01em;">Questly</span>
+      <span style="font-size: 14px; color: #CFE8D7;">Tu vida es la aventura</span>
+    </div>
+  </header>
+
+  <main style="flex-grow: 1; overflow-y: auto; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px;">
+
+    <sc-if value="{{showTabs}}" hint-placeholder-val="{{ true }}">
+      <div role="tablist" aria-label="Acceso" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+          <button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{tb.bg}}; color: {{tb.fg}}; font-size: 15px; font-weight: 700; box-shadow: {{tb.shadow}}; cursor: pointer;">{{tb.label}}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800;">{{title}}</h1>
+      <p style="margin: 0; font-size: 14px; color: #4E5C52; line-height: 1.45;">{{lead}}</p>
+    </div>
+
+    <sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="q-shake" style="display: flex; gap: 10px; align-items: flex-start; background: #FBE4DF; border-radius: 14px; padding: 12px;">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8361F" stroke-width="2.2" stroke-linecap="round" style="flex-shrink: 0;"><path d="M12 9v4M12 17v.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+        <span style="font-size: 14px; color: #A8361F; line-height: 1.4;">{{errorText}}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isLogin}}" hint-placeholder-val="{{ true }}">
+      <form onSubmit="{{submitLogin}}" novalidate style="display: flex; flex-direction: column; gap: 12px;">
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Correo electrónico
+          <input type="email" value="{{email}}" onInput="{{setEmail}}" autocomplete="email" inputmode="email" placeholder="tu@correo.com" aria-invalid="{{emailInvalid}}" style="min-height: 52px; border: 1.5px solid {{emailBorder}}; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+        </label>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label for="pw-l" style="font-size: 14px; font-weight: 700;">Contraseña</label>
+          <div style="position: relative;">
+            <input id="pw-l" type="{{pwType}}" value="{{pw}}" onInput="{{setPw}}" autocomplete="current-password" placeholder="Tu contraseña" style="width: 100%; box-sizing: border-box; min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 56px 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+            <button type="button" onClick="{{togglePw}}" aria-label="{{pwToggleLabel}}" aria-pressed="{{pwShown}}" style="position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; border: none; background: transparent; color: #4E5C52; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{eyeIcon}}"></path></svg></button>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; cursor: pointer;"><input type="checkbox" checked="{{remember}}" onChange="{{toggleRemember}}" style="width: 20px; height: 20px; accent-color: #2E7D4F;">Recordarme</label>
+          <button type="button" onClick="{{toRecover}}" style="min-height: 44px; border: none; background: transparent; color: #1F5C39; font-size: 14px; font-weight: 700; cursor: pointer; padding: 0;">¿Olvidaste tu contraseña?</button>
+        </div>
+        <button type="submit" class="q-press" style="min-height: 56px; border: none; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; font-size: 17px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">{{loginCta}}</button>
+      </form>
+    </sc-if>
+
+    <sc-if value="{{isRegister}}" hint-placeholder-val="{{ false }}">
+      <form onSubmit="{{submitRegister}}" novalidate style="display: flex; flex-direction: column; gap: 12px;">
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Tu nombre
+          <input value="{{name}}" onInput="{{setName}}" autocomplete="given-name" placeholder="Ej.: Jose" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Correo electrónico
+          <input type="email" value="{{email}}" onInput="{{setEmail}}" autocomplete="email" inputmode="email" placeholder="tu@correo.com" aria-invalid="{{emailInvalid}}" style="min-height: 52px; border: 1.5px solid {{emailBorder}}; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+        </label>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label for="pw-r" style="font-size: 14px; font-weight: 700;">Crea una contraseña</label>
+          <div style="position: relative;">
+            <input id="pw-r" type="{{pwType}}" value="{{pw}}" onInput="{{setPw}}" autocomplete="new-password" aria-describedby="pw-rules" placeholder="Mínimo 8 caracteres" style="width: 100%; box-sizing: border-box; min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 56px 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+            <button type="button" onClick="{{togglePw}}" aria-label="{{pwToggleLabel}}" aria-pressed="{{pwShown}}" style="position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; border: none; background: transparent; color: #4E5C52; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{eyeIcon}}"></path></svg></button>
+          </div>
+          <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px;">
+            <sc-for list="{{strength}}" as="st" hint-placeholder-count="3"><span style="height: 6px; border-radius: 99px; background: {{st.bg}};"></span></sc-for>
+          </div>
+          <ul id="pw-rules" aria-live="polite" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px;">
+            <sc-for list="{{rules}}" as="ru" hint-placeholder-count="3">
+              <li style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{ru.fg}};"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{ru.icon}}"></path></svg>{{ru.label}}<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{ru.sr}}</span></li>
+            </sc-for>
+          </ul>
+        </div>
+        <label style="display: flex; align-items: flex-start; gap: 10px; min-height: 44px; font-size: 14px; line-height: 1.4; cursor: pointer;"><input type="checkbox" checked="{{terms}}" onChange="{{toggleTerms}}" style="width: 20px; height: 20px; margin: 1px 0 0; flex-shrink: 0; accent-color: #2E7D4F;"><span>Acepto los <a href="#" style="color: #1F5C39; font-weight: 700;">términos</a> y la <a href="#" style="color: #1F5C39; font-weight: 700;">política de privacidad</a>.</span></label>
+        <button type="submit" class="q-press" style="min-height: 56px; border: none; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; font-size: 17px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">{{registerCta}}</button>
+      </form>
+    </sc-if>
+
+    <sc-if value="{{isRecover}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{submitRecover}}" novalidate style="display: flex; flex-direction: column; gap: 12px;">
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Correo de tu cuenta
+              <input type="email" value="{{email}}" onInput="{{setEmail}}" autocomplete="email" inputmode="email" placeholder="tu@correo.com" aria-invalid="{{emailInvalid}}" style="min-height: 52px; border: 1.5px solid {{emailBorder}}; border-radius: 14px; padding: 0 14px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+            </label>
+            <button type="submit" class="q-press" style="min-height: 56px; border: none; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; font-size: 17px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">Enviar enlace</button>
+          </form>
+        </sc-if>
+        <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+          <div role="status" class="q-pop" style="background: #E1F0E6; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;">
+            <svg aria-hidden="true" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1F5C39" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3zM3 7l9 6 9-6"></path></svg>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 800; color: #1F5C39;">Revisa tu correo</span>
+            <span style="font-size: 14px; color: #1F5C39; line-height: 1.45;">Si {{email}} tiene una cuenta, te llegará un enlace en unos minutos. Mira también en spam.</span>
+          </div>
+          <button type="button" onClick="{{toLogin}}" class="q-press" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; background: #FFFFFF; color: #1E2A22; font-size: 16px; font-weight: 700; cursor: pointer;">Volver a iniciar sesión</button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showSocial}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div aria-hidden="true" style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #4E5C52;"><span style="flex-grow: 1; height: 1px; background: #DCE4D4;"></span>o continúa con<span style="flex-grow: 1; height: 1px; background: #DCE4D4;"></span></div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+          <button type="button" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; background: #FFFFFF; color: #1E2A22; font-size: 15px; font-weight: 700; cursor: pointer;">Google</button>
+          <button type="button" style="min-height: 52px; border: 1.5px solid #C9D3C2; border-radius: 14px; background: #FFFFFF; color: #1E2A22; font-size: 15px; font-weight: 700; cursor: pointer;">Apple</button>
+        </div>
+        <p style="margin: 0; font-size: 14px; color: #4E5C52; text-align: center;">{{switchText}} <button type="button" onClick="{{switchView}}" style="min-height: 44px; border: none; background: transparent; color: #1F5C39; font-size: 14px; font-weight: 700; cursor: pointer; padding: 0 4px;">{{switchCta}}</button></p>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-fade" style="position: absolute; inset: 0; background: rgba(243,246,239,.92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+      <svg class="q-bob" aria-hidden="true" width="96" height="96" viewBox="0 0 120 120"><path d="M60 40 C50 14 26 14 26 14 C30 30 42 38 60 40 C78 38 90 30 94 14 C94 14 70 14 60 40Z" fill="#7CC79A"></path><ellipse cx="60" cy="76" rx="38" ry="34" fill="#3F9563"></ellipse><circle cx="46" cy="72" r="7" fill="#FFFFFF"></circle><circle cx="74" cy="72" r="7" fill="#FFFFFF"></circle><circle cx="47" cy="73" r="3.4" fill="#1A1F1B"></circle><circle cx="75" cy="73" r="3.4" fill="#1A1F1B"></circle><path d="M50 88 Q60 96 70 88" fill="none" stroke="#1A1F1B" stroke-width="3" stroke-linecap="round"></path></svg>
+      <span style="font-size: 16px; font-weight: 700; color: #1E2A22;">{{loadingText}}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{doneLogin}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: #F3F6EF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800;">{{doneTitle}}</span>
+      <span style="font-size: 15px; color: #4E5C52; line-height: 1.45;">{{doneText}}</span>
+      <a href="{{doneHref}}" class="q-press" style="margin-top: 6px; min-height: 56px; width: 100%; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 0 #1F5C39;">{{doneCta}}</a>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"view":{"editor":"enum","options":["login","registro","recuperar"],"default":"login","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: props.view || 'login', email: '', pw: '', name: '', show: false, remember: true, terms: false, error: '', tried: false, sent: false, loading: false, done: false };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.lt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const v = s.view;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email.trim());
+    const badEmail = s.tried && !emailOk;
+    const r1 = s.pw.length >= 8, r2 = /\d/.test(s.pw), r3 = /[A-Z]/.test(s.pw) && /[a-z]/.test(s.pw);
+    const score = [r1, r2, r3].filter(Boolean).length;
+    const sColor = score === 3 ? '#2E7D4F' : (score === 2 ? '#D9A21B' : '#E0573F');
+    const rules = [[r1, 'Al menos 8 caracteres'], [r2, 'Un número'], [r3, 'Mayúsculas y minúsculas']].map(([ok, label]) => ({ label, fg: ok ? '#1F5C39' : '#4E5C52', icon: ok ? 'M5 12l5 5 9-10' : 'M12 12h.01', sr: ok ? ': cumplido' : ': pendiente' }));
+    const go = (view) => this.setState({ view, error: '', tried: false, sent: false });
+    const startLoad = (text, after) => { this.setState({ loading: true, loadText: text, error: '' }); clearTimeout(this.lt); this.lt = setTimeout(() => this.setState({ loading: false, ...after }), 1100); };
+    const copy = {
+      login: ['Bienvenido de vuelta', 'Tu racha y tus misiones te esperan.'],
+      registro: ['Crea tu cuenta', 'Guarda tu progreso y juega desde cualquier dispositivo.'],
+      recuperar: ['Recupera tu contraseña', 'Te enviaremos un enlace para crear una nueva.']
+    }[v];
+    const tabs = [['login', 'Iniciar sesión'], ['registro', 'Registrarse']].map(([id, label]) => { const on = v === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => go(id) }; });
+    return {
+      headH: v === 'recuperar' ? '170px' : '210px',
+      tabs, showTabs: v !== 'recuperar', isLogin: v === 'login', isRegister: v === 'registro', isRecover: v === 'recuperar',
+      title: copy[0], lead: copy[1],
+      hasError: !!s.error, errorText: s.error,
+      email: s.email, setEmail: (e) => this.setState({ email: e.target.value, error: '' }),
+      emailInvalid: badEmail ? 'true' : 'false', emailBorder: badEmail ? '#A8361F' : '#C9D3C2',
+      pw: s.pw, setPw: (e) => this.setState({ pw: e.target.value, error: '' }),
+      pwType: s.show ? 'text' : 'password', pwShown: s.show ? 'true' : 'false', pwToggleLabel: s.show ? 'Ocultar contraseña' : 'Mostrar contraseña',
+      eyeIcon: s.show ? 'M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A10 10 0 0 1 12 5c5 0 9 4.5 10 7a13 13 0 0 1-3 4M6.6 6.6A13 13 0 0 0 2 12c1 2.5 5 7 10 7a10 10 0 0 0 4.4-1' : 'M2 12c1-2.5 5-7 10-7s9 4.5 10 7c-1 2.5-5 7-10 7S3 14.5 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+      togglePw: () => this.setState({ show: !this.state.show }),
+      remember: s.remember, toggleRemember: () => this.setState({ remember: !this.state.remember }),
+      name: s.name, setName: (e) => this.setState({ name: e.target.value, error: '' }),
+      terms: s.terms, toggleTerms: () => this.setState({ terms: !this.state.terms, error: '' }),
+      strength: [1, 2, 3].map(i => ({ bg: s.pw && i <= Math.max(score, 1) ? sColor : '#E7EDE1' })), rules,
+      loginCta: 'Entrar al reino', registerCta: 'Crear cuenta',
+      submitLogin: (e) => { if (e && e.preventDefault) e.preventDefault();
+        if (!emailOk || !s.pw) { this.setState({ tried: true, error: !emailOk ? 'Revisa el correo: parece que falta algo (ej.: tu@correo.com).' : 'Escribe tu contraseña para entrar.' }); return; }
+        if (s.pw.length < 6) { this.setState({ tried: true, error: 'El correo o la contraseña no coinciden. Inténtalo de nuevo o recupera tu contraseña.' }); return; }
+        startLoad('Abriendo las puertas del reino…', { done: true }); },
+      submitRegister: (e) => { if (e && e.preventDefault) e.preventDefault();
+        let err = '';
+        if (!s.name.trim()) err = 'Dinos cómo te llamas.';
+        else if (!emailOk) err = 'Revisa el correo: parece que falta algo (ej.: tu@correo.com).';
+        else if (score < 3) err = 'Tu contraseña necesita cumplir los 3 requisitos.';
+        else if (!s.terms) err = 'Acepta los términos para crear tu cuenta.';
+        if (err) { this.setState({ tried: true, error: err }); return; }
+        startLoad('Forjando tu personaje…', { done: true }); },
+      submitRecover: (e) => { if (e && e.preventDefault) e.preventDefault();
+        if (!emailOk) { this.setState({ tried: true, error: 'Escribe un correo válido para enviarte el enlace.' }); return; }
+        startLoad('Enviando enlace…', { sent: true }); },
+      notSent: !s.sent, sent: s.sent,
+      toRecover: () => go('recuperar'), toLogin: () => go('login'),
+      showSocial: v !== 'recuperar',
+      switchText: v === 'login' ? '¿Aún no tienes cuenta?' : '¿Ya tienes cuenta?', switchCta: v === 'login' ? 'Regístrate' : 'Inicia sesión',
+      switchView: () => go(v === 'login' ? 'registro' : 'login'),
+      loading: s.loading, loadingText: s.loadText || '',
+      doneLogin: s.done,
+      doneTitle: v === 'registro' ? '¡Cuenta creada!' : '¡Hola de nuevo!',
+      doneText: v === 'registro' ? 'RPGenie te espera para preparar tu personaje en 4 pasos.' : 'Tu racha de 12 días sigue en pie.',
+      doneHref: v === 'registro' ? 'Onboarding.dc.html' : 'Main.dc.html',
+      doneCta: v === 'registro' ? 'Crear mi personaje' : 'Ir al inicio'
+    };
+  }
+}
+</script>
+</body>
+</html>

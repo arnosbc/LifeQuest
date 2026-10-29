@@ -9,6 +9,9 @@ abstract class TavernRepository {
 
   Future<Either<Failure, Unit>> createNpc(NewNpc npc);
 
+  /// Título sugerido por RPGenie (Edge Function `npc-mission`); solo texto.
+  Future<Either<Failure, String?>> suggestMission(String npcId);
+
   /// Crea la misión como tarea real; el servidor cobra si no es gratis.
   Future<Either<Failure, Unit>> acceptMission({
     required String npcId,

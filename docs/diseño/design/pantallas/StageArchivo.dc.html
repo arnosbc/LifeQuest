@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Stage — Archivo</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Biblioteca" heading="Archivo" icon="archive" back-href="StageBiblioteca.dc.html" back-label="Volver a la Biblioteca" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 14px;">
+
+      <section aria-label="Resumen del archivo" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center;">
+        <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800;">{{total}}</span><span style="font-size: 12px; color: #4E5C52;">guardados</span></span>
+        <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; color: #6E4D00;">{{bosses}}</span><span style="font-size: 12px; color: #4E5C52;">jefes vencidos</span></span>
+        <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; color: #1F5C39;">{{xpSum}}</span><span style="font-size: 12px; color: #4E5C52;">XP conservada</span></span>
+      </section>
+
+      <label style="position: relative; display: flex;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Buscar en el archivo</span>
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.2" stroke-linecap="round" style="position: absolute; left: 14px; top: 15px;"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+        <input type="search" value="{{q}}" onInput="{{setQ}}" placeholder="Buscar en el archivo" style="width: 100%; min-height: 48px; border: 1.5px solid #C9D3C2; border-radius: 14px; padding: 0 14px 0 40px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+      </label>
+
+      <div role="group" aria-label="Filtrar por tipo" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+          <button type="button" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}" style="flex-shrink: 0; min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1.5px solid {{f.border}}; background: {{f.bg}}; color: {{f.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{f.label}}</button>
+        </sc-for>
+      </div>
+
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+        <sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+          <li style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 12px; background: {{it.tint}}; color: {{it.ink}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg></span>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 15px; font-weight: 700; line-height: 1.3;">{{it.name}}</span>
+                <span style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: #4E5C52;">
+                  <span style="font-weight: 700; padding: 1px 7px; border-radius: 6px; background: {{it.tint}}; color: {{it.ink}};">{{it.type}}</span>
+                  <span style="font-weight: 700; color: {{it.reasonFg}};">{{it.reason}}</span>
+                  <span>· {{it.when}}</span>
+                </span>
+              </span>
+              <sc-if value="{{it.boss}}" hint-placeholder-val="{{ false }}"><svg role="img" aria-label="Jefe derrotado" width="22" height="22" viewBox="0 0 24 24" fill="#D9A21B" stroke="#6E4D00" stroke-width="1.4" stroke-linejoin="round"><path d="M3 18h18M4 18L3 7l5 4 4-7 4 7 5-4-1 11z"></path></svg></sc-if>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span style="flex-grow: 1; font-size: 12px; color: #4E5C52;">{{it.note}}</span>
+              <button type="button" onClick="{{it.restore}}" aria-label="Restaurar {{it.name}}" style="min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v5h5"></path></svg>Restaurar</button>
+              <button type="button" onClick="{{it.ask}}" aria-label="Eliminar {{it.name}} para siempre" style="width: 44px; height: 44px; border-radius: 12px; border: 1.5px solid #F0C3B9; background: #FBE4DF; color: #A8361F; cursor: pointer; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+            </div>
+          </li>
+        </sc-for>
+      </ul>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+        <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 22px 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
+          <svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#7D8A80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"></path></svg>
+          <span style="font-size: 15px; font-weight: 700;">Nada por aquí</span>
+          <span style="font-size: 13px; color: #4E5C52;">Prueba con otro filtro o búsqueda.</span>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; gap: 10px; align-items: flex-start; background: #E1F0E6; border-radius: 16px; padding: 12px;">
+        <svg aria-hidden="true" width="36" height="36" viewBox="0 0 48 48" style="flex-shrink: 0;"><ellipse cx="24" cy="30" rx="14" ry="12" fill="#2E7D4F"></ellipse><path d="M24 18 C20 8 12 8 12 8 C14 14 18 17 24 18 C30 17 34 14 36 8 C36 8 28 8 24 18Z" fill="#3F9563"></path><circle cx="19" cy="29" r="2.4" fill="#FFFFFF"></circle><circle cx="29" cy="29" r="2.4" fill="#FFFFFF"></circle></svg>
+        <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #1F5C39;"><strong>RPGenie:</strong> Archivar quita ruido de tu Stage, pero no borra la XP ni los logros que ganaste. Puedes restaurar cualquier cosa cuando quieras.</p>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{confirmOn}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.6); display: flex; align-items: center; justify-content: center; padding: 24px;">
+      <div role="alertdialog" aria-modal="true" aria-labelledby="del-t" aria-describedby="del-d" class="q-pop" style="width: 100%; background: #FFFFFF; border-radius: 24px; padding: 22px 20px 18px; display: flex; flex-direction: column; gap: 10px; text-align: center;">
+        <h2 id="del-t" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 21px; font-weight: 800;">¿Eliminar para siempre?</h2>
+        <p id="del-d" style="margin: 0; font-size: 15px; color: #4E5C52; line-height: 1.45;">«{{delName}}» desaparecerá y no se podrá recuperar. La XP que ganaste con él se mantiene.</p>
+        <button type="button" onClick="{{doDelete}}" class="q-press" style="margin-top: 6px; min-height: 52px; border: none; border-radius: 14px; background: #A8361F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #7A2716; cursor: pointer;">Sí, eliminar</button>
+        <button type="button" onClick="{{cancelDelete}}" style="min-height: 52px; border-radius: 14px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 16px; font-weight: 700; cursor: pointer;">Mejor no</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 84px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22); display: flex; align-items: center; gap: 10px;"><span style="flex-grow: 1;">{{toast}}</span><sc-if value="{{canUndo}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{undo}}" style="min-height: 44px; border: none; background: transparent; color: #9FDCB4; font-size: 14px; font-weight: 700; cursor: pointer;; display: inline-flex; align-items: center">Deshacer</button></sc-if></div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filter: 'Todo', q: '', del: -1, toast: '', undo: null,
+      items: [
+        { name: 'Vocabulario de viaje', type: 'Proyecto', reason: 'Completado', when: '2 oct', xp: 140, note: '6 tareas · +140 XP' },
+        { name: 'Correr 5 km sin parar', type: 'Meta', reason: 'Jefe derrotado', when: '18 sep', xp: 300, note: 'Título «Corredor del alba»', boss: true },
+        { name: 'Mudanza de habitación', type: 'Proyecto', reason: 'Completado', when: '30 ago', xp: 95, note: '9 tareas · +95 XP' },
+        { name: 'Curso de dibujo online', type: 'Proyecto', reason: 'Pausado', when: '12 ago', xp: 40, note: 'Lo pausaste en la tarea 3 de 8' },
+        { name: 'Guía de atajos de Figma', type: 'Recurso', reason: 'Ya no lo uso', when: '5 ago', xp: 0, note: 'Enlace guardado' },
+        { name: 'Reunión del equipo de Questly', type: 'Evento', reason: 'Asistido', when: '8 oct', xp: 10, note: 'Con Equipo · +10 XP' },
+        { name: 'Leer 12 libros en 2026', type: 'Meta', reason: 'Abandonada', when: '1 jul', xp: 60, note: 'Llegaste a 4 de 12' }
+      ]
+    };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.tt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  flash(m, undo) { clearTimeout(this.tt); this.setState({ toast: m, undo: undo || null }); this.tt = setTimeout(() => this.setState({ toast: '', undo: null }), 3200); }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const T = {
+      'Proyecto': ['#E3E9F7', '#2C4580', 'M3 7h6l2 2h10v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z'],
+      'Meta': ['#FBE4DF', '#A8361F', 'M12 3v18M12 4h7l-2 3 2 3h-7'],
+      'Recurso': ['#FBF0D3', '#6E4D00', 'M6 3h9l4 4v14H6zM14 3v5h5'],
+      'Evento': ['#E1F0E6', '#1F5C39', 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4']
+    };
+    const rFg = { 'Completado': '#1F5C39', 'Jefe derrotado': '#6E4D00', 'Asistido': '#1F5C39', 'Pausado': '#3E4A42', 'Abandonada': '#3E4A42', 'Ya no lo uso': '#3E4A42' };
+    const q = s.q.trim().toLowerCase();
+    const items = s.items.map((it, i) => ({ ...it, i })).filter(it => (s.filter === 'Todo' || it.type === s.filter) && (!q || it.name.toLowerCase().indexOf(q) >= 0)).map(it => ({
+      ...it, tint: T[it.type][0], ink: T[it.type][1], icon: T[it.type][2], reasonFg: rFg[it.reason] || '#3E4A42', boss: !!it.boss,
+      restore: () => { const prev = this.state.items; this.setState({ items: prev.filter((_, j) => j !== it.i) }); this.flash('«' + it.name + '» volvió a tu Stage', prev); },
+      ask: () => this.setState({ del: it.i })
+    }));
+    const filters = ['Todo', 'Proyecto', 'Meta', 'Recurso', 'Evento'].map(k => { const on = s.filter === k; const lbl = k === 'Todo' ? 'Todo' : k + 's'; return { label: lbl, pressed: on ? 'true' : 'false', bg: on ? '#1E2A22' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#1E2A22' : '#C9D3C2', pick: () => this.setState({ filter: k }) }; });
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Stage'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? '#1F5C39' : '#4E5C52', weight: on ? 700 : 400, pill: on ? '#E1F0E6' : 'transparent' }; });
+    const delItem = s.del >= 0 ? s.items[s.del] : null;
+    return {
+      total: s.items.length, bosses: s.items.filter(x => x.boss).length, xpSum: s.items.reduce((a, x) => a + x.xp, 0),
+      q: s.q, setQ: (e) => this.setState({ q: e.target.value }), filters, items, empty: items.length === 0,
+      confirmOn: !!delItem, delName: delItem ? delItem.name : '',
+      cancelDelete: () => this.setState({ del: -1 }),
+      doDelete: () => { const n = this.state.items[this.state.del].name; this.setState({ items: this.state.items.filter((_, j) => j !== this.state.del), del: -1 }); this.flash('«' + n + '» eliminado'); },
+      toast: s.toast, toastOn: !!s.toast, canUndo: !!s.undo, undo: () => { if (this.state.undo) this.setState({ items: this.state.undo, toast: '', undo: null }); },
+      navItems
+    };
+  }
+}
+</script>
+</body>
+</html>

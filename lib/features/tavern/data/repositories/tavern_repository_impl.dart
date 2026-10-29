@@ -20,6 +20,10 @@ class TavernRepositoryImpl implements TavernRepository {
       _done(() => _remote.createNpc(npc));
 
   @override
+  Future<Either<Failure, String?>> suggestMission(String npcId) =>
+      _run(() => _remote.suggestMission(npcId));
+
+  @override
   Future<Either<Failure, Unit>> acceptMission({
     required String npcId,
     required String title,
@@ -53,7 +57,14 @@ class TavernRepositoryImpl implements TavernRepository {
         ),
       );
     } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error.code)));
+      return Left(
+        ServerFailure(
+          error.code == 'suggestion_failed'
+              ? 'RPGenie no pudo crear la misión ahora '
+                    '(código ${error.statusCode}). Inténtalo en un rato.'
+              : _messageFor(error.code),
+        ),
+      );
     }
   }
 
@@ -63,6 +74,8 @@ class TavernRepositoryImpl implements TavernRepository {
       'Tu Taverna está llena. Mejora el Estandarte del Refugio para recibir más NPCs.',
     'invalid_name' => 'Dale a tu NPC un nombre de hasta 60 caracteres.',
     'skill_not_found' => 'Elige la skill que entrenará este NPC.',
+    'invalid_noble_mission' =>
+      'Escribe la noble misión (hasta 300 caracteres): es el tema de sus misiones.',
     'invalid_title' => 'Escribe la misión en hasta 200 caracteres.',
     'npc_mission_open' =>
       'Este NPC ya te dio una misión. Cúmplela y te propondrá otra.',

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Questly — Economía del reino</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1240px; box-sizing: border-box; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; padding: 48px 56px 64px; display: flex; flex-direction: column; gap: 36px;">
+  <header style="display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid #DCE4D4; padding-bottom: 24px;">
+    <span style="font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #6E4D00;">Diseño de sistemas · propuesta v1</span>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: -0.02em;">Economía del reino</h1>
+    <p style="margin: 0; font-size: 17px; color: #4E5C52; max-width: 860px; line-height: 1.5;">Objetivo: que las Monedas valgan lo mismo el día 1 y el día 300, para alguien que juega poco y para alguien que juega mucho. Se logra con tres ideas: <strong>los ingresos no crecen con el nivel</strong>, <strong>hay un tope diario suave</strong> y <strong>la bolsa tiene límite</strong>. La XP, en cambio, nunca tiene tope: es el progreso real.</p>
+  </header>
+
+  <section style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;">
+    <sc-for list="{{pillars}}" as="p" hint-placeholder-count="4">
+      <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; color: {{p.ink}};">{{p.big}}</span>
+        <span style="font-size: 15px; font-weight: 700;">{{p.title}}</span>
+        <span style="font-size: 13px; color: #3E4A42; line-height: 1.45;">{{p.body}}</span>
+      </div>
+    </sc-for>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">Entradas · de dónde salen las Monedas</h2>
+      <table style="border-collapse: collapse; font-size: 14px;">
+        <thead><tr><th scope="col" style="text-align: left; padding: 8px 0; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">Fuente</th><th scope="col" style="text-align: right; padding: 8px 0; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">XP</th><th scope="col" style="text-align: right; padding: 8px 0; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">Monedas</th></tr></thead>
+        <tbody><sc-for list="{{faucets}}" as="f" hint-placeholder-count="8"><tr><td style="padding: 8px 12px 8px 0; border-bottom: 1px solid #EEF2EA;">{{f.src}}</td><td style="padding: 8px 0; border-bottom: 1px solid #EEF2EA; text-align: right; font-family: 'DM Mono', monospace;">{{f.xp}}</td><td style="padding: 8px 0; border-bottom: 1px solid #EEF2EA; text-align: right; font-family: 'DM Mono', monospace; color: #6E4D00;">{{f.c}}</td></tr></sc-for></tbody>
+      </table>
+      <p style="margin: 0; font-size: 13px; color: #4E5C52; line-height: 1.5;">Regla única: <strong>Monedas = 30 % de la XP</strong> (3 por cada 10 XP). La dificultad cambia la XP y la vida perdida, nunca las Monedas, así los precios sirven igual para todos.</p>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">Salidas · en qué se gastan</h2>
+      <table style="border-collapse: collapse; font-size: 14px;">
+        <thead><tr><th scope="col" style="text-align: left; padding: 8px 0; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">Objeto</th><th scope="col" style="text-align: right; padding: 8px 0; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">Precio</th><th scope="col" style="text-align: right; padding: 8px 0; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">≈ días</th><th scope="col" style="text-align: left; padding: 8px 0 8px 12px; border-bottom: 1px solid #DCE4D4; font-size: 12px; color: #4E5C52;">Límite</th></tr></thead>
+        <tbody><sc-for list="{{sinks}}" as="s" hint-placeholder-count="9"><tr><td style="padding: 8px 12px 8px 0; border-bottom: 1px solid #EEF2EA;">{{s.name}}</td><td style="padding: 8px 0; border-bottom: 1px solid #EEF2EA; text-align: right; font-family: 'DM Mono', monospace; color: #6E4D00;">{{s.p}}</td><td style="padding: 8px 0; border-bottom: 1px solid #EEF2EA; text-align: right; font-family: 'DM Mono', monospace;">{{s.d}}</td><td style="padding: 8px 0 8px 12px; border-bottom: 1px solid #EEF2EA; color: #3E4A42; font-size: 13px;">{{s.l}}</td></tr></sc-for></tbody>
+      </table>
+      <p style="margin: 0; font-size: 13px; color: #4E5C52; line-height: 1.5;">Precios anclados al <strong>«día de juego»</strong> = 50 Monedas (lo que gana un jugador regular). Son fijos: no hay inflación porque los ingresos tampoco suben.</p>
+    </div>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">Los 6 estabilizadores</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+      <sc-for list="{{controls}}" as="k" hint-placeholder-count="6">
+        <div style="background: #F3F6EF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #2E7D4F; color: #FFFFFF; font-family: 'DM Mono', monospace; font-size: 13px; display: inline-flex; align-items: center; justify-content: center;">{{k.n}}</span>{{k.t}}</span>
+          <span style="font-size: 13px; color: #3E4A42; line-height: 1.5;">{{k.b}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <h2 style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">Simulación · 180 días, 40 partidas por perfil</h2>
+      <div role="radiogroup" aria-label="Métrica" style="display: flex; gap: 4px; background: #E7EDE1; border-radius: 12px; padding: 4px;">
+        <sc-for list="{{metrics}}" as="mt" hint-placeholder-count="2"><button type="button" role="radio" aria-checked="{{mt.sel}}" onClick="{{mt.pick}}" style="min-height: 40px; padding: 0 12px; border: none; border-radius: 9px; background: {{mt.bg}}; color: {{mt.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{mt.label}}</button></sc-for>
+      </div>
+    </div>
+    <div style="display: flex; gap: 18px; font-size: 13px;">
+      <span style="display: flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #B9C3BB;"></span>Sin controles (modelo inicial)</span>
+      <span style="display: flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #2E7D4F;"></span>Con los 6 estabilizadores</span>
+    </div>
+    <div role="img" aria-label="{{chartAria}}" style="display: flex; flex-direction: column; gap: 14px;">
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center;">
+          <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{r.name}}</span><span style="font-size: 12px; color: #4E5C52;">{{r.desc}}</span></span>
+          <span style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="display: flex; align-items: center; gap: 8px;"><span style="height: 18px; width: {{r.wa}}; min-width: 4px; background: #B9C3BB; border-radius: 0 4px 4px 0;"></span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #3E4A42;">{{r.va}}</span></span>
+            <span style="display: flex; align-items: center; gap: 8px;"><span style="height: 18px; width: {{r.wb}}; min-width: 4px; background: #2E7D4F; border-radius: 0 4px 4px 0;"></span><span style="font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700;">{{r.vb}}</span></span>
+          </span>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin: 0; font-size: 14px; color: #3E4A42; line-height: 1.5;">{{note}}</p>
+    <table style="border-collapse: collapse; font-size: 13px;">
+      <caption style="text-align: left; font-size: 12px; font-weight: 700; color: #4E5C52; padding-bottom: 6px;">Resultados con estabilizadores (promedio)</caption>
+      <thead><tr><sc-for list="{{tHead}}" as="h" hint-placeholder-count="6"><th scope="col" style="text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid #DCE4D4; color: #4E5C52;">{{h}}</th></sc-for></tr></thead>
+      <tbody><sc-for list="{{tRows}}" as="tr" hint-placeholder-count="3"><tr><sc-for list="{{tr}}" as="cell" hint-placeholder-count="6"><td style="padding: 6px 10px 6px 0; border-bottom: 1px solid #EEF2EA; font-family: 'DM Mono', monospace;">{{cell}}</td></sc-for></tr></sc-for></tbody>
+    </table>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">Vida (HP): la otra moneda</h2>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; line-height: 1.5;">
+        <li>Pierdes: hábito malo −3 / −5 / −8 · misión vencida −5 · día sin jugar −5.</li>
+        <li>Recuperas: +4 cada día con un hábito bueno (+1 por nivel de Huerto) y el Hotel.</li>
+        <li>Debilitado por debajo de 30: −25 % de XP (nunca de Monedas) hasta superar 30.</li>
+        <li>Nunca baja de 0 ni se pierde nivel: el castigo es suave y siempre tiene salida.</li>
+        <li>Dificultad: la vida perdida se multiplica por 0,75 (Fácil), 1 (Normal) o 1,25 (Difícil).</li>
+      </ul>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4; padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">Qué sustituye a las autorecompensas</h2>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; line-height: 1.5;">
+        <li><strong>Refugio:</strong> mejoras permanentes con precio creciente (120 × 1,35ⁿ). Dan comodidad, nunca más Monedas.</li>
+        <li><strong>Mercado:</strong> Elixir de enfoque y Cofre misterioso, siempre disponibles.</li>
+        <li><strong>Mercado negro:</strong> objetos raros limitados que rotan cada mes.</li>
+        <li><strong>Tesoro del reino:</strong> el excedente se vuelve prestigio y títulos visibles en el perfil.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section style="background: #FBF0D3; border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;">
+    <h2 style="margin: 0; font-size: 16px; font-weight: 700; color: #6E4D00;">Cómo revisarla después del lanzamiento</h2>
+    <p style="margin: 0; font-size: 14px; color: #6E4D00; line-height: 1.5;">Medir cada mes: Monedas ganadas por usuario activo al día, % gastado, % que va al Tesoro y precio de lo que más se compra. Si el % gastado baja de 60 %, añadir un objeto al Mercado negro; si sube de 95 % con jugadores casuales, bajar la Siesta. Solo se tocan los precios del Mercado negro y del Refugio; las reglas de ingreso no se cambian, para no romper la confianza.</p>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":2500}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { metric: 'bal' }; }
+  renderVals() {
+    const s = this.state;
+    const sim = [
+      { name: 'Casual', desc: '1–4 misiones, falta 1 de cada 4 días', bal: [3612, 152], daily: [30, 22], spent: 34, spentB: 96, tre: 0, lvl: 9 },
+      { name: 'Regular', desc: '3–7 misiones al día', bal: [13532, 666], daily: [80, 52], spent: 6, spentB: 71, tre: 2091, lvl: 14 },
+      { name: 'Intenso', desc: '8–16 misiones al día', bal: [29240, 876], daily: [167, 72], spent: 3, spentB: 74, tre: 2526, lvl: 19 }
+    ];
+    const k = s.metric === 'bal' ? 'bal' : 'daily';
+    const max = Math.max(...sim.map(x => x[k][0]));
+    const fmt = (n) => n.toLocaleString('es-ES');
+    const rows = sim.map(x => ({ name: x.name, desc: x.desc, wa: (x[k][0] / max * 78).toFixed(1) + '%', wb: (x[k][1] / max * 78).toFixed(1) + '%', va: fmt(x[k][0]), vb: fmt(x[k][1]) }));
+    const metrics = [['bal', 'Monedas al día 180'], ['daily', 'Monedas por día']].map(([id, label]) => { const on = s.metric === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', pick: () => this.setState({ metric: id }) }; });
+    return {
+      pillars: [
+        { big: '30 %', title: 'Una sola regla de ingreso', body: 'Cada 10 XP = 3 Monedas, venga de donde venga.', ink: '#6E4D00' },
+        { big: '75', title: 'Tope suave diario', body: '50 Monedas completas y 25 más a la mitad. Después, solo XP.', ink: '#6E4D00' },
+        { big: '400+', title: 'Bolsa con límite', body: '400 + 25 por nivel, máximo 1.000. El resto va al Tesoro.', ink: '#6E4D00' },
+        { big: '×3', title: 'Brecha controlada', body: 'Un jugador intenso gana ~3 veces lo de uno casual, no 6.', ink: '#1F5C39' }
+      ],
+      faucets: [
+        { src: 'Tarea (estimada por RPGenie)', xp: '10–40', c: '3–12' },
+        { src: 'Hábito bueno cumplido', xp: '5–13', c: '2–4' },
+        { src: 'Ciclo de Mazmorra (25–45 min)', xp: '10', c: '3' },
+        { src: 'Misión de NPC', xp: '15–80', c: '5–24' },
+        { src: 'Cofre del día (≥ 3 misiones)', xp: '—', c: '15' },
+        { src: 'Proyecto completado', xp: '+120', c: '+36' },
+        { src: 'Jefe derrotado (meta)', xp: '+300', c: '+90' },
+        { src: 'Logros', xp: 'variable', c: '50–200' }
+      ],
+      sinks: [
+        { name: 'Siesta reparadora (+10 vida)', p: 30, d: '0,6', l: 'Sin límite' },
+        { name: 'Noche en la posada (+25)', p: 70, d: '1,4', l: 'Sin límite' },
+        { name: 'Banquete (vida completa)', p: 150, d: '3', l: 'Sin límite' },
+        { name: 'Elixir de enfoque (×1,5 XP)', p: 40, d: '0,8', l: '1 activo' },
+        { name: 'Cofre misterioso', p: 60, d: '1,2', l: '1 al día' },
+        { name: 'Pase de Recuperación', p: 90, d: '1,8', l: '1 al mes · guardar 2' },
+        { name: 'Recuperar racha', p: 150, d: '3', l: '1 al mes' },
+        { name: 'Mejora del Refugio', p: '120→', d: '2,4→', l: '×1,35 cada una' },
+        { name: 'Pedir misión NPC extra', p: 15, d: '0,3', l: 'tras la gratis de 3 h' }
+      ],
+      controls: [
+        { n: 1, t: 'Ingreso plano', b: 'Las Monedas por acción no suben con el nivel. Lo que crece es la XP necesaria para subir (100 × nivel^1,5).' },
+        { n: 2, t: 'Tope suave diario', b: 'Más de 75 Monedas al día no tiene sentido: así quien juega 10 horas no rompe los precios para los demás.' },
+        { n: 3, t: 'Bolsa con límite', b: 'Evita acumular miles de Monedas. Lo que no cabe pasa al Tesoro del reino (prestigio, no se gasta).' },
+        { n: 4, t: 'Precios fijos y anclados', b: 'Cada precio equivale a una fracción de un «día de juego». Nunca suben, así el usuario confía en ellos.' },
+        { n: 5, t: 'Salidas que crecen', b: 'El Refugio sube de precio con cada mejora: absorbe a quien tiene mucho sin castigar a quien tiene poco.' },
+        { n: 6, t: 'Anti-trampas', b: 'XP por tarea entre 10 y 40; una tarea hecha a menos de 2 min de crearla da el mínimo y 0 Monedas; máximo 15 tareas con Monedas al día.' }
+      ],
+      metrics, rows,
+      chartAria: s.metric === 'bal' ? 'Monedas acumuladas al día 180. Casual: 3.612 sin controles y 152 con controles. Regular: 13.532 y 666. Intenso: 29.240 y 876.' : 'Monedas ganadas por día. Casual: 30 y 22. Regular: 80 y 52. Intenso: 167 y 72.',
+      note: s.metric === 'bal' ? 'Sin controles, las Monedas se acumulan sin parar y los precios dejan de importar (un jugador intenso tendría 29.000). Con los estabilizadores, todos los perfiles se mantienen entre 100 y 900: siempre hay algo que quieres y casi siempre puedes pagarlo.' : 'Con el tope suave, la diferencia entre jugar poco y jugar mucho baja de ×5,6 a ×3,3: los precios sirven para todos.',
+      tHead: ['Perfil', 'Monedas/día', '% gastado', 'Al Tesoro', 'Saldo medio', 'Nivel'],
+      tRows: [['Casual', '22', '96 %', '0', '110', '9'], ['Regular', '52', '71 %', '2.091', '511', '14'], ['Intenso', '72', '74 %', '2.526', '620', '19']]
+    };
+  }
+}
+</script>
+</body>
+</html>

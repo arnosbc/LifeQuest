@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Errores y momentos difíciles</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <sc-if value="{{offlineBar}}" hint-placeholder-val="{{ true }}">
+    <div role="status" style="flex-shrink: 0; background: {{net.bg}}; color: {{net.fg}}; padding: 10px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700;">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="{{net.anim}}"><path d="{{net.icon}}"></path></svg>
+      <span style="flex-grow: 1;">{{net.text}}</span>
+    </div>
+  </sc-if>
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Estados de la app" heading="Cuando algo falla" icon="flame" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 18px;">
+      <p style="margin: 0; font-size: 14px; color: #4E5C52; line-height: 1.5;">Errores técnicos y momentos difíciles del juego. Siempre explicamos qué pasó, que tu progreso está a salvo y qué puedes hacer. Nunca culpa.</p>
+
+      <section aria-labelledby="s1" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s1" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">1 · Sin conexión</h2>
+        <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <span style="font-size: 14px; line-height: 1.45;">La app sigue funcionando sin internet. Los avances se guardan en el teléfono y se suben al volver la conexión.</span>
+          <button type="button" onClick="{{cycleNet}}" style="min-height: 48px; border-radius: 12px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 14px; font-weight: 700; cursor: pointer;">{{netBtn}}</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="s2" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s2" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">2 · RPGenie no responde</h2>
+        <div aria-live="polite" style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; gap: 12px; align-items: flex-start;">
+          <svg aria-hidden="true" width="48" height="48" viewBox="0 0 120 120" class="{{genieAnim}}" style="flex-shrink: 0;"><path d="M60 40 C50 14 26 14 26 14 C30 30 42 38 60 40 C78 38 90 30 94 14 C94 14 70 14 60 40Z" fill="#7CC79A"></path><ellipse cx="60" cy="76" rx="38" ry="34" fill="#3F9563"></ellipse><path d="M40 72 h12 M68 72 h12" stroke="#1A1F1B" stroke-width="4" stroke-linecap="round" opacity="{{sleepy}}"></path><circle cx="46" cy="72" r="6" fill="#FFFFFF" opacity="{{awake}}"></circle><circle cx="74" cy="72" r="6" fill="#FFFFFF" opacity="{{awake}}"></circle><circle cx="47" cy="73" r="3" fill="#1A1F1B" opacity="{{awake}}"></circle><circle cx="75" cy="73" r="3" fill="#1A1F1B" opacity="{{awake}}"></circle><path d="M52 90 Q60 94 68 90" fill="none" stroke="#1A1F1B" stroke-width="3" stroke-linecap="round"></path></svg>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 15px; font-weight: 700;">{{genie.title}}</span>
+            <span style="font-size: 13px; color: #4E5C52; line-height: 1.45;">{{genie.body}}</span>
+            <sc-if value="{{genie.canRetry}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{retryGenie}}" style="align-self: flex-start; min-height: 44px; padding: 0 14px; border: none; border-radius: 12px; background: #2E7D4F; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer;">Reintentar</button></sc-if>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="s3" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s3" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">3 · Error al guardar y campo inválido</h2>
+        <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700;">Nombre de la tarea
+            <input value="" placeholder="Escribe un nombre" aria-invalid="true" aria-describedby="e-name" style="min-height: 48px; border: 1.5px solid #A8361F; border-radius: 12px; padding: 0 12px; font-size: 16px; background: #FFFFFF; color: #1E2A22;">
+          </label>
+          <span id="e-name" style="display: flex; align-items: center; gap: 6px; margin-top: -4px; font-size: 13px; color: #A8361F;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5M12 16v.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path></svg>Ponle un nombre para poder guardarla.</span>
+          <div role="alert" style="background: #1E2A22; color: #F3F6EF; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; font-size: 13px;"><span style="flex-grow: 1;">No pudimos guardar el cambio. Sigue en tu teléfono.</span><button type="button" style="min-height: 44px; border: none; background: transparent; color: #9FDCB4; font-size: 13px; font-weight: 700; cursor: pointer;; display: inline-flex; align-items: center">Reintentar</button></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="s4" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s4" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">4 · Cargando</h2>
+        <div aria-hidden="true" style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; gap: 12px; align-items: center;"><span class="q-glow" style="width: 44px; height: 44px; border-radius: 12px; background: #E7EDE1;"></span><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;"><span style="height: 12px; width: 70%; border-radius: 6px; background: #E7EDE1;"></span><span style="height: 10px; width: 45%; border-radius: 6px; background: #EEF2EA;"></span></span></div>
+          <div style="height: 10px; border-radius: 99px; background: #EEF2EA;"></div>
+        </div>
+        <span style="font-size: 12px; color: #4E5C52;">Esqueletos con la forma del contenido; si tarda más de 3 s, RPGenie aparece con un mensaje.</span>
+      </section>
+
+      <section aria-labelledby="s5" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s5" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">5 · Héroe debilitado (vida baja)</h2>
+        <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 2px #E0573F, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="#FBE4DF" stroke="#A8361F" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"></path><path d="M12 9l-1.5 3h3L12 15" fill="none" stroke-linecap="round"></path></svg>
+            <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">Estás debilitado</span><span style="font-size: 13px; color: #4E5C52;">Vida {{hp}} / 100</span></span>
+            <span style="font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: #FBE4DF; color: #A8361F;">−25 % XP</span>
+          </div>
+          <div role="progressbar" aria-label="Vida" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hp}}" style="height: 10px; border-radius: 99px; background: #E7EDE1; overflow: hidden; position: relative;"><div style="height: 100%; width: {{hpPct}}; background: #E0573F; border-radius: 99px; transition: width .4s ease;"></div><span aria-hidden="true" style="position: absolute; left: 30%; top: -2px; bottom: -2px; width: 2px; background: #1E2A22;"></span></div>
+          <span style="font-size: 13px; color: #3E4A42; line-height: 1.45;">{{hpText}}</span>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+            <a href="Marketplace.dc.html" class="q-press" style="min-height: 48px; border-radius: 12px; background: #2E7D4F; color: #FFFFFF; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 0 #1F5C39;">Descansar en el Hotel</a>
+            <button type="button" onClick="{{heal}}" style="min-height: 48px; border-radius: 12px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 14px; font-weight: 700; cursor: pointer;">Hábito bueno +5</button>
+          </div>
+        </div>
+        <span style="font-size: 12px; color: #4E5C52;">Propuesta: umbral de 30 de vida. El documento aún no fija el valor.</span>
+      </section>
+
+      <section aria-labelledby="s6" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s6" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">6 · Racha rota</h2>
+        <div aria-live="polite" style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px; text-align: center; align-items: center;">
+          <svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="{{flameFill}}" stroke="{{flameStroke}}" stroke-width="1.6" stroke-linejoin="round" class="{{flameAnim}}"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 3-6 0 2.5 1 4 2.5 4C11.5 9 10 5 12 2z"></path></svg>
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 800;">{{streak.title}}</span>
+          <span style="font-size: 14px; color: #4E5C52; line-height: 1.45;">{{streak.body}}</span>
+          <sc-if value="{{streak.ask}}" hint-placeholder-val="{{ true }}">
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+              <button type="button" onClick="{{usePass}}" class="q-press" style="min-height: 48px; border: none; border-radius: 12px; background: #2E7D4F; color: #FFFFFF; font-size: 14px; font-weight: 700; box-shadow: 0 3px 0 #1F5C39; cursor: pointer;">Usar Pase de Recuperación (tienes 1)</button>
+              <button type="button" onClick="{{restart}}" style="min-height: 48px; border-radius: 12px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 14px; font-weight: 700; cursor: pointer;">Empezar una racha nueva</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{streak.done}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{resetStreak}}" style="min-height: 44px; border: none; background: transparent; color: #1F5C39; font-size: 13px; font-weight: 700; cursor: pointer;; display: inline-flex; align-items: center">Ver de nuevo (demo)</button></sc-if>
+        </div>
+      </section>
+
+      <section aria-labelledby="s7" style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 id="s7" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">7 · El jefe escapó (meta vencida)</h2>
+        <div style="background: #2A2020; color: #F7EDEA; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <svg aria-hidden="true" width="52" height="52" viewBox="0 0 112 112" style="flex-shrink: 0; opacity: .8;"><path d="M30 40 L18 10 L42 28Z M82 40 L94 10 L70 28Z" fill="#6B4A4A"></path><path d="M20 72 C20 34 92 34 92 72 C92 96 74 104 56 104 C38 104 20 96 20 72Z" fill="#4A3434"></path><ellipse cx="42" cy="64" rx="8" ry="6" fill="#F2C66B"></ellipse><ellipse cx="70" cy="64" rx="8" ry="6" fill="#F2C66B"></ellipse></svg>
+            <span style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 16px; font-weight: 700;">El Dragón del Inglés escapó… por ahora</span><span style="font-size: 13px; color: #E9D6D1;">Llegó el 31 de marzo con 22 de vida. Le quitaste 78: eso cuenta.</span></span>
+          </div>
+          <span style="font-size: 13px; color: #E9D6D1; line-height: 1.45;">La XP de cada golpe ya es tuya. Solo falta la recompensa final.</span>
+          <a href="CrearMeta.dc.html" class="q-press" style="min-height: 48px; border-radius: 12px; background: #F2C66B; color: #1A1F1B; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 0 #A8862F;">Replantear la meta con S.M.A.R.T.</a>
+          <a href="StageArchivo.dc.html" style="min-height: 44px; border-radius: 12px; border: 1.5px solid #6B4A4A; color: #F7EDEA; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none;">Archivar como aprendizaje</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { net: 'off', genie: 'error', hp: 18, streak: 'ask' }; }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.nt); clearTimeout(this.gt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const NET = {
+      off: { bg: '#1E2A22', fg: '#F3F6EF', text: 'Sin conexión · 3 avances guardados en tu teléfono', icon: 'M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5.2-2.8M12 20h.01M19 13a10 10 0 0 0-2.3-1.7', anim: '' },
+      sync: { bg: '#E3E9F7', fg: '#2C4580', text: 'Conexión recuperada · sincronizando 3 avances…', icon: 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5', anim: 'q-flame' },
+      ok: { bg: '#E1F0E6', fg: '#1F5C39', text: 'Todo al día', icon: 'M5 12l5 5 9-10', anim: '' }
+    };
+    const G = {
+      error: { title: 'RPGenie se quedó dormido', body: 'No pudimos preparar tu misión ahora. Tus tareas siguen disponibles en Stage.', canRetry: true },
+      loading: { title: 'Despertando a RPGenie…', body: 'Un momento, estoy revisando tus metas.', canRetry: false },
+      ok: { title: '¡Listo! Tu misión te espera', body: 'Grabar el episodio 1 del podcast · +25 XP', canRetry: false }
+    };
+    const weak = s.hp < 30;
+    const ST = {
+      ask: { title: 'Tu racha de 12 días se pausó', body: 'Ayer no completaste ningún hábito. Pasa a todos los héroes: tienes 48 h para recuperarla.', ask: true, done: false },
+      saved: { title: '¡Racha de 12 días a salvo!', body: 'Usaste tu Pase de Recuperación. Hoy cuenta como el día 13.', ask: false, done: true },
+      fresh: { title: 'Día 1 de una nueva racha', body: 'Tu récord de 12 días queda guardado en tus logros. A por el siguiente.', ask: false, done: true }
+    };
+    return {
+      offlineBar: true, net: NET[s.net], netBtn: s.net === 'off' ? 'Simular reconexión' : (s.net === 'sync' ? 'Sincronizando…' : 'Simular sin conexión'),
+      cycleNet: () => { clearTimeout(this.nt); if (this.state.net === 'off') { this.setState({ net: 'sync' }); this.nt = setTimeout(() => this.setState({ net: 'ok' }), 1400); } else this.setState({ net: 'off' }); },
+      genie: G[s.genie], genieAnim: s.genie === 'loading' ? 'q-bob' : '', sleepy: s.genie === 'error' ? 1 : 0, awake: s.genie === 'error' ? 0 : 1,
+      retryGenie: () => { clearTimeout(this.gt); this.setState({ genie: 'loading' }); this.gt = setTimeout(() => this.setState({ genie: 'ok' }), 1300); },
+      hp: s.hp, hpPct: s.hp + '%',
+      hpText: weak ? 'Con menos de 30 de vida ganas menos XP. Descansa o cumple hábitos buenos para salir de este estado.' : '¡Recuperado! Ya ganas XP normal otra vez.',
+      heal: () => this.setState({ hp: Math.min(100, this.state.hp + 5) }),
+      streak: ST[s.streak], flameFill: s.streak === 'ask' ? '#E7EDE1' : '#F2A08C', flameStroke: s.streak === 'ask' ? '#7D8A80' : '#A8361F', flameAnim: s.streak === 'ask' ? '' : 'q-flame',
+      usePass: () => this.setState({ streak: 'saved' }), restart: () => this.setState({ streak: 'fresh' }), resetStreak: () => this.setState({ streak: 'ask' })
+    };
+  }
+}
+</script>
+</body>
+</html>

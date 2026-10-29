@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Marketplace — Tienda del héroe</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Marketplace" heading="Tienda del héroe" icon="coin" back-href="Perfil.dc.html" back-label="Volver al perfil" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+
+      <section aria-label="Tu bolsa" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1;">
+            <span style="font-size: 12px; font-weight: 700; color: #4E5C52;">Tu bolsa · guarda hasta {{cap}}</span>
+            <span style="display: flex; align-items: center; gap: 6px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800; color: #6E4D00;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#D9A21B" stroke="#6E4D00" stroke-width="1.6"></circle><circle cx="12" cy="12" r="5" fill="none" stroke="#FBF0D3" stroke-width="1.6"></circle></svg>{{coins}}</span>
+            <span style="font-size: 13px; color: #A8361F;">Vida {{hp}} / 100</span>
+          </span>
+          <button type="button" onClick="{{openCart}}" aria-label="Abrir carrito, {{cartCount}} objetos" class="q-press" style="min-height: 52px; padding: 0 16px; border: none; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 0 #1F5C39;">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12H5zM9 8V6a3 3 0 0 1 6 0v2"></path></svg>Carrito · {{cartCount}}
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #EEF2EA; padding-top: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px;"><span style="font-weight: 700;">Monedas de hoy</span><span style="font-family: 'DM Mono', monospace; color: #4E5C52;">{{today}} · ritmo {{rate}}</span></div>
+          <div role="progressbar" aria-label="Monedas ganadas hoy" aria-valuemin="0" aria-valuemax="75" aria-valuenow="{{today}}" style="height: 10px; border-radius: 99px; background: #E7EDE1; overflow: hidden; display: flex; gap: 2px;">
+            <span style="width: 66.6%; position: relative; overflow: hidden; border-radius: 99px 0 0 99px; background: #E7EDE1;"><span style="position: absolute; inset: 0; width: {{fullPct}}; background: #D9A21B;"></span></span>
+            <span style="width: 33.4%; position: relative; overflow: hidden; border-radius: 0 99px 99px 0; background: #E7EDE1;"><span style="position: absolute; inset: 0; width: {{halfPct}}; background: #B9890F;"></span></span>
+          </div>
+          <span style="font-size: 12px; color: #4E5C52; line-height: 1.4;">Las primeras 50 llegan completas y las 50 siguientes a la mitad. Tu XP nunca tiene tope.</span>
+        </div>
+      </section>
+
+      <div role="tablist" aria-label="Secciones del mercado" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4">
+          <button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{tb.bg}}; color: {{tb.fg}}; font-size: 13px; font-weight: 700; box-shadow: {{tb.shadow}}; cursor: pointer; padding: 0 2px;">{{tb.label}}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{isHotel}}" hint-placeholder-val="{{ true }}">
+        <section role="tabpanel" aria-label="Hotel" style="display: flex; flex-direction: column; gap: 10px;">
+          <p style="margin: 0; font-size: 14px; color: #4E5C52; line-height: 1.45;">Descansa para recuperar vida tras un mal día. Sin culpas: el progreso se mantiene.</p>
+          <sc-for list="{{hotel}}" as="it" hint-placeholder-count="3">
+            <article style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; gap: 12px; align-items: center;">
+              <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 16px; background: #FBE4DF; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A8361F" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg></span>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 15px; font-weight: 700;">{{it.name}}</span>
+                <span style="font-size: 13px; color: #A8361F; font-weight: 700;">{{it.effect}}</span>
+                <span style="font-size: 12px; color: #4E5C52;">{{it.preview}}</span>
+              </span>
+              <button type="button" onClick="{{it.add}}" aria-label="Añadir {{it.name}} al carrito por {{it.price}} Monedas" class="q-press" style="min-width: 76px; min-height: 48px; border-radius: 12px; border: 1.5px solid #EBD9A6; background: #FBF0D3; color: #6E4D00; font-family: 'DM Mono', monospace; font-size: 14px; cursor: pointer; box-shadow: 0 3px 0 #EBD9A6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;">{{it.price}}<span style="font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;">{{it.inCart}}</span></button>
+            </article>
+          </sc-for>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isMarket}}" hint-placeholder-val="{{ false }}">
+        <section role="tabpanel" aria-label="Mercado" style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{market}}" as="it" hint-placeholder-count="2">
+            <article style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; gap: 12px; align-items: center;">
+              <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 16px; background: #E3E9F7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2C4580" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg></span>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 15px; font-weight: 700;">{{it.name}}</span><span style="font-size: 13px; color: #3E4A42; line-height: 1.35;">{{it.effect}}</span></span>
+              <button type="button" onClick="{{it.add}}" aria-label="Añadir {{it.name}} por {{it.price}} Monedas" class="q-press" style="min-width: 76px; min-height: 48px; border-radius: 12px; border: 1.5px solid #EBD9A6; background: #FBF0D3; color: #6E4D00; font-family: 'DM Mono', monospace; font-size: 14px; cursor: pointer; box-shadow: 0 3px 0 #EBD9A6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;">{{it.price}}<span style="font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;">{{it.inCart}}</span></button>
+            </article>
+          </sc-for>
+          <h2 style="margin: 6px 0 0; display: flex; align-items: center; gap: 8px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Mercado negro<span style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #2A2020; color: #F2C66B;">se repone el 1 de cada mes</span></h2>
+          <sc-for list="{{black}}" as="it" hint-placeholder-count="3">
+            <article style="background: #2A2020; color: #F7EDEA; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px; opacity: {{it.opacity}};">
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 16px; background: #4A3636; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F2C66B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg></span>
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 15px; font-weight: 700;">{{it.name}}</span><span style="font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: #F2C66B; color: #2B1E00;">{{it.rarity}}</span></span>
+                  <span style="font-size: 13px; color: #E9D6D1; line-height: 1.4;">{{it.effect}}</span>
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="flex-grow: 1; font-size: 12px; color: #F2B8A8;">{{it.stockText}}</span>
+                <button type="button" onClick="{{it.add}}" disabled="{{it.locked}}" aria-label="{{it.aria}}" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: none; background: {{it.btnBg}}; color: #2B1E00; font-family: 'DM Mono', monospace; font-size: 14px; cursor: pointer;">{{it.btnLabel}}</button>
+              </div>
+            </article>
+          </sc-for>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isRefugio}}" hint-placeholder-val="{{ false }}">
+        <section role="tabpanel" aria-label="Refugio" style="display: flex; flex-direction: column; gap: 10px;">
+          <p style="margin: 0; font-size: 14px; color: #4E5C52; line-height: 1.45;">Mejoras permanentes para tu refugio. Cada mejora que compras sube un poco el precio de la siguiente. Ninguna da más Monedas.</p>
+          <sc-for list="{{refugio}}" as="up" hint-placeholder-count="3">
+            <article style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 16px; background: #E1F0E6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5C39" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{up.icon}}"></path></svg></span>
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 15px; font-weight: 700;">{{up.name}} · nivel {{up.lvl}}</span><span style="font-size: 13px; color: #3E4A42; line-height: 1.35;">{{up.effect}}</span></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span aria-hidden="true" style="flex-grow: 1; display: flex; gap: 3px;"><sc-for list="{{up.pips}}" as="pp" hint-placeholder-count="4"><span style="flex: 1; height: 8px; border-radius: 4px; background: {{pp.bg}};"></span></sc-for></span>
+                <button type="button" onClick="{{up.buy}}" disabled="{{up.off}}" aria-label="{{up.aria}}" class="q-press" style="min-width: 96px; min-height: 44px; border-radius: 12px; border: none; background: {{up.btnBg}}; color: #FFFFFF; font-family: 'DM Mono', monospace; font-size: 14px; cursor: pointer;">{{up.btnLabel}}</button>
+              </div>
+            </article>
+          </sc-for>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isMine}}" hint-placeholder-val="{{ false }}">
+        <section role="tabpanel" aria-label="Mis compras" style="display: flex; flex-direction: column; gap: 10px;">
+          <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+            <sc-for list="{{purchases}}" as="p" hint-placeholder-count="3">
+              <li style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #EEF2EA;">
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 500;">{{p.name}}</span><span style="font-size: 12px; color: #4E5C52;">{{p.when}}</span></span>
+                <span style="font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: {{p.stBg}}; color: {{p.stFg}};">{{p.status}}</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #6E4D00;">−{{p.price}}</span>
+              </li>
+            </sc-for>
+          </ul>
+          <div style="background: #FBF0D3; border-radius: 16px; padding: 12px 14px; display: flex; gap: 10px; align-items: center;">
+            <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="#D9A21B" stroke="#6E4D00" stroke-width="1.4" stroke-linejoin="round"><path d="M3 18h18M4 18L3 7l5 4 4-7 4 7 5-4-1 11z"></path></svg>
+            <span style="font-size: 13px; color: #6E4D00; line-height: 1.4;"><strong>Tesoro del reino: 1.240.</strong> Las Monedas que no caben en tu bolsa se guardan aquí como prestigio y desbloquean títulos.</span>
+          </div>
+          <a href="Inventario.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #1F5C39;">Ver objetos guardados en el inventario</a>
+        </section>
+      </sc-if>
+    </div>
+  </main>
+
+  <sc-if value="{{showCart}}" hint-placeholder-val="{{ false }}">
+    <div class="q-fade" style="position: absolute; inset: 0; background: rgba(18,34,24,.55); display: flex; align-items: flex-end;">
+      <div role="dialog" aria-modal="true" aria-labelledby="cart-t" class="q-sheet" style="width: 100%; max-height: 80%; background: #FFFFFF; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; overflow: hidden;">
+        <div style="padding: 10px 20px 0; display: flex; flex-direction: column; gap: 10px;">
+          <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 id="cart-t" style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;">Tu carrito</h2>
+            <button type="button" onClick="{{closeCart}}" aria-label="Cerrar carrito" style="width: 44px; height: 44px; border: none; background: #F3F6EF; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+          </div>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 8px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <sc-for list="{{cartLines}}" as="cl" hint-placeholder-count="2">
+            <li style="display: flex; align-items: center; gap: 10px; min-height: 56px; border-bottom: 1px solid #EEF2EA;">
+              <span style="flex-grow: 1; font-size: 15px;">{{cl.name}}</span>
+              <button type="button" onClick="{{cl.dec}}" aria-label="Quitar uno de {{cl.name}}" style="width: 44px; height: 44px; border: none; border-radius: 12px; background: #F3F6EF; color: #1E2A22; font-size: 20px; cursor: pointer;">−</button>
+              <span style="font-family: 'DM Mono', monospace; font-size: 15px; width: 20px; text-align: center;">{{cl.qty}}</span>
+              <button type="button" onClick="{{cl.inc}}" aria-label="Añadir otro {{cl.name}}" style="width: 44px; height: 44px; border: none; border-radius: 12px; background: #F3F6EF; color: #1E2A22; font-size: 20px; cursor: pointer;">+</button>
+              <span style="font-family: 'DM Mono', monospace; font-size: 14px; color: #6E4D00; width: 48px; text-align: right;">{{cl.total}}</span>
+            </li>
+          </sc-for>
+          <sc-if value="{{cartEmpty}}" hint-placeholder-val="{{ false }}"><li style="padding: 24px 0; text-align: center; font-size: 15px; color: #4E5C52;">Tu carrito está vacío.</li></sc-if>
+        </ul>
+        <div style="padding: 12px 20px 20px; border-top: 1px solid #DCE4D4; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 14px;"><span>Total</span><span style="font-family: 'DM Mono', monospace; color: #6E4D00;">{{cartTotal}} Monedas</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; color: {{afterColor}};"><span>Te quedarán</span><span style="font-family: 'DM Mono', monospace;">{{after}}</span></div>
+          <button type="button" onClick="{{buy}}" disabled="{{cantBuy}}" class="q-press" style="min-height: 52px; border: none; border-radius: 14px; background: {{buyBg}}; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 {{buyShadow}}; cursor: pointer;">{{buyLabel}}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 84px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22);">{{toast}}</div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <sc-for list="{{navItems}}" as="nv" hint-placeholder-count="5">
+      <a href="{{nv.href}}" aria-current="{{nv.current}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{nv.fg}}; font-size: 12px; font-weight: {{nv.weight}};"><span style="width: 44px; height: 28px; border-radius: 99px; background: {{nv.pill}}; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.icon}}"></path></svg></span>{{nv.label}}</a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tab":{"editor":"enum","options":["hotel","mercado","refugio","compras"],"default":"hotel","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: props.tab || 'hotel', coins: 340, hp: 62, level: 12, today: 58, cart: {}, cartOpen: false, toast: '',
+      stock: { racha: 1, pase: 1 }, ups: { huerto: 1, biblio: 0, estandarte: 1 },
+      purchases: [
+        { name: 'Siesta reparadora', when: '3 oct', price: 30, status: 'Usado' },
+        { name: 'Pase de Recuperación', when: '28 sep', price: 90, status: 'Guardado' },
+        { name: 'Huerto · nivel 1', when: '20 sep', price: 120, status: 'Activo' }
+      ]
+    };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  componentWillUnmount() { clearTimeout(this.tt); }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  flash(msg) { clearTimeout(this.tt); this.setState({ toast: msg }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const cap = Math.min(1000, 400 + 25 * s.level);
+    const catalog = {
+      siesta: { name: 'Siesta reparadora', price: 30, hp: 10, icon: 'M3 18v-6h18v6M3 14h18M7 12V9h4v3', effect: '+10 de vida' },
+      posada: { name: 'Noche en la posada', price: 70, hp: 25, icon: 'M3 21V10l9-6 9 6v11M9 21v-6h6v6', effect: '+25 de vida' },
+      banquete: { name: 'Banquete del reino', price: 150, hp: 100, icon: 'M4 11h16a8 8 0 0 1-16 0zM12 3v4M8 5l1 2M16 5l-1 2', effect: 'Vida completa' },
+      elixir: { name: 'Elixir de enfoque', price: 40, icon: 'M9 3h6M10 3v5L5 18a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3', effect: 'Tu próxima sesión en la Mazmorra da ×1,5 de XP.' },
+      cofre: { name: 'Cofre misterioso', price: 60, icon: 'M3 10h18v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM3 10l2-5h14l2 5M10 10v4h4v-4', effect: 'Un consumible al azar. A veces trae un título exclusivo.' },
+      racha: { name: 'Recuperar racha', price: 150, black: true, icon: 'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 3-6 0 2.5 1 4 2.5 4C11.5 9 10 5 12 2z', effect: 'Devuelve una racha rota en las últimas 48 h.', rarity: 'Épico' },
+      pase: { name: 'Pase de Recuperación', price: 90, black: true, icon: 'M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4zM10 7v12', effect: 'Protege tu racha si fallas un día. Puedes guardar 2 como máximo.', rarity: 'Raro' }
+    };
+    const inCart = (k) => s.cart[k] || 0;
+    const add = (k) => () => {
+      const c = catalog[k];
+      if (c.black && inCart(k) >= s.stock[k]) return;
+      this.setState({ cart: { ...this.state.cart, [k]: inCart(k) + 1 } });
+      this.flash(c.name + ' añadido al carrito');
+    };
+    const hpGain = Object.keys(s.cart).reduce((a, k) => a + (catalog[k].hp || 0) * s.cart[k], 0);
+    const hotel = ['siesta', 'posada', 'banquete'].map(k => ({ ...catalog[k], inCart: inCart(k) ? inCart(k) + ' en carrito' : 'Añadir', preview: 'Tu vida: ' + s.hp + ' → ' + Math.min(100, s.hp + hpGain + catalog[k].hp), add: add(k) }));
+    const market = ['elixir', 'cofre'].map(k => ({ ...catalog[k], inCart: inCart(k) ? inCart(k) + ' en carrito' : 'Añadir', add: add(k) }));
+    const black = ['racha', 'pase'].map(k => {
+      const c = catalog[k]; const left = s.stock[k] - inCart(k); const locked = left <= 0;
+      return { ...c, locked, opacity: 1, stockText: left > 0 ? 'Queda ' + left + ' este mes' : 'Agotado · vuelve el 1 de noviembre', btnBg: locked ? '#7D6B66' : '#F2C66B', btnLabel: locked ? 'Agotado' : c.price, aria: locked ? c.name + ' agotado' : 'Añadir ' + c.name + ' por ' + c.price + ' Monedas', add: add(k) };
+    });
+    black.push({ name: 'Objeto del mes', rarity: '???', effect: 'Cada mes llega un objeto distinto y limitado.', icon: 'M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5v.01', locked: true, opacity: 0.6, stockText: 'Llega el 1 de noviembre', btnBg: '#7D6B66', btnLabel: '—', aria: 'Objeto del mes, próximamente', add: () => {} });
+    const totalUps = s.ups.huerto + s.ups.biblio + s.ups.estandarte;
+    const upCost = Math.round(120 * Math.pow(1.35, totalUps) / 5) * 5;
+    const upDefs = [
+      { id: 'huerto', name: 'Huerto', icon: 'M12 22V12M12 12C12 7 8 5 4 5c0 4 3 7 8 7zM12 12c0-4 3-7 8-7 0 4-3 7-8 7', max: 4, eff: (l) => '+' + (l + 1) + ' de vida extra cada día que cumples un hábito.' },
+      { id: 'biblio', name: 'Biblioteca de RPGenie', icon: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11', max: 4, eff: (l) => 'RPGenie te ofrece ' + (l + 1) + ' misión ligera extra al día.' },
+      { id: 'estandarte', name: 'Estandarte del gremio', icon: 'M5 21V4h12l-2 4 2 4H5', max: 4, eff: (l) => 'Hasta ' + (3 + l + 1) + ' NPCs en la Taverna.' }
+    ];
+    const refugio = upDefs.map(u => {
+      const l = s.ups[u.id]; const maxed = l >= u.max; const poor = s.coins < upCost; const off = maxed || poor;
+      return { name: u.name, icon: u.icon, lvl: l, effect: maxed ? 'Nivel máximo alcanzado.' : 'Siguiente: ' + u.eff(l), off,
+        pips: Array.from({ length: u.max }, (_, i) => ({ bg: i < l ? '#2E7D4F' : '#E7EDE1' })),
+        btnBg: off ? '#7D8A80' : '#2E7D4F', btnLabel: maxed ? 'Máximo' : upCost, aria: maxed ? u.name + ' al máximo' : 'Mejorar ' + u.name + ' por ' + upCost + ' Monedas' + (poor ? ', no te alcanza' : ''),
+        buy: () => { if (off) return; this.setState({ coins: this.state.coins - upCost, ups: { ...this.state.ups, [u.id]: l + 1 }, purchases: [{ name: u.name + ' · nivel ' + (l + 1), when: 'Hoy', price: upCost, status: 'Activo' }, ...this.state.purchases] }); this.flash(u.name + ' mejorado. La próxima mejora cuesta un poco más.'); } };
+    });
+    const lines = Object.keys(s.cart).filter(k => s.cart[k] > 0);
+    const cartTotal = lines.reduce((a, k) => a + catalog[k].price * s.cart[k], 0);
+    const after = s.coins - cartTotal;
+    const cartLines = lines.map(k => ({ name: catalog[k].name, qty: s.cart[k], total: catalog[k].price * s.cart[k], dec: () => this.setState({ cart: { ...this.state.cart, [k]: Math.max(0, inCart(k) - 1) } }), inc: () => add(k)() }));
+    const cantBuy = lines.length === 0 || after < 0;
+    const tabs = [['hotel', 'Hotel'], ['mercado', 'Mercado'], ['refugio', 'Refugio'], ['compras', 'Compras']].map(([id, label]) => { const on = s.tab === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => this.setState({ tab: id }) }; });
+    const stLook = { 'Usado': ['#E7EDE1', '#3E4A42'], 'Guardado': ['#E1F0E6', '#1F5C39'], 'Activo': ['#E3E9F7', '#2C4580'] };
+    const purchases = s.purchases.map(p => ({ ...p, stBg: stLook[p.status][0], stFg: stLook[p.status][1] }));
+    const navDefs = [['Main.dc.html', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['Stage.dc.html', 'Stage', 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'], ['Habitos.dc.html', 'Hábitos', 'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5'], ['Mazmorra.dc.html', 'Mazmorra', 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2'], ['Perfil.dc.html', 'Perfil', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    const navItems = navDefs.map(([href, label, icon]) => { const on = label === 'Perfil'; return { href, label, icon, current: on ? 'page' : 'false', fg: on ? '#1F5C39' : '#4E5C52', weight: on ? 700 : 400, pill: on ? '#E1F0E6' : 'transparent' }; });
+    const full = Math.min(s.today, 50), half = Math.max(0, Math.min(s.today - 50, 25));
+    return {
+      coins: s.coins, hp: s.hp, cap, today: s.today, rate: s.today < 50 ? 'completo' : (s.today < 75 ? 'a la mitad' : 'en pausa'),
+      fullPct: (full / 50 * 100) + '%', halfPct: (half / 25 * 100) + '%',
+      cartCount: lines.reduce((a, k) => a + s.cart[k], 0),
+      tabs, isHotel: s.tab === 'hotel', isMarket: s.tab === 'mercado', isRefugio: s.tab === 'refugio', isMine: s.tab === 'compras',
+      hotel, market, black, refugio, purchases, navItems,
+      showCart: s.cartOpen, openCart: () => this.setState({ cartOpen: true }), closeCart: () => this.setState({ cartOpen: false }),
+      cartLines, cartEmpty: lines.length === 0, cartTotal, after: after + ' Monedas', afterColor: after < 0 ? '#A8361F' : '#4E5C52',
+      cantBuy, buyBg: cantBuy ? '#7D8A80' : '#2E7D4F', buyShadow: cantBuy ? '#5E6B61' : '#1F5C39',
+      buyLabel: after < 0 ? 'Te faltan ' + (-after) + ' Monedas' : (lines.length ? 'Comprar por ' + cartTotal : 'Añade algo primero'),
+      buy: () => {
+        if (cantBuy) return;
+        const newP = []; const stock = { ...this.state.stock };
+        lines.forEach(k => { for (let i = 0; i < s.cart[k]; i++) newP.push({ name: catalog[k].name, when: 'Hoy', price: catalog[k].price, status: catalog[k].hp ? 'Usado' : 'Guardado' }); if (stock[k] != null) stock[k] -= s.cart[k]; });
+        this.setState({ coins: after, hp: Math.min(100, s.hp + hpGain), cart: {}, cartOpen: false, stock, purchases: [...newP, ...this.state.purchases], tab: 'compras' });
+        this.flash('¡Compra hecha! ' + (hpGain ? 'Recuperaste vida.' : 'Lo guardamos en tu inventario.'));
+      },
+      toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

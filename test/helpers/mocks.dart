@@ -41,6 +41,7 @@ import 'package:proyecto_movil/features/tavern/domain/usecases/accept_npc_missio
 import 'package:proyecto_movil/features/tavern/domain/usecases/complete_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/create_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/get_tavern_board.dart';
+import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:proyecto_movil/features/auth/domain/repositories/auth_repository.dart';
@@ -281,6 +282,8 @@ class MockTavernBloc extends MockBloc<TavernEvent, TavernState>
 class MockGetTavernBoard extends Mock implements GetTavernBoard {}
 
 class MockCreateNpc extends Mock implements CreateNpc {}
+
+class MockSuggestNpcMission extends Mock implements SuggestNpcMission {}
 
 class MockAcceptNpcMission extends Mock implements AcceptNpcMission {}
 

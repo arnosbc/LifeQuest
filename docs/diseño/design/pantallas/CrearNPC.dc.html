@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Taverna — Crear NPC</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 20px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="La Taverna" heading="Invita a un NPC" icon="mug" back-href="Taverna.dc.html" back-label="Volver a la Taverna" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 18px;">
+
+      <section aria-label="Vista previa" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+        <div style="background: {{banner}}; color: {{bannerInk}}; padding: 12px 14px; display: flex; align-items: center; gap: 12px; transition: background .3s;">
+          <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 3px 0 rgba(0,0,0,.12);">
+            <sc-if value="{{isOwl}}" hint-placeholder-val="{{ false }}"><svg class="q-pop" width="44" height="44" viewBox="0 0 64 64"><path d="M16 18 L22 6 L28 16Z M48 18 L42 6 L36 16Z" fill="#6B4A2E"></path><ellipse cx="32" cy="36" rx="20" ry="22" fill="#8A6240"></ellipse><ellipse cx="32" cy="44" rx="12" ry="12" fill="#E8D3B5"></ellipse><circle cx="24" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="40" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="24" cy="30" r="4" fill="#1E2A22"></circle><circle cx="40" cy="30" r="4" fill="#1E2A22"></circle><path d="M29 38 L32 43 L35 38Z" fill="#D9A21B"></path></svg></sc-if>
+            <sc-if value="{{isFox}}" hint-placeholder-val="{{ false }}"><svg class="q-pop" width="44" height="44" viewBox="0 0 64 64"><path d="M12 12 L24 28 L10 30Z M52 12 L40 28 L54 30Z" fill="#B44E1A"></path><path d="M10 28 Q32 14 54 28 L44 50 Q32 58 20 50Z" fill="#E07A35"></path><path d="M20 40 Q32 50 44 40 L40 50 Q32 56 24 50Z" fill="#FFF4E6"></path><circle cx="25" cy="34" r="3" fill="#1E2A22"></circle><circle cx="39" cy="34" r="3" fill="#1E2A22"></circle><circle cx="32" cy="47" r="3" fill="#1E2A22"></circle></svg></sc-if>
+            <sc-if value="{{isTurtle}}" hint-placeholder-val="{{ false }}"><svg class="q-pop" width="44" height="44" viewBox="0 0 64 64"><rect x="14" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><rect x="38" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><ellipse cx="30" cy="40" rx="22" ry="15" fill="#3F9563"></ellipse><path d="M18 40 L24 31 L36 31 L42 40 L36 49 L24 49Z" fill="#2E7D4F" stroke="#CDE8D5" stroke-width="1.5"></path><circle cx="52" cy="28" r="8" fill="#8CC17A"></circle><circle cx="54" cy="26" r="1.8" fill="#1E2A22"></circle></svg></sc-if>
+            <sc-if value="{{isCrow}}" hint-placeholder-val="{{ true }}"><svg class="q-pop" width="44" height="44" viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="18" ry="20" fill="#2F3A4A"></ellipse><path d="M42 30 L58 35 L42 40Z" fill="#D9A21B"></path><circle cx="36" cy="30" r="4.5" fill="#FFFFFF"></circle><circle cx="37" cy="30" r="2.2" fill="#1E2A22"></circle><path d="M16 38 Q8 50 18 57 L28 46Z" fill="#1F2733"></path></svg></sc-if>
+          </span>
+          <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">{{nameShown}}</span>
+            <span style="font-size: 13px;">{{role}} · {{freq}}</span>
+          </span>
+        </div>
+        <div style="padding: 10px 14px; font-size: 13px; color: #4E5C52; line-height: 1.45;">{{nobleShown}}</div>
+      </section>
+
+      <div role="progressbar" aria-label="Paso {{stepNum}} de 4" aria-valuemin="1" aria-valuemax="4" aria-valuenow="{{stepNum}}" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px;">
+        <sc-for list="{{stepBars}}" as="sb" hint-placeholder-count="4"><span style="display: flex; flex-direction: column; gap: 4px;"><span style="height: 6px; border-radius: 99px; background: {{sb.bg}};"></span><span style="font-size: 11px; font-weight: 700; color: {{sb.fg}};">{{sb.label}}</span></span></sc-for>
+      </div>
+
+      <sc-if value="{{isS1}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div role="radiogroup" aria-labelledby="av-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <h2 id="av-l" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Elige su forma</h2>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;">
+              <sc-for list="{{kinds}}" as="k" hint-placeholder-count="4">
+                <button type="button" role="radio" aria-checked="{{k.checked}}" aria-label="{{k.label}}" onClick="{{k.pick}}" class="q-press" style="aspect-ratio: 1; border-radius: 16px; border: 2px solid {{k.border}}; background: {{k.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; box-shadow: 0 3px 0 {{k.border}};">
+                  <sc-if value="{{k.isOwl}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 64 64"><path d="M16 18 L22 6 L28 16Z M48 18 L42 6 L36 16Z" fill="#6B4A2E"></path><ellipse cx="32" cy="36" rx="20" ry="22" fill="#8A6240"></ellipse><ellipse cx="32" cy="44" rx="12" ry="12" fill="#E8D3B5"></ellipse><circle cx="24" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="40" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="24" cy="30" r="4" fill="#1E2A22"></circle><circle cx="40" cy="30" r="4" fill="#1E2A22"></circle><path d="M29 38 L32 43 L35 38Z" fill="#D9A21B"></path></svg></sc-if>
+                  <sc-if value="{{k.isFox}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 64 64"><path d="M12 12 L24 28 L10 30Z M52 12 L40 28 L54 30Z" fill="#B44E1A"></path><path d="M10 28 Q32 14 54 28 L44 50 Q32 58 20 50Z" fill="#E07A35"></path><path d="M20 40 Q32 50 44 40 L40 50 Q32 56 24 50Z" fill="#FFF4E6"></path><circle cx="25" cy="34" r="3" fill="#1E2A22"></circle><circle cx="39" cy="34" r="3" fill="#1E2A22"></circle><circle cx="32" cy="47" r="3" fill="#1E2A22"></circle></svg></sc-if>
+                  <sc-if value="{{k.isTurtle}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 64 64"><rect x="14" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><rect x="38" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><ellipse cx="30" cy="40" rx="22" ry="15" fill="#3F9563"></ellipse><path d="M18 40 L24 31 L36 31 L42 40 L36 49 L24 49Z" fill="#2E7D4F" stroke="#CDE8D5" stroke-width="1.5"></path><circle cx="52" cy="28" r="8" fill="#8CC17A"></circle><circle cx="54" cy="26" r="1.8" fill="#1E2A22"></circle></svg></sc-if>
+                  <sc-if value="{{k.isCrow}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="18" ry="20" fill="#2F3A4A"></ellipse><path d="M42 30 L58 35 L42 40Z" fill="#D9A21B"></path><circle cx="36" cy="30" r="4.5" fill="#FFFFFF"></circle><circle cx="37" cy="30" r="2.2" fill="#1E2A22"></circle><path d="M16 38 Q8 50 18 57 L28 46Z" fill="#1F2733"></path></svg></sc-if>
+                  <span style="font-size: 11px; font-weight: 700; color: #1E2A22;">{{k.label}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div role="radiogroup" aria-labelledby="bn-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <h2 id="bn-l" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Color de su estandarte</h2>
+            <div style="display: flex; gap: 6px;">
+              <sc-for list="{{banners}}" as="b" hint-placeholder-count="5">
+                <button type="button" role="radio" aria-checked="{{b.checked}}" aria-label="{{b.label}}" onClick="{{b.pick}}" style="width: 52px; height: 52px; border: none; background: transparent; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><span style="width: 36px; height: 36px; border-radius: 12px; background: {{b.color}}; box-shadow: {{b.ring}}; display: block;"></span></button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isS2}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="npc-name" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">¿Cómo se llama?</label>
+            <input id="npc-name" type="text" value="{{name}}" onChange="{{setName}}" placeholder="Ej.: Cuervo Mensajero" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+          </div>
+          <div role="radiogroup" aria-labelledby="role-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <h2 id="role-l" style="margin: 0; font-size: 14px; font-weight: 700;">Su papel en tu aventura</h2>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <sc-for list="{{roles}}" as="r" hint-placeholder-count="4">
+                <button type="button" role="radio" aria-checked="{{r.checked}}" onClick="{{r.pick}}" style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1.5px solid {{r.border}}; background: {{r.bg}}; color: {{r.fg}}; font-size: 14px; font-weight: 600; cursor: pointer;">{{r.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label for="npc-noble" style="font-size: 14px; font-weight: 700;">Su noble misión</label>
+            <textarea id="npc-noble" rows="3" value="{{noble}}" onChange="{{setNoble}}" style="box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 12px 14px; font-size: 15px; line-height: 1.45; color: #1E2A22; background: #FFFFFF; resize: none;"></textarea>
+            <span style="font-size: 12px; color: #4E5C52;">Ideas:</span>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <sc-for list="{{nobleIdeas}}" as="ni" hint-placeholder-count="3">
+                <button type="button" onClick="{{ni.use}}" style="min-height: 44px; padding: 0 12px; border-radius: 99px; border: 1.5px dashed #3C5BA8; background: #F5F7FC; color: #2C4580; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left;; display: inline-flex; align-items: center">{{ni.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isS3}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div role="radiogroup" aria-labelledby="fr-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <h2 id="fr-l" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">¿Cada cuánto te da misiones?</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+              <sc-for list="{{freqs}}" as="f" hint-placeholder-count="3">
+                <button type="button" role="radio" aria-checked="{{f.checked}}" onClick="{{f.pick}}" class="q-press" style="min-height: 64px; border-radius: 14px; border: 1.5px solid {{f.border}}; background: {{f.bg}}; color: {{f.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; box-shadow: 0 3px 0 {{f.border}};"><span style="font-size: 15px; font-weight: 700;">{{f.label}}</span><span style="font-size: 11px;">{{f.hint}}</span></button>
+              </sc-for>
+            </div>
+          </div>
+          <div role="radiogroup" aria-labelledby="fo-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <h2 id="fo-l" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">¿En qué te va a ayudar?</h2>
+            <sc-for list="{{focuses}}" as="fo" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{fo.checked}}" onClick="{{fo.pick}}" style="min-height: 60px; border-radius: 14px; border: 1.5px solid {{fo.border}}; background: {{fo.bg}}; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: #1E2A22;">
+                <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 99px; border: 2px solid {{fo.dotBorder}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><span style="width: 10px; height: 10px; border-radius: 99px; background: {{fo.dot}};"></span></span>
+                <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; font-weight: 700;">{{fo.label}}</span><span style="font-size: 12px; color: #4E5C52;">{{fo.hint}}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isS4}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="npc-id" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">¿Quién eres en este reino?</label>
+            <textarea id="npc-id" rows="2" value="{{identity}}" onChange="{{setIdentity}}" style="box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 12px 14px; font-size: 15px; line-height: 1.45; color: #1E2A22; background: #FFFFFF; resize: none;"></textarea>
+            <span style="font-size: 12px; color: #4E5C52;">Todos tus NPCs usan esta frase para hablarte como a ti.</span>
+          </div>
+          <section aria-label="Primera misión de ejemplo" style="background: #1E2A22; color: #F3F6EF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #9FDCB4;">Así sonaría su primera misión</span>
+            <span style="font-size: 15px; font-style: italic; color: #CFDACF; line-height: 1.5;">«{{greeting}}»</span>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 800; line-height: 1.25;">{{sampleMission}}</span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #9FDCB4;">+{{sampleXp}} XP · <span style="color: #F2C66B;">+{{sampleCoins}} Monedas</span></span>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+        <div class="q-pop" style="background: #E1F0E6; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px; text-align: center;">
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; color: #1F5C39;">¡{{nameShown}} se sentó a tu mesa!</span>
+          <span style="font-size: 14px; color: #1F5C39; line-height: 1.5;">Su primera misión ya te espera en la Taverna.</span>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+
+  <div style="flex-shrink: 0; padding: 12px 20px 18px; border-top: 1px solid #DCE4D4; background: #FFFFFF; display: flex; gap: 10px;">
+    <sc-if value="{{showPrev}}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{prev}}" style="min-height: 52px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 15px; font-weight: 700; cursor: pointer;">Atrás</button>
+    </sc-if>
+    <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+      <button type="button" onClick="{{next}}" class="q-press" style="flex-grow: 1; min-height: 52px; border: none; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">{{nextLabel}}</button>
+    </sc-if>
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+      <a href="Taverna.dc.html" class="q-press" style="flex-grow: 1; min-height: 52px; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; display: flex; align-items: center; justify-content: center; text-decoration: none;">Ir a la Taverna</a>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 1, kind: 'crow', banner: '#2F3A4A', name: 'Cuervo Mensajero', role: 'Entrenador', noble: 'Recordarme mis proyectos y ayudarme a no dejarlos para el final.', freq: 'Semanal', focus: 'Proyectos', identity: 'Un estudiante que convierte cada semestre en una campaña.' };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const kindDefs = [['owl', 'Búho'], ['fox', 'Zorra'], ['turtle', 'Tortuga'], ['crow', 'Cuervo']];
+    const kinds = kindDefs.map(([id, label]) => { const on = s.kind === id; return { label, isOwl: id === 'owl', isFox: id === 'fox', isTurtle: id === 'turtle', isCrow: id === 'crow', checked: on ? 'true' : 'false', bg: on ? '#E1F0E6' : '#FFFFFF', border: on ? '#2E7D4F' : '#DCE4D4', pick: () => this.setState({ kind: id }) }; });
+    const bannerDefs = [['#2F3A4A', 'Noche', '#FFFFFF'], ['#2C4580', 'Río', '#FFFFFF'], ['#2E7D4F', 'Bosque', '#FFFFFF'], ['#A8361F', 'Brasa', '#FFFFFF'], ['#D9A21B', 'Oro', '#1A1F1B']];
+    const banners = bannerDefs.map(([color, label]) => { const on = s.banner === color; return { color, label, checked: on ? 'true' : 'false', ring: on ? '0 0 0 3px #FFFFFF, 0 0 0 5px #1E2A22' : 'none', pick: () => this.setState({ banner: color }) }; });
+    const bannerInk = (bannerDefs.find(b => b[0] === s.banner) || bannerDefs[0])[2];
+    const chip = (list, cur, key) => list.map(label => { const on = cur === label; return { label, checked: on ? 'true' : 'false', bg: on ? '#2E7D4F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#2E7D4F' : '#C9D3C2', pick: () => this.setState({ [key]: label }) }; });
+    const roles = chip(['Mentor', 'Compañero tranquilo', 'Entrenador', 'Guardián de hábitos'], s.role, 'role');
+    const ideas = ['Impulsarme cada día a dar un paso más', 'Que cumpla mis metas semanales sin agobio', 'Recordarme mis proyectos antes de que venzan'];
+    const nobleIdeas = ideas.map(label => ({ label, use: () => this.setState({ noble: label + '.' }) }));
+    const freqDefs = [['Diaria', 'Cada mañana'], ['Semanal', 'Cada lunes'], ['Mensual', 'Cada día 1']];
+    const freqs = freqDefs.map(([label, hint]) => { const on = s.freq === label; return { label, hint, checked: on ? 'true' : 'false', bg: on ? '#2E7D4F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#1F5C39' : '#C9D3C2', pick: () => this.setState({ freq: label }) }; });
+    const focusDefs = [['Meta actual', 'Golpear al Boss «Hablar inglés con fluidez básica»'], ['Proyectos', 'Avanzar tus proyectos activos'], ['Hábitos', 'Cuidar tus rachas y hábitos']];
+    const focuses = focusDefs.map(([label, hint]) => { const on = s.focus === label; return { label, hint, checked: on ? 'true' : 'false', bg: on ? '#E1F0E6' : '#FFFFFF', border: on ? '#2E7D4F' : '#DCE4D4', dot: on ? '#2E7D4F' : 'transparent', dotBorder: on ? '#2E7D4F' : '#B7C4AE', pick: () => this.setState({ focus: label }) }; });
+    const samples = {
+      'Meta actual': ['Escribe 5 frases en inglés sobre tu semana', 25],
+      'Proyectos': ['Termina «Diseñar portada del ensayo» antes del jueves', 30],
+      'Hábitos': ['Completa tus 3 hábitos buenos durante 3 días seguidos', 35]
+    };
+    const sm = samples[s.focus];
+    const labels = ['Forma', 'Nombre', 'Ritmo', 'Identidad'];
+    const stepBars = labels.map((label, i) => ({ label, bg: i < s.step ? '#2E7D4F' : '#DCE4D4', fg: i < s.step ? '#1F5C39' : '#4E5C52' }));
+    const nameShown = s.name.trim() || 'Tu nuevo NPC';
+    return {
+      isOwl: s.kind === 'owl', isFox: s.kind === 'fox', isTurtle: s.kind === 'turtle', isCrow: s.kind === 'crow',
+      banner: s.banner, bannerInk, nameShown, role: s.role, freq: s.freq, nobleShown: s.noble || 'Su noble misión aparecerá aquí.',
+      stepBars, stepNum: Math.min(s.step, 4),
+      isS1: s.step === 1, isS2: s.step === 2, isS3: s.step === 3, isS4: s.step === 4, isDone: s.step === 5, notDone: s.step < 5,
+      kinds, banners, roles, nobleIdeas, freqs, focuses,
+      name: s.name, setName: (e) => this.setState({ name: e.target.value }),
+      noble: s.noble, setNoble: (e) => this.setState({ noble: e.target.value }),
+      identity: s.identity, setIdentity: (e) => this.setState({ identity: e.target.value }),
+      greeting: 'Hola. Sé que eres ' + s.identity.replace(/\.$/, '').toLowerCase() + '. Esta ' + (s.freq === 'Diaria' ? 'jornada' : s.freq === 'Semanal' ? 'semana' : 'luna') + ' te propongo esto:',
+      sampleMission: sm[0], sampleXp: sm[1], sampleCoins: Math.round(sm[1] * 0.3),
+      showPrev: s.step > 1 && s.step < 5,
+      prev: () => this.setState({ step: s.step - 1 }),
+      next: () => this.setState({ step: s.step + 1 }),
+      nextLabel: s.step < 4 ? 'Siguiente' : 'Sentar a ' + nameShown + ' en la mesa'
+    };
+  }
+}
+</script>
+</body>
+</html>

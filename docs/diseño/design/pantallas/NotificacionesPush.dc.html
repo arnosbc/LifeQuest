@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Avisos en el móvil</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0E1B14; color: #EEF3EC; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <svg aria-hidden="true" width="390" height="844" viewBox="0 0 390 844" style="position: absolute; left: 0; top: 0;">
+    <circle cx="300" cy="120" r="34" fill="#E9EFE6" opacity=".18"></circle>
+    <circle cx="60" cy="90" r="1.6" fill="#E9EFE6" opacity=".6"></circle><circle cx="140" cy="60" r="1.2" fill="#E9EFE6" opacity=".5"></circle><circle cx="230" cy="200" r="1.4" fill="#E9EFE6" opacity=".5"></circle>
+    <path d="M0 690 L80 630 L140 664 L220 600 L300 650 L390 620 V844 H0Z" fill="#16241D"></path>
+    <path d="M0 740 Q120 712 220 734 T390 726 V844 H0Z" fill="#1C2C24"></path>
+  </svg>
+
+  <main style="position: relative; flex-grow: 1; overflow-y: auto; padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 10px;">
+    <a href="Notificaciones.dc.html" aria-label="Volver a los avisos" style="align-self: flex-start; width: 44px; height: 44px; border-radius: 99px; display: flex; align-items: center; justify-content: center; color: #EEF3EC; background: rgba(238,243,236,.08);"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <div aria-hidden="true" style="text-align: center; display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px;">
+      <span style="font-size: 14px; color: #A9B8AD;">lunes, 12 de octubre</span>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 64px; font-weight: 600; line-height: 1;">{{clock}}</span>
+    </div>
+
+    <div role="radiogroup" aria-label="Momento del día" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: rgba(238,243,236,.08); border-radius: 14px; padding: 4px;">
+      <sc-for list="{{moments}}" as="mo" hint-placeholder-count="3">
+        <button type="button" role="radio" aria-checked="{{mo.sel}}" onClick="{{mo.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{mo.bg}}; color: {{mo.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{mo.label}}</button>
+      </sc-for>
+    </div>
+
+    <ul aria-label="Avisos de ejemplo" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+      <sc-for list="{{pushes}}" as="p" hint-placeholder-count="2">
+        <li class="q-sheet" style="background: rgba(238,243,236,.14); border-radius: 20px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; box-shadow: inset 0 0 0 {{p.ringW}} {{p.ring}};">
+          <span aria-hidden="true" style="width: 38px; height: 38px; border-radius: 10px; background: #2E7D4F; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="26" height="26" viewBox="0 0 48 48"><ellipse cx="24" cy="30" rx="13" ry="11" fill="#7CC79A"></ellipse><path d="M24 19 C20 9 12 9 12 9 C14 15 18 18 24 19 C30 18 34 15 36 9 C36 9 28 9 24 19Z" fill="#A8E0BE"></path><circle cx="19" cy="29" r="2.2" fill="#1A1F1B"></circle><circle cx="29" cy="29" r="2.2" fill="#1A1F1B"></circle></svg></span>
+          <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+            <span style="display: flex; justify-content: space-between; font-size: 12px; color: #CFDACF;"><span style="font-weight: 700;">QUESTLY · {{p.level}}</span><span>{{p.when}}</span></span>
+            <span style="font-size: 15px; font-weight: 700; line-height: 1.3;">{{p.title}}</span>
+            <span style="font-size: 14px; color: #E2EAE0; line-height: 1.35;">{{p.body}}</span>
+          </span>
+        </li>
+      </sc-for>
+    </ul>
+    <sc-if value="{{silent}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 0; text-align: center; font-size: 13px; color: #A9B8AD; line-height: 1.4;">Ventana de silencio activa. Solo llegaría un aviso crítico, y como mucho uno por noche.</p>
+    </sc-if>
+
+    <section aria-labelledby="tone-t" style="margin-top: 8px; background: #F3F6EF; color: #1E2A22; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 id="tone-t" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Tono de los avisos</h2>
+      <p style="margin: 0; font-size: 13px; color: #4E5C52; line-height: 1.4;">Invitamos, nunca amenazamos. Un aviso por motivo, agrupados cuando no son urgentes.</p>
+      <sc-for list="{{tone}}" as="t" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px;">
+          <div style="background: #E1F0E6; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #1F5C39;">✓ ASÍ SÍ</span><span style="font-size: 13px; line-height: 1.35; color: #1F5C39;">{{t.yes}}</span></div>
+          <div style="background: #FBE4DF; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; font-weight: 800; color: #A8361F;">✕ ASÍ NO</span><span style="font-size: 13px; line-height: 1.35; color: #A8361F; text-decoration: line-through;">{{t.no}}</span></div>
+        </div>
+      </sc-for>
+      <dl style="margin: 4px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; font-size: 13px; line-height: 1.35;">
+        <dt style="font-weight: 700; color: #A8361F;">▲ Crítico</dt><dd style="margin: 0; color: #3E4A42;">Racha a punto de romperse. Máx. 1 al día, atraviesa el silencio.</dd>
+        <dt style="font-weight: 700; color: #6E4D00;">● Importante</dt><dd style="margin: 0; color: #3E4A42;">Eventos, jefes y fechas límite. Respeta el silencio.</dd>
+        <dt style="font-weight: 700; color: #3E4A42;">○ Informativo</dt><dd style="margin: 0; color: #3E4A42;">NPCs, logros y resúmenes. Se agrupan en el resumen diario.</dd>
+      </dl>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { moment: 'tarde' }; }
+  renderVals() {
+    const s = this.state;
+    const sets = {
+      manana: { clock: '08:00', pushes: [
+        { level: 'Importante', when: 'ahora', title: 'Tu misión de hoy está lista', body: 'Grabar el episodio 1 del podcast · +25 XP. Tu mejor hora empieza a las 10.', lv: 'imp' },
+        { level: 'Informativo', when: 'ahora', title: 'Maestro Búho te dejó una misión', body: 'Lee un capítulo en voz alta · +20 XP', lv: 'info' }
+      ] },
+      tarde: { clock: '20:30', pushes: [
+        { level: 'Crítico', when: 'ahora', title: 'Tu racha de 12 días te está esperando', body: 'Un hábito pequeño antes de medianoche y sigue en pie.', lv: 'crit' },
+        { level: 'Resumen', when: '21:00', title: 'Hoy: +135 XP y 6 misiones', body: 'Tu skill Inglés subió un 8 %. Mañana tienes una entrevista a las 11:00.', lv: 'info' }
+      ] },
+      noche: { clock: '23:15', pushes: [
+        { level: 'Crítico', when: 'ahora', title: 'Última oportunidad para tu racha', body: 'Si hoy no puedes, tienes 1 Pase de Recuperación guardado. Descansa tranquilo.', lv: 'crit' }
+      ] }
+    };
+    const cur = sets[s.moment];
+    const moments = [['manana', 'Mañana'], ['tarde', 'Tarde'], ['noche', 'Noche']].map(([id, label]) => { const on = s.moment === id; return { label, sel: on ? 'true' : 'false', bg: on ? '#EEF3EC' : 'transparent', fg: on ? '#13201A' : '#CFDACF', pick: () => this.setState({ moment: id }) }; });
+    return {
+      clock: cur.clock, moments, silent: s.moment === 'noche',
+      pushes: cur.pushes.map(p => ({ ...p, ring: p.lv === 'crit' ? '#F2A08C' : 'transparent', ringW: p.lv === 'crit' ? '1.5px' : '0' })),
+      tone: [
+        { yes: 'Tu racha de 12 días te está esperando.', no: '¡Vas a perder tu racha!' },
+        { yes: 'El jefe está herido: un golpe más y cae.', no: 'Llevas 3 días sin avanzar tu meta.' },
+        { yes: 'Hoy fue un día flojo. Mañana empezamos de nuevo.', no: 'Fallaste 4 misiones hoy.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

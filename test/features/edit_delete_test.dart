@@ -88,6 +88,7 @@ void main() {
       return TavernBloc(
         getBoard: getBoard,
         createNpc: MockCreateNpc(),
+        suggestMission: MockSuggestNpcMission(),
         acceptMission: MockAcceptNpcMission(),
         completeMission: MockCompleteNpcMission(),
         renameNpc: MockRenameNpc(),

@@ -46,3 +46,6 @@ app.*.map.json
 
 # Credenciales locales de Supabase (ver supabase.example.json)
 supabase.json
+
+# Grafo generado por graphify
+graphify-out/

@@ -21,6 +21,16 @@ class NpcCreated extends TavernEvent {
   List<Object?> get props => [npc];
 }
 
+/// RPGenie redacta la misión con la noble misión del NPC y se acepta sola.
+class NpcMissionRequested extends TavernEvent {
+  const NpcMissionRequested(this.npc);
+
+  final Npc npc;
+
+  @override
+  List<Object?> get props => [npc];
+}
+
 class NpcMissionAccepted extends TavernEvent {
   const NpcMissionAccepted({required this.npcId, required this.title});
 

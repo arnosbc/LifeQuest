@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Perfil del Personaje</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden;">
+
+  <main style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="Tu personaje" heading="Perfil" icon="user" action-href="Configuracion.dc.html" action-label="Configuración" action-icon="gear" hint-size="390px,156px"></dc-import>
+
+    <div style="padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 18px;">
+      <header style="display: flex; flex-direction: column; gap: 8px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px;">
+        <div style="display: flex; align-items: flex-end; gap: 12px;">
+          <div style="width: 80px; height: 80px; border-radius: 22px; background: #E1F0E6; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;">
+            <svg role="img" aria-label="Avatar del héroe" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1F5C39" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 4.5-3 8.5-7 11-4-2.5-7-6.5-7-11V5z" fill="#E1F0E6"></path><path d="M9 11l2 2 4-4"></path></svg>
+          </div>
+          <div style="position: relative; width: 44px; height: 48px; margin-bottom: 4px;">
+            <svg aria-hidden="true" width="44" height="48" viewBox="0 0 52 56"><path d="M26 2 L49 15 L49 41 L26 54 L3 41 L3 15 Z" fill="#2E7D4F" stroke="#1F5C39" stroke-width="3" stroke-linejoin="round"></path></svg>
+            <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; color: #FFFFFF;" aria-label="Nivel 7">7</span>
+          </div>
+        </div>
+        <h1 style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.01em;">Jose</h1>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #E3E9F7; color: #2C4580;">Estratega</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #E1F0E6; color: #1F5C39;">Explorador · Nivel 7</span>
+        </div>
+        <blockquote style="margin: 6px 0 0; padding: 12px 14px; background: #F3F6EF; border-radius: 14px; font-size: 15px; line-height: 1.5;">
+          <span style="display: block; font-size: 12px; font-weight: 700; color: #4E5C52; margin-bottom: 4px;">¿Quién eres en este reino?</span>
+          Un estudiante que convierte cada semestre en una campaña.
+        </blockquote>
+      </header>
+
+      <section aria-label="Estadísticas" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+        <div style="grid-column: span 2; background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px;"><span style="font-weight: 700; color: #1F5C39;">Progreso a Nivel 8</span><span style="font-family: 'DM Mono', monospace;">1 440 / 1 500 XP</span></div>
+          <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px;">
+            <span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #2E7D4F;"></span><span style="height: 10px; border-radius: 3px; background: #9FCFB0;"></span><span style="height: 10px; border-radius: 3px; background: #E7EDE1;"></span>
+          </div>
+        </div>
+        <div style="background: #FBE4DF; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 12px; font-weight: 700; color: #A8361F;">Vida</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 22px; color: #A8361F;">82<span style="font-size: 12px;"> / 100</span></span>
+        </div>
+        <div style="background: #FBF0D3; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 12px; font-weight: 700; color: #6E4D00;">Monedas</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 22px; color: #6E4D00;">340</span>
+        </div>
+        <div style="grid-column: span 2; background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;">
+          <svg aria-hidden="true" width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#E7EDE1" stroke-width="6"></circle><circle cx="22" cy="22" r="18" fill="none" stroke="#3C5BA8" stroke-width="6" stroke-linecap="round" stroke-dasharray="113.1" stroke-dashoffset="36.2" transform="rotate(-90 22 22)"></circle></svg>
+          <span style="flex-grow: 1; font-size: 14px;">Tasa de finalización de objetivos</span>
+          <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; color: #2C4580;">68%</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="sk-title" style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h2 id="sk-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">Skills · Áreas</h2>
+          <span style="font-size: 13px; color: #4E5C52;">{{skillCount}} de 6 espacios</span>
+        </div>
+        <sc-for list="{{skills}}" as="s" hint-placeholder-count="4">
+          <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px #DCE4D4;">
+            <button type="button" onClick="{{s.toggle}}" aria-expanded="{{s.openStr}}" style="width: 100%; min-height: 64px; border: none; background: transparent; padding: 10px 12px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: inherit;">
+              <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 12px; background: {{s.bg}}; color: {{s.fg}}; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; flex-shrink: 0;">{{s.initial}}</span>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                <span style="display: flex; justify-content: space-between; font-size: 15px;"><span style="font-weight: 700;">{{s.name}}</span><span style="font-family: 'DM Mono', monospace; font-size: 13px;">Nv {{s.level}}</span></span>
+                <span style="height: 8px; background: #E7EDE1; border-radius: 99px; overflow: hidden; display: block;"><span style="display: block; height: 100%; width: {{s.pct}}%; background: {{s.bar}}; border-radius: 99px;"></span></span>
+              </span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round" style="transform: rotate({{s.rot}}deg); transition: transform .2s; flex-shrink: 0;"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+            <sc-if value="{{s.open}}" hint-placeholder-val="{{ false }}">
+              <div class="q-fade" style="padding: 0 12px 14px 64px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #1E2A22;">
+                <span><strong>{{s.pct}}%</strong> hacia el Nivel {{s.next}} · faltan {{s.left}} XP</span>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <span style="padding: 3px 8px; border-radius: 99px; background: #FBE4DF; color: #A8361F; font-weight: 700;">{{s.goals}} metas</span>
+                  <span style="padding: 3px 8px; border-radius: 99px; background: #E3E9F7; color: #2C4580; font-weight: 700;">{{s.projects}} proyectos</span>
+                  <span style="padding: 3px 8px; border-radius: 99px; background: #E1F0E6; color: #1F5C39; font-weight: 700;">{{s.tasks}} tareas</span>
+                </div>
+                <span style="color: #4E5C52; line-height: 1.45;">Todo lo que completes con esta skill le suma XP. Es también tu Área en Stage.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <button type="button" class="q-press" style="min-height: 52px; border: 1.5px dashed #2E7D4F; border-radius: 14px; background: #FFFFFF; font-size: 15px; font-weight: 700; color: #1F5C39; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Nueva skill · quedan {{slotsLeft}}
+        </button>
+      </section>
+
+      <section aria-labelledby="ach-title" style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h2 id="ach-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">Logros</h2>
+          <a href="Inventario.dc.html" style="font-size: 14px; font-weight: 700; color: #1F5C39;">Ver los 14</a>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;">
+          <sc-for list="{{badges}}" as="b" hint-placeholder-count="4">
+            <li style="display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
+              <span style="position: relative; width: 56px; height: 60px;">
+                <svg aria-hidden="true" width="56" height="60" viewBox="0 0 52 56"><path d="M26 2 L49 15 L49 41 L26 54 L3 41 L3 15 Z" fill="{{b.fill}}" stroke="{{b.stroke}}" stroke-width="2.5" stroke-linejoin="round"></path></svg>
+                <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 16px; color: {{b.ink}};">{{b.mark}}</span>
+              </span>
+              <span style="font-size: 12px; line-height: 1.25; color: {{b.label}};">{{b.name}}<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{b.sr}}</span></span>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+
+
+      <section aria-label="Más" style="display: flex; flex-direction: column; background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px #DCE4D4; padding: 0 14px;">
+        <a href="Estadisticas.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px; border-bottom: 1px solid #E7EDE1;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C4580" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg><span style="flex-grow: 1;">Estadísticas</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="VisionBoard.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px; border-bottom: 1px solid #E7EDE1;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5C39" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle></svg><span style="flex-grow: 1;">Vision Board</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Inventario.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px; border-bottom: 1px solid #E7EDE1;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E4D00" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><path d="M3 10l2-5h14l2 5M10 10v4h4v-4"></path></svg><span style="flex-grow: 1;">Inventario</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Marketplace.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px; border-bottom: 1px solid #E7EDE1;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E4D00" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v10M9 10h4.5a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3H15"></path></svg><span style="flex-grow: 1;">Marketplace · Hotel y mercado</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Taverna.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px; border-bottom: 1px solid #E7EDE1;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E4D00" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h11v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2"></path></svg><span style="flex-grow: 1;">La Taverna · tus NPCs</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Diario.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px; border-bottom: 1px solid #E7EDE1;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8361F" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"></path><path d="M5 17a3 3 0 0 1 3-3h11M9 8h6"></path></svg><span style="flex-grow: 1;">Diario · Bitácora de misiones</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Configuracion.dc.html" style="min-height: 52px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #1E2A22; font-size: 15px;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C4580" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span style="flex-grow: 1;">Game Master · Configuración</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+      </section>
+    </div>
+  </main>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Inicio</a>
+    <a href="Stage.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span>Stage</a>
+    <a href="Habitos.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"></path></svg></span>Hábitos</a>
+    <a href="Mazmorra.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg></span>Mazmorra</a>
+    <a href="Perfil.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #1F5C39; font-size: 12px; font-weight: 700;"><span style="width: 44px; height: 28px; border-radius: 99px; background: #E1F0E6; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: 1, diff: 'Normal' };
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const data = [
+      { id: 1, name: 'Inglés', level: 4, pct: 40, goals: 1, projects: 1, tasks: 12, bg: '#E1F0E6', fg: '#1F5C39', bar: '#2E7D4F' },
+      { id: 2, name: 'Química', level: 3, pct: 72, goals: 1, projects: 2, tasks: 9, bg: '#E3E9F7', fg: '#2C4580', bar: '#3C5BA8' },
+      { id: 3, name: 'Escritura', level: 2, pct: 25, goals: 0, projects: 1, tasks: 6, bg: '#FBF0D3', fg: '#6E4D00', bar: '#D9A21B' },
+      { id: 4, name: 'Salud', level: 5, pct: 58, goals: 2, projects: 0, tasks: 4, bg: '#FBE4DF', fg: '#A8361F', bar: '#E0573F' }
+    ];
+    const skills = data.map(s => {
+      const open = this.state.open === s.id;
+      return { ...s, initial: s.name.charAt(0), next: s.level + 1, left: Math.round((100 - s.pct) * (s.level * 0.6)), open, openStr: open ? 'true' : 'false', rot: open ? 90 : 0, toggle: () => this.setState({ open: open ? 0 : s.id }) };
+    });
+    const badges = [
+      { name: 'Primera mazmorra', mark: 'I', fill: '#2E7D4F', stroke: '#1F5C39', ink: '#FFFFFF', label: '#1E2A22', sr: ' (desbloqueado)' },
+      { name: 'Racha de 10', mark: '10', fill: '#D9A21B', stroke: '#6E4D00', ink: '#3D2B00', label: '#1E2A22', sr: ' (desbloqueado)' },
+      { name: 'Boss derrotado', mark: 'B', fill: '#3C5BA8', stroke: '#2C4580', ink: '#FFFFFF', label: '#1E2A22', sr: ' (desbloqueado)' },
+      { name: '¿Secreto?', mark: '?', fill: '#E7EDE1', stroke: '#B7C4AE', ink: '#4E5C52', label: '#4E5C52', sr: ' (bloqueado, logro oculto)' }
+    ];
+    const hints = {
+      'Fácil': 'Ganas más XP y Monedas por misión. Ideal para arrancar.',
+      'Normal': 'Recompensas equilibradas. Recomendado para la mayoría.',
+      'Difícil': 'Menos recompensa por misión: cada nivel cuesta más y vale más.'
+    };
+    const levels = ['Fácil', 'Normal', 'Difícil'].map(label => {
+      const on = this.state.diff === label;
+      return { label, checked: on ? 'true' : 'false', bg: on ? '#2E7D4F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#1F5C39' : '#C9D3C2', pick: () => this.setState({ diff: label }) };
+    });
+    return { skills, skillCount: skills.length, slotsLeft: 6 - skills.length, badges, levels, levelHint: hints[this.state.diff] };
+  }
+}
+</script>
+</body>
+</html>

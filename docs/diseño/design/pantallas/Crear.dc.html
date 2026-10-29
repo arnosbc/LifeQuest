@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Crear — Tarea, Proyecto o Meta</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+
+  <div aria-hidden="true" style="position: absolute; inset: 0; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="height: 56px; border-radius: 14px; background: #E7EDE1;"></div>
+    <div style="height: 52px; border-radius: 14px; background: #FFFFFF;"></div>
+    <div style="height: 120px; border-radius: 16px; background: #FFFFFF;"></div>
+    <div style="height: 64px; border-radius: 14px; background: #FFFFFF;"></div>
+    <div style="height: 64px; border-radius: 14px; background: #FFFFFF;"></div>
+  </div>
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(18,34,24,.55);"></div>
+
+  <div role="dialog" aria-modal="true" aria-labelledby="sheet-title" class="q-sheet" style="position: absolute; left: 0; right: 0; bottom: 0; top: 44px; background: #FFFFFF; border-radius: 26px 26px 0 0; display: flex; flex-direction: column; overflow: hidden;">
+    <div style="flex-shrink: 0; padding: 8px 12px 6px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #E7EDE1;">
+      <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: #DCE4D4;"></span>
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <sc-if value="{{canBack}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{back}}" aria-label="Volver" style="width: 44px; height: 44px; border: none; background: transparent; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1E2A22;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        </sc-if>
+        <sc-if value="{{noBack}}" hint-placeholder-val="{{ true }}"><span style="width: 8px;"></span></sc-if>
+        <h1 id="sheet-title" style="flex-grow: 1; margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800;">{{sheetTitle}}</h1>
+        <a href="Main.dc.html" aria-label="Cerrar" style="width: 44px; height: 44px; border-radius: 99px; background: #F3F6EF; display: flex; align-items: center; justify-content: center; color: #1E2A22;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; overflow-y: auto; padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 18px;">
+
+      <sc-if value="{{isMenu}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; gap: 10px; align-items: flex-end;">
+            <svg role="img" aria-label="RPGenie" class="q-bob" width="52" height="52" viewBox="0 0 64 64" style="flex-shrink: 0;"><path d="M32 16 C27 5 15 6 17 15 C23 16 28 16 32 16Z" fill="#5FAE7A"></path><path d="M32 16 C37 5 49 6 47 15 C41 16 36 16 32 16Z" fill="#3F9563"></path><path d="M32 16 v5" stroke="#1F5C39" stroke-width="2.5" stroke-linecap="round"></path><ellipse cx="32" cy="40" rx="21" ry="19" fill="#2E7D4F"></ellipse><ellipse cx="32" cy="45" rx="13" ry="10" fill="#CDE8D5"></ellipse><circle cx="24.5" cy="35" r="3.4" fill="#1E2A22"></circle><circle cx="39.5" cy="35" r="3.4" fill="#1E2A22"></circle><circle cx="25.6" cy="33.8" r="1.1" fill="#FFFFFF"></circle><circle cx="40.6" cy="33.8" r="1.1" fill="#FFFFFF"></circle><ellipse cx="19" cy="41" rx="3" ry="2" fill="#E0573F" opacity=".55"></ellipse><ellipse cx="45" cy="41" rx="3" ry="2" fill="#E0573F" opacity=".55"></ellipse><path d="M28 42 q4 4 8 0" fill="none" stroke="#1E2A22" stroke-width="2" stroke-linecap="round"></path></svg>
+            <p style="margin: 0; flex-grow: 1; background: #E3E9F7; color: #1E2A22; border-radius: 16px 16px 16px 4px; padding: 10px 12px; font-size: 14px; line-height: 1.45;">Elige qué quieres crear. Si no lo tienes claro, te ayudo a decidir con tres preguntas.</p>
+          </div>
+
+          <sc-for list="{{kinds}}" as="k" hint-placeholder-count="3">
+            <button type="button" onClick="{{k.pick}}" class="q-press" style="border: 1.5px solid {{k.border}}; background: #FFFFFF; border-radius: 18px; padding: 14px; display: flex; gap: 14px; align-items: flex-start; text-align: left; color: inherit; cursor: pointer; box-shadow: 0 4px 0 {{k.border}};">
+              <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 14px; background: {{k.tint}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <sc-if value="{{k.isTask}}" hint-placeholder-val="{{ false }}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5C39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"></rect><path d="M7.5 12l3 3 6-6.5"></path></svg></sc-if>
+                <sc-if value="{{k.isProject}}" hint-placeholder-val="{{ false }}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2C4580" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17.5l9 5 9-5"></path></svg></sc-if>
+                <sc-if value="{{k.isGoal}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 64 64"><path d="M14 22 L10 8 L22 16 Z" fill="#A8361F"></path><path d="M50 22 L54 8 L42 16Z" fill="#A8361F"></path><path d="M12 30 C12 16 52 16 52 30 L52 50 C52 56 46 58 40 56 L32 52 L24 56 C18 58 12 56 12 50Z" fill="#3A2A2A"></path><ellipse cx="24" cy="34" rx="4" ry="3" fill="#E0573F"></ellipse><ellipse cx="40" cy="34" rx="4" ry="3" fill="#E0573F"></ellipse><path d="M24 44 l4 -3 l4 3 l4 -3 l4 3" stroke="#F3F6EF" stroke-width="2.4" fill="none" stroke-linejoin="round"></path></svg></sc-if>
+              </span>
+              <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px;">
+                <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                  <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 800;">{{k.name}}</span>
+                  <span style="font-size: 12px; font-weight: 700; color: {{k.ink}}; background: {{k.tint}}; padding: 2px 8px; border-radius: 99px;">{{k.chip}}</span>
+                </span>
+                <span style="font-size: 14px; line-height: 1.4;">{{k.desc}}</span>
+                <span style="font-size: 13px; color: #4E5C52;">{{k.example}}</span>
+              </span>
+            </button>
+          </sc-for>
+
+          <button type="button" onClick="{{goDiag}}" style="min-height: 52px; border: 1.5px dashed #3C5BA8; background: #F5F7FC; border-radius: 14px; color: #2C4580; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5v.01"></path></svg>
+            No estoy seguro · Diagnosticar
+          </button>
+
+          <section aria-labelledby="how-title" style="background: #F3F6EF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+            <h2 id="how-title" style="margin: 0; font-size: 14px; font-weight: 700;">Cómo se conectan</h2>
+            <div aria-hidden="true" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: #3A2A2A; color: #FFFFFF;">Meta · Boss</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+              <span style="font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: #E3E9F7; color: #2C4580;">Proyectos</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+              <span style="font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: #E1F0E6; color: #1F5C39;">Tareas</span>
+            </div>
+            <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #4E5C52;">Una Meta se cumple con Proyectos y Tareas. Cada uno que completas le quita vida al Boss de tu Meta.</p>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isTask}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="t-title" style="font-size: 13px; font-weight: 700;">Nombre de la misión</label>
+            <input id="t-title" type="text" value="{{task.title}}" onChange="{{setTaskTitle}}" placeholder="Ej.: Repasar el capítulo 3" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+          </div>
+
+          <div role="radiogroup" aria-labelledby="t-skill-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <span id="t-skill-l" style="font-size: 13px; font-weight: 700;">Skill · Área</span>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <sc-for list="{{taskSkills}}" as="c" hint-placeholder-count="5">
+                <button type="button" role="radio" aria-checked="{{c.checked}}" onClick="{{c.pick}}" style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1.5px solid {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; font-weight: 600; cursor: pointer;">{{c.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div role="radiogroup" aria-labelledby="t-prio-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <span id="t-prio-l" style="font-size: 13px; font-weight: 700;">Prioridad</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+              <sc-for list="{{prios}}" as="p" hint-placeholder-count="3">
+                <button type="button" role="radio" aria-checked="{{p.checked}}" onClick="{{p.pick}}" style="min-height: 48px; border-radius: 12px; border: 1.5px solid {{p.border}}; background: {{p.bg}}; color: #1E2A22; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 99px; background: {{p.dot}};"></span>{{p.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span id="t-link-l" style="font-size: 13px; font-weight: 700;">Vincular a <span style="font-weight: 400; color: #4E5C52;">(opcional)</span></span>
+            <div role="radiogroup" aria-labelledby="t-link-l" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;">
+              <sc-for list="{{linkTypes}}" as="lk" hint-placeholder-count="3">
+                <button type="button" role="radio" aria-checked="{{lk.checked}}" onClick="{{lk.pick}}" class="q-press" style="min-height: 56px; border-radius: 14px; border: 1.5px solid {{lk.border}}; background: {{lk.bg}}; color: {{lk.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; box-shadow: 0 3px 0 {{lk.border}}; font-size: 14px; font-weight: 700;">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{lk.icon}}"></path></svg>{{lk.label}}
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{showLinkSelect}}" hint-placeholder-val="{{ true }}">
+              <div class="q-fade" style="display: flex; flex-direction: column; gap: 6px;">
+                <label for="t-link" style="font-size: 13px; font-weight: 700;">{{linkSelectLabel}}</label>
+                <select id="t-link" value="{{task.linkTarget}}" onChange="{{setTaskLink}}" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 12px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+                  <sc-for list="{{linkOptions}}" as="lo" hint-placeholder-count="2"><option value="{{lo}}">{{lo}}</option></sc-for>
+                </select>
+                <span style="font-size: 13px; color: #4E5C52; line-height: 1.4;">{{linkHelp}}</span>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="t-date" style="font-size: 13px; font-weight: 700;">Fecha límite <span style="font-weight: 400; color: #4E5C52;">(opcional)</span></label>
+            <input id="t-date" type="date" value="{{task.date}}" onChange="{{setTaskDate}}" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+          </div>
+
+          <section aria-label="Recompensa estimada por RPGenie" aria-live="polite" style="border-radius: 18px; background: #1E2A22; color: #F3F6EF; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <svg aria-hidden="true" class="q-bob" width="40" height="40" viewBox="0 0 64 64" style="flex-shrink: 0;"><path d="M32 16 C27 5 15 6 17 15 C23 16 28 16 32 16Z" fill="#5FAE7A"></path><path d="M32 16 C37 5 49 6 47 15 C41 16 36 16 32 16Z" fill="#3F9563"></path><ellipse cx="32" cy="40" rx="21" ry="19" fill="#2E7D4F"></ellipse><ellipse cx="32" cy="45" rx="13" ry="10" fill="#CDE8D5"></ellipse><circle cx="24.5" cy="35" r="3.4" fill="#1E2A22"></circle><circle cx="39.5" cy="35" r="3.4" fill="#1E2A22"></circle><path d="M28 42 q4 4 8 0" fill="none" stroke="#1E2A22" stroke-width="2" stroke-linecap="round"></path></svg>
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #BFD9C7;">RPGenie estima esta misión</span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 14px;">
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 800; color: #9FDCB4;">+{{rewardXp}} XP</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 18px; color: #F2C66B;">+{{rewardCoins}} Monedas</span>
+            </div>
+            <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px;">
+              <sc-for list="{{rewardWhy}}" as="rw" hint-placeholder-count="3">
+                <li style="display: flex; justify-content: space-between; font-size: 13px; color: #CFDACF;"><span>{{rw.what}}</span><span style="font-family: 'DM Mono', monospace; color: #9FDCB4;">{{rw.value}}</span></li>
+              </sc-for>
+            </ul>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isProject}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="p-title" style="font-size: 13px; font-weight: 700;">Nombre del proyecto</label>
+            <input id="p-title" type="text" value="{{proj.title}}" onChange="{{setProjTitle}}" placeholder="Ej.: Ensayo final de Historia" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+          </div>
+
+          <div role="radiogroup" aria-labelledby="p-skill-l" style="display: flex; flex-direction: column; gap: 8px;">
+            <span id="p-skill-l" style="font-size: 13px; font-weight: 700;">Skill · Área</span>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <sc-for list="{{projSkills}}" as="c" hint-placeholder-count="5">
+                <button type="button" role="radio" aria-checked="{{c.checked}}" onClick="{{c.pick}}" style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1.5px solid {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; font-weight: 600; cursor: pointer;">{{c.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+            <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+              <label for="p-start" style="font-size: 13px; font-weight: 700;">Inicio</label>
+              <input id="p-start" type="date" value="{{proj.start}}" onChange="{{setProjStart}}" style="height: 50px; box-sizing: border-box; width: 100%; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 10px; font-size: 15px; color: #1E2A22; background: #FFFFFF;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+              <label for="p-end" style="font-size: 13px; font-weight: 700;">Fin</label>
+              <input id="p-end" type="date" value="{{proj.end}}" onChange="{{setProjEnd}}" style="height: 50px; box-sizing: border-box; width: 100%; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 10px; font-size: 15px; color: #1E2A22; background: #FFFFFF;">
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="p-goal" style="font-size: 13px; font-weight: 700;">Meta vinculada <span style="font-weight: 400; color: #4E5C52;">(opcional)</span></label>
+            <select id="p-goal" value="{{proj.goal}}" onChange="{{setProjGoal}}" aria-describedby="p-goal-h" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 12px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+              <option value="Ninguna">Ninguna</option>
+              <option value="Hablar inglés con fluidez básica">Hablar inglés con fluidez básica</option>
+              <option value="Terminar el semestre con promedio 9">Terminar el semestre con promedio 9</option>
+            </select>
+            <span id="p-goal-h" style="font-size: 13px; color: #4E5C52; line-height: 1.4;">Si la vinculas, cada tarea que completes de este proyecto le quita vida al Boss de esa Meta.</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 13px; font-weight: 700;">Primeras tareas · {{projCount}}</span>
+            <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px;">
+              <sc-for list="{{projTasks}}" as="pt" hint-placeholder-count="3">
+                <li style="display: flex; align-items: center; gap: 10px; background: #F3F6EF; border-radius: 12px; padding: 0 4px 0 12px; min-height: 48px;">
+                  <span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 6px; border: 2px solid #B7C4AE; flex-shrink: 0;"></span>
+                  <span style="flex-grow: 1; font-size: 15px;">{{pt.label}}</span>
+                  <button type="button" onClick="{{pt.remove}}" aria-label="Quitar {{pt.label}}" style="width: 44px; height: 44px; border: none; background: transparent; border-radius: 99px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #4E5C52;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+                </li>
+              </sc-for>
+            </ul>
+            <form onSubmit="{{addProjTask}}" style="display: flex; gap: 8px;">
+              <label for="p-new" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Nueva tarea del proyecto</label>
+              <input id="p-new" type="text" value="{{proj.draft}}" onChange="{{setProjDraft}}" placeholder="Añadir tarea…" style="flex-grow: 1; min-width: 0; height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 12px; font-size: 15px; color: #1E2A22; background: #FFFFFF;">
+              <button type="submit" aria-label="Añadir tarea" style="width: 48px; height: 48px; border: none; border-radius: 12px; background: #E1F0E6; color: #1F5C39; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+            </form>
+          </div>
+
+          <section aria-label="Ritmo necesario" aria-live="polite" style="border-radius: 18px; background: #E3E9F7; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #2C4580;">Ritmo necesario</span>
+              <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: {{paceBg}}; color: {{paceFg}};">Urgencia {{paceLabel}}</span>
+            </div>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; color: #1E2A22;">{{paceText}}</span>
+            <span style="font-size: 13px; color: #2C4580; line-height: 1.5;">{{projCount}} tareas en {{weeks}} semanas. Si el ritmo necesario sube, te avisaré de que el proyecto cambió de prioridad.</span>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isGoal}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px; background: #2A2020; color: #F7EDEA; border-radius: 18px; padding: 12px 14px;">
+            <svg aria-hidden="true" width="48" height="48" viewBox="0 0 64 64" style="flex-shrink: 0;"><path d="M14 22 L10 8 L22 16 Z" fill="#E0573F"></path><path d="M50 22 L54 8 L42 16Z" fill="#E0573F"></path><path d="M12 30 C12 16 52 16 52 30 L52 50 C52 56 46 58 40 56 L32 52 L24 56 C18 58 12 56 12 50Z" fill="#4A3636"></path><ellipse cx="24" cy="34" rx="4" ry="3" fill="#F2C66B"></ellipse><ellipse cx="40" cy="34" rx="4" ry="3" fill="#F2C66B"></ellipse><path d="M24 44 l4 -3 l4 3 l4 -3 l4 3" stroke="#F7EDEA" stroke-width="2.4" fill="none" stroke-linejoin="round"></path></svg>
+            <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #F2B8A8;">Tu próximo Boss</span>
+              <span style="font-size: 15px; font-weight: 700; line-height: 1.3;">{{goalName}}</span>
+              <span aria-hidden="true" style="height: 6px; border-radius: 99px; background: #E0573F; display: block;"></span>
+            </div>
+          </div>
+
+          <nav aria-label="Pasos S.M.A.R.T." style="display: flex; gap: 6px;">
+            <sc-for list="{{steps}}" as="st" hint-placeholder-count="7">
+              <button type="button" onClick="{{st.go}}" aria-label="{{st.aria}}" aria-current="{{st.current}}" style="flex: 1; min-width: 0; height: 44px; border-radius: 12px; border: 1.5px solid {{st.border}}; background: {{st.bg}}; color: {{st.fg}}; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; padding: 0;">{{st.short}}</button>
+            </sc-for>
+          </nav>
+
+          <sc-if value="{{isStep0}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <p style="margin: 0; font-size: 15px; line-height: 1.5;">Establecer metas es fácil; establecer <strong>buenas</strong> metas es el verdadero desafío. Te guío paso a paso.</p>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label for="g-title" style="font-size: 13px; font-weight: 700;">Título de tu Meta</label>
+                <input id="g-title" type="text" value="{{goal.title}}" onChange="{{setG_title}}" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+              </div>
+              <div role="radiogroup" aria-labelledby="g-skill-l" style="display: flex; flex-direction: column; gap: 8px;">
+                <span id="g-skill-l" style="font-size: 13px; font-weight: 700;">¿Está relacionada con alguna de tus skills?</span>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <sc-for list="{{goalSkills}}" as="c" hint-placeholder-count="5">
+                    <button type="button" role="radio" aria-checked="{{c.checked}}" onClick="{{c.pick}}" style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1.5px solid {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; font-weight: 600; cursor: pointer;">{{c.label}}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isLetterStep}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 16px; background: #2E7D4F; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; box-shadow: 0 4px 0 #1F5C39;">{{cur.letter}}</span>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 12px; font-weight: 700; color: #4E5C52;">Paso {{stepNum}} de 5</span>
+                  <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800;">{{cur.name}}</h2>
+                </div>
+              </div>
+              <ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 1.45; color: #1E2A22;">
+                <sc-for list="{{cur.qs}}" as="q" hint-placeholder-count="3"><li>{{q}}</li></sc-for>
+              </ul>
+              <sc-if value="{{cur.hasRange}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 8px; background: #F3F6EF; border-radius: 14px; padding: 12px 14px;">
+                  <label for="g-prob" style="font-size: 13px; font-weight: 700; display: flex; justify-content: space-between;"><span>¿Qué probabilidad crees tener de lograrla?</span><span style="font-family: 'DM Mono', monospace; color: #1F5C39;">{{goal.prob}}%</span></label>
+                  <input id="g-prob" type="range" min="0" max="100" step="5" value="{{goal.prob}}" onChange="{{setG_prob}}" style="width: 100%; accent-color: #2E7D4F; height: 32px;">
+                  <span style="font-size: 13px; color: #4E5C52;">{{probHint}}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{cur.hasDate}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <label for="g-date" style="font-size: 13px; font-weight: 700;">Fecha límite</label>
+                  <input id="g-date" type="date" value="{{goal.date}}" onChange="{{setG_date}}" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+                </div>
+              </sc-if>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label for="g-text" style="font-size: 13px; font-weight: 700;">{{cur.fieldLabel}}</label>
+                <textarea id="g-text" rows="3" value="{{curText}}" onChange="{{setCurText}}" style="box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 12px 14px; font-size: 15px; line-height: 1.45; color: #1E2A22; background: #FFFFFF; resize: none;"></textarea>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; background: {{checkBg}}; border-radius: 14px; padding: 4px 14px; min-height: 52px; transition: background .2s;">
+                <input id="g-check" type="checkbox" checked="{{curCheck}}" onChange="{{toggleCheck}}" style="width: 22px; height: 22px; margin: 0; accent-color: #2E7D4F; flex-shrink: 0; cursor: pointer;">
+                <label for="g-check" style="flex-grow: 1; font-size: 14px; line-height: 1.4; cursor: pointer; padding: 8px 0;"><strong>Verificación:</strong> {{cur.check}}</label>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isSummary}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 12px; font-weight: 700; color: #4E5C52; text-transform: uppercase; letter-spacing: .06em;">Revisa tu meta antes de crearla</span>
+                <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.2;">{{goal.title}}</h2>
+                <span style="align-self: flex-start; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #E1F0E6; color: #1F5C39;">Skill · {{goal.skill}}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; background: #F3F6EF; border-radius: 12px; padding: 10px 12px;">
+                <span style="font-size: 13px; font-weight: 700;">Calidad S.M.A.R.T.</span>
+                <span aria-hidden="true" style="flex-grow: 1; height: 8px; border-radius: 99px; background: #DCE4D4; overflow: hidden; display: block;"><span style="display: block; height: 100%; width: {{qualityPct}}%; background: #2E7D4F; border-radius: 99px;"></span></span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 13px;">{{verifiedCount}}/5</span>
+              </div>
+              <sc-for list="{{summary}}" as="sm" hint-placeholder-count="5">
+                <div style="display: flex; gap: 12px; border: 1.5px solid #DCE4D4; border-radius: 14px; padding: 12px;">
+                  <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 10px; background: #2E7D4F; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800; flex-shrink: 0;">{{sm.letter}}</span>
+                  <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="display: flex; justify-content: space-between; gap: 8px; align-items: center;">
+                      <span style="font-size: 14px; font-weight: 700;">{{sm.name}}</span>
+                      <span style="font-size: 12px; font-weight: 700; color: {{sm.stFg}}; background: {{sm.stBg}}; padding: 2px 8px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                        <sc-if value="{{sm.ok}}" hint-placeholder-val="{{ true }}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+                        <sc-if value="{{sm.notOk}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 6v8M12 18v.01"></path></svg></sc-if>
+                        {{sm.st}}
+                      </span>
+                    </span>
+                    <span style="font-size: 14px; line-height: 1.45; color: #1E2A22;">{{sm.text}}</span>
+                    <sc-if value="{{sm.notOk}}" hint-placeholder-val="{{ false }}">
+                      <button type="button" onClick="{{sm.fix}}" style="align-self: flex-start; min-height: 44px; padding: 0; border: none; background: transparent; color: #2C4580; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">Revisar este paso</button>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isDiag}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="d-idea" style="font-size: 13px; font-weight: 700;">¿Qué tienes en mente?</label>
+            <input id="d-idea" type="text" value="{{diag.idea}}" onChange="{{setIdea}}" style="height: 50px; box-sizing: border-box; border: 1.5px solid #C9D3C2; border-radius: 12px; padding: 0 14px; font-size: 16px; color: #1E2A22; background: #FFFFFF;">
+          </div>
+          <ol aria-label="Conversación del diagnóstico" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{chat}}" as="m" hint-placeholder-count="3">
+              <li style="display: flex; justify-content: {{m.justify}}; gap: 8px; align-items: flex-end;">
+                <sc-if value="{{m.bot}}" hint-placeholder-val="{{ true }}">
+                  <svg aria-hidden="true" width="32" height="32" viewBox="0 0 64 64" style="flex-shrink: 0;"><path d="M32 16 C27 5 15 6 17 15 C23 16 28 16 32 16Z" fill="#5FAE7A"></path><path d="M32 16 C37 5 49 6 47 15 C41 16 36 16 32 16Z" fill="#3F9563"></path><ellipse cx="32" cy="40" rx="21" ry="19" fill="#2E7D4F"></ellipse><ellipse cx="32" cy="45" rx="13" ry="10" fill="#CDE8D5"></ellipse><circle cx="24.5" cy="35" r="3.4" fill="#1E2A22"></circle><circle cx="39.5" cy="35" r="3.4" fill="#1E2A22"></circle><path d="M28 42 q4 4 8 0" fill="none" stroke="#1E2A22" stroke-width="2" stroke-linecap="round"></path></svg>
+                </sc-if>
+                <span style="max-width: 78%; padding: 10px 12px; font-size: 14px; line-height: 1.45; border-radius: {{m.radius}}; background: {{m.bg}}; color: {{m.fg}};"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{m.who}}: </span>{{m.text}}</span>
+              </li>
+            </sc-for>
+          </ol>
+
+          <sc-if value="{{diagAsking}}" hint-placeholder-val="{{ true }}">
+            <div role="group" aria-label="Respuestas" style="display: flex; flex-direction: column; gap: 8px;">
+              <sc-for list="{{options}}" as="op" hint-placeholder-count="2">
+                <button type="button" onClick="{{op.pick}}" class="q-press" style="min-height: 52px; border-radius: 14px; border: 1.5px solid #2E7D4F; background: #FFFFFF; color: #1F5C39; font-size: 15px; font-weight: 700; text-align: left; padding: 0 16px; cursor: pointer; box-shadow: 0 3px 0 #BFD9C7; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                  <span>{{op.label}}</span>
+                  <span style="font-size: 12px; font-weight: 400; color: #4E5C52;">{{op.hint}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{diagResult}}" hint-placeholder-val="{{ false }}">
+            <section aria-live="polite" aria-label="Resultado del diagnóstico" class="q-pop" style="border-radius: 18px; background: {{res.bg}}; color: {{res.fg}}; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Resultado</span>
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800;">Es una {{res.kind}}</span>
+              <span style="font-size: 14px; line-height: 1.5;">{{res.text}}</span>
+              <span style="font-size: 13px; font-weight: 700;">+20 XP · paso de bienvenida «Usa el diagnóstico»</span>
+            </section>
+          </sc-if>
+
+          <button type="button" onClick="{{resetDiag}}" style="align-self: center; min-height: 44px; border: none; background: transparent; color: #2C4580; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">Empezar de nuevo</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+        <div class="q-pop" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 16px;">
+          <sc-if value="{{doneGoal}}" hint-placeholder-val="{{ false }}">
+            <svg aria-hidden="true" width="120" height="120" viewBox="0 0 64 64"><path d="M14 22 L10 8 L22 16 Z" fill="#A8361F"></path><path d="M50 22 L54 8 L42 16Z" fill="#A8361F"></path><path d="M12 30 C12 16 52 16 52 30 L52 50 C52 56 46 58 40 56 L32 52 L24 56 C18 58 12 56 12 50Z" fill="#3A2A2A"></path><ellipse cx="24" cy="34" rx="4" ry="3" fill="#E0573F"></ellipse><ellipse cx="40" cy="34" rx="4" ry="3" fill="#E0573F"></ellipse><path d="M24 44 l4 -3 l4 3 l4 -3 l4 3" stroke="#F3F6EF" stroke-width="2.4" fill="none" stroke-linejoin="round"></path></svg>
+          </sc-if>
+          <sc-if value="{{doneOther}}" hint-placeholder-val="{{ true }}">
+            <svg aria-hidden="true" width="110" height="110" viewBox="0 0 64 64"><path d="M32 16 C27 5 15 6 17 15 C23 16 28 16 32 16Z" fill="#5FAE7A"></path><path d="M32 16 C37 5 49 6 47 15 C41 16 36 16 32 16Z" fill="#3F9563"></path><ellipse cx="32" cy="40" rx="21" ry="19" fill="#2E7D4F"></ellipse><ellipse cx="32" cy="45" rx="13" ry="10" fill="#CDE8D5"></ellipse><path d="M21 35 q3.5 -4 7 0 M36 35 q3.5 -4 7 0" fill="none" stroke="#1E2A22" stroke-width="2.4" stroke-linecap="round"></path><path d="M26 42 q6 6 12 0" fill="none" stroke="#1E2A22" stroke-width="2.2" stroke-linecap="round"></path><ellipse cx="19" cy="41" rx="3" ry="2" fill="#E0573F" opacity=".55"></ellipse><ellipse cx="45" cy="41" rx="3" ry="2" fill="#E0573F" opacity=".55"></ellipse></svg>
+          </sc-if>
+          <span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #1F5C39;">{{doneKicker}}</span>
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.2;">{{doneTitle}}</h2>
+          <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #4E5C52;">{{doneText}}</p>
+          <sc-if value="{{doneGoal}}" hint-placeholder-val="{{ false }}">
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left;">
+              <span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;"><span>Vida del Boss</span><span style="font-family: 'DM Mono', monospace;">100%</span></span>
+              <span aria-hidden="true" style="height: 12px; border-radius: 99px; background: #E0573F; display: block; box-shadow: inset 0 -3px 0 rgba(0,0,0,.15);"></span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{hasFooter}}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; padding: 12px 18px 18px; border-top: 1px solid #E7EDE1; display: flex; gap: 10px; background: #FFFFFF;">
+        <sc-if value="{{showPrev}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{prevStep}}" style="min-height: 52px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #C9D3C2; background: #FFFFFF; color: #1E2A22; font-size: 15px; font-weight: 700; cursor: pointer;">Atrás</button>
+        </sc-if>
+        <button type="button" onClick="{{primary}}" class="q-press" style="flex-grow: 1; min-height: 52px; border: none; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; cursor: pointer;">{{primaryLabel}}</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; padding: 12px 18px 18px; display: flex; flex-direction: column; gap: 8px;">
+        <a href="Main.dc.html" class="q-press" style="min-height: 52px; border-radius: 14px; background: #2E7D4F; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 0 #1F5C39; display: flex; align-items: center; justify-content: center; text-decoration: none;">Volver a Stage</a>
+        <button type="button" onClick="{{again}}" style="min-height: 48px; border: none; background: transparent; color: #2C4580; font-size: 15px; font-weight: 700; cursor: pointer;">Crear otra cosa</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["menu","tarea","proyecto","meta","resumen","diagnostico"],"default":"menu","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const st = props.start || 'menu';
+    const viewMap = { menu: 'menu', tarea: 'task', proyecto: 'project', meta: 'goal', resumen: 'goal', diagnostico: 'diag' };
+    this.state = {
+      view: viewMap[st] || 'menu',
+      doneKind: null,
+      task: { title: st === 'tarea' ? 'Repasar el capítulo 3 de Química' : '', skill: 'Química', prio: 'Media', linkType: 'Proyecto', linkTarget: 'Proyecto del semestre', date: '2026-10-14' },
+      proj: { title: st === 'proyecto' ? 'Ensayo final de Historia' : '', skill: 'Escritura', start: '2026-10-12', end: '2026-11-23', goal: 'Terminar el semestre con promedio 9', tasks: ['Elegir el tema', 'Buscar 5 fuentes', 'Escribir el borrador', 'Revisar y entregar'], draft: '' },
+      goal: {
+        step: st === 'resumen' ? 6 : (st === 'meta' ? 1 : 0),
+        title: 'Hablar inglés con fluidez básica', skill: 'Inglés',
+        s: 'Aprender 20 palabras al día y conversar 15 minutos, tres veces por semana, con mi compañero de intercambio.',
+        m: 'Mantener una conversación de 10 minutos sin cambiar al español. Lo reviso cada domingo.',
+        a: 'Tengo 30 minutos libres al día y una app de vocabulario.',
+        prob: 70,
+        r: 'Lo necesito para mi intercambio del próximo año.',
+        t: 'Hitos: 1 mes (500 palabras), 3 meses (primera conversación de 10 min).',
+        date: '2027-03-31',
+        c: { 1: true, 2: true, 3: false, 4: true, 5: true }
+      },
+      diag: st === 'diagnostico'
+        ? { idea: 'Aprender a cocinar 10 recetas', node: 'q2', log: [{ q: 'q1', a: 'Sí, es accionable' }] }
+        : { idea: 'Aprender a cocinar 10 recetas', node: 'q1', log: [] }
+    };
+  }
+  setSub(key, patch) { this.setState({ [key]: { ...this.state[key], ...patch } }); }
+  chips(list, cur, onPick) {
+    return list.map(label => {
+      const on = label === cur;
+      return { label, checked: on ? 'true' : 'false', bg: on ? '#2E7D4F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#2E7D4F' : '#C9D3C2', pick: () => onPick(label) };
+    });
+  }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const v = s.view;
+    const skills = ['Inglés', 'Química', 'Escritura', 'Salud', 'Sin skill'];
+
+    const kinds = [
+      { key: 'task', name: 'Tarea', chip: '10–40 XP', desc: 'Una sola acción que terminas de una vez.', example: 'Ej.: Responder el correo del tutor', tint: '#E1F0E6', ink: '#1F5C39', border: '#BFD9C7' },
+      { key: 'project', name: 'Proyecto', chip: 'Semanas', desc: 'Varios pasos con fecha de inicio y fin.', example: 'Ej.: Ensayo final de Historia', tint: '#E3E9F7', ink: '#2C4580', border: '#C3CFEA' },
+      { key: 'goal', name: 'Meta', chip: 'Boss', desc: 'Algo grande que logras en meses. Se convierte en un Boss.', example: 'Ej.: Hablar inglés con fluidez básica', tint: '#FBE4DF', ink: '#A8361F', border: '#F0C3B9' }
+    ].map(k => ({ ...k, isTask: k.key === 'task', isProject: k.key === 'project', isGoal: k.key === 'goal', pick: () => this.setState({ view: k.key }) }));
+
+    // Tarea
+    const t = s.task;
+    const words = (t.title || '').trim().split(/\s+/).filter(Boolean).length;
+    const why = [{ what: 'Base de toda misión', value: '+10' }];
+    if (words >= 5) why.push({ what: 'Parece una misión con varios pasos', value: '+10' });
+    if (t.prio === 'Alta') why.push({ what: 'Prioridad alta', value: '+10' });
+    if (t.prio === 'Media') why.push({ what: 'Prioridad media', value: '+5' });
+    if (t.linkType === 'Meta') why.push({ what: 'Golpea a un Boss (Meta)', value: '+10' });
+    if (t.linkType === 'Proyecto') why.push({ what: 'Avanza un proyecto', value: '+5' });
+    const rewardXp = why.reduce((a, w) => a + Number(w.value.replace('+', '')), 0);
+    const rewardCoins = Math.round(rewardXp * 0.3);
+    const linkOpts = { Proyecto: ['Proyecto del semestre', 'Ensayo final de Historia', 'Tutorial de la app'], Meta: ['Hablar inglés con fluidez básica', 'Terminar el semestre con promedio 9'] };
+    const linkIcons = { Ninguno: 'M5 12h14', Proyecto: 'M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', Meta: 'M12 3v18M12 4h7l-2 3 2 3h-7' };
+    const linkTypes = ['Ninguno', 'Proyecto', 'Meta'].map(label => {
+      const on = t.linkType === label;
+      return { label, icon: linkIcons[label], checked: on ? 'true' : 'false', bg: on ? '#2E7D4F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A22', border: on ? '#1F5C39' : '#C9D3C2', pick: () => this.setSub('task', { linkType: label, linkTarget: label === 'Ninguno' ? '' : linkOpts[label][0] }) };
+    });
+    const prioDef = { Baja: '#5FAE7A', Media: '#D9A21B', Alta: '#E0573F' };
+    const prios = ['Baja', 'Media', 'Alta'].map(label => {
+      const on = t.prio === label;
+      return { label, dot: prioDef[label], checked: on ? 'true' : 'false', bg: on ? '#F3F6EF' : '#FFFFFF', border: on ? '#1E2A22' : '#C9D3C2', pick: () => this.setSub('task', { prio: label }) };
+    });
+
+    // Proyecto
+    const p = s.proj;
+    const d0 = new Date(p.start), d1 = new Date(p.end);
+    const days = Math.max(1, Math.round((d1 - d0) / 86400000));
+    const weeks = Math.max(1, Math.ceil(days / 7));
+    const pace = p.tasks.length / weeks;
+    const paceLabel = pace > 3 ? 'Alta' : (pace > 1.5 ? 'Media' : 'Baja');
+    const paceCol = { Alta: ['#FBE4DF', '#A8361F'], Media: ['#FBF0D3', '#6E4D00'], Baja: ['#E1F0E6', '#1F5C39'] }[paceLabel];
+    const paceNum = pace < 1 ? '1 tarea cada ' + Math.round(1 / pace) + ' semanas' : '≈ ' + (Math.round(pace * 10) / 10) + ' tareas por semana';
+
+    // Meta
+    const g = s.goal;
+    const stepDefs = [
+      null,
+      { letter: 'S', name: 'Específico', key: 's', fieldLabel: '¿Qué quieres lograr exactamente?', qs: ['¿Tu meta está claramente definida? «Mejorar mi inglés» es vago; «aprender 20 palabras al día» es específico.', '¿Quién está involucrado o afectado?'], check: '¿la respuesta contiene una acción y un resultado claros?' },
+      { letter: 'M', name: 'Medible', key: 'm', fieldLabel: '¿Cómo sabrás que lo lograste?', qs: ['¿Qué números o señales usarás para medir el progreso?', '¿Con qué frecuencia revisarás tu avance?'], check: '¿hay un indicador medible o una condición de éxito?' },
+      { letter: 'A', name: 'Alcanzable', key: 'a', fieldLabel: '¿Con qué recursos cuentas?', qs: ['¿Tienes el tiempo, las habilidades, el dinero y el apoyo?', '¿Es un reto, pero sigue siendo realista?'], check: '¿es posible dadas tus limitaciones actuales?', hasRange: true },
+      { letter: 'R', name: 'Relevante', key: 'r', fieldLabel: '¿Por qué es importante para ti?', qs: ['¿Está alineada con tu Vision Board o tus prioridades actuales?', '¿Te acerca a tu dirección de largo plazo?'], check: '¿es significativa y está alineada con tus prioridades?' },
+      { letter: 'T', name: 'Con plazo definido', key: 't', fieldLabel: '¿En qué hitos la puedes dividir?', qs: ['¿Cuándo quieres completarla?', '¿Se puede dividir en hitos de 1 semana, 1 mes o 3 meses?'], check: '¿hay un plazo o una fecha límite específica?', hasDate: true }
+    ];
+    const step = g.step;
+    const cur = (step >= 1 && step <= 5) ? stepDefs[step] : { letter: '', name: '', qs: [], fieldLabel: '', check: '', key: 's' };
+    const shorts = ['Meta', 'S', 'M', 'A', 'R', 'T', 'OK'];
+    const stepNames = ['Tu meta', 'Específico', 'Medible', 'Alcanzable', 'Relevante', 'Con plazo', 'Resumen'];
+    const steps = shorts.map((sh, i) => {
+      const on = i === step;
+      const done = i < step && (i === 0 || i === 6 || g.c[i]);
+      return {
+        short: sh,
+        aria: 'Paso ' + stepNames[i] + (on ? ', actual' : (done ? ', completado' : '')),
+        current: on ? 'step' : 'false',
+        bg: on ? '#1E2A22' : (done ? '#E1F0E6' : '#FFFFFF'),
+        fg: on ? '#FFFFFF' : (done ? '#1F5C39' : '#4E5C52'),
+        border: on ? '#1E2A22' : (done ? '#BFD9C7' : '#DCE4D4'),
+        go: () => this.setSub('goal', { step: i })
+      };
+    });
+    const verifiedCount = [1, 2, 3, 4, 5].filter(i => g.c[i]).length;
+    const summary = [1, 2, 3, 4, 5].map(i => {
+      const d = stepDefs[i];
+      const ok = !!g.c[i];
+      let text = g[d.key];
+      if (i === 3) text = text + ' Probabilidad estimada: ' + g.prob + '%.';
+      if (i === 5) text = 'Fecha límite: ' + g.date + '. ' + text;
+      return { letter: d.letter, name: d.name, text, ok, notOk: !ok, st: ok ? 'Verificado' : 'Sin verificar', stBg: ok ? '#E1F0E6' : '#FBF0D3', stFg: ok ? '#1F5C39' : '#6E4D00', fix: () => this.setSub('goal', { step: i }) };
+    });
+    const probHint = g.prob >= 80 ? 'Muy probable: ¿podrías hacerla un poco más retadora?' : (g.prob >= 50 ? 'Buen equilibrio entre reto y realismo.' : 'Poco probable: considera reducir el alcance o ampliar el plazo.');
+
+    // Diagnóstico
+    const tree = {
+      q1: { text: '¿Es accionable? ¿Puedes hacer algo concreto al respecto?', opts: [['Sí, es accionable', 'Hay un paso que puedo dar', 'q2'], ['No', 'Es una idea o información para guardar', 'r_ref']] },
+      q2: { text: '¿Se resuelve en un solo paso, o necesita varios pasos?', opts: [['Un solo paso', 'Lo termino de una vez', 'q3'], ['Varios pasos', 'Necesito hacer varias cosas', 'q3b']] },
+      q3: { text: '¿Lo puedes hacer ahora mismo en un par de minutos?', opts: [['Sí, en 2 minutos', 'Es muy rápido', 'r_now'], ['No', 'Me tomará más tiempo', 'q5']] },
+      q5: { text: '¿Tiene una fecha o un momento específico?', opts: [['Sí', 'Tiene fecha límite', 'r_task_date'], ['No', 'Cuando pueda', 'r_task']] },
+      q3b: { text: '¿Se completa con una lista de tareas en unas semanas, o es algo más amplio que tomará meses?', opts: [['Semanas', 'Una lista de tareas acotada', 'r_proj'], ['Meses', 'Varios proyectos o un hábito sostenido', 'r_goal']] }
+    };
+    const results = {
+      r_ref: { kind: 'Referencia', text: 'No es accionable todavía: guárdala en tu Brain Dump como Referencia o «Algún día / Tal vez».', cta: null, bg: '#E7EDE1', fg: '#1E2A22' },
+      r_now: { kind: 'Tarea rápida', text: '¡Hazla ya! Te toma menos tiempo hacerla que guardarla.', cta: 'task', bg: '#E1F0E6', fg: '#1F5C39' },
+      r_task_date: { kind: 'Tarea', text: 'Una sola acción con fecha: la creamos con su fecha límite para que aparezca en tu calendario.', cta: 'task', bg: '#E1F0E6', fg: '#1F5C39' },
+      r_task: { kind: 'Tarea', text: 'Una sola acción sin fecha: entra a tu lista de próximas acciones.', cta: 'task', bg: '#E1F0E6', fg: '#1F5C39' },
+      r_proj: { kind: 'Proyecto', text: 'Tiene varios pasos y un plazo de semanas. Lo dividimos en tareas y calculo el ritmo que necesitas.', cta: 'project', bg: '#E3E9F7', fg: '#2C4580' },
+      r_goal: { kind: 'Meta', text: 'Es algo grande que lograrás con varios proyectos o un hábito: será tu próximo Boss. La definimos con S.M.A.R.T.', cta: 'goal', bg: '#FBE4DF', fg: '#A8361F' }
+    };
+    const dg = s.diag;
+    const chat = [];
+    const bot = (text) => chat.push({ bot: true, who: 'RPGenie', text, justify: 'flex-start', bg: '#F3F6EF', fg: '#1E2A22', radius: '16px 16px 16px 4px' });
+    const me = (text) => chat.push({ bot: false, who: 'Tú', text, justify: 'flex-end', bg: '#2E7D4F', fg: '#FFFFFF', radius: '16px 16px 4px 16px' });
+    bot('Vamos a clasificar «' + (dg.idea || 'tu idea') + '». Responde con lo primero que pienses.');
+    dg.log.forEach(e => { bot(tree[e.q].text); me(e.a); });
+    const asking = !!tree[dg.node];
+    if (asking) bot(tree[dg.node].text);
+    const res = asking ? results.r_task : results[dg.node];
+    const options = asking ? tree[dg.node].opts.map(([label, hint, next]) => ({
+      label, hint,
+      pick: () => this.setSub('diag', { node: next, log: [...this.state.diag.log, { q: this.state.diag.node, a: label }] })
+    })) : [];
+
+    // Navegación y pie
+    const titles = { menu: '¿Qué quieres crear?', task: 'Nueva Tarea', project: 'Nuevo Proyecto', goal: 'Nueva Meta · S.M.A.R.T.', diag: 'Diagnóstico', done: '¡Listo!' };
+    let primaryLabel = '', primary = () => {}, hasFooter = false, showPrev = false;
+    if (v === 'task') { hasFooter = true; primaryLabel = 'Crear misión · +' + rewardXp + ' XP'; primary = () => this.setState({ view: 'done', doneKind: 'task' }); }
+    if (v === 'project') { hasFooter = true; primaryLabel = 'Crear proyecto'; primary = () => this.setState({ view: 'done', doneKind: 'project' }); }
+    if (v === 'goal') {
+      hasFooter = true; showPrev = step > 0;
+      primaryLabel = step < 5 ? 'Siguiente' : (step === 5 ? 'Ver resumen' : 'Crear seguimiento para esta Meta');
+      primary = () => step < 6 ? this.setSub('goal', { step: step + 1 }) : this.setState({ view: 'done', doneKind: 'goal' });
+    }
+    if (v === 'diag' && !asking && res.cta) {
+      hasFooter = true;
+      primaryLabel = 'Crear como ' + res.kind;
+      primary = () => {
+        const idea = this.state.diag.idea;
+        if (res.cta === 'task') this.setState({ view: 'task', task: { ...this.state.task, title: idea } });
+        if (res.cta === 'project') this.setState({ view: 'project', proj: { ...this.state.proj, title: idea } });
+        if (res.cta === 'goal') this.setState({ view: 'goal', goal: { ...this.state.goal, title: idea, step: 0 } });
+      };
+    }
+    const dk = s.doneKind;
+    const doneCopy = {
+      task: ['Misión creada', t.title || 'Nueva misión', 'Al completarla ganarás +' + rewardXp + ' XP y +' + rewardCoins + ' Monedas. La encontrarás en tus misiones de hoy.'],
+      project: ['Proyecto creado', p.title || 'Nuevo proyecto', p.tasks.length + ' tareas listas. Ritmo necesario: ' + paceNum + '.'],
+      goal: ['¡Apareció un nuevo Boss!', g.title, 'Cada proyecto y tarea vinculada le quitará vida. Cuando llegue a cero, habrás cumplido tu meta.']
+    }[dk || 'task'];
+
+    return {
+      sheetTitle: titles[v],
+      canBack: v !== 'menu' && v !== 'done', noBack: v === 'menu' || v === 'done',
+      back: () => this.setState({ view: 'menu' }),
+      isMenu: v === 'menu', isTask: v === 'task', isProject: v === 'project', isGoal: v === 'goal', isDiag: v === 'diag', isDone: v === 'done',
+      kinds, goDiag: () => this.setState({ view: 'diag' }),
+
+      task: t,
+      setTaskTitle: (e) => this.setSub('task', { title: e.target.value }),
+      setTaskDate: (e) => this.setSub('task', { date: e.target.value }),
+      taskSkills: this.chips(skills, t.skill, (x) => this.setSub('task', { skill: x })),
+      prios, rewardXp, rewardCoins, rewardWhy: why, linkTypes,
+      showLinkSelect: t.linkType !== 'Ninguno',
+      linkSelectLabel: t.linkType === 'Meta' ? 'Elige la meta' : 'Elige el proyecto',
+      linkOptions: t.linkType === 'Ninguno' ? [] : linkOpts[t.linkType],
+      linkHelp: t.linkType === 'Meta' ? 'Al completarla, le quitas vida al Boss de esa meta.' : 'Al completarla, sube el progreso del proyecto.',
+      setTaskLink: (e) => this.setSub('task', { linkTarget: e.target.value }),
+
+      proj: p,
+      setProjTitle: (e) => this.setSub('proj', { title: e.target.value }),
+      setProjStart: (e) => this.setSub('proj', { start: e.target.value }),
+      setProjEnd: (e) => this.setSub('proj', { end: e.target.value }),
+      setProjGoal: (e) => this.setSub('proj', { goal: e.target.value }),
+      setProjDraft: (e) => this.setSub('proj', { draft: e.target.value }),
+      addProjTask: (e) => { e.preventDefault(); const d = this.state.proj.draft.trim(); if (!d) return; this.setSub('proj', { tasks: [...this.state.proj.tasks, d], draft: '' }); },
+      projSkills: this.chips(skills, p.skill, (x) => this.setSub('proj', { skill: x })),
+      projTasks: p.tasks.map((label, i) => ({ label, remove: () => this.setSub('proj', { tasks: this.state.proj.tasks.filter((_, j) => j !== i) }) })),
+      projCount: p.tasks.length, weeks, paceText: paceNum, paceLabel, paceBg: paceCol[0], paceFg: paceCol[1],
+
+      goal: g, goalName: g.title || 'Tu meta', steps, cur, stepNum: step,
+      isStep0: step === 0, isLetterStep: step >= 1 && step <= 5, isSummary: step === 6,
+      goalSkills: this.chips(skills, g.skill, (x) => this.setSub('goal', { skill: x })),
+      setG_title: (e) => this.setSub('goal', { title: e.target.value }),
+      setG_prob: (e) => this.setSub('goal', { prob: Number(e.target.value) }),
+      setG_date: (e) => this.setSub('goal', { date: e.target.value }),
+      curText: g[cur.key] || '',
+      setCurText: (e) => this.setSub('goal', { [cur.key]: e.target.value }),
+      curCheck: !!g.c[step],
+      checkBg: g.c[step] ? '#E1F0E6' : '#F3F6EF',
+      toggleCheck: () => this.setSub('goal', { c: { ...this.state.goal.c, [step]: !this.state.goal.c[step] } }),
+      summary, verifiedCount, qualityPct: verifiedCount * 20, probHint,
+
+      diag: dg, chat, options, diagAsking: asking, diagResult: !asking, res,
+      setIdea: (e) => this.setSub('diag', { idea: e.target.value }),
+      resetDiag: () => this.setSub('diag', { node: 'q1', log: [] }),
+
+      hasFooter, showPrev, primaryLabel, primary,
+      prevStep: () => this.setSub('goal', { step: Math.max(0, step - 1) }),
+      doneGoal: dk === 'goal', doneOther: dk !== 'goal',
+      doneKicker: doneCopy[0], doneTitle: doneCopy[1], doneText: doneCopy[2],
+      again: () => this.setState({ view: 'menu', doneKind: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

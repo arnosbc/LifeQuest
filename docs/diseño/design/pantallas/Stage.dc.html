@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Stage · P.A.R.A.</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="{{pageKicker}}" heading="{{pageTitle}}" icon="board" action-href="Crear.dc.html" action-label="Crear tarea, proyecto o meta" action-icon="plus" hint-size="390px,156px"></dc-import>
+    <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+    <sc-if value="{{inSub}}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{backToLib}}" style="align-self: flex-start; min-height: 44px; margin-left: -6px; padding: 0 10px 0 4px; border: none; background: transparent; display: flex; align-items: center; gap: 4px; cursor: pointer; color: #1F5C39; font-size: 14px; font-weight: 700;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>Biblioteca</button>
+    </sc-if>
+    <sc-if value="{{showTabs}}" hint-placeholder-val="{{ true }}">
+      <div role="tablist" aria-label="Secciones de Stage" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #E7EDE1; border-radius: 14px; padding: 4px;">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="3">
+          <button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="min-height: 44px; border: none; border-radius: 11px; background: {{tb.bg}}; color: {{tb.fg}}; font-size: 14px; font-weight: 700; box-shadow: {{tb.shadow}}; cursor: pointer;">{{tb.label}}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isHoy}}" hint-placeholder-val="{{ true }}">
+      <section role="tabpanel" aria-label="Hoy" style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800;">Camino de hoy</span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4E5C52;">{{dayDone}}/{{dayTotal}} misiones</span>
+          </div>
+          <div role="progressbar" aria-label="Misiones de hoy completadas" aria-valuemin="0" aria-valuemax="{{dayTotal}}" aria-valuenow="{{dayDone}}" style="display: flex; align-items: center; gap: 8px;">
+            <span aria-hidden="true" style="flex-grow: 1; display: grid; grid-template-columns: repeat({{dayTotal}}, minmax(0, 1fr)); gap: 4px;">
+              <sc-for list="{{daySteps}}" as="ds" hint-placeholder-count="6"><span style="height: 12px; border-radius: 4px; background: {{ds}}; transition: background .3s;"></span></sc-for>
+            </span>
+            <svg aria-hidden="true" class="{{chestClass}}" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6E4D00" stroke-width="1.6" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M3 10h18v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="{{chestFill}}"></path><path d="M3 10l2-5h14l2 5" fill="#EBC25A"></path><path d="M10 10v4h4v-4"></path></svg>
+          </div>
+          <span style="font-size: 13px; color: #4E5C52;">{{chestText}}</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div role="radiogroup" aria-label="Periodo" style="display: flex; gap: 2px;">
+            <sc-for list="{{ranges}}" as="r" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{r.checked}}" onClick="{{r.pick}}" style="min-height: 44px; padding: 0 12px; border: none; border-radius: 99px; background: {{r.bg}}; color: {{r.fg}}; font-size: 14px; font-weight: 700; cursor: pointer;">{{r.label}}</button>
+            </sc-for>
+          </div>
+          <span style="font-size: 13px; color: #4E5C52;">{{summary}}</span>
+        </div>
+
+        <form onSubmit="{{quickAdd}}" style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px #DCE4D4; padding: 0 6px 0 14px;">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+          <label for="qa" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Añadir misión rápida</label>
+          <input id="qa" type="text" value="{{draft}}" onChange="{{onDraft}}" placeholder="Añadir algo para hoy" style="flex-grow: 1; min-width: 0; height: 50px; border: none; outline-offset: -2px; font-size: 15px; color: #1E2A22; background: transparent;">
+        </form>
+
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <button type="button" onClick="{{g.toggle}}" aria-expanded="{{g.openStr}}" style="min-height: 44px; border: none; background: transparent; padding: 0; display: flex; align-items: center; gap: 8px; cursor: pointer; color: inherit;">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 8px; background: {{g.tint}}; color: {{g.fg}};"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 99px; background: {{g.dot}};"></span>{{g.name}}</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4E5C52;">{{g.count}}</span>
+              <span style="flex-grow: 1;"></span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.2" stroke-linecap="round" style="transform: rotate({{g.rot}}deg); transition: transform .2s;"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{g.open}}" hint-placeholder-val="{{ true }}">
+              <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+                <sc-for list="{{g.items}}" as="t" hint-placeholder-count="2">
+                  <li style="position: relative; border-bottom: 1px solid #EEF2EA;">
+                    <div style="display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 6px;">
+                      <button type="button" aria-pressed="{{t.pressed}}" aria-label="Completar: {{t.title}}" onClick="{{t.toggle}}" style="width: 44px; height: 44px; flex-shrink: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; border: 2px solid {{t.ring}}; background: {{t.fill}}; display: flex; align-items: center; justify-content: center; transition: background .2s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{t.tick}}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+                      </button>
+                      <button type="button" onClick="{{t.expand}}" aria-expanded="{{t.openStr}}" style="flex-grow: 1; min-width: 0; min-height: 48px; border: none; background: transparent; padding: 0 8px 0 2px; display: flex; align-items: center; gap: 8px; text-align: left; cursor: pointer; color: inherit;">
+                        <span style="flex-grow: 1; font-size: 15px; color: {{t.color}}; text-decoration: {{t.deco}};">{{t.title}}</span>
+                        <span style="font-family: 'DM Mono', monospace; font-size: 12px; color: #1F5C39; background: #E1F0E6; padding: 2px 6px; border-radius: 6px; flex-shrink: 0;">+{{t.xp}}</span>
+                        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9AA79D" stroke-width="2.2" stroke-linecap="round" style="transform: rotate({{t.rot}}deg); transition: transform .2s; flex-shrink: 0;"><path d="M9 6l6 6-6 6"></path></svg>
+                      </button>
+                    </div>
+                    <sc-if value="{{t.open}}" hint-placeholder-val="{{ false }}">
+                      <div class="q-fade" style="padding: 0 14px 14px 54px; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px;">
+                          <span style="display: inline-flex; align-items: center; gap: 5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: {{t.st.bg}}; color: {{t.st.fg}};"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 99px; background: {{t.st.dot}};"></span>{{t.st.label}}</span>
+                          <span style="padding: 3px 8px; border-radius: 99px; background: #E3E9F7; color: #2C4580; font-weight: 700;">{{t.linkLabel}}</span>
+                          <span style="font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 99px; background: #E1F0E6; color: #1F5C39;">+{{t.xp}} XP · +{{t.coins}}</span>
+                        </div>
+                        <a href="Mazmorra.dc.html" style="align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 12px; background: #1E2A22; color: #F3F6EF; display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 14px; font-weight: 700;"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"></path></svg>Iniciar sesión</a>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{t.floating}}" hint-placeholder-val="{{ false }}">
+                      <span aria-hidden="true" class="q-float" style="position: absolute; right: 40px; top: 6px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 15px; color: #1F5C39;">+{{t.xp}} XP</span>
+                    </sc-if>
+                  </li>
+                </sc-for>
+              </ul>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <sc-if value="{{nothing}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 8px 0; text-align: center; font-size: 15px; color: #4E5C52;">Nada pendiente en este periodo.</p>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isCal}}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" aria-label="Calendario" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <h2 style="margin: 0; flex-grow: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">{{calTitle}}</h2>
+          <div role="radiogroup" aria-label="Vista" style="display: flex; gap: 2px;">
+            <sc-for list="{{calModes}}" as="cm" hint-placeholder-count="2">
+              <button type="button" role="radio" aria-checked="{{cm.checked}}" onClick="{{cm.pick}}" style="min-height: 44px; padding: 0 12px; border: none; border-radius: 99px; background: {{cm.bg}}; color: {{cm.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{cm.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4; padding: 10px 8px;">
+          <div style="display: flex; align-items: center; gap: 2px;">
+            <sc-if value="{{isWeek}}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{prevPeriod}}" aria-label="Semana anterior" style="width: 32px; height: 44px; flex-shrink: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #4E5C52;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+            </sc-if>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px;">
+              <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: 12px; color: #4E5C52;"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+              <div role="grid" aria-label="{{calTitle}}" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px;">
+                <sc-for list="{{calDays}}" as="cd" hint-placeholder-count="7">
+                  <sc-if value="{{cd.blank}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true"></span></sc-if>
+                  <sc-if value="{{cd.real}}" hint-placeholder-val="{{ true }}">
+                    <button type="button" role="gridcell" aria-selected="{{cd.sel}}" aria-label="{{cd.aria}}" onClick="{{cd.pick}}" style="min-height: 48px; border: none; border-radius: 12px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; padding: 0;">
+                      <span style="width: 32px; height: 32px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: {{cd.weight}}; background: {{cd.numBg}}; color: {{cd.numFg}}; box-shadow: {{cd.ring}};">{{cd.n}}</span>
+                      <span aria-hidden="true" style="width: 5px; height: 5px; border-radius: 99px; background: {{cd.dot}};"></span>
+                    </button>
+                  </sc-if>
+                </sc-for>
+              </div>
+            </div>
+            <sc-if value="{{isWeek}}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{nextPeriod}}" aria-label="Semana siguiente" style="width: 32px; height: 44px; flex-shrink: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #4E5C52;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></button>
+            </sc-if>
+          </div>
+        </div>
+        <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #4E5C52;">{{selLabel}}</h3>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{selItems}}" as="ev" hint-placeholder-count="2">
+            <li style="background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px #DCE4D4; display: flex; align-items: center; gap: 4px; padding: 6px 14px 6px 6px;">
+              <button type="button" aria-pressed="{{ev.pressed}}" aria-label="Completar: {{ev.title}}" onClick="{{ev.toggle}}" style="width: 44px; height: 44px; flex-shrink: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 99px; border: 2px solid {{ev.ring}}; background: {{ev.fill}}; display: flex; align-items: center; justify-content: center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{ev.tick}}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+              </button>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 6px 0;">
+                <span style="font-size: 15px; text-decoration: {{ev.deco}}; color: {{ev.color}};">{{ev.title}}</span>
+                <span style="font-size: 12px; color: #4E5C52;">{{ev.project}}</span>
+              </span>
+              <span style="font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: {{ev.tb.bg}}; color: {{ev.tb.fg}}; white-space: nowrap;">{{ev.tb.label}}</span>
+            </li>
+          </sc-for>
+        </ul>
+        <sc-if value="{{selEmpty}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; text-align: center; font-size: 15px; color: #4E5C52; padding: 12px;">Día libre.</p>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isLib}}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" aria-label="Biblioteca" style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="margin: 0 0 4px; font-size: 14px; color: #4E5C52; line-height: 1.5;">Todo lo que organizas, en un solo lugar. Entra solo cuando lo necesites.</p>
+        <sc-for list="{{libItems}}" as="lb" hint-placeholder-count="4">
+          <button type="button" onClick="{{lb.go}}" class="q-press" style="min-height: 76px; border: none; border-radius: 18px; background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4, 0 3px 0 #DCE4D4; padding: 0 16px; display: flex; align-items: center; gap: 14px; text-align: left; cursor: pointer; color: inherit;">
+            <span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 13px; background: {{lb.tint}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{lb.ink}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{lb.icon}}"></path></svg></span>
+            <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">{{lb.name}}</span>
+              <span style="font-size: 13px; color: #4E5C52;">{{lb.sub}}</span>
+            </span>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4E5C52" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+        </sc-for>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+          <sc-for list="{{libLinks}}" as="lk" hint-placeholder-count="2">
+            <a href="{{lk.href}}" class="q-press" style="min-height: 64px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 0 0 1px #DCE4D4, 0 3px 0 #DCE4D4; padding: 0 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+              <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; background: {{lk.tint}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{lk.ink}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{lk.icon}}"></path></svg></span>
+              <span style="display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 15px; font-weight: 700;">{{lk.name}}</span><span style="font-size: 12px; color: #4E5C52;">{{lk.sub}}</span></span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isProj}}" hint-placeholder-val="{{ false }}">
+      <section aria-label="Proyectos" style="display: flex; flex-direction: column; gap: 12px;">
+        <div role="radiogroup" aria-label="Filtrar" style="display: flex; gap: 2px;">
+          <sc-for list="{{projFilters}}" as="f" hint-placeholder-count="3">
+            <button type="button" role="radio" aria-checked="{{f.checked}}" onClick="{{f.pick}}" style="min-height: 44px; padding: 0 12px; border: none; border-radius: 99px; background: {{f.bg}}; color: {{f.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{f.label}} · {{f.n}}</button>
+          </sc-for>
+        </div>
+        <sc-for list="{{projects}}" as="p" hint-placeholder-count="3">
+          <article style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <h3 style="margin: 0; flex-grow: 1; font-size: 16px; font-weight: 700; line-height: 1.3;"><a href="ProyectoDetalle.dc.html" style="color: inherit; text-decoration: underline; text-decoration-color: #C9D3C2; text-underline-offset: 3px; display: inline-block; min-height: 44px;">{{p.title}}</a></h3>
+              <span style="font-family: 'DM Mono', monospace; font-size: 13px;">{{p.pct}}%</span>
+            </div>
+            <span role="progressbar" aria-label="Progreso de {{p.title}}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{p.pct}}" style="height: 6px; border-radius: 99px; background: #E7EDE1; overflow: hidden; display: block;"><span style="display: block; height: 100%; width: {{p.pct}}%; background: #2E7D4F; border-radius: 99px;"></span></span>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4E5C52;">
+              <span>{{p.doneLabel}}</span>
+              <span aria-hidden="true">·</span>
+              <sc-if value="{{p.hasArea}}" hint-placeholder-val="{{ true }}"><span>{{p.area}}</span></sc-if>
+              <sc-if value="{{p.noArea}}" hint-placeholder-val="{{ false }}"><span style="color: #A8361F; font-weight: 700;">Sin área asignada</span></sc-if>
+              <span style="flex-grow: 1;"></span>
+              <button type="button" onClick="{{p.toggle}}" aria-expanded="{{p.openStr}}" style="min-height: 44px; border: none; background: transparent; padding: 0 0 0 8px; color: #1F5C39; font-size: 13px; font-weight: 700; cursor: pointer;">{{p.toggleLabel}}</button>
+            </div>
+            <sc-if value="{{p.open}}" hint-placeholder-val="{{ false }}">
+              <div class="q-fade" style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 13px; padding-top: 4px; border-top: 1px solid #EEF2EA;">
+                <sc-for list="{{p.rows}}" as="rw" hint-placeholder-count="4">
+                  <span style="font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: {{rw.bg}}; color: {{rw.fg}}; text-align: center; margin-top: 6px;">{{rw.label}}</span>
+                  <span style="margin-top: 6px;">{{rw.value}}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+          </article>
+        </sc-for>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isGoals}}" hint-placeholder-val="{{ false }}">
+      <section aria-label="Metas" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div role="radiogroup" aria-label="Filtrar" style="display: flex; gap: 2px;">
+            <sc-for list="{{goalFilters}}" as="f" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{f.checked}}" onClick="{{f.pick}}" style="min-height: 44px; padding: 0 10px; border: none; border-radius: 99px; background: {{f.bg}}; color: {{f.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{f.label}} · {{f.n}}</button>
+            </sc-for>
+          </div>
+          <span style="font-size: 12px; color: #4E5C52; white-space: nowrap;">T4 2026</span>
+        </div>
+        <sc-for list="{{goals}}" as="gl" hint-placeholder-count="2">
+          <article style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <svg aria-hidden="true" width="36" height="36" viewBox="0 0 64 64" style="flex-shrink: 0; opacity: {{gl.bossOpacity}};"><path d="M14 22 L10 8 L22 16 Z" fill="#E0573F"></path><path d="M50 22 L54 8 L42 16Z" fill="#E0573F"></path><path d="M12 30 C12 16 52 16 52 30 L52 50 C52 56 46 58 40 56 L32 52 L24 56 C18 58 12 56 12 50Z" fill="#4A3636"></path><ellipse cx="24" cy="34" rx="4" ry="3" fill="#F2C66B"></ellipse><ellipse cx="40" cy="34" rx="4" ry="3" fill="#F2C66B"></ellipse></svg>
+              <h3 style="margin: 0; flex-grow: 1; font-size: 16px; font-weight: 700; line-height: 1.3;">{{gl.title}}</h3>
+            </div>
+            <span style="display: flex; justify-content: space-between; font-size: 13px; color: #4E5C52;"><span>{{gl.bossLabel}}</span><span style="font-family: 'DM Mono', monospace; color: #1E2A22;">{{gl.boss}}%</span></span>
+            <span aria-hidden="true" style="height: 6px; border-radius: 99px; background: #E7EDE1; overflow: hidden; display: block;"><span style="display: block; height: 100%; width: {{gl.boss}}%; background: #E0573F; border-radius: 99px;"></span></span>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4E5C52;">
+              <span>{{gl.skill}} · {{gl.doneLabel}}</span>
+              <span style="flex-grow: 1;"></span>
+              <button type="button" onClick="{{gl.toggle}}" aria-expanded="{{gl.openStr}}" style="min-height: 44px; border: none; background: transparent; padding: 0 0 0 8px; color: #1F5C39; font-size: 13px; font-weight: 700; cursor: pointer;">{{gl.toggleLabel}}</button>
+            </div>
+            <sc-if value="{{gl.open}}" hint-placeholder-val="{{ false }}">
+              <div class="q-fade" style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 13px; padding-top: 4px; border-top: 1px solid #EEF2EA;">
+                <sc-for list="{{gl.rows}}" as="rw" hint-placeholder-count="5">
+                  <span style="font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: {{rw.bg}}; color: {{rw.fg}}; text-align: center; margin-top: 6px;">{{rw.label}}</span>
+                  <span style="margin-top: 6px;">{{rw.value}}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+          </article>
+        </sc-for>
+        <a href="CrearMeta.dc.html" style="min-height: 52px; border: 1.5px dashed #2E7D4F; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; color: #1F5C39; font-size: 14px; font-weight: 700;">Nueva meta S.M.A.R.T.</a>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isAreas}}" hint-placeholder-val="{{ false }}">
+      <section aria-label="Áreas" style="display: flex; flex-direction: column; gap: 10px;">
+        <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px #DCE4D4; overflow: hidden;">
+          <sc-for list="{{areas}}" as="ar" hint-placeholder-count="4">
+            <li style="border-bottom: 1px solid #EEF2EA;">
+              <button type="button" onClick="{{ar.toggle}}" aria-expanded="{{ar.openStr}}" style="width: 100%; min-height: 68px; border: none; background: transparent; padding: 10px 14px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: inherit;">
+                <span aria-hidden="true" style="width: 38px; height: 38px; border-radius: 11px; background: {{ar.tint}}; color: {{ar.ink}}; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 17px; flex-shrink: 0;">{{ar.initial}}</span>
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                  <span style="display: flex; justify-content: space-between; font-size: 15px;"><span style="font-weight: 700;">{{ar.name}}</span><span style="font-family: 'DM Mono', monospace; font-size: 13px;">Nivel {{ar.level}}</span></span>
+                  <span aria-hidden="true" style="height: 6px; border-radius: 99px; background: #E7EDE1; overflow: hidden; display: block;"><span style="display: block; height: 100%; width: {{ar.pct}}%; background: {{ar.bar}}; border-radius: 99px;"></span></span>
+                </span>
+              </button>
+              <sc-if value="{{ar.open}}" hint-placeholder-val="{{ false }}">
+                <div class="q-fade" style="padding: 0 14px 14px 64px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                  <span style="color: #4E5C52;">{{ar.xp}} de {{ar.need}} XP para el nivel {{ar.next}}</span>
+                  <div style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center;">
+                    <sc-for list="{{ar.rows}}" as="rw" hint-placeholder-count="4">
+                      <span style="font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: {{rw.bg}}; color: {{rw.fg}}; text-align: center;">{{rw.label}}</span>
+                      <span>{{rw.value}}</span>
+                    </sc-for>
+                  </div>
+                  <a href="AreaDetalle.dc.html" style="align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 12px; background: #E1F0E6; color: #1F5C39; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; text-decoration: none;">Ver el área completa<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+                </div>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+        <span style="font-size: 13px; color: #4E5C52; text-align: center;">Tienes 2 espacios libres para nuevas skills.</span>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isRes}}" hint-placeholder-val="{{ false }}">
+      <section aria-label="Recursos" style="display: flex; flex-direction: column; gap: 12px;">
+        <div role="radiogroup" aria-label="Vista" style="display: flex; gap: 2px;">
+          <sc-for list="{{resViews}}" as="rv" hint-placeholder-count="3">
+            <button type="button" role="radio" aria-checked="{{rv.checked}}" onClick="{{rv.pick}}" style="min-height: 44px; padding: 0 12px; border: none; border-radius: 99px; background: {{rv.bg}}; color: {{rv.fg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{rv.label}}</button>
+          </sc-for>
+        </div>
+        <sc-for list="{{resGroups}}" as="rg" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <h3 style="margin: 4px 0 0; font-size: 13px; font-weight: 700; color: #4E5C52;">{{rg.name}} · {{rg.count}}</h3>
+            <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px #DCE4D4; overflow: hidden;">
+              <sc-for list="{{rg.items}}" as="rs" hint-placeholder-count="2">
+                <li style="display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 14px; border-bottom: 1px solid #EEF2EA;">
+                  <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 8px 0;">
+                    <span style="font-size: 15px; line-height: 1.3;">{{rs.title}}</span>
+                    <span style="font-size: 12px; color: #4E5C52;">{{rs.meta}}</span>
+                  </span>
+                  <button type="button" aria-pressed="{{rs.favStr}}" aria-label="{{rs.favAria}}" onClick="{{rs.fav}}" style="width: 44px; height: 44px; border: none; background: transparent; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="{{rs.starFill}}" stroke="{{rs.starStroke}}" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button>
+                  <button type="button" aria-label="{{rs.archAria}}" onClick="{{rs.arch}}" style="width: 44px; height: 44px; border: none; background: transparent; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #4E5C52;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"></rect><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"></path></svg></button>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+        </sc-for>
+        <sc-if value="{{resEmpty}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 8px 0; text-align: center; font-size: 15px; color: #4E5C52;">{{resEmptyText}}</p>
+        </sc-if>
+      </section>
+    </sc-if>
+    </div>
+  </main>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 84px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22);">{{toast}}</div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Inicio</a>
+    <a href="Stage.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #1F5C39; font-size: 12px; font-weight: 700;"><span style="width: 44px; height: 28px; border-radius: 99px; background: #E1F0E6; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span>Stage</a>
+    <a href="Habitos.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"></path></svg></span>Hábitos</a>
+    <a href="Mazmorra.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg></span>Mazmorra</a>
+    <a href="Perfil.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"section":{"editor":"enum","options":["hoy","calendario","biblioteca","proyectos","metas","areas","recursos"],"default":"hoy","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      section: props.section || 'hoy',
+      range: 'hoy', draft: '', toast: '', floatId: 0, nextId: 100, expanded: 0,
+      open: { Urgente: true, Alta: true, Media: false, Baja: false, Pendiente: false, Completadas: false },
+      calMode: 'semana', week: 0, selDay: 11,
+      projFilter: 'En progreso', projOpen: {}, goalFilter: 'En progreso', goalOpen: {}, areaOpen: 0,
+      resView: 'Todos',
+      tasks: [
+        { id: 1, title: 'Entregar informe de laboratorio', prio: 'Urgente', st: 'En progreso', day: 0, lvl: 3, xp: 40, coins: 15, min: 45 },
+        { id: 2, title: 'Responder correos del tutor', prio: 'Urgente', st: 'Bandeja', day: 0, lvl: 1, xp: 10, coins: 4, min: 10 },
+        { id: 3, title: 'Pagar la factura de internet', prio: 'Urgente', st: 'Bandeja', day: 0, lvl: 1, xp: 10, coins: 4, min: 5 },
+        { id: 4, title: 'Escribir la introducción', prio: 'Alta', st: 'En progreso', day: 0, lvl: 2, xp: 30, coins: 12, min: 30 },
+        { id: 5, title: 'Repasar 20 palabras de inglés', prio: 'Media', st: 'Bandeja', day: 0, lvl: 1, xp: 15, coins: 6, min: 15 },
+        { id: 6, title: 'Ordenar apuntes de la semana', prio: 'Baja', st: 'Bandeja', day: 0, lvl: 1, xp: 10, coins: 4, min: 15 },
+        { id: 7, title: 'Comprar comida para el perro', prio: 'Media', st: 'Bandeja', day: 1, lvl: 1, xp: 10, coins: 4, min: 20 },
+        { id: 8, title: 'Diseñar portada del ensayo', prio: 'Alta', st: 'Bandeja', day: 2, lvl: 2, xp: 25, coins: 10, min: 40 },
+        { id: 9, title: 'Preparar exposición de Historia', prio: 'Alta', st: 'Bandeja', day: 3, lvl: 3, xp: 40, coins: 16, min: 90 },
+        { id: 10, title: 'Buscar 5 fuentes para el ensayo', prio: 'Media', st: 'Bandeja', day: 5, lvl: 2, xp: 20, coins: 8, min: 45 }
+      ],
+      events: [
+        { id: 1, d: 6, title: 'Investigar público objetivo', project: 'Ensayo final de Historia', done: true },
+        { id: 2, d: 7, title: 'Subir avance al repositorio', project: 'Proyecto del semestre', done: false },
+        { id: 3, d: 8, title: 'Crear calendario de estudio', project: 'Proyecto del semestre', done: false },
+        { id: 4, d: 11, title: 'Entregar informe de laboratorio', project: 'Proyecto del semestre', done: false },
+        { id: 5, d: 11, title: 'Repasar 20 palabras de inglés', project: 'Portafolio de inglés', done: false },
+        { id: 6, d: 13, title: 'Diseñar portada del ensayo', project: 'Ensayo final de Historia', done: false },
+        { id: 7, d: 14, title: 'Preparar exposición de Historia', project: 'Ensayo final de Historia', done: false },
+        { id: 8, d: 20, title: 'Primer borrador completo', project: 'Ensayo final de Historia', done: false },
+        { id: 9, d: 23, title: 'Prueba de 3 km', project: 'Plan de entrenamiento', done: false },
+        { id: 10, d: 30, title: 'Entrega final del semestre', project: 'Proyecto del semestre', done: false }
+      ],
+      projects: [
+        { id: 1, title: 'Proyecto del semestre', area: 'Química', status: 'En progreso', c: [0, 1, 6] },
+        { id: 2, title: 'Ensayo final de Historia', area: 'Escritura', status: 'En progreso', c: [2, 1, 1] },
+        { id: 3, title: 'Tutorial de la app', area: null, status: 'En progreso', c: [1, 1, 1] },
+        { id: 4, title: 'Portafolio de inglés', area: 'Inglés', status: 'Sin iniciar', c: [3, 0, 0] },
+        { id: 5, title: 'Plan de entrenamiento', area: 'Salud', status: 'Sin iniciar', c: [4, 0, 0] },
+        { id: 6, title: 'Organizar el espacio de estudio', area: 'Salud', status: 'Completada', c: [0, 0, 5] }
+      ],
+      goals: [
+        { id: 1, title: 'Hablar inglés con fluidez básica', skill: 'Inglés', status: 'En progreso', c: [10, 2, 7], projects: 1 },
+        { id: 2, title: 'Terminar el semestre con promedio 9', skill: 'Química', status: 'En progreso', c: [4, 2, 7], projects: 1 },
+        { id: 3, title: 'Correr 5 km sin parar', skill: 'Salud', status: 'Completada', c: [0, 0, 3], projects: 0 },
+        { id: 4, title: 'Leer 12 libros este año', skill: 'Escritura', status: 'Sin iniciar', c: [12, 0, 0], projects: 0 }
+      ],
+      resources: [
+        { id: 1, title: 'El método P.A.R.A. explicado', area: null, group: 'Revisados', fav: true, arch: false },
+        { id: 2, title: 'Guía de citas APA 7.ª edición', area: 'Escritura', group: 'Revisados', fav: false, arch: false },
+        { id: 3, title: 'Lista de verbos irregulares', area: 'Inglés', group: 'Por revisar', fav: false, arch: false },
+        { id: 4, title: 'Video: la técnica Pomodoro', area: null, group: 'Bandeja', fav: false, arch: false },
+        { id: 5, title: 'Apuntes de estequiometría', area: 'Química', group: 'Bandeja', fav: false, arch: false },
+        { id: 6, title: 'Rutina de calentamiento', area: 'Salud', group: 'Revisados', fav: false, arch: true }
+      ]
+    };
+  }
+  componentWillUnmount() { clearTimeout(this.tt); clearTimeout(this.ft); }
+  flash(msg) { clearTimeout(this.tt); this.setState({ toast: msg }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const ST = {
+      'Sin iniciar': { label: 'Sin iniciar', bg: '#E7EDE1', fg: '#3E4A42', dot: '#7D8A80' },
+      'Bandeja': { label: 'Bandeja', bg: '#E7EDE1', fg: '#3E4A42', dot: '#7D8A80' },
+      'En progreso': { label: 'En progreso', bg: '#E3E9F7', fg: '#2C4580', dot: '#3C5BA8' },
+      'Completada': { label: 'Completada', bg: '#E1F0E6', fg: '#1F5C39', dot: '#2E7D4F' }
+    };
+    const pill = (cur, val, setter) => ({ checked: cur === val ? 'true' : 'false', bg: cur === val ? '#1E2A22' : 'transparent', fg: cur === val ? '#FFFFFF' : '#4E5C52', pick: setter });
+    const countRows = (c) => [
+      { label: 'Sin iniciar', value: c[0] + ' tareas', bg: '#E7EDE1', fg: '#3E4A42' },
+      { label: 'En progreso', value: c[1] + ' tareas', bg: '#E3E9F7', fg: '#2C4580' },
+      { label: 'Completada', value: c[2] + ' tareas', bg: '#E1F0E6', fg: '#1F5C39' },
+      { label: 'Total', value: (c[0] + c[1] + c[2]) + ' tareas', bg: '#FBF0D3', fg: '#6E4D00' }
+    ];
+    const sub = ['proyectos', 'metas', 'areas', 'recursos'];
+    const inSub = sub.indexOf(s.section) >= 0;
+    const tabSel = inSub ? 'biblioteca' : s.section;
+    const tabs = [['hoy', 'Hoy'], ['calendario', 'Calendario'], ['biblioteca', 'Biblioteca']].map(([id, label]) => {
+      const on = tabSel === id;
+      return { label, sel: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#1E2A22' : '#4E5C52', shadow: on ? '0 1px 3px rgba(30,42,34,.12)' : 'none', pick: () => this.setState({ section: id }) };
+    });
+    const titles = { hoy: 'Stage', calendario: 'Stage', biblioteca: 'Stage', proyectos: 'Proyectos', metas: 'Metas', areas: 'Áreas', recursos: 'Recursos' };
+
+    // Hoy
+    const ranges = [['hoy', 'Hoy'], ['manana', 'Mañana'], ['7dias', '7 días']].map(([id, label]) => ({ label, ...pill(s.range, id, () => this.setState({ range: id })) }));
+    const inRange = (t) => s.range === 'hoy' ? t.day === 0 : (s.range === 'manana' ? t.day === 1 : t.day <= 7);
+    const visibleTasks = s.tasks.filter(inRange);
+    const pending = visibleTasks.filter(t => t.st !== 'Completada');
+    const mins = pending.reduce((a, t) => a + t.min, 0);
+    const prioDot = { Urgente: ['#E0573F', '#A8361F'], Alta: ['#EB8A5E', '#9A3F12'], Media: ['#D9A21B', '#6E4D00'], Baja: ['#5FAE7A', '#1F5C39'], Pendiente: ['#9AA79D', '#3E4A42'], Completadas: ['#2E7D4F', '#1F5C39'] };
+    const mkTask = (t) => {
+      const done = t.st === 'Completada';
+      const open = s.expanded === t.id;
+      return {
+        ...t, st: ST[t.st], open, openStr: open ? 'true' : 'false', rot: open ? 90 : 0,
+        linkLabel: ({ 1: 'Proyecto · Semestre', 4: 'Proyecto · Ensayo', 5: 'Meta · Inglés', 8: 'Proyecto · Ensayo', 9: 'Proyecto · Ensayo', 10: 'Proyecto · Ensayo' })[t.id] || 'Sin vincular',
+        pressed: done ? 'true' : 'false', ring: done ? '#2E7D4F' : '#B7C4AE', fill: done ? '#2E7D4F' : '#FFFFFF', tick: done ? '#FFFFFF' : 'transparent',
+        color: done ? '#4E5C52' : '#1E2A22', deco: done ? 'line-through' : 'none', floating: s.floatId === t.id,
+        expand: () => this.setState({ expanded: open ? 0 : t.id }),
+        toggle: () => {
+          const now = !done;
+          this.setState({ tasks: this.state.tasks.map(x => x.id === t.id ? { ...x, st: now ? 'Completada' : 'Bandeja' } : x), floatId: now ? t.id : 0, expanded: 0 });
+          if (now) { clearTimeout(this.ft); this.ft = setTimeout(() => this.setState({ floatId: 0 }), 1300); }
+        }
+      };
+    };
+    const groups = ['Urgente', 'Alta', 'Media', 'Baja', 'Pendiente', 'Completadas'].map(name => {
+      const items = (name === 'Completadas' ? visibleTasks.filter(t => t.st === 'Completada') : pending.filter(t => t.prio === name)).map(mkTask);
+      const open = !!s.open[name];
+      const tints = { Urgente: '#FBE4DF', Alta: '#FCE9DD', Media: '#FBF0D3', Baja: '#E1F0E6', Pendiente: '#E7EDE1', Completadas: '#E1F0E6' };
+      return { name, tint: tints[name], dot: prioDot[name][0], fg: prioDot[name][1], count: items.length, items, open, openStr: open ? 'true' : 'false', rot: open ? 180 : 0, toggle: () => this.setState({ open: { ...this.state.open, [name]: !open } }) };
+    }).filter(g => g.count > 0);
+    const h = Math.floor(mins / 60), m = mins % 60;
+    const xpInPlay = pending.reduce((a, t) => a + t.xp, 0);
+    const todayTasks = s.tasks.filter(t => t.day === 0);
+    const dayDone = todayTasks.filter(t => t.st === 'Completada').length;
+    const dayTotal = todayTasks.length;
+    const daySteps = todayTasks.map((t, i) => i < dayDone ? '#2E7D4F' : '#E7EDE1');
+    const chestOpen = dayDone === dayTotal && dayTotal > 0;
+    const summary = pending.length === 0 ? 'Todo listo' : pending.length + ' misiones · +' + xpInPlay + ' XP en juego';
+
+    // Calendario (1 de octubre de 2026 = jueves)
+    const today = 11, offset = 3;
+    const isWeek = s.calMode === 'semana';
+    const weekStart = 5 + 7 * s.week;
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const dow = (d) => (d + 3) % 7;
+    const tag = (e) => {
+      if (e.done) return { label: 'Hecha', bg: '#E1F0E6', fg: '#1F5C39' };
+      if (e.d < today) return { label: 'Vencida', bg: '#FBE4DF', fg: '#A8361F' };
+      if (e.d === today) return { label: 'Hoy', bg: '#FBF0D3', fg: '#6E4D00' };
+      const left = e.d - today; return { label: 'En ' + left + (left === 1 ? ' día' : ' días'), bg: '#F3F6EF', fg: '#3E4A42' };
+    };
+    const mkDay = (d) => {
+      const evs = s.events.filter(e => e.d === d);
+      const sel = s.selDay === d, isToday = d === today;
+      const overdue = evs.some(e => !e.done && e.d < today);
+      return {
+        blank: false, real: true, n: d, sel: sel ? 'true' : 'false',
+        aria: d + ' de octubre' + (isToday ? ', hoy' : '') + (evs.length ? ', ' + evs.length + (evs.length === 1 ? ' tarea' : ' tareas') : ''),
+        numBg: sel ? '#1E2A22' : 'transparent', numFg: sel ? '#FFFFFF' : '#1E2A22',
+        ring: isToday && !sel ? 'inset 0 0 0 2px #2E7D4F' : 'none', weight: isToday || sel ? 700 : 400,
+        dot: evs.length ? (overdue ? '#E0573F' : '#7D8A80') : 'transparent',
+        pick: () => this.setState({ selDay: d })
+      };
+    };
+    const calDays = [];
+    if (isWeek) { for (let d = weekStart; d < weekStart + 7; d++) calDays.push(mkDay(d)); }
+    else { for (let i = 0; i < offset; i++) calDays.push({ blank: true, real: false }); for (let d = 1; d <= 31; d++) calDays.push(mkDay(d)); }
+    const calModes = [['semana', 'Semana'], ['mes', 'Mes']].map(([id, label]) => ({ label, ...pill(s.calMode, id, () => this.setState({ calMode: id })) }));
+    const selItems = s.events.filter(e => e.d === s.selDay).map(e => ({
+      ...e, tb: tag(e), pressed: e.done ? 'true' : 'false',
+      ring: e.done ? '#2E7D4F' : '#B7C4AE', fill: e.done ? '#2E7D4F' : '#FFFFFF', tick: e.done ? '#FFFFFF' : 'transparent',
+      color: e.done ? '#4E5C52' : '#1E2A22', deco: e.done ? 'line-through' : 'none',
+      toggle: () => this.setState({ events: this.state.events.map(y => y.id === e.id ? { ...y, done: !y.done } : y) })
+    }));
+
+    // Biblioteca
+    const activeP = s.projects.filter(p => p.status === 'En progreso').length;
+    const activeG = s.goals.filter(g => g.status === 'En progreso').length;
+    const resN = s.resources.filter(r => !r.arch).length;
+    const libItems = [
+      { id: 'proyectos', name: 'Proyectos', sub: activeP + ' en progreso', tint: '#E3E9F7', ink: '#2C4580', icon: 'M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
+      { id: 'metas', name: 'Metas', sub: activeG + ' Bosses activos', tint: '#FBE4DF', ink: '#A8361F', icon: 'M12 3v18M12 4h7l-2 3 2 3h-7' },
+      { id: 'areas', name: 'Áreas', sub: '4 skills · la más alta en nivel 5', tint: '#E1F0E6', ink: '#1F5C39', icon: 'M12 21c-4-3-7-6.5-7-10.5A7 7 0 0 1 12 4a7 7 0 0 1 7 6.5c0 4-3 7.5-7 10.5zM12 10v7' },
+      { id: 'recursos', name: 'Recursos', sub: resN + ' guardados', tint: '#FBF0D3', ink: '#6E4D00', icon: 'M6 3h9l4 4v14H6zM14 3v5h5' }
+    ].map(x => ({ ...x, go: () => this.setState({ section: x.id }) }));
+    const libLinks = [
+      { href: 'StageEventos.dc.html', name: 'Eventos', sub: '4 próximos', tint: '#E1F0E6', ink: '#1F5C39', icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4' },
+      { href: 'StageArchivo.dc.html', name: 'Archivo', sub: '7 guardados', tint: '#E7EDE1', ink: '#3E4A42', icon: 'M3 4h18v4H3zM5 8v12h14V8M10 12h4' }
+    ];
+
+    // Proyectos
+    const projFilters = [['En progreso', 'Activos'], ['Sin iniciar', 'Sin iniciar'], ['Completada', 'Hechos']].map(([id, label]) => ({ label, n: s.projects.filter(p => p.status === id).length, ...pill(s.projFilter, id, () => this.setState({ projFilter: id })) }));
+    const projects = s.projects.filter(p => p.status === s.projFilter).map(p => {
+      const total = p.c[0] + p.c[1] + p.c[2];
+      const open = !!s.projOpen[p.id];
+      return { ...p, pct: total ? Math.round(p.c[2] / total * 100) : 0, doneLabel: p.c[2] + ' de ' + total + ' tareas', hasArea: !!p.area, noArea: !p.area, rows: countRows(p.c), open, openStr: open ? 'true' : 'false', toggleLabel: open ? 'Ocultar' : 'Detalles', toggle: () => this.setState({ projOpen: { ...this.state.projOpen, [p.id]: !open } }) };
+    });
+
+    // Metas
+    const goalFilters = [['En progreso', 'Activas'], ['Sin iniciar', 'Sin iniciar'], ['Completada', 'Logradas']].map(([id, label]) => ({ label, n: s.goals.filter(g => g.status === id).length, ...pill(s.goalFilter, id, () => this.setState({ goalFilter: id })) }));
+    const goals = s.goals.filter(g => g.status === s.goalFilter).map(g => {
+      const total = g.c[0] + g.c[1] + g.c[2];
+      const pct = total ? Math.round(g.c[2] / total * 100) : 0;
+      const open = !!s.goalOpen[g.id];
+      const rows = countRows(g.c); rows.push({ label: 'Proyectos', value: g.projects + ' vinculados', bg: '#E3E9F7', fg: '#2C4580' });
+      return { ...g, boss: 100 - pct, bossLabel: pct >= 100 ? 'Boss derrotado' : 'Vida del Boss', bossOpacity: pct >= 100 ? 0.4 : 1, doneLabel: g.c[2] + ' de ' + total + ' tareas', rows, open, openStr: open ? 'true' : 'false', toggleLabel: open ? 'Ocultar' : 'Detalles', toggle: () => this.setState({ goalOpen: { ...this.state.goalOpen, [g.id]: !open } }) };
+    });
+
+    // Áreas
+    const areaDefs = [
+      { name: 'Inglés', level: 4, xp: 208, need: 520, tint: '#E1F0E6', ink: '#1F5C39', bar: '#2E7D4F' },
+      { name: 'Química', level: 3, xp: 302, need: 420, tint: '#E3E9F7', ink: '#2C4580', bar: '#3C5BA8' },
+      { name: 'Escritura', level: 2, xp: 80, need: 320, tint: '#FBF0D3', ink: '#6E4D00', bar: '#D9A21B' },
+      { name: 'Salud', level: 5, xp: 360, need: 620, tint: '#FBE4DF', ink: '#A8361F', bar: '#E0573F' }
+    ];
+    const areas = areaDefs.map((a, i) => {
+      const cnt = (st) => s.projects.filter(x => x.area === a.name && x.status === st).length + ' proyectos · ' + s.goals.filter(x => x.skill === a.name && x.status === st).length + ' metas';
+      const open = s.areaOpen === i + 1;
+      return { ...a, initial: a.name.charAt(0), next: a.level + 1, pct: Math.round(a.xp / a.need * 100), open, openStr: open ? 'true' : 'false', toggle: () => this.setState({ areaOpen: open ? 0 : i + 1 }), rows: [
+        { label: 'Sin iniciar', value: cnt('Sin iniciar'), bg: '#E7EDE1', fg: '#3E4A42' },
+        { label: 'En progreso', value: cnt('En progreso'), bg: '#E3E9F7', fg: '#2C4580' },
+        { label: 'Completada', value: cnt('Completada'), bg: '#E1F0E6', fg: '#1F5C39' }
+      ] };
+    });
+
+    // Recursos
+    const resViews = ['Todos', 'Favoritos', 'Archivados'].map(v => ({ label: v, ...pill(s.resView, v, () => this.setState({ resView: v })) }));
+    const vis = s.resources.filter(r => s.resView === 'Archivados' ? r.arch : (!r.arch && (s.resView === 'Todos' || r.fav)));
+    const resGroups = ['Bandeja', 'Por revisar', 'Revisados'].map(g => ({ name: g, items: vis.filter(r => r.group === g).map(r => ({
+      ...r, meta: r.area ? r.area : 'Sin área',
+      favStr: r.fav ? 'true' : 'false', favAria: (r.fav ? 'Quitar de favoritos: ' : 'Marcar como favorito: ') + r.title,
+      starFill: r.fav ? '#D9A21B' : 'none', starStroke: r.fav ? '#6E4D00' : '#9AA79D',
+      archAria: (r.arch ? 'Restaurar: ' : 'Archivar: ') + r.title,
+      fav: () => this.setState({ resources: this.state.resources.map(x => x.id === r.id ? { ...x, fav: !x.fav } : x) }),
+      arch: () => { this.setState({ resources: this.state.resources.map(x => x.id === r.id ? { ...x, arch: !x.arch } : x) }); this.flash(r.arch ? 'Restaurado' : 'Archivado'); }
+    })) })).map(g => ({ ...g, count: g.items.length })).filter(g => g.count > 0);
+
+    return {
+      pageTitle: titles[s.section], inSub,
+      pageKicker: inSub ? 'Biblioteca' : 'Tablero de misiones',
+      dayDone, dayTotal, daySteps,
+      chestFill: chestOpen ? '#F2C66B' : '#D9A21B', chestClass: chestOpen ? 'q-pop' : 'q-glow',
+      chestText: chestOpen ? '¡Cofre del día abierto! +15 Monedas' : 'Completa ' + (dayTotal - dayDone) + ' más para abrir el cofre del día (+15 Monedas)', showTabs: !inSub, tabs,
+      backToLib: () => this.setState({ section: 'biblioteca' }),
+      isHoy: s.section === 'hoy', isCal: s.section === 'calendario', isLib: s.section === 'biblioteca', libLinks,
+      isProj: s.section === 'proyectos', isGoals: s.section === 'metas', isAreas: s.section === 'areas', isRes: s.section === 'recursos',
+      ranges, groups, summary, nothing: groups.length === 0,
+      draft: s.draft, onDraft: (e) => this.setState({ draft: e.target.value }),
+      quickAdd: (e) => {
+        e.preventDefault();
+        const title = this.state.draft.trim(); if (!title) return;
+        const id = this.state.nextId;
+        this.setState({ draft: '', nextId: id + 1, range: 'hoy', open: { ...this.state.open, Pendiente: true }, tasks: [...this.state.tasks, { id, title, prio: 'Pendiente', st: 'Bandeja', day: 0, lvl: 1, xp: 10, coins: 4, min: 15 }] });
+        this.flash('Guardada en Pendiente');
+      },
+      calModes, calDays, isWeek,
+      calTitle: isWeek ? (weekStart + '–' + (weekStart + 6) + ' oct') : 'Octubre 2026',
+      prevPeriod: () => this.setState({ week: Math.max(0, s.week - 1) }),
+      nextPeriod: () => this.setState({ week: Math.min(2, s.week + 1) }),
+      selLabel: dayNames[dow(s.selDay)] + ' ' + s.selDay + (s.selDay === today ? ' · hoy' : ''),
+      selItems, selEmpty: selItems.length === 0,
+      libItems, projFilters, projects, goalFilters, goals, areas,
+      resViews, resGroups, resEmpty: resGroups.length === 0,
+      resEmptyText: s.resView === 'Favoritos' ? 'Aún no tienes favoritos.' : (s.resView === 'Archivados' ? 'Nada archivado.' : 'Sin recursos todavía.'),
+      toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

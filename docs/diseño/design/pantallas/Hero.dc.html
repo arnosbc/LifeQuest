@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Componente · Cabecera de página</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<header style="position: relative; width: 390px; height: 156px; box-sizing: border-box; background: {{bg}}; color: #F3F6EF; font-family: 'DM Sans', system-ui, sans-serif; border-radius: 0 0 26px 26px; overflow: hidden; flex-shrink: 0;">
+  <svg aria-hidden="true" width="390" height="156" viewBox="0 0 390 156" style="position: absolute; left: 0; top: 0;">
+    <circle cx="332" cy="40" r="16" fill="{{sun}}" opacity=".85"></circle>
+    <circle cx="296" cy="22" r="2" fill="{{sun}}" opacity=".6"></circle>
+    <circle cx="364" cy="66" r="1.6" fill="{{sun}}" opacity=".5"></circle>
+    <path d="M150 126 L196 96 L230 114 L268 92 L318 116 L354 98 L390 110 L390 156 L150 156Z" fill="{{hill1}}"></path>
+    <path d="M0 140 Q100 122 200 138 T390 132 L390 156 L0 156Z" fill="{{hill2}}"></path>
+    <path d="M300 150 L312 118 L324 150Z M326 152 L340 112 L354 152Z M356 150 L368 122 L380 150Z M206 152 L216 128 L226 152Z" fill="{{trees}}"></path>
+  </svg>
+  <div style="position: relative; height: 100%; box-sizing: border-box; padding: 10px 12px 0 20px; display: flex; flex-direction: column;">
+    <div style="display: flex; align-items: center; justify-content: space-between; min-height: 44px;">
+      <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}">
+        <a href="{{backHref}}" aria-label="{{backLabel}}" style="width: 44px; height: 44px; margin-left: -12px; border-radius: 99px; display: flex; align-items: center; justify-content: center; color: #F3F6EF;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      </sc-if>
+      <sc-if value="{{noBack}}" hint-placeholder-val="{{ true }}">
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: {{kickerColor}};"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{iconPath}}"></path></svg>{{kicker}}</span>
+      </sc-if>
+      <sc-if value="{{hasAction}}" hint-placeholder-val="{{ false }}">
+        <a href="{{actionHref}}" aria-label="{{actionLabel}}" style="position: relative; width: 44px; height: 44px; border-radius: 14px; background: rgba(243,246,239,.14); display: flex; align-items: center; justify-content: center; color: #F3F6EF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{actionPath}}"></path></svg><sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; top: 6px; right: 6px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 99px; background: #F2C66B; color: #1A1F1B; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center;">{{badge}}</span></sc-if></a>
+      </sc-if>
+    </div>
+    <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}">
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: {{kickerColor}};"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{iconPath}}"></path></svg>{{kicker}}</span>
+    </sc-if>
+    <h1 style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.1; max-width: 260px;">{{heading}}</h1>
+  </div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kicker":{"editor":"text","default":"Tablero de misiones"},"heading":{"editor":"text","default":"Stage"},"icon":{"editor":"enum","options":["sword","home","board","leaf","user","book","gear","mug","flame","coin","crown","star","boss","inbox","calendar","archive"],"default":"sword"},"tone":{"editor":"enum","options":["forest","night","river","ember","gold"],"default":"forest"},"backHref":{"editor":"text","default":""},"backLabel":{"editor":"text","default":"Volver"},"actionHref":{"editor":"text","default":""},"actionLabel":{"editor":"text","default":""},"badge":{"editor":"text","default":""},"actionIcon":{"editor":"enum","options":["plus","gear","edit","bell"],"default":"plus"},"$preview":{"width":390,"height":156}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const icons = {
+      sword: 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2',
+      home: 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+      board: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+      leaf: 'M5 19C5 10 11 4 20 4c0 9-6 15-15 15zM5 19l8-8',
+      user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0',
+      book: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11',
+      gear: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1',
+      mug: 'M5 8h11v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2',
+      flame: 'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 3-6 0 2.5 1 4 2.5 4C11.5 9 10 5 12 2z',
+      coin: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v10M9 10h4.5a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3H15',
+      crown: 'M3 18h18M4 18L3 7l5 4 4-7 4 7 5-4-1 11',
+      star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
+      boss: 'M6 9L4 3l5 3M18 9l2-6-5 3M5 11c0-5 14-5 14 0v8c0 2-2 3-4 2l-3-2-3 2c-2 1-4 0-4-2z',
+      inbox: 'M3 13l3-8h12l3 8v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM3 13h5l1 3h6l1-3h5',
+      calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+      archive: 'M3 4h18v4H3zM5 8v12h14V8M10 12h4'
+    };
+    const actions = { plus: 'M12 5v14M5 12h14', gear: icons.gear, edit: 'M4 20h4L19 9l-4-4L4 16zM14 6l4 4', bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4' };
+    const tones = {
+      forest: { bg: '#1F5C39', sun: '#F2C66B', hill1: '#2E7D4F', hill2: '#276B44', trees: '#174A2E', kicker: '#CFE8D7' },
+      night: { bg: '#0E1B14', sun: '#E9EFE6', hill1: '#1C2C24', hill2: '#16241D', trees: '#0B140F', kicker: '#9FDCB4' },
+      river: { bg: '#24396B', sun: '#F2C66B', hill1: '#3C5BA8', hill2: '#31498A', trees: '#1A2A52', kicker: '#D3DDF4' },
+      ember: { bg: '#7A2716', sun: '#F2C66B', hill1: '#A8361F', hill2: '#922F1B', trees: '#5A1C10', kicker: '#F7D5CC' },
+      gold: { bg: '#5C4100', sun: '#FBF0D3', hill1: '#8A6200', hill2: '#765400', trees: '#3F2D00', kicker: '#F5E3B0' }
+    };
+    const t = tones[p.tone] || tones.forest;
+    return {
+      bg: t.bg, sun: t.sun, hill1: t.hill1, hill2: t.hill2, trees: t.trees, kickerColor: t.kicker,
+      kicker: p.kicker ?? 'Tablero de misiones',
+      heading: p.heading ?? 'Stage',
+      iconPath: icons[p.icon] || icons.sword,
+      hasBack: !!p.backHref, noBack: !p.backHref, backHref: p.backHref || '', backLabel: p.backLabel || 'Volver',
+      hasAction: !!p.actionHref, actionHref: p.actionHref || '', actionLabel: p.actionLabel || '',
+      actionPath: actions[p.actionIcon] || actions.plus,
+      hasBadge: !!p.badge, badge: p.badge || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

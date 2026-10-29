@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>La Taverna</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./questly.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Mono:wght@500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div data-mode="{{qMode}}" data-theme="{{qTheme}}" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F6EF; color: #1E2A22; font-family: 'DM Sans', system-ui, sans-serif; position: relative; overflow: hidden;">
+  <main style="flex-grow: 1; overflow-y: auto; padding: 0 0 28px; display: flex; flex-direction: column;">
+    <dc-import name="Hero" tone="{{qTone}}" kicker="{{heroKicker}}" heading="{{heroHeading}}" icon="mug" back-href="{{heroBack}}" back-label="Volver" action-href="CrearNPC.dc.html" action-label="{{heroActionLabel}}" action-icon="{{heroActionIcon}}" hint-size="390px,156px"></dc-import>
+
+    <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+      <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+        <section aria-label="Tu identidad" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; padding: 14px; display: flex; gap: 12px; align-items: flex-start;">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 64 64" style="flex-shrink: 0;"><path d="M32 16 C27 5 15 6 17 15 C23 16 28 16 32 16Z" fill="#5FAE7A"></path><path d="M32 16 C37 5 49 6 47 15 C41 16 36 16 32 16Z" fill="#3F9563"></path><ellipse cx="32" cy="40" rx="21" ry="19" fill="#2E7D4F"></ellipse><ellipse cx="32" cy="45" rx="13" ry="10" fill="#CDE8D5"></ellipse><circle cx="24.5" cy="35" r="3.4" fill="#1E2A22"></circle><circle cx="39.5" cy="35" r="3.4" fill="#1E2A22"></circle><path d="M28 42 q4 4 8 0" fill="none" stroke="#1E2A22" stroke-width="2" stroke-linecap="round"></path></svg>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 13px; color: #2C4580; line-height: 1.45;">Tus compañeros conocen a quién aconsejan. RPGenie les da misiones según tu meta actual.</span>
+            <span style="font-size: 12px; font-weight: 700; color: #4E5C52; margin-top: 4px;">¿Quién eres en este reino?</span>
+            <span style="font-size: 15px; font-style: italic;">«Un estudiante que convierte cada semestre en una campaña.»</span>
+          </div>
+        </section>
+
+        <h2 style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">En la mesa · {{npcCount}} compañeros</h2>
+
+        <sc-for list="{{npcs}}" as="n" hint-placeholder-count="3">
+          <article style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+            <button type="button" onClick="{{n.open}}" style="width: 100%; border: none; background: {{n.banner}}; padding: 12px 14px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: {{n.bannerInk}};">
+              <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 3px 0 rgba(0,0,0,.12);">
+                <sc-if value="{{n.isOwl}}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 64 64"><path d="M16 18 L22 6 L28 16Z M48 18 L42 6 L36 16Z" fill="#6B4A2E"></path><ellipse cx="32" cy="36" rx="20" ry="22" fill="#8A6240"></ellipse><ellipse cx="32" cy="44" rx="12" ry="12" fill="#E8D3B5"></ellipse><circle cx="24" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="40" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="24" cy="30" r="4" fill="#1E2A22"></circle><circle cx="40" cy="30" r="4" fill="#1E2A22"></circle><path d="M29 38 L32 43 L35 38Z" fill="#D9A21B"></path></svg></sc-if>
+                <sc-if value="{{n.isFox}}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 64 64"><path d="M12 12 L24 28 L10 30Z M52 12 L40 28 L54 30Z" fill="#B44E1A"></path><path d="M10 28 Q32 14 54 28 L44 50 Q32 58 20 50Z" fill="#E07A35"></path><path d="M20 40 Q32 50 44 40 L40 50 Q32 56 24 50Z" fill="#FFF4E6"></path><circle cx="25" cy="34" r="3" fill="#1E2A22"></circle><circle cx="39" cy="34" r="3" fill="#1E2A22"></circle><circle cx="32" cy="47" r="3" fill="#1E2A22"></circle></svg></sc-if>
+                <sc-if value="{{n.isTurtle}}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 64 64"><rect x="14" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><rect x="38" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><ellipse cx="30" cy="40" rx="22" ry="15" fill="#3F9563"></ellipse><path d="M18 40 L24 31 L36 31 L42 40 L36 49 L24 49Z" fill="#2E7D4F" stroke="#CDE8D5" stroke-width="1.5"></path><circle cx="52" cy="28" r="8" fill="#8CC17A"></circle><circle cx="54" cy="26" r="1.8" fill="#1E2A22"></circle></svg></sc-if>
+                <sc-if value="{{n.isCrow}}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="18" ry="20" fill="#2F3A4A"></ellipse><path d="M42 30 L58 35 L42 40Z" fill="#D9A21B"></path><circle cx="36" cy="30" r="4.5" fill="#FFFFFF"></circle><circle cx="37" cy="30" r="2.2" fill="#1E2A22"></circle><path d="M16 38 Q8 50 18 57 L28 46Z" fill="#1F2733"></path></svg></sc-if>
+              </span>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">{{n.name}}</span>
+                <span style="font-size: 13px;">{{n.role}} · {{n.freq}}</span>
+              </span>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+            <div style="padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px;">
+              <sc-if value="{{n.hasMission}}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4E5C52;">Misión de {{n.freqLower}}</span>
+                  <span style="font-size: 15px; font-weight: 700; line-height: 1.35;">{{n.mTitle}}</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-family: 'DM Mono', monospace; font-size: 12px; padding: 3px 8px; border-radius: 99px; background: #E1F0E6; color: #1F5C39;">+{{n.mXp}} XP</span>
+                    <span style="font-family: 'DM Mono', monospace; font-size: 12px; padding: 3px 8px; border-radius: 99px; background: #FBF0D3; color: #6E4D00;">+{{n.mCoins}}</span>
+                    <span style="flex-grow: 1;"></span>
+                    <button type="button" onClick="{{n.complete}}" class="q-press" style="min-height: 44px; padding: 0 14px; border: none; border-radius: 12px; background: #2E7D4F; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 0 #1F5C39;">Completar</button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{n.noMission}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex-grow: 1; font-size: 14px; color: #4E5C52;">{{n.waitText}}</span>
+                  <button type="button" onClick="{{n.ask}}" disabled="{{n.cooling}}" style="min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1.5px solid {{n.askBorder}}; background: #FFFFFF; color: {{n.askFg}}; font-size: 13px; font-weight: 700; cursor: pointer;">{{n.askLabel}}</button>
+                </div>
+              </sc-if>
+            </div>
+          </article>
+        </sc-for>
+
+        <a href="CrearNPC.dc.html" style="min-height: 64px; border: 1.5px dashed #2E7D4F; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; color: #1F5C39; font-size: 15px; font-weight: 700; background: #FFFFFF;"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Invitar un nuevo NPC a la mesa</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isDetail}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+        <section aria-label="Ficha del NPC" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+          <div style="height: 64px; background: {{d.banner}};"></div>
+          <div style="padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px;">
+            <span aria-hidden="true" style="width: 76px; height: 76px; margin-top: -38px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 4px #FFFFFF, 0 4px 12px rgba(30,42,34,.15); display: flex; align-items: center; justify-content: center;">
+              <sc-if value="{{d.isOwl}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 64 64"><path d="M16 18 L22 6 L28 16Z M48 18 L42 6 L36 16Z" fill="#6B4A2E"></path><ellipse cx="32" cy="36" rx="20" ry="22" fill="#8A6240"></ellipse><ellipse cx="32" cy="44" rx="12" ry="12" fill="#E8D3B5"></ellipse><circle cx="24" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="40" cy="30" r="8" fill="#FFFFFF"></circle><circle cx="24" cy="30" r="4" fill="#1E2A22"></circle><circle cx="40" cy="30" r="4" fill="#1E2A22"></circle><path d="M29 38 L32 43 L35 38Z" fill="#D9A21B"></path></svg></sc-if>
+              <sc-if value="{{d.isFox}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 64 64"><path d="M12 12 L24 28 L10 30Z M52 12 L40 28 L54 30Z" fill="#B44E1A"></path><path d="M10 28 Q32 14 54 28 L44 50 Q32 58 20 50Z" fill="#E07A35"></path><path d="M20 40 Q32 50 44 40 L40 50 Q32 56 24 50Z" fill="#FFF4E6"></path><circle cx="25" cy="34" r="3" fill="#1E2A22"></circle><circle cx="39" cy="34" r="3" fill="#1E2A22"></circle><circle cx="32" cy="47" r="3" fill="#1E2A22"></circle></svg></sc-if>
+              <sc-if value="{{d.isTurtle}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 64 64"><rect x="14" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><rect x="38" y="46" width="7" height="9" rx="3.5" fill="#8CC17A"></rect><ellipse cx="30" cy="40" rx="22" ry="15" fill="#3F9563"></ellipse><path d="M18 40 L24 31 L36 31 L42 40 L36 49 L24 49Z" fill="#2E7D4F" stroke="#CDE8D5" stroke-width="1.5"></path><circle cx="52" cy="28" r="8" fill="#8CC17A"></circle><circle cx="54" cy="26" r="1.8" fill="#1E2A22"></circle></svg></sc-if>
+              <sc-if value="{{d.isCrow}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="18" ry="20" fill="#2F3A4A"></ellipse><path d="M42 30 L58 35 L42 40Z" fill="#D9A21B"></path><circle cx="36" cy="30" r="4.5" fill="#FFFFFF"></circle><circle cx="37" cy="30" r="2.2" fill="#1E2A22"></circle><path d="M16 38 Q8 50 18 57 L28 46Z" fill="#1F2733"></path></svg></sc-if>
+            </span>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #E3E9F7; color: #2C4580;">{{d.role}}</span>
+              <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #E1F0E6; color: #1F5C39;">Misiones {{d.freqLower}}s</span>
+              <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #FBF0D3; color: #6E4D00;">Enfoque · {{d.focus}}</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 12px; font-weight: 700; color: #4E5C52;">Noble misión</span>
+              <span style="font-size: 16px; line-height: 1.45;">{{d.noble}}</span>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="act-title" style="background: #1E2A22; color: #F3F6EF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <h2 id="act-title" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #9FDCB4;">Misión de {{d.freqLower}} · creada por RPGenie</h2>
+          <sc-if value="{{d.thinking}}" hint-placeholder-val="{{ false }}">
+            <span class="q-fade" style="font-size: 15px; color: #CFDACF;">{{d.name}} está pensando una misión para ti…</span>
+          </sc-if>
+          <sc-if value="{{d.hasMission}}" hint-placeholder-val="{{ true }}">
+            <div class="q-fade" style="display: flex; flex-direction: column; gap: 10px;">
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 21px; font-weight: 800; line-height: 1.25;">{{d.mTitle}}</span>
+              <span style="font-size: 13px; color: #CFDACF; line-height: 1.45;">{{d.mWhy}}</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #9FDCB4;">+{{d.mXp}} XP</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #F2C66B;">+{{d.mCoins}} Monedas</span>
+                <span style="flex-grow: 1;"></span>
+                <button type="button" onClick="{{d.complete}}" class="q-press" style="min-height: 48px; padding: 0 16px; border: none; border-radius: 14px; background: #7FD3A0; color: #0E1B14; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #3F9563;">Completar</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{d.waiting}}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 15px; color: #CFDACF;">{{d.waitText}}</span>
+          </sc-if>
+          <button type="button" onClick="{{d.ask}}" disabled="{{d.cooling}}" style="min-height: 48px; border-radius: 14px; border: 1.5px solid #3A5446; background: transparent; color: {{d.askFg}}; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>{{d.askLabel}}</button>
+        </section>
+
+        <section aria-labelledby="hist-title" style="display: flex; flex-direction: column; gap: 8px;">
+          <h2 id="hist-title" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800;">Misiones anteriores</h2>
+          <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 20px; box-shadow: 0 0 0 1px #DCE4D4, 0 4px 0 #DCE4D4; overflow: hidden;">
+            <sc-for list="{{d.history}}" as="h" hint-placeholder-count="3">
+              <li style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #EEF2EA;">
+                <span style="width: 28px; height: 28px; border-radius: 9px; background: {{h.bg}}; color: {{h.fg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <sc-if value="{{h.ok}}" hint-placeholder-val="{{ true }}"><svg role="img" aria-label="Completada" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+                  <sc-if value="{{h.fail}}" hint-placeholder-val="{{ false }}"><svg role="img" aria-label="No completada" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+                </span>
+                <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px;">{{h.title}}</span><span style="font-size: 12px; color: #4E5C52;">{{h.when}}</span></span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 12px; color: {{h.fg}};">{{h.reward}}</span>
+              </li>
+            </sc-for>
+          </ul>
+        </section>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div role="status" class="q-sheet" style="position: absolute; left: 20px; right: 20px; bottom: 84px; background: #1E2A22; color: #F3F6EF; border-radius: 14px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 24px rgba(30,42,34,.22);">{{toast}}</div>
+  </sc-if>
+
+  <nav aria-label="Principal" style="flex-shrink: 0; display: flex; background: #FFFFFF; border-top: 1px solid #DCE4D4; padding: 4px 4px 10px;">
+    <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Inicio</a>
+    <a href="Stage.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span>Stage</a>
+    <a href="Habitos.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"></path></svg></span>Hábitos</a>
+    <a href="Mazmorra.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg></span>Mazmorra</a>
+    <a href="Perfil.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4E5C52; font-size: 12px;"><span style="width: 44px; height: 28px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"npc":{"editor":"enum","options":["0","1","2","3"],"default":"0","section":"Estado inicial"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      view: Number(props.npc || 0),
+      toast: '', thinking: 0,
+      npcs: [
+        { id: 1, kind: 'owl', name: 'Maestro Búho', role: 'Mentor', freq: 'Diaria', focus: 'Meta · Inglés', noble: 'Impulsarte todos los días a dar un paso hacia hablar inglés con fluidez.', banner: '#2C4580', bannerInk: '#FFFFFF',
+          mission: { title: 'Lee en voz alta un capítulo corto en inglés y anota 5 palabras nuevas', why: 'Tu Boss «Hablar inglés» está al 64 %. Leer en voz alta trabaja pronunciación y vocabulario a la vez.', xp: 20, coins: 8 }, cooldown: false,
+          history: [{ title: 'Escucha un podcast de 10 minutos en inglés', when: 'Ayer', ok: true, reward: '+20 XP' }, { title: 'Escribe 3 frases sobre tu día en inglés', when: 'Hace 2 días', ok: true, reward: '+15 XP' }, { title: 'Repasa los verbos irregulares', when: 'Hace 3 días', ok: false, reward: 'Sin recompensa' }] },
+        { id: 2, kind: 'fox', name: 'Zorra Brisa', role: 'Compañera tranquila', freq: 'Semanal', focus: 'Metas semanales', noble: 'Que cada semana cierres al menos una misión importante sin agobiarte.', banner: '#E07A35', bannerInk: '#1A1F1B',
+          mission: null, cooldown: true,
+          history: [{ title: 'Termina el primer borrador del ensayo', when: 'Semana pasada', ok: true, reward: '+60 XP' }] },
+        { id: 3, kind: 'turtle', name: 'Tortuga Sabia', role: 'Guardiana de hábitos', freq: 'Mensual', focus: 'Hábitos', noble: 'Que no abandones tus hábitos aunque el mes se complique.', banner: '#2E7D4F', bannerInk: '#FFFFFF',
+          mission: { title: 'Mantén tu racha de lectura 20 días este mes', why: 'Llevas 12 días seguidos. Faltan 8 para llegar a la meta del mes.', xp: 80, coins: 30 }, cooldown: false,
+          history: [{ title: 'Ejercicio 12 veces en septiembre', when: 'Septiembre', ok: true, reward: '+80 XP' }] }
+      ]
+    };
+  }
+  componentWillUnmount() { clearTimeout(this.tt); clearTimeout(this.th); }
+  flash(msg) { clearTimeout(this.tt); this.setState({ toast: msg }); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  patch(id, p) { this.setState({ npcs: this.state.npcs.map(n => n.id === id ? { ...n, ...p } : n) }); }
+  componentDidMount() { this._qs = () => this.forceUpdate(); try { window.addEventListener('storage', this._qs); } catch (e) {} }
+  qt() {
+    let m = this.props.mode, t = this.props.theme;
+    try { m = m || localStorage.getItem('questly-mode'); t = t || localStorage.getItem('questly-theme'); } catch (e) {}
+    let dark = m === 'oscuro';
+    if (m === 'auto') { try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+    t = ['bosque', 'rio', 'brasa', 'oro'].indexOf(t) >= 0 ? t : 'bosque';
+    const tones = { bosque: 'forest', rio: 'river', brasa: 'ember', oro: 'gold' };
+    return { qMode: dark ? 'dark' : 'light', qTheme: t, qTone: dark ? 'night' : tones[t] };
+  }
+  renderVals() { return { ...this.qt(), ...this.rv() }; }
+  rv() {
+    const s = this.state;
+    const newMissions = {
+      1: { title: 'Graba un audio de 1 minuto presentándote en inglés', why: 'Hablar es la parte que más te cuesta según tus misiones. Un minuto basta.', xp: 20, coins: 8 },
+      2: { title: 'Elige una sola misión importante y termínala antes del viernes', why: 'Tu Stage tiene 3 misiones urgentes. Una a la vez.', xp: 40, coins: 16 },
+      3: { title: 'Bebe 2 L de agua 5 días seguidos', why: 'Es tu hábito con la racha más corta.', xp: 60, coins: 24 }
+    };
+    const shape = (n) => {
+      const lower = n.freq.toLowerCase();
+      return {
+        ...n, isOwl: n.kind === 'owl', isFox: n.kind === 'fox', isTurtle: n.kind === 'turtle', isCrow: n.kind === 'crow',
+        freqLower: lower === 'diaria' ? 'hoy' : (lower === 'semanal' ? 'la semana' : 'el mes'),
+        hasMission: !!n.mission && s.thinking !== n.id, noMission: !n.mission && s.thinking !== n.id,
+        thinking: s.thinking === n.id, waiting: !n.mission && s.thinking !== n.id,
+        mTitle: n.mission ? n.mission.title : '', mWhy: n.mission ? n.mission.why : '', mXp: n.mission ? n.mission.xp : 0, mCoins: n.mission ? n.mission.coins : 0,
+        waitText: n.cooldown ? 'Misión cumplida. La próxima llega ' + (lower === 'diaria' ? 'mañana' : lower === 'semanal' ? 'el lunes' : 'el mes que viene') + '.' : 'Sin misión activa.',
+        cooling: n.cooldown, askLabel: n.cooldown ? 'Pedir otra · disponible en 3 h' : 'Pedir misión al momento',
+        askFg: n.cooldown ? '#7D8A80' : (s.view ? '#F3F6EF' : '#1F5C39'), askBorder: n.cooldown ? '#DCE4D4' : '#2E7D4F',
+        history: n.history.map(h => ({ ...h, fail: !h.ok, bg: h.ok ? '#E1F0E6' : '#FBE4DF', fg: h.ok ? '#1F5C39' : '#A8361F' })),
+        open: () => this.setState({ view: n.id }),
+        complete: () => { const m = n.mission; this.patch(n.id, { mission: null, cooldown: false, history: [{ title: m.title, when: 'Ahora', ok: true, reward: '+' + m.xp + ' XP' }, ...n.history] }); this.flash(n.name + ': ¡bien hecho! +' + m.xp + ' XP · +' + m.coins + ' Monedas'); },
+        ask: () => {
+          if (n.cooldown) return;
+          this.setState({ thinking: n.id });
+          clearTimeout(this.th);
+          this.th = setTimeout(() => { this.setState({ thinking: 0 }); this.patch(n.id, { mission: newMissions[n.id], cooldown: true }); }, 1200);
+        }
+      };
+    };
+    const npcs = s.npcs.map(shape);
+    const d = s.view ? npcs.find(n => n.id === s.view) : null;
+    return {
+      isList: !d, isDetail: !!d, npcs, npcCount: npcs.length,
+      d: d || npcs[0],
+      heroKicker: d ? 'La Taverna' : 'Salón de compañeros',
+      heroHeading: d ? d.name : 'La Taverna',
+      heroBack: d ? 'Taverna.dc.html' : 'Main.dc.html',
+      heroActionLabel: d ? 'Editar NPC' : 'Crear NPC', heroActionIcon: d ? 'edit' : 'plus',
+      toast: s.toast, toastOn: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
