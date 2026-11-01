@@ -18,7 +18,6 @@ void main() {
   late MockAppearanceBloc appearanceBloc;
   late int settingsOpened;
   late int journalOpened;
-  late int marketplaceOpened;
   late int otherOpened;
 
   setUp(() {
@@ -31,7 +30,6 @@ void main() {
     );
     settingsOpened = 0;
     journalOpened = 0;
-    marketplaceOpened = 0;
     otherOpened = 0;
   });
 
@@ -63,11 +61,8 @@ void main() {
                 onOpenNotifications: () {},
                 onOpenHelp: () {},
                 onOpenJournal: () => journalOpened++,
-                onOpenMarketplace: () => marketplaceOpened++,
                 onOpenSettings: () => settingsOpened++,
                 onOpenStats: () => otherOpened++,
-                onOpenVision: () => otherOpened++,
-                onOpenInventory: () => otherOpened++,
               ),
             ),
           ),
@@ -76,155 +71,52 @@ void main() {
     );
   }
 
-  testWidgets('muestra identidad, vitalidad, tasa y skills', (tester) async {
+  testWidgets('muestra identidad, nivel, tasa y áreas', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
     expect(find.text('Ana'), findsOneWidget);
-    expect(find.text('Nivel 24 · Estratega'), findsOneWidget);
+    expect(find.text('Nivel 24'), findsOneWidget);
     expect(
       find.text('Una estratega que termina lo que empieza.'),
       findsOneWidget,
     );
-    expect(find.text('80 / 100'), findsOneWidget);
-    expect(find.text('2.450'), findsOneWidget);
     expect(find.text('76 %'), findsOneWidget);
-    expect(find.text('38 de 50 misiones cumplidas'), findsOneWidget);
+    expect(find.text('38 de 50 tareas cumplidas'), findsOneWidget);
     expect(find.text('Inglés'), findsOneWidget);
     expect(find.text('2 / 6'), findsOneWidget);
-    expect(find.text('Añadir skill'), findsOneWidget);
+    expect(find.text('Añadir área'), findsOneWidget);
   });
 
-  testWidgets('vitalidad baja explica la regla vigente', (tester) async {
-    const weakened = CharacterProfile(
-      level: 3,
-      currentXp: 0,
-      xpToNextLevel: 100,
-      coins: 10,
-      hpCurrent: 29,
-      hpMax: 100,
-      isWeakened: true,
-      questsCompleted: 0,
-      questsFailed: 0,
-      skillLimit: 6,
-      skills: [],
-    );
-    await pump(tester, const ProfileSuccess(weakened));
-
-    expect(
-      find.text(
-        'Vitalidad baja: ganas un 25 % menos de XP hasta recuperarte. '
-        'Tus Monedas no cambian.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.byIcon(Icons.heart_broken_outlined), findsOneWidget);
-  });
-
-  testWidgets('con vida suficiente no hay aviso de vitalidad', (tester) async {
+  testWidgets('no muestra la economía del juego anterior', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
-    expect(find.textContaining('Vitalidad baja'), findsNothing);
-  });
-
-  testWidgets('muestra el título activo y el Tesoro', (tester) async {
-    await pump(tester, const ProfileSuccess(profile));
-
-    expect(find.text('Guardián del Huerto'), findsOneWidget);
-    expect(find.text('Tesoro del reino'), findsOneWidget);
-    expect(find.text('12.500'), findsOneWidget);
-    expect(
-      find.text('Lo que no cabe en tu bolsa. No se gasta: es tu prestigio.'),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('sin título ni Tesoro no deja huecos', (tester) async {
-    await pump(tester, const ProfileSuccess(newProfile));
-
-    expect(find.text('Guardián del Huerto'), findsNothing);
-    expect(find.text('Tesoro del reino'), findsOneWidget);
-    expect(
-      find.text('Lo que no cabe en tu bolsa. No se gasta: es tu prestigio.'),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('elegir título envía el elegido', (tester) async {
-    await pump(tester, const ProfileSuccess(profile));
-
-    await tester.tap(find.text('Elegir título'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Sin título'), findsOneWidget);
-    expect(find.text('Guardián del Huerto'), findsNWidgets(2));
-    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
-    await tester.tap(find.text('Explorador'));
-    await tester.pumpAndSettle();
-
-    verify(() => bloc.add(const ProfileActiveTitleChanged('t2'))).called(1);
-  });
-
-  testWidgets('sin títulos la hoja explica cómo se ganan', (tester) async {
-    await pump(tester, const ProfileSuccess(newProfile));
-
-    await tester.tap(find.text('Elegir título'));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text(
-        'Aún no tienes títulos. Se ganan con logros, subiendo de nivel y '
-        'llenando tu Tesoro del reino.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.textContaining('Comprar'), findsNothing);
-    expect(find.text('Sin título'), findsNothing);
-  });
-
-  testWidgets('6 accesos en el orden del diseño', (tester) async {
-    await pump(tester, const ProfileSuccess(profile));
-
-    const labels = [
-      'Diario',
-      'Estadísticas',
-      'Vision Board',
-      'Inventario y logros',
-      'Marketplace',
-      'Configuración',
-    ];
-    final positions = [
-      for (final label in labels) tester.getTopLeft(find.text(label)),
-    ];
-    for (var i = 1; i < positions.length; i++) {
-      final (prev, curr) = (positions[i - 1], positions[i]);
-      expect(
-        curr.dy > prev.dy || (curr.dy == prev.dy && curr.dx > prev.dx),
-        isTrue,
-        reason: '${labels[i]} va después de ${labels[i - 1]}',
-      );
-    }
-    for (final gone in ['Historial', 'Game Master', 'Apariencia']) {
+    for (final gone in [
+      'Vitalidad (HP)',
+      'Monedas',
+      'historial',
+      'Elegir título',
+      'Guardián del Huerto',
+    ]) {
       expect(find.text(gone), findsNothing);
     }
+  });
 
-    await tester.tap(find.text('Diario'));
-    await tester.tap(find.text('Marketplace'));
-    await tester.tap(find.text('Configuración'));
-    expect((journalOpened, marketplaceOpened, settingsOpened), (1, 1, 1));
+  testWidgets('3 accesos: Historial, Estadísticas y Ajustes', (tester) async {
+    await pump(tester, const ProfileSuccess(profile));
 
+    await tester.tap(find.text('Historial'));
+    await tester.tap(find.text('Ajustes'));
     await tester.tap(find.text('Estadísticas'));
-    await tester.tap(find.text('Vision Board'));
-    await tester.tap(find.text('Inventario y logros'));
-    expect(otherOpened, 3);
+    expect((journalOpened, settingsOpened, otherOpened), (1, 1, 1));
   });
 
   testWidgets('editar la identidad envía lo escrito', (tester) async {
     await pump(tester, const ProfileSuccess(newProfile));
 
-    await tester.tap(find.text('¿Quién eres en este reino?'));
+    await tester.tap(find.text('¿Qué quieres lograr este año?'));
     await tester.pumpAndSettle();
     await tester.enterText(
-      find.widgetWithText(TextFormField, '¿Quién eres en este reino?'),
+      find.widgetWithText(TextFormField, '¿Qué quieres lograr este año?'),
       'Un aprendiz constante',
     );
     await tester.tap(find.text('Guardar'));
@@ -240,28 +132,28 @@ void main() {
     ).called(1);
   });
 
-  testWidgets('una skill sin nombre no se crea', (tester) async {
+  testWidgets('un área sin nombre no se crea', (tester) async {
     await pump(tester, const ProfileSuccess(newProfile));
 
-    await tester.tap(find.text('Añadir skill'));
+    await tester.tap(find.text('Añadir área'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Crear skill'));
+    await tester.tap(find.text('Crear área'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Ponle un nombre a tu skill.'), findsOneWidget);
+    expect(find.text('Ponle un nombre al área.'), findsOneWidget);
     await tester.enterText(find.byType(TextFormField), 'Salud');
-    await tester.tap(find.text('Crear skill'));
+    await tester.tap(find.text('Crear área'));
     await tester.pumpAndSettle();
 
     verify(() => bloc.add(const ProfileSkillCreated('Salud'))).called(1);
   });
 
-  testWidgets('eliminar una skill pide confirmación', (tester) async {
+  testWidgets('eliminar un área pide confirmación', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
     await tester.tap(find.text('Inglés'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Eliminar skill'));
+    await tester.tap(find.text('Eliminar área'));
     await tester.pumpAndSettle();
 
     expect(find.text('¿Eliminar «Inglés»?'), findsOneWidget);
@@ -309,8 +201,7 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.text('1.250.000'), findsOneWidget);
-    expect(find.text('Inventario y logros'), findsOneWidget);
+    expect(find.text('Estadísticas'), findsOneWidget);
     expect(find.text('Ayuda'), findsOneWidget);
   });
 }

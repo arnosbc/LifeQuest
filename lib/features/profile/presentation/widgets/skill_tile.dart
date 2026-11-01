@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 
-/// Skill del árbol de habilidades. Tocarla abre sus opciones.
+/// Área con su nivel. Tocarla abre sus opciones.
 class SkillTile extends StatelessWidget {
   const SkillTile({super.key, required this.skill, required this.onTap});
 
@@ -90,7 +90,7 @@ class AddSkillTile extends StatelessWidget {
             Icon(Icons.add_rounded, color: context.lq.deepGreen),
             const SizedBox(height: 4),
             Text(
-              'Añadir skill',
+              'Añadir área',
               style: TextStyle(
                 color: context.lq.deepGreen,
                 fontSize: 13,

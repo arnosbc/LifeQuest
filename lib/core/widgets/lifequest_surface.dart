@@ -21,15 +21,8 @@ class LifeQuestSurface extends StatelessWidget {
     padding: padding,
     decoration: BoxDecoration(
       color: color ?? context.lq.surface,
-      borderRadius: BorderRadius.circular(11),
+      borderRadius: BorderRadius.circular(14),
       border: Border.all(color: context.lq.line),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x08000000),
-          blurRadius: 7,
-          offset: Offset(0, 2),
-        ),
-      ],
     ),
     child: child,
   );

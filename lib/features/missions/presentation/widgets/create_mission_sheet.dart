@@ -141,10 +141,10 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
             ),
             const SizedBox(height: 15),
             Text(
-              'Nueva misión',
+              'Nueva tarea',
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: context.lq.ink,
               ),
             ),
@@ -163,7 +163,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                 hintText: 'Ej. Preparar la exposición del viernes',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.auto_awesome),
-                  tooltip: 'Convertir en misión',
+                  tooltip: 'Convertir en tarea',
                   onPressed: _interpret,
                 ),
                 helperText:
@@ -171,16 +171,16 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
               ),
             ),
             const SizedBox(height: 10),
-            _section('DEFINE LA MISIÓN'),
+            _section('DEFINE LA TAREA'),
             TextFormField(
               controller: _title,
               maxLength: 200,
               decoration: const InputDecoration(
-                labelText: 'Nombre de la misión *',
+                labelText: 'Nombre de la tarea *',
                 hintText: 'Preparar presentación del proyecto',
               ),
               validator: (v) => v == null || v.trim().isEmpty
-                  ? 'Escribe un nombre para la misión'
+                  ? 'Escribe un nombre para la tarea'
                   : null,
             ),
             const SizedBox(height: 8),
@@ -201,7 +201,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
               children: [
                 Expanded(
                   child: _linkDropdown(
-                    'Área / skill',
+                    'Área',
                     _skillId,
                     widget.board.skills,
                     (v) => setState(() => _skillId = v),
@@ -220,7 +220,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
             ),
             const SizedBox(height: 8),
             _linkDropdown(
-              'Meta (cada misión le resta vida al jefe)',
+              'Meta',
               _goalId,
               widget.board.goals,
               (v) => setState(() => _goalId = v),
@@ -307,12 +307,12 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                           'RECOMPENSA ESTIMADA',
                           style: TextStyle(
                             fontSize: 9,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             color: context.lq.deepGreen,
                           ),
                         ),
                         Text(
-                          '$_xp XP · ${MissionsFormat.estimatedCoins(_xp)} monedas',
+                          '$_xp XP',
                           style: TextStyle(
                             color: context.lq.ink,
                             fontWeight: FontWeight.w700,
@@ -331,7 +331,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
               child: FilledButton.icon(
                 onPressed: () => _save(start: false),
                 icon: const Icon(Icons.check),
-                label: const Text('Crear misión'),
+                label: const Text('Crear tarea'),
               ),
             ),
             const SizedBox(height: 8),
@@ -359,7 +359,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
       style: TextStyle(
         color: context.lq.deepGreen,
         fontSize: 10,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w700,
       ),
     ),
   );

@@ -9,7 +9,7 @@ void main() {
     expect(HomeDashboardModel.fromJson(dashboardJson).toEntity(), dashboard);
   });
 
-  test('sin estadísticas, misión ni hábitos usa los valores por defecto', () {
+  test('sin estadísticas, tarea ni hábitos usa los valores por defecto', () {
     final entity = HomeDashboardModel.fromJson(const {
       'display_name': '  ',
       'character_class': null,

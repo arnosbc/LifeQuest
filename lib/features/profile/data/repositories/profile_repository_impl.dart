@@ -73,21 +73,19 @@ class ProfileRepositoryImpl implements ProfileRepository {
   static String _messageFor(ServerException error) =>
       switch ((error.code, error.statusCode)) {
         ('skill_limit_reached', _) =>
-          'Ya tienes el máximo de skills. Libera una o amplía el límite en '
-              'Game Master.',
+          'Ya tienes el máximo de áreas. Libera una o amplía el límite en '
+              'Ajustes.',
         // FK de npcs.skill_id (ON DELETE RESTRICT).
         (_, '23503') =>
-          'Un NPC de la Taverna usa esta skill. Asígnale otra antes de '
+          'Hay datos que dependen de esta área. Reasígnalos antes de '
               'eliminarla.',
         // CHECK de longitud (002_profile.sql).
         (_, '23514') =>
           'Usa un nombre de 1 a 40 caracteres y una identidad de hasta 280.',
         // check_active_title (004_structure.sql).
-        ('title_not_earned', _) =>
-          'Ese título todavía no es tuyo. Los títulos se ganan con logros, '
-              'nivel y Tesoro.',
+        ('title_not_earned', _) => 'Ese título todavía no es tuyo.',
         ('profile_not_found', _) =>
-          'Estamos preparando tu personaje. Desliza para actualizar en un '
+          'Estamos preparando tu cuenta. Desliza para actualizar en un '
               'momento.',
         _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
       };

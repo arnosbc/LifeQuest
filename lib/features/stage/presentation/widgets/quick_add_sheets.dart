@@ -20,7 +20,7 @@ class QuickAddSheet extends StatelessWidget {
         context,
         QuickAddKind.mission,
         Icons.flag_outlined,
-        'Misión',
+        'Tarea',
         'Un paso concreto que puedes completar',
       ),
       _option(
@@ -28,14 +28,14 @@ class QuickAddSheet extends StatelessWidget {
         QuickAddKind.project,
         Icons.work_outline,
         'Proyecto',
-        'Un resultado de semanas con varias misiones',
+        'Un resultado de semanas con varias tareas',
       ),
       _option(
         context,
         QuickAddKind.goal,
         Icons.emoji_events_outlined,
         'Meta',
-        'Un logro de meses: se convierte en un jefe a derrotar',
+        'Un logro de meses: tus tareas y proyectos la hacen avanzar',
       ),
       _option(
         context,
@@ -155,14 +155,14 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
         ),
         const SizedBox(height: 8),
         _linkDropdown(
-          'Área / skill',
+          'Área',
           _skillId,
           widget.skills,
           (v) => setState(() => _skillId = v),
         ),
         const SizedBox(height: 8),
         _linkDropdown(
-          'Meta (completarlo le resta vida al jefe)',
+          'Meta',
           _goalId,
           widget.goals,
           (v) => setState(() => _goalId = v),
@@ -360,7 +360,7 @@ class _CreateGoalSheetState extends State<CreateGoalSheet> {
         DropdownButtonFormField<String?>(
           initialValue: _skillId,
           isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Área / skill'),
+          decoration: const InputDecoration(labelText: 'Área'),
           items: [
             const DropdownMenuItem(value: null, child: Text('Sin vincular')),
             for (final skill in widget.skills)
@@ -482,7 +482,7 @@ class _SheetFrame extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               color: context.lq.ink,
             ),
           ),

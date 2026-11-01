@@ -4,20 +4,18 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_format.dart';
 
-/// Identidad del héroe y su avance hacia el siguiente nivel.
+/// Tu nombre, tu enfoque y el avance hacia el siguiente nivel.
 class CharacterCard extends StatelessWidget {
   const CharacterCard({
     super.key,
     required this.name,
     required this.profile,
     required this.onEditIdentity,
-    required this.onChooseTitle,
   });
 
   final String name;
   final CharacterProfile profile;
   final VoidCallback onEditIdentity;
-  final VoidCallback onChooseTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +32,13 @@ class CharacterCard extends StatelessWidget {
               ExcludeSemantics(
                 child: CircleAvatar(
                   radius: 32,
-                  backgroundColor: lq.deepGreen,
+                  backgroundColor: lq.green,
                   child: Text(
                     name.isEmpty ? 'A' : name.characters.first.toUpperCase(),
                     style: TextStyle(
                       color: lq.onDeepGreen,
                       fontSize: 26,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -58,29 +56,14 @@ class CharacterCard extends StatelessWidget {
                         color: lq.ink,
                         fontSize: 20,
                         height: 1.2,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    if (p.activeTitle case final title?) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        title.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: lq.muted,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 4),
                     Text(
-                      p.characterClass == null
-                          ? 'Nivel ${p.level}'
-                          : 'Nivel ${p.level} · ${p.characterClass}',
+                      'Nivel ${p.level}',
                       style: TextStyle(
-                        color: lq.deepGreen,
+                        color: lq.green,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),
@@ -92,35 +75,21 @@ class CharacterCard extends StatelessWidget {
                 tooltip: 'Editar identidad',
                 onPressed: onEditIdentity,
                 icon: const Icon(Icons.edit_outlined, size: 20),
-                color: lq.deepGreen,
+                color: lq.green,
                 style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
               ),
             ],
           ),
-          TextButton.icon(
-            onPressed: onChooseTitle,
-            icon: const Icon(Icons.workspace_premium_outlined, size: 18),
-            label: const Text('Elegir título'),
-            style: TextButton.styleFrom(
-              foregroundColor: lq.deepGreen,
-              minimumSize: const Size(48, 48),
-              padding: EdgeInsets.zero,
-              textStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: p.identityStatement == null
                 ? TextButton.icon(
                     onPressed: onEditIdentity,
                     icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('¿Quién eres en este reino?'),
+                    label: const Text('¿Qué quieres lograr este año?'),
                     style: TextButton.styleFrom(
-                      foregroundColor: lq.deepGreen,
+                      foregroundColor: lq.green,
                       minimumSize: const Size(48, 48),
                       padding: EdgeInsets.zero,
                       textStyle: const TextStyle(
@@ -169,7 +138,7 @@ class CharacterCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 LinearProgressIndicator(
                   value: p.xpProgress,
-                  minHeight: 10,
+                  minHeight: 6,
                   color: lq.green,
                   backgroundColor: lq.softGreen,
                   borderRadius: const BorderRadius.all(Radius.circular(10)),

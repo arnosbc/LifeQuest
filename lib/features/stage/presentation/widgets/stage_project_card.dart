@@ -62,7 +62,7 @@ class StageProjectCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$details\n${project.tasksDone} de ${project.tasksTotal} misiones · $urgencyLabel',
+                    '$details\n${project.tasksDone} de ${project.tasksTotal} tareas · $urgencyLabel',
                     style: TextStyle(color: context.lq.muted, fontSize: 10),
                   ),
                   const SizedBox(height: 5),
@@ -81,7 +81,7 @@ class StageProjectCard extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Aún no tiene misiones.',
+                      'Aún no tiene tareas.',
                       style: TextStyle(color: context.lq.muted, fontSize: 11),
                     ),
                   ),
@@ -131,7 +131,7 @@ class StageProjectCard extends StatelessWidget {
                     TextButton.icon(
                       onPressed: onAddMission,
                       icon: const Icon(Icons.add),
-                      label: const Text('Misión'),
+                      label: const Text('Tarea'),
                     ),
                     if (project.canComplete)
                       FilledButton.tonal(

@@ -95,7 +95,7 @@ void main() {
     expect(board.goalLinks, [const StageLink(id: 'g1', name: 'Ascenso')]);
   });
 
-  test('un proyecto sin misiones o con misiones abiertas no se completa', () {
+  test('un proyecto sin tareas o con tareas abiertas no se completa', () {
     expect(stageBoard.projects.single.canComplete, isFalse);
     expect(
       const StageProject(
@@ -141,7 +141,7 @@ void main() {
         await repository.completeProject('p1'),
         const Left(
           ServerFailure(
-            'A este proyecto aún le quedan misiones abiertas. ¡Ya casi!',
+            'A este proyecto aún le quedan tareas abiertas. ¡Ya casi!',
           ),
         ),
       );

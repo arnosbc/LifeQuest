@@ -2,6 +2,7 @@
 library;
 
 export 'package:proyecto_movil/app/config/theme.dart';
+export 'package:proyecto_movil/core/theme/questly_palette.dart';
 export 'package:proyecto_movil/core/widgets/confirm_dialog.dart';
 export 'package:proyecto_movil/core/widgets/difficulty_picker.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_action_row.dart';

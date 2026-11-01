@@ -26,7 +26,7 @@ class LifeQuestListRow extends StatelessWidget {
       child: Row(
         children: [
           LifeQuestIconTile(icon),
-          const SizedBox(width: 9),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,14 +35,14 @@ class LifeQuestListRow extends StatelessWidget {
                   title,
                   style: TextStyle(
                     color: context.lq.ink,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: TextStyle(color: context.lq.muted, fontSize: 10),
+                  style: TextStyle(color: context.lq.muted, fontSize: 13),
                 ),
               ],
             ),
@@ -52,8 +52,8 @@ class LifeQuestListRow extends StatelessWidget {
               trailing!,
               style: TextStyle(
                 color: context.lq.deepGreen,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
         ],

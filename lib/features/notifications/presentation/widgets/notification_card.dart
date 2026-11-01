@@ -35,7 +35,7 @@ class NotificationCard extends StatelessWidget {
               style: TextStyle(
                 color: context.lq.muted,
                 fontSize: 8,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -69,7 +69,7 @@ class NotificationCard extends StatelessWidget {
                               fontSize: 9,
                               fontWeight: isRead
                                   ? FontWeight.w600
-                                  : FontWeight.w800,
+                                  : FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 3),

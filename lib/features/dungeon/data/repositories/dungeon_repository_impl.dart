@@ -64,19 +64,19 @@ class DungeonRepositoryImpl implements DungeonRepository {
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
     'session_already_open' =>
-      'Ya tienes una Mazmorra en curso. Desliza para retomarla.',
+      'Ya tienes una sesión de foco en curso. Desliza para retomarla.',
     'invalid_duration' =>
       'La sesión dura de 30 min a 8 h, en pasos de 30, y cabe al menos un ciclo.',
-    'no_tasks' => 'Elige al menos una misión para tu mochila.',
-    'session_task_limit' => 'Tu mochila admite hasta 5 misiones.',
+    'no_tasks' => 'Elige al menos una tarea para tu mochila.',
+    'session_task_limit' => 'Tu mochila admite hasta 5 tareas.',
     'task_not_found' =>
-      'Alguna misión ya no está abierta. Desliza para actualizar.',
+      'Alguna tarea ya no está abierta. Desliza para actualizar.',
     'cycle_not_finished' => 'Al ciclo aún le falta un poco. Sigue concentrado.',
     'session_cycles_exhausted' =>
       'Completaste todos los ciclos de esta sesión. ¡Gran trabajo!',
     'session_not_found' || 'session_not_active' =>
       'Esta sesión ya terminó. Puedes empezar otra cuando quieras.',
-    'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+    'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

@@ -32,33 +32,27 @@ class QuestlyButton extends StatelessWidget {
     final q = context.q;
     final enabled = onPressed != null;
     final v = enabled ? variant : null;
-    final (Color bg, Color fg, Color? border, Color? shadow) = switch (v) {
-      QuestlyButtonVariant.primary => (
-        q.accent,
-        q.onAccent,
-        null,
-        q.buttonShadow,
-      ),
-      QuestlyButtonVariant.secondary => (q.card, q.text, q.inputBorder, null),
-      QuestlyButtonVariant.tonal => (q.tint, q.ink, q.tonalBorder, null),
+    final (Color bg, Color fg, Color? border) = switch (v) {
+      QuestlyButtonVariant.primary => (q.accent, q.onAccent, null),
+      QuestlyButtonVariant.secondary => (q.card, q.text, q.inputBorder),
+      QuestlyButtonVariant.tonal => (q.tint, q.ink, null),
       QuestlyButtonVariant.destructive => (
         q.destructive,
         q.onDestructive,
         null,
-        q.destructiveShadow,
       ),
-      QuestlyButtonVariant.text => (Colors.transparent, q.ink, null, null),
-      null => (q.disabled, q.onDestructive, null, null),
+      QuestlyButtonVariant.text => (Colors.transparent, q.ink, null),
+      null => (q.disabled, q.onDestructive, null),
     };
     final height = switch (variant) {
-      QuestlyButtonVariant.tonal => 48.0,
+      QuestlyButtonVariant.tonal => 44.0,
       QuestlyButtonVariant.text => QSize.minTap,
       _ => QSize.buttonPrimary,
     };
     final fontSize = switch (variant) {
       QuestlyButtonVariant.tonal => 15.0,
       QuestlyButtonVariant.text => 14.0,
-      _ => 16.0,
+      _ => 15.0,
     };
     final text = enabled ? label : (disabledReason ?? label);
     final content = Row(
@@ -92,8 +86,7 @@ class QuestlyButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(QRadius.button),
-        border: border == null ? null : Border.all(color: border, width: 1.5),
-        boxShadow: shadow == null ? null : qSolidShadow(shadow),
+        border: border == null ? null : Border.all(color: border),
       ),
       child: Center(widthFactor: 1, heightFactor: 1, child: content),
     );

@@ -12,7 +12,7 @@ import 'package:proyecto_movil/features/profile/presentation/widgets/profile_qui
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_sheets.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/skill_tile.dart';
 
-/// Perfil del Personaje. Necesita un [ProfileBloc] (lo provee el router).
+/// Tú: perfil, áreas y accesos. Necesita un [ProfileBloc] (lo provee el router).
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
@@ -20,11 +20,8 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenNotifications,
     required this.onOpenHelp,
     required this.onOpenJournal,
-    required this.onOpenMarketplace,
     required this.onOpenSettings,
     required this.onOpenStats,
-    required this.onOpenVision,
-    required this.onOpenInventory,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -32,11 +29,8 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenNotifications;
   final VoidCallback onOpenHelp;
   final VoidCallback onOpenJournal;
-  final VoidCallback onOpenMarketplace;
   final VoidCallback onOpenSettings;
   final VoidCallback onOpenStats;
-  final VoidCallback onOpenVision;
-  final VoidCallback onOpenInventory;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<ProfileBloc, ProfileState>(
@@ -45,15 +39,15 @@ class ProfileScreen extends StatelessWidget {
         showLifeQuestMessage(context, (state as ProfileSuccess).message!),
     builder: (context, state) => switch (state) {
       ProfileInitial() || ProfileLoading() => Center(
-        child: CircularProgressIndicator(color: context.lq.deepGreen),
+        child: CircularProgressIndicator(color: context.lq.green),
       ),
-      ProfileFailure(:final message) => _ErrorView(
+      ProfileFailure(:final message) => LifeQuestErrorView(
         message: message,
         onRetry: () =>
             context.read<ProfileBloc>().add(const ProfileRequested()),
       ),
       ProfileSuccess(:final profile, :final saving) => RefreshIndicator(
-        color: context.lq.deepGreen,
+        color: context.lq.green,
         onRefresh: () => _refresh(context.read<ProfileBloc>()),
         child: _content(context, profile, saving: saving),
       ),
@@ -92,15 +86,6 @@ class ProfileScreen extends StatelessWidget {
       }
     }
 
-    Future<void> chooseTitle() async {
-      final choice = await showTitleSheet(
-        context,
-        earned: profile.earnedTitles,
-        active: profile.activeTitle,
-      );
-      if (choice != null) bloc.add(ProfileActiveTitleChanged(choice.titleId));
-    }
-
     Future<void> addSkill() async {
       if (await showSkillSheet(context) case SkillNameSaved(:final name)) {
         bloc.add(ProfileSkillCreated(name));
@@ -118,11 +103,11 @@ class ProfileScreen extends StatelessWidget {
     }
 
     return LifeQuestPage(
-      title: 'Perfil',
-      subtitle: 'Tu progreso, a tu manera.',
+      title: 'Tú',
+      subtitle: 'Tu progreso y tus áreas.',
       trailing: IconButton(
         onPressed: onOpenSettings,
-        tooltip: 'Configuración',
+        tooltip: 'Ajustes',
         icon: const Icon(Icons.settings_outlined, size: 22),
         color: lq.ink,
         style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
@@ -133,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
           height: 3,
           child: saving
               ? LinearProgressIndicator(
-                  color: lq.deepGreen,
+                  color: lq.green,
                   backgroundColor: Colors.transparent,
                 )
               : null,
@@ -143,71 +128,48 @@ class ProfileScreen extends StatelessWidget {
           name: name,
           profile: profile,
           onEditIdentity: editIdentity,
-          onChooseTitle: chooseTitle,
         ),
         const SizedBox(height: 12),
         HeroStatusCard(profile: profile),
         const SizedBox(height: 28),
         const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
         const SizedBox(height: 8),
-        // Dos filas de 3: seis en una fila no caben en un teléfono.
         _group(
           padding: const EdgeInsets.all(6),
-          child: Column(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final row in [
-                [
-                  ProfileQuickLink(
-                    icon: Icons.menu_book_outlined,
-                    label: 'Diario',
-                    onTap: onOpenJournal,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.insights_outlined,
-                    label: 'Estadísticas',
-                    onTap: onOpenStats,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.visibility_outlined,
-                    label: 'Vision Board',
-                    onTap: onOpenVision,
-                  ),
-                ],
-                [
-                  ProfileQuickLink(
-                    icon: Icons.inventory_2_outlined,
-                    label: 'Inventario y logros',
-                    onTap: onOpenInventory,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.storefront_outlined,
-                    label: 'Marketplace',
-                    onTap: onOpenMarketplace,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.tune_rounded,
-                    label: 'Configuración',
-                    onTap: onOpenSettings,
-                  ),
-                ],
-              ])
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [for (final link in row) Expanded(child: link)],
+              for (final link in [
+                ProfileQuickLink(
+                  icon: Icons.history_rounded,
+                  label: 'Historial',
+                  onTap: onOpenJournal,
                 ),
+                ProfileQuickLink(
+                  icon: Icons.insights_outlined,
+                  label: 'Estadísticas',
+                  onTap: onOpenStats,
+                ),
+                ProfileQuickLink(
+                  icon: Icons.tune_rounded,
+                  label: 'Ajustes',
+                  onTap: onOpenSettings,
+                ),
+              ])
+                Expanded(child: link),
             ],
           ),
         ),
         const SizedBox(height: 28),
         LifeQuestSectionHeading(
-          'ÁRBOL DE HABILIDADES',
+          'ÁREAS',
           action: '${profile.skills.length} / ${profile.skillLimit}',
         ),
         if (profile.skills.isEmpty) ...[
           const SizedBox(height: 4),
           Text(
-            'Las skills son tus áreas de vida. Cada misión y hábito que '
-            'vincules a una la hará crecer.',
+            'Las áreas agrupan tus tareas y hábitos (Trabajo, Salud, '
+            'Estudio…). Cada cosa que cumplas en un área la hace subir.',
             style: TextStyle(color: lq.muted, fontSize: 13, height: 1.4),
           ),
         ],
@@ -267,43 +229,6 @@ class ProfileScreen extends StatelessWidget {
           child: children.length > 1 ? children[1] : const SizedBox.shrink(),
         ),
       ],
-    ),
-  );
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const LifeQuestIconTile(Icons.cloud_off_rounded, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: context.lq.ink, fontSize: 15),
-          ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded, size: 20),
-            label: const Text('Reintentar'),
-            style: FilledButton.styleFrom(
-              backgroundColor: context.lq.deepGreen,
-              foregroundColor: context.lq.onDeepGreen,
-              minimumSize: const Size(48, 48),
-            ),
-          ),
-        ],
-      ),
     ),
   );
 }

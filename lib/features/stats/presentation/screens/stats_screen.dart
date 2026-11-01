@@ -49,7 +49,7 @@ class StatsScreen extends StatelessWidget {
           children: [
             Expanded(child: _compare('XP', b.xp, b.xpPrev)),
             const SizedBox(width: 6),
-            Expanded(child: _compare('Misiones', b.missions, b.missionsPrev)),
+            Expanded(child: _compare('Tareas', b.missions, b.missionsPrev)),
             const SizedBox(width: 6),
             Expanded(
               child: _compare('Min. foco', b.focusMinutes, b.focusMinutesPrev),
@@ -132,7 +132,7 @@ class StatsScreen extends StatelessWidget {
           const LifeQuestListRow(
             icon: Icons.category_outlined,
             title: 'Sin XP por Área esta semana',
-            subtitle: 'Vincula tus misiones y hábitos a una skill.',
+            subtitle: 'Vincula tus tareas y hábitos a un área.',
           ),
         for (final s in b.xpBySkill)
           Padding(

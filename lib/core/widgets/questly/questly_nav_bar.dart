@@ -4,8 +4,8 @@ import 'package:proyecto_movil/core/theme/questly_icons.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Barra inferior de 5 pestañas (Main.dc.html): la activa lleva una píldora
-/// de tinte y el texto en tinta.
+/// Barra inferior de 5 pestañas: la activa lleva una píldora de tinte y el
+/// texto en tinta.
 class QuestlyNavBar extends StatelessWidget {
   const QuestlyNavBar({
     super.key,
@@ -17,11 +17,11 @@ class QuestlyNavBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   static const _items = [
-    (QIcons.home, 'Inicio'),
-    (QIcons.stage, 'Stage'),
+    (QIcons.today, 'Hoy'),
+    (QIcons.tasks, 'Tareas'),
     (QIcons.habits, 'Hábitos'),
-    (QIcons.sword, 'Mazmorra'),
-    (QIcons.profile, 'Perfil'),
+    (QIcons.focus, 'Foco'),
+    (QIcons.profile, 'Tú'),
   ];
 
   @override
@@ -107,7 +107,7 @@ class _NavItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: QText.label(color).copyWith(
                   fontSize: 12,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+                  fontWeight: active ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ],

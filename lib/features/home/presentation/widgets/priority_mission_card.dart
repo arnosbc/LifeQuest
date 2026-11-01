@@ -4,8 +4,8 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/home_format.dart';
 
-/// La única acción primaria del Home: retomar la misión prioritaria o, si no
-/// hay ninguna, crear la siguiente.
+/// La acción principal de Hoy: empezar la tarea que toca ahora o, si no hay
+/// ninguna, crear la siguiente.
 class PriorityMissionCard extends StatelessWidget {
   const PriorityMissionCard({
     super.key,
@@ -32,7 +32,7 @@ class PriorityMissionCard extends StatelessWidget {
               LifeQuestIconTile(
                 mission == null
                     ? Icons.task_alt_rounded
-                    : Icons.verified_user_outlined,
+                    : Icons.radio_button_unchecked_rounded,
                 size: 40,
               ),
               const SizedBox(width: 12),
@@ -41,7 +41,7 @@ class PriorityMissionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      mission?.title ?? 'No tienes misiones pendientes',
+                      mission?.title ?? 'No tienes tareas pendientes',
                       style: TextStyle(
                         color: context.lq.ink,
                         fontSize: 17,
@@ -52,7 +52,7 @@ class PriorityMissionCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     if (mission == null)
                       Text(
-                        'Captura una idea o crea tu próxima misión.',
+                        'Escribe lo que tengas en mente y lo ordenamos.',
                         style: TextStyle(color: context.lq.muted, fontSize: 13),
                       )
                     else
@@ -75,26 +75,6 @@ class PriorityMissionCard extends StatelessWidget {
               ),
             ],
           ),
-          if (mission != null &&
-              (mission.xpReward > 0 || mission.coinReward > 0)) ...[
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (mission.xpReward > 0)
-                  _Reward(
-                    Icons.bolt_rounded,
-                    '+${HomeFormat.number(mission.xpReward)} XP',
-                  ),
-                if (mission.coinReward > 0)
-                  _Reward(
-                    Icons.toll_rounded,
-                    '+${HomeFormat.number(mission.coinReward)} monedas',
-                  ),
-              ],
-            ),
-          ],
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -102,13 +82,11 @@ class PriorityMissionCard extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: mission == null ? onCreate : onContinue,
               icon: Icon(
-                mission == null ? Icons.add_rounded : Icons.play_arrow_rounded,
+                mission == null ? Icons.add_rounded : Icons.timer_outlined,
                 size: 20,
               ),
-              label: Text(mission == null ? 'Crear misión' : 'Continuar'),
+              label: Text(mission == null ? 'Crear tarea' : 'Empezar foco'),
               style: FilledButton.styleFrom(
-                backgroundColor: context.lq.deepGreen,
-                foregroundColor: context.lq.onDeepGreen,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -135,51 +113,18 @@ class _Meta extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(icon, size: 16, color: context.lq.deepGreen),
+      Icon(icon, size: 16, color: context.lq.muted),
       const SizedBox(width: 4),
       Flexible(
         child: Text(
           label,
           style: TextStyle(
-            color: context.lq.deepGreen,
+            color: context.lq.muted,
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
     ],
-  );
-}
-
-class _Reward extends StatelessWidget {
-  const _Reward(this.icon, this.label);
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-    decoration: BoxDecoration(
-      color: context.lq.softGreen,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: context.lq.deepGreen),
-        const SizedBox(width: 4),
-        Flexible(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: context.lq.ink,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ],
-    ),
   );
 }

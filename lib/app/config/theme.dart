@@ -2,26 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
-import 'package:proyecto_movil/features/profile/domain/entities/theme_realm.dart';
 
-/// Paleta fija (Bosque claro de «Bosque vivo»). Las pantallas aún no migradas
-/// la usan directamente; las migradas leen `context.lq` o `context.q`.
-abstract final class LifeQuestColors {
-  static const green = Color(0xFF2E7D4F);
-  static const deepGreen = Color(0xFF1F5C39);
-  static const ink = QColors.text;
-  static const muted = QColors.text2;
-  static const background = QColors.bg;
-  static const line = QColors.border;
-  static const softGreen = Color(0xFFE1F0E6);
-  static const outline = QColors.inputBorder;
-  static const error = QColors.coralInk;
-  // Pérdida de HP y malos hábitos: solo relleno o iconos, nunca texto pequeño.
-  static const warning = QColors.coral;
-}
-
-/// Roles de color de las pantallas anteriores al rediseño, calculados desde
-/// los tokens Questly (docs/diseño/PLAN-REDISENO.md §3) para cada modo y tema.
+/// Roles de color con nombres de las pantallas anteriores, calculados desde
+/// la paleta (`context.q`) de cada modo.
 @immutable
 class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
   const LifeQuestPalette({
@@ -68,10 +51,10 @@ class LifeQuestPalette extends ThemeExtension<LifeQuestPalette> {
   final Color warning;
 
   static final light = LifeQuestPalette.fromQuestly(
-    QuestlyPalette.of(QuestlyRealm.bosque, dark: false),
+    QuestlyPalette.of(dark: false),
   );
   static final dark = LifeQuestPalette.fromQuestly(
-    QuestlyPalette.of(QuestlyRealm.bosque, dark: true),
+    QuestlyPalette.of(dark: true),
   );
 
   @override
@@ -104,20 +87,11 @@ extension LifeQuestPaletteContext on BuildContext {
       Theme.of(this).extension<LifeQuestPalette>() ?? LifeQuestPalette.light;
 }
 
-/// El dominio no conoce el tema visual: aquí se traduce el tema guardado.
-QuestlyRealm questlyRealmOf(ThemeRealm realm) => switch (realm) {
-  ThemeRealm.bosque => QuestlyRealm.bosque,
-  ThemeRealm.rio => QuestlyRealm.rio,
-  ThemeRealm.brasa => QuestlyRealm.brasa,
-  ThemeRealm.oro => QuestlyRealm.oro,
-};
-
 abstract final class LifeQuestTheme {
-  /// Tema Questly del modo y tema del reino, con las dos paletas: la nueva
-  /// (`context.q`) y la de las pantallas aún no migradas (`context.lq`).
-  static ThemeData build(QuestlyRealm realm, {required bool dark}) {
-    final q = QuestlyPalette.of(realm, dark: dark);
-    final base = questlyTheme(realm: realm, dark: dark);
+  /// Tema del modo con las dos paletas: `context.q` y `context.lq`.
+  static ThemeData build({required bool dark}) {
+    final q = QuestlyPalette.of(dark: dark);
+    final base = questlyTheme(dark: dark);
     return base.copyWith(
       // Hojas, diálogos y avisos de Material sin color propio siguen al tema.
       colorScheme: base.colorScheme.copyWith(
@@ -133,10 +107,6 @@ abstract final class LifeQuestTheme {
     );
   }
 
-  static final light = build(QuestlyRealm.bosque, dark: false);
-  static final dark = build(QuestlyRealm.bosque, dark: true);
-
-  /// shortcut: fuerza el tema claro en pantallas que aún usan LifeQuestColors
-  /// fijos (sobre fondo oscuro su texto sería ilegible); quitar al migrarlas.
-  static Widget lightOnly(Widget child) => Theme(data: light, child: child);
+  static final light = build(dark: false);
+  static final dark = build(dark: true);
 }

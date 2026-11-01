@@ -31,7 +31,7 @@ class AppShell extends StatelessWidget {
             ? null
             : FloatingActionButton.small(
                 heroTag: 'brain_dump',
-                tooltip: 'Brain Dump: anota una idea',
+                tooltip: 'Bandeja: anota una idea',
                 backgroundColor: q.accent,
                 foregroundColor: q.onAccent,
                 onPressed: () => context.push(RoutePaths.brainDump),

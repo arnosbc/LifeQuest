@@ -37,7 +37,7 @@ class NotificationsHeader extends StatelessWidget {
           style: TextStyle(
             color: context.lq.ink,
             fontSize: 16,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),

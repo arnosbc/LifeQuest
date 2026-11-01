@@ -77,7 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               _ => Center(
                 child: Semantics(
-                  label: 'Preparando tu aventura',
+                  label: 'Preparando tu espacio',
                   child: CircularProgressIndicator(color: context.lq.deepGreen),
                 ),
               ),
@@ -187,7 +187,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       )
                     : Text(switch (_step) {
                         0 => 'Empezar',
-                        _ when last => 'Entrar al reino',
+                        _ when last => 'Empezar',
                         _ => 'Continuar',
                       }),
               ),

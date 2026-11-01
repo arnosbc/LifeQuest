@@ -21,8 +21,3 @@ class HomeHabitCompleted extends HomeEvent {
   @override
   List<Object?> get props => [habitId];
 }
-
-/// El usuario abrió el cofre del día.
-class HomeChestClaimed extends HomeEvent {
-  const HomeChestClaimed();
-}

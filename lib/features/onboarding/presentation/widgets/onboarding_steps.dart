@@ -14,11 +14,11 @@ class WelcomeStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       _Title('Bienvenido a LifeQuest'),
-      _Body('Tu progreso real hace progresar a tu personaje.'),
+      _Body('Lo que cumples en tu día se convierte en progreso visible.'),
       SizedBox(height: 20),
       LifeQuestSurface(
         padding: EdgeInsets.all(16),
-        child: _Body('Tarea → XP y Monedas → Nivel'),
+        child: _Body('Tarea → XP → Nivel'),
       ),
     ],
   );
@@ -33,7 +33,7 @@ class IdentityStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _Title('¿Quién eres en este reino?'),
+      const _Title('¿Qué quieres lograr este año?'),
       const _Body('Puedes dejarlo para después.'),
       const SizedBox(height: 16),
       TextField(
@@ -71,14 +71,14 @@ class SkillStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const _Title('¿Qué área de tu vida quieres hacer crecer?'),
-      const _Body('Será tu primera skill. Puedes dejarlo para después.'),
+      const _Body('Será tu primera área. Puedes dejarlo para después.'),
       const SizedBox(height: 16),
       TextField(
         controller: controller,
         maxLength: OnboardingChoices.skillMaxLength,
         textCapitalization: TextCapitalization.sentences,
         decoration: const InputDecoration(
-          labelText: 'Nombre de la skill',
+          labelText: 'Nombre de el área',
           border: OutlineInputBorder(),
         ),
       ),
@@ -124,8 +124,7 @@ class DifficultyStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const _Title('Elige tu dificultad'),
-      if (DifficultyPicker.sameCoins(options))
-        const _Body('Las Monedas son iguales en las tres.'),
+      const _Body('Cambia cuánta XP ganas. Lo puedes ajustar luego.'),
       const SizedBox(height: 16),
       DifficultyPicker(
         options: options,
@@ -138,7 +137,7 @@ class DifficultyStep extends StatelessWidget {
           Icon(Icons.info_outline_rounded, size: 18, color: context.lq.muted),
           const SizedBox(width: 6),
           const Expanded(
-            child: _Body('Después solo podrás cambiarla en Configuración.'),
+            child: _Body('Después solo podrás cambiarla en Ajustes.'),
           ),
         ],
       ),
@@ -171,7 +170,7 @@ class SummaryStep extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _Row('Identidad', _or(identity, 'Sin identidad por ahora')),
-            _Row('Skill', _or(skill, 'Sin skill por ahora')),
+            _Row('Área', _or(skill, 'Sin área por ahora')),
             _Row('Dificultad', difficultyName(difficulty)),
           ],
         ),
@@ -198,7 +197,7 @@ class _Title extends StatelessWidget {
         style: TextStyle(
           color: context.lq.ink,
           fontSize: 21,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w700,
         ),
       ),
     ),

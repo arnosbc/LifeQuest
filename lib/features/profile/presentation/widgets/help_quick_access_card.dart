@@ -32,7 +32,7 @@ class HelpQuickAccessCard extends StatelessWidget {
             style: TextStyle(
               color: context.lq.ink,
               fontSize: 9,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 2),

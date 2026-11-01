@@ -46,7 +46,7 @@ class _HelpScreenState extends State<HelpScreen> {
     ),
     (
       '¿Cómo gano experiencia?',
-      'Completa misiones, registra hábitos y termina sesiones de concentración para recibir XP.',
+      'Completa tareas, registra hábitos y termina sesiones de concentración para recibir XP.',
     ),
     (
       '¿Cómo cambio mi apariencia?',
@@ -76,7 +76,7 @@ class _HelpScreenState extends State<HelpScreen> {
           style: TextStyle(
             color: context.lq.ink,
             fontSize: 13,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 3),
@@ -168,7 +168,7 @@ class _HelpScreenState extends State<HelpScreen> {
             style: TextStyle(
               color: context.lq.ink,
               fontSize: 17,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 10),

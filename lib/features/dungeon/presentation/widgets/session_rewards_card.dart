@@ -31,7 +31,7 @@ class SessionRewardsCard extends StatelessWidget {
           style: TextStyle(
             color: context.lq.muted,
             fontSize: 9,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 7),
@@ -39,10 +39,6 @@ class SessionRewardsCard extends StatelessWidget {
           children: [
             Expanded(
               child: LifeQuestStat(value: '$xp XP', label: 'XP ganada'),
-            ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: LifeQuestStat(value: '$coins ◉', label: 'Monedas ganadas'),
             ),
           ],
         ),

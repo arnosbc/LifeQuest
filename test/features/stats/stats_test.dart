@@ -53,7 +53,7 @@ void main() {
 
     test('sin actividad invitan sin culpa y siempre son 3 o menos', () {
       final notes = const StatsBoard().observations;
-      expect(notes.first, contains('una misión pequeña basta'));
+      expect(notes.first, contains('una tarea pequeña basta'));
       expect(notes.length, lessThanOrEqualTo(3));
       for (final n in notes) {
         expect(n.toLowerCase(), isNot(contains('perder')));

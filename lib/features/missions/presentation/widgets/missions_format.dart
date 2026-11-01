@@ -37,7 +37,7 @@ abstract final class MissionsFormat {
       mission.goalTitle ??
       mission.projectTitle ??
       mission.skillName ??
-      'Misión libre';
+      'Tarea libre';
 
   /// "Hoy · 18:00", "Mañana · 09:30", "12 oct · 18:00" o, si ya pasó,
   /// "Pendiente desde el 12 oct" (sin culpa, solo el dato).

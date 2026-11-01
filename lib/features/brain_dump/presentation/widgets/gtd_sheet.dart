@@ -125,7 +125,7 @@ class _GtdSheetState extends State<GtdSheet> {
       ),
       _Step.details => (
         '¿Tiene un momento específico?',
-        [('Crear misión', () => _convert(ThoughtKind.task))],
+        [('Crear tarea', () => _convert(ThoughtKind.task))],
       ),
     };
 
@@ -155,7 +155,7 @@ class _GtdSheetState extends State<GtdSheet> {
               style: TextStyle(
                 color: context.lq.ink,
                 fontSize: 18,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 12),

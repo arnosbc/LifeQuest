@@ -9,6 +9,7 @@ void main() {
       home: Scaffold(
         body: DashboardGreeting(
           userName: 'Alex',
+          subtitle: 'Te queda 1 tarea para hoy.',
           onOpenProfile: () {},
           now: now,
         ),

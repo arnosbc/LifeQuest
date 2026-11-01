@@ -4,7 +4,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 
 /// Hábitos buenos de hoy. Tocar uno pendiente lo registra; registrarlo da
-/// XP y Monedas en el servidor, así que no se desmarca desde aquí.
+/// XP en el servidor, así que no se desmarca desde aquí.
 class HabitStrip extends StatelessWidget {
   const HabitStrip({
     super.key,

@@ -63,10 +63,7 @@ void main() {
     expect(
       await repository.setActiveTitle('t9'),
       const Left<Failure, Unit>(
-        ServerFailure(
-          'Ese título todavía no es tuyo. Los títulos se ganan con logros, '
-          'nivel y Tesoro.',
-        ),
+        ServerFailure('Ese título todavía no es tuyo.'),
       ),
     );
   });
@@ -86,10 +83,10 @@ void main() {
 
   final cases = {
     const ServerException(code: 'skill_limit_reached', statusCode: 'P0001'):
-        'Ya tienes el máximo de skills. Libera una o amplía el límite en '
-        'Game Master.',
+        'Ya tienes el máximo de áreas. Libera una o amplía el límite en '
+        'Ajustes.',
     const ServerException(code: 'update or delete…', statusCode: '23503'):
-        'Un NPC de la Taverna usa esta skill. Asígnale otra antes de '
+        'Hay datos que dependen de esta área. Reasígnalos antes de '
         'eliminarla.',
     const ServerException(code: 'new row violates…', statusCode: '23514'):
         'Usa un nombre de 1 a 40 caracteres y una identidad de hasta 280.',

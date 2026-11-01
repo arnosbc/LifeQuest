@@ -22,7 +22,6 @@ class HomeSuccess extends HomeState {
     this.dashboard, {
     this.refreshing = false,
     this.busyHabitId,
-    this.claimingChest = false,
     this.message,
   });
 
@@ -34,20 +33,11 @@ class HomeSuccess extends HomeState {
   /// Hábito que se está registrando.
   final String? busyHabitId;
 
-  /// Abriendo el cofre del día.
-  final bool claimingChest;
-
   /// Aviso puntual para mostrar en un snackbar (p. ej. un error al registrar).
   final String? message;
 
   @override
-  List<Object?> get props => [
-    dashboard,
-    refreshing,
-    busyHabitId,
-    claimingChest,
-    message,
-  ];
+  List<Object?> get props => [dashboard, refreshing, busyHabitId, message];
 }
 
 /// La primera carga falló; no hay datos que mostrar.

@@ -40,7 +40,7 @@ class CycleDurationCard extends StatelessWidget {
           style: TextStyle(
             color: context.lq.muted,
             fontSize: 9,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 7),
@@ -62,7 +62,7 @@ class CycleDurationCard extends StatelessWidget {
           style: TextStyle(
             color: context.lq.muted,
             fontSize: 9,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
           ),
         ),
         Row(
@@ -81,7 +81,7 @@ class CycleDurationCard extends StatelessWidget {
                 style: TextStyle(
                   color: context.lq.ink,
                   fontSize: 13,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

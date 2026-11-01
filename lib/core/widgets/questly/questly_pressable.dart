@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Superficie «de juego»: al pulsarla baja 3 px y pierde la sombra sólida
-/// (DESIGN.md §1). Con foco de teclado muestra el anillo de foco.
+/// Superficie pulsable: al pulsarla se atenúa un poco. Con foco de teclado
+/// muestra el anillo de foco.
 class QuestlyPressable extends StatefulWidget {
   const QuestlyPressable({
     super.key,
@@ -44,33 +44,33 @@ class _QuestlyPressableState extends State<QuestlyPressable> {
       enabled: widget.onTap != null,
       selected: widget.selected,
       label: widget.semanticsLabel,
-      child: AnimatedContainer(
+      child: AnimatedOpacity(
         duration: context.motion(QMotion.press),
-        transform: Matrix4.translationValues(0, pressed ? 3 : 0, 0),
-        constraints: widget.constraints,
-        decoration: pressed
-            ? widget.decoration.copyWith(boxShadow: const [])
-            : widget.decoration,
-        foregroundDecoration: _focused
-            ? BoxDecoration(
-                borderRadius: borderRadius,
-                border: Border.all(color: context.q.focus, width: 3),
-              )
-            : null,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            onTap: widget.onTap,
-            borderRadius: borderRadius,
-            splashFactory: NoSplash.splashFactory,
-            highlightColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            onHighlightChanged: (v) => setState(() => _pressed = v),
-            onFocusChange: (v) => setState(() => _focused = v),
-            child: Padding(
-              padding: widget.padding ?? EdgeInsets.zero,
-              child: widget.child,
+        opacity: pressed ? 0.7 : 1,
+        child: Container(
+          constraints: widget.constraints,
+          decoration: widget.decoration,
+          foregroundDecoration: _focused
+              ? BoxDecoration(
+                  borderRadius: borderRadius,
+                  border: Border.all(color: context.q.focus, width: 3),
+                )
+              : null,
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: widget.onTap,
+              borderRadius: borderRadius,
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              onHighlightChanged: (v) => setState(() => _pressed = v),
+              onFocusChange: (v) => setState(() => _focused = v),
+              child: Padding(
+                padding: widget.padding ?? EdgeInsets.zero,
+                child: widget.child,
+              ),
             ),
           ),
         ),

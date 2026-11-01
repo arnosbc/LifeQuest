@@ -45,7 +45,7 @@ class HabitCalendar extends StatelessWidget {
               style: TextStyle(
                 color: context.lq.muted,
                 fontSize: 10,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
             Text(

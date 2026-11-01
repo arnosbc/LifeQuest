@@ -34,7 +34,7 @@ class DeepWorkSessionCard extends StatelessWidget {
             style: TextStyle(
               color: context.lq.muted,
               fontSize: 9,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 10),
@@ -59,15 +59,15 @@ class DeepWorkSessionCard extends StatelessWidget {
           ),
           const SizedBox(height: 11),
           Text(
-            'MOCHILA · ${session.tasks.length} misiones · $done completadas',
+            'MOCHILA · ${session.tasks.length} tareas · $done completadas',
             style: TextStyle(
               color: context.lq.muted,
               fontSize: 9,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
           Text(
-            'Toca una misión para concentrarte en ella este ciclo.',
+            'Toca una tarea para concentrarte en ella este ciclo.',
             style: TextStyle(color: context.lq.muted, fontSize: 9),
           ),
           for (final task in session.tasks) _task(context, task),

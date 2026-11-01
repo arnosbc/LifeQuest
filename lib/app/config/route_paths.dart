@@ -8,15 +8,15 @@ abstract final class RoutePaths {
   // Primer inicio de sesión, antes de Inicio.
   static const onboarding = '/onboarding';
 
-  // Pestañas de la barra inferior (§13: Inicio · Stage · Hábitos · Mazmorra · Perfil).
+  // Pestañas de la barra inferior: Hoy · Tareas · Hábitos · Foco · Tú.
   static const home = '/home';
-  static const stage = '/stage';
+  static const missions = '/tasks';
   static const habits = '/habits';
   static const dungeon = '/dungeon';
   static const profile = '/profile';
 
-  // Dentro de la pestaña Stage.
-  static const missions = '/stage/missions';
+  // Dentro de la pestaña Tareas: proyectos, metas y recursos (P.A.R.A.).
+  static const stage = '/tasks/projects';
 
   // Subpáginas de perfil (dentro de la pestaña Perfil).
   static const notifications = '/profile/notifications';
@@ -27,17 +27,9 @@ abstract final class RoutePaths {
 
   // Subpáginas de Configuración.
   static const appearance = '/settings/appearance';
-  // Galería de componentes Questly (solo en modo debug).
-  static const designPreview = '/settings/diseno';
-  static const rpgenie = '/rpgenie';
   static const journal = '/journal';
-  static const goals = '/goals';
-  static const tavern = '/tavern';
-  static const marketplace = '/marketplace';
   static const brainDump = '/brain-dump';
 
   // Desde Perfil (§13).
   static const stats = '/stats';
-  static const vision = '/vision';
-  static const inventory = '/inventory';
 }

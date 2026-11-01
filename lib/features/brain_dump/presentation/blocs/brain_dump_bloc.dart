@@ -53,10 +53,10 @@ class BrainDumpBloc extends Bloc<BrainDumpEvent, BrainDumpState> {
         e.conversion.thoughtId,
         () => _convert(e.conversion),
         switch (e.conversion.kind) {
-          ThoughtKind.task => 'Misión creada. Ya está en tu Stage.',
+          ThoughtKind.task => 'Tarea creada. Ya está en Tareas.',
           ThoughtKind.done => '¡Hecho en un momento! Una menos.',
-          ThoughtKind.delegated => 'Delegada. Queda pendiente en tu Stage.',
-          ThoughtKind.project => 'Proyecto creado en tu Stage.',
+          ThoughtKind.delegated => 'Delegada. Queda pendiente en Tareas.',
+          ThoughtKind.project => 'Proyecto creado.',
         },
       ),
       transformer: droppable(),

@@ -77,7 +77,7 @@ class DungeonBoard extends Equatable {
   /// XP base por ciclo (sin multiplicadores).
   final int cycleXp;
 
-  /// RF-067: descansos que el jugador eligió en Configuración.
+  /// RF-067: descansos que el jugador eligió en Ajustes.
   final int shortBreakMinutes;
   final int longBreakMinutes;
   final int longBreakEveryNCycles;

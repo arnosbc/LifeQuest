@@ -6,11 +6,13 @@ class DashboardGreeting extends StatelessWidget {
   const DashboardGreeting({
     super.key,
     required this.userName,
+    required this.subtitle,
     required this.onOpenProfile,
     this.now,
   });
 
   final String userName;
+  final String subtitle;
   final VoidCallback onOpenProfile;
   final DateTime? now;
 
@@ -58,9 +60,9 @@ class DashboardGreeting extends StatelessWidget {
                 '${_weekdays[date.weekday - 1]}, ${date.day} de '
                 '${_months[date.month - 1]}',
                 style: TextStyle(
-                  color: context.lq.deepGreen,
+                  color: context.lq.muted,
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 4),
@@ -70,32 +72,21 @@ class DashboardGreeting extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: context.lq.ink,
-                  fontSize: 24,
+                  fontSize: 26,
                   height: 1.2,
-                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.6,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                'Tu siguiente avance está listo.',
+                subtitle,
                 style: TextStyle(color: context.lq.muted, fontSize: 15),
               ),
             ],
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          tooltip: 'Notificaciones',
-          onPressed: () =>
-              showLifeQuestMessage(context, 'No tienes notificaciones nuevas.'),
-          icon: const Icon(Icons.notifications_none_rounded, size: 22),
-          style: IconButton.styleFrom(
-            backgroundColor: context.lq.surface,
-            foregroundColor: context.lq.ink,
-            side: BorderSide(color: context.lq.line),
-            minimumSize: const Size(48, 48),
-          ),
-        ),
         IconButton(
           tooltip: 'Abrir perfil',
           onPressed: onOpenProfile,

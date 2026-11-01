@@ -87,7 +87,7 @@ class _BrainDumpScreenState extends State<BrainDumpScreen> {
     final board = state.board;
     final idle = state.busyKey == null;
     return LifeQuestPage(
-      title: 'Brain Dump',
+      title: 'Bandeja',
       subtitle: 'Saca de tu cabeza todo lo pendiente. Luego decides.',
       children: [
         Row(

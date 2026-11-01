@@ -18,7 +18,7 @@ class SkillDeleteRequested extends SkillSheetResult {
   const SkillDeleteRequested();
 }
 
-/// Edita el nombre y la respuesta a «¿Quién eres en este reino?».
+/// Edita el nombre y la respuesta a «¿Qué quieres lograr este año?».
 /// Devuelve `(nombre, identidad)` o null si se cierra sin guardar.
 Future<(String, String)?> showIdentitySheet(
   BuildContext context, {
@@ -101,7 +101,7 @@ class _TitlePicker extends StatelessWidget {
       child: earned.isEmpty
           ? Text(
               'Aún no tienes títulos. Se ganan con logros, subiendo de nivel '
-              'y llenando tu Tesoro del reino.',
+              'y llenando tu historial.',
               style: TextStyle(color: lq.muted, fontSize: 15, height: 1.4),
             )
           : Column(
@@ -160,7 +160,7 @@ class _IdentityFormState extends State<_IdentityForm> {
             maxLength: 40,
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.words,
-            decoration: _decoration(context, 'Nombre del héroe'),
+            decoration: _decoration(context, 'Tu nombre'),
             validator: (value) => (value ?? '').trim().isEmpty
                 ? 'Escribe cómo quieres que te llamemos.'
                 : null,
@@ -174,7 +174,7 @@ class _IdentityFormState extends State<_IdentityForm> {
             textCapitalization: TextCapitalization.sentences,
             decoration: _decoration(
               context,
-              '¿Quién eres en este reino?',
+              '¿Qué quieres lograr este año?',
               hint: 'Ej.: Una estratega que termina lo que empieza.',
             ),
           ),
@@ -219,7 +219,7 @@ class _SkillFormState extends State<_SkillForm> {
         title: Text('¿Eliminar «${widget.name}»?'),
         content: const Text(
           'Se quitará de tus metas, proyectos, tareas y hábitos, y su nivel '
-          'no se podrá recuperar. Tu XP y tu nivel de personaje no cambian.',
+          'no se podrá recuperar. Tu XP y tu nivel no cambian.',
         ),
         actions: [
           TextButton(
@@ -241,7 +241,7 @@ class _SkillFormState extends State<_SkillForm> {
 
   @override
   Widget build(BuildContext context) => _SheetFrame(
-    title: _isNew ? 'Nueva skill' : 'Editar skill',
+    title: _isNew ? 'Nueva área' : 'Editar área',
     child: Form(
       key: _formKey,
       child: Column(
@@ -251,7 +251,7 @@ class _SkillFormState extends State<_SkillForm> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
-                'Una skill es un área de tu vida que quieres hacer crecer: '
+                'Un área agrupa lo que haces en una parte de tu vida: '
                 'Salud, Inglés, Universidad…',
                 style: TextStyle(color: context.lq.muted, fontSize: 13),
               ),
@@ -263,14 +263,14 @@ class _SkillFormState extends State<_SkillForm> {
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _save(),
-            decoration: _decoration(context, 'Nombre de la skill'),
+            decoration: _decoration(context, 'Nombre del área'),
             validator: (value) => (value ?? '').trim().isEmpty
-                ? 'Ponle un nombre a tu skill.'
+                ? 'Ponle un nombre al área.'
                 : null,
           ),
           const SizedBox(height: 8),
           _PrimaryButton(
-            label: _isNew ? 'Crear skill' : 'Guardar',
+            label: _isNew ? 'Crear área' : 'Guardar',
             onPressed: _save,
           ),
           if (!_isNew) ...[
@@ -278,7 +278,7 @@ class _SkillFormState extends State<_SkillForm> {
             TextButton.icon(
               onPressed: _delete,
               icon: const Icon(Icons.delete_outline_rounded, size: 20),
-              label: const Text('Eliminar skill'),
+              label: const Text('Eliminar área'),
               style: TextButton.styleFrom(
                 foregroundColor: context.lq.error,
                 minimumSize: const Size.fromHeight(48),
@@ -317,7 +317,7 @@ class _SheetFrame extends StatelessWidget {
               style: TextStyle(
                 color: context.lq.ink,
                 fontSize: 21,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),

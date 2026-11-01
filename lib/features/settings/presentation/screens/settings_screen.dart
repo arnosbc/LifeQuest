@@ -36,7 +36,7 @@ class SettingsScreen extends StatelessWidget {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as SettingsSuccess).message!),
     builder: (context, state) => LifeQuestPage(
-      title: 'Configuración',
+      title: 'Ajustes',
       subtitle: 'Tus reglas del juego. Cámbialas cuando quieras.',
       trailing: IconButton(
         onPressed: onBack,
@@ -134,15 +134,13 @@ class SettingsScreen extends StatelessWidget {
     return [
       const LifeQuestSectionHeading('DIFICULTAD'),
       const SizedBox(height: 4),
-      if (DifficultyPicker.sameCoins(overview.difficulties))
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            'Cambia la XP que ganas y la vida que pierdes. Las Monedas son '
-            'iguales en las tres.',
-            style: TextStyle(color: context.lq.muted, fontSize: 12),
-          ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          'Cambia cuánta XP ganas por cada cosa que cumples.',
+          style: TextStyle(color: context.lq.muted, fontSize: 13),
         ),
+      ),
       DifficultyPicker(
         options: overview.difficulties,
         selected: settings.difficulty,
@@ -162,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       SettingLink(
         icon: Icons.timer_outlined,
-        title: 'Descansos de la Mazmorra',
+        title: 'Descansos del foco',
         description: breaksSummary(settings),
         onTap: saving ? null : () => edit(showBreaksSheet),
       ),

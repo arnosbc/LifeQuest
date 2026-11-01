@@ -133,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Semantics(
           header: true,
           child: Text(
-            'Crea tu Héroe',
+            'Crea tu cuenta',
             style: TextStyle(
               color: context.lq.ink,
               fontSize: 28,

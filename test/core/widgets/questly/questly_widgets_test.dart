@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 
-Widget _app(
-  Widget child, {
-  bool dark = false,
-  QuestlyRealm realm = QuestlyRealm.bosque,
-}) => MaterialApp(
-  theme: LifeQuestTheme.build(realm, dark: dark),
+Widget _app(Widget child, {bool dark = false}) => MaterialApp(
+  theme: LifeQuestTheme.build(dark: dark),
   home: Scaffold(
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -20,30 +15,22 @@ Widget _app(
 );
 
 void main() {
-  setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
-
-  testWidgets('los componentes se pintan en claro, oscuro y los 4 temas', (
-    tester,
-  ) async {
-    for (final realm in QuestlyRealm.values) {
-      for (final dark in [false, true]) {
-        await tester.pumpWidget(
-          _app(
-            dark: dark,
-            realm: realm,
-            Column(
-              children: [
-                const QuestlyHero(kicker: 'Diario', heading: 'Bitácora'),
-                QuestlyButton(label: 'Principal', onPressed: () {}),
-                const QuestlyCard(child: Text('Tarjeta')),
-                const QuestlyPriorityChip(QuestlyPriority.high),
-              ],
-            ),
+  testWidgets('los componentes se pintan en claro y oscuro', (tester) async {
+    for (final dark in [false, true]) {
+      await tester.pumpWidget(
+        _app(
+          dark: dark,
+          Column(
+            children: [
+              QuestlyButton(label: 'Principal', onPressed: () {}),
+              const QuestlyCard(child: Text('Tarjeta')),
+              const QuestlyPriorityChip(QuestlyPriority.high),
+            ],
           ),
-        );
-        expect(tester.takeException(), isNull);
-        expect(find.text('Bitácora'), findsOneWidget);
-      }
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text('Tarjeta'), findsOneWidget);
     }
   });
 
@@ -58,7 +45,7 @@ void main() {
             QuestlyButton(label: 'Guardar', onPressed: () => taps++),
             const QuestlyButton(
               label: 'Comprar',
-              disabledReason: 'Te faltan 20 Monedas',
+              disabledReason: 'Escribe un título',
               onPressed: null,
             ),
           ],
@@ -66,7 +53,7 @@ void main() {
       ),
     );
     await tester.tap(find.text('Guardar'));
-    await tester.tap(find.text('Te faltan 20 Monedas'));
+    await tester.tap(find.text('Escribe un título'));
     expect(taps, 1);
     expect(find.text('Comprar'), findsNothing);
     expect(
@@ -83,13 +70,6 @@ void main() {
       _app(
         Column(
           children: [
-            QuestlyHero(
-              kicker: 'Tablero de misiones',
-              heading: 'Stage',
-              onBack: () {},
-              onAction: () {},
-              actionLabel: 'Crear',
-            ),
             QuestlyFilterChip(label: 'Hoy', selected: true, onTap: () {}),
             QuestlySegmented<int>(
               segments: const [(0, 'Hoy'), (1, 'Calendario')],
@@ -101,8 +81,6 @@ void main() {
         ),
       ),
     );
-    expect(find.bySemanticsLabel('Volver'), findsOneWidget);
-    expect(find.bySemanticsLabel('Crear'), findsOneWidget);
     expect(find.bySemanticsLabel('Cerrar'), findsOneWidget);
     await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
@@ -116,7 +94,7 @@ void main() {
     int? tapped;
     await tester.pumpWidget(
       MaterialApp(
-        theme: LifeQuestTheme.build(QuestlyRealm.bosque, dark: false),
+        theme: LifeQuestTheme.light,
         home: Scaffold(
           bottomNavigationBar: QuestlyNavBar(
             currentIndex: 1,
@@ -125,22 +103,22 @@ void main() {
         ),
       ),
     );
-    for (final label in ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil']) {
+    for (final label in ['Hoy', 'Tareas', 'Hábitos', 'Foco', 'Tú']) {
       expect(find.text(label), findsOneWidget);
     }
     expect(
-      tester.getSemantics(find.text('Stage')),
+      tester.getSemantics(find.text('Tareas')),
       matchesSemantics(
         isButton: true,
         isSelected: true,
         hasSelectedState: true,
-        label: 'Stage',
+        label: 'Tareas',
         hasTapAction: true,
         isFocusable: true,
         hasFocusAction: true,
       ),
     );
-    await tester.tap(find.text('Mazmorra'));
+    await tester.tap(find.text('Foco'));
     expect(tapped, 3);
     // La barra mide lo suyo y deja ver la pantalla.
     expect(tester.getSize(find.byType(QuestlyNavBar)).height, lessThan(100));
@@ -180,7 +158,7 @@ void main() {
                 label: 'Hoja',
                 onPressed: () => showQuestlySheet<void>(
                   context,
-                  title: 'Tu carrito',
+                  title: 'Nueva tarea',
                   child: const Text('Contenido'),
                 ),
               ),
@@ -199,10 +177,10 @@ void main() {
     );
     await tester.tap(find.text('Hoja'));
     await tester.pumpAndSettle();
-    expect(find.text('Tu carrito'), findsOneWidget);
+    expect(find.text('Nueva tarea'), findsOneWidget);
     await tester.tap(find.byTooltip('Cerrar'));
     await tester.pumpAndSettle();
-    expect(find.text('Tu carrito'), findsNothing);
+    expect(find.text('Nueva tarea'), findsNothing);
 
     await tester.tap(find.text('Diálogo'));
     await tester.pumpAndSettle();

@@ -19,14 +19,9 @@ class DifficultyPicker extends StatelessWidget {
   /// Null deshabilita las opciones (p. ej. mientras se guarda).
   final ValueChanged<GameDifficulty>? onSelected;
 
-  /// Si las Monedas no cambian entre niveles, basta con decirlo una vez.
-  static bool sameCoins(List<DifficultyOption> options) =>
-      options.map((o) => o.coinMultiplier).toSet().length <= 1;
-
   @override
   Widget build(BuildContext context) {
     final lq = context.lq;
-    final coins = !sameCoins(options);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -66,9 +61,7 @@ class DifficultyPicker extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'XP ${multiplier(option.xpMultiplier)} · '
-                              'Vida perdida ${multiplier(option.hpPenaltyMultiplier)}'
-                              '${coins ? ' · Monedas ${multiplier(option.coinMultiplier)}' : ''}',
+                              'XP ${multiplier(option.xpMultiplier)}',
                               style: TextStyle(color: lq.muted, fontSize: 13),
                             ),
                           ],

@@ -59,7 +59,7 @@ void main() {
     await pump(tester);
     expect(find.text('Nivel 7'), findsOneWidget);
     expect(find.text('120 / 1852 XP'), findsOneWidget);
-    expect(find.text('XP ×0,85 · Vida perdida ×1,25'), findsOneWidget);
+    expect(find.text('XP ×0,85'), findsOneWidget);
     expect(find.text('Sin límite diario · sin silencio'), findsOneWidget);
     expect(find.text('5 min, y 15 min cada 4 ciclos'), findsOneWidget);
   });
@@ -94,9 +94,9 @@ void main() {
     );
   });
 
-  testWidgets('cambiar los descansos de la Mazmorra', (tester) async {
+  testWidgets('cambiar los descansos de la Foco', (tester) async {
     await pump(tester);
-    await tester.tap(find.text('Descansos de la Mazmorra'));
+    await tester.tap(find.text('Descansos del foco'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Más').first);
     await tester.tap(find.byTooltip('Menos').last);
@@ -113,6 +113,8 @@ void main() {
     await pump(tester);
     final link = find.text('Modo claro, oscuro o del sistema.');
     await tester.scrollUntilVisible(link, 100);
+    await tester.ensureVisible(link);
+    await tester.pumpAndSettle();
     await tester.tap(link);
     expect(appearanceOpened, 1);
   });

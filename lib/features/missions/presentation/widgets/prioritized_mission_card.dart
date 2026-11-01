@@ -35,11 +35,11 @@ class PrioritizedMissionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'MISIÓN PRIORIZADA',
+              'TAREA PRIORIZADA',
               style: TextStyle(
                 color: context.lq.deepGreen,
                 fontSize: 10,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
             menu ??
@@ -53,7 +53,7 @@ class PrioritizedMissionCard extends StatelessWidget {
             color: context.lq.ink,
             fontSize: 20,
             height: 1.2,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
           ),
         ),
         if (mission.description case final description?) ...[
@@ -78,11 +78,7 @@ class PrioritizedMissionCard extends StatelessWidget {
             '${mission.subtasksDone} de ${mission.subtasksTotal}',
           ),
         const Divider(height: 20),
-        _detail(
-          context,
-          'Recompensa',
-          '${mission.xpReward} XP    ·    ${mission.coinReward} monedas',
-        ),
+        _detail(context, 'Recompensa', '${mission.xpReward} XP'),
         const SizedBox(height: 9),
         SizedBox(
           width: double.infinity,
@@ -96,7 +92,7 @@ class PrioritizedMissionCard extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.check_rounded),
-            label: Text(busy ? 'Completando…' : 'Completar misión'),
+            label: Text(busy ? 'Completando…' : 'Completar tarea'),
             style: FilledButton.styleFrom(backgroundColor: context.lq.green),
           ),
         ),

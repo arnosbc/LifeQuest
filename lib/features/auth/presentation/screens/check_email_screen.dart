@@ -50,7 +50,7 @@ class CheckEmailScreen extends StatelessWidget {
       ),
       const SizedBox(height: 8),
       Text(
-        'Tu Héroe «$username» ya existe. Solo falta activarlo con el enlace '
+        'Tu cuenta «$username» ya existe. Solo falta activarlo con el enlace '
         'que enviamos a:',
         textAlign: TextAlign.center,
         style: TextStyle(color: context.lq.muted, fontSize: 15, height: 1.4),

@@ -5,6 +5,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 enum QIcons {
+  today(
+    '<rect x="3" y="5" width="18" height="16" rx="2"/>'
+    '<path d="M3 10h18M8 3v4M16 3v4"/>',
+  ),
+  tasks(
+    '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/>',
+  ),
+  focus('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>'),
   sword(
     '<path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/>',
   ),

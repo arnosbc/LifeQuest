@@ -141,7 +141,7 @@ class _NotificationSheetState extends State<_NotificationSheet> {
         ],
         const SizedBox(height: 4),
         Text(
-          'Durante una Mazmorra, los avisos no críticos esperan solos.',
+          'Durante una sesión de foco, los avisos no críticos esperan solos.',
           style: TextStyle(color: lq.muted, fontSize: 12),
         ),
       ],
@@ -165,7 +165,7 @@ class _BreaksSheetState extends State<_BreaksSheet> {
 
   @override
   Widget build(BuildContext context) => _SheetFrame(
-    title: 'Descansos de la Mazmorra',
+    title: 'Descansos del foco',
     onSave: () => Navigator.pop(
       context,
       widget.settings.withBreaks(
@@ -227,7 +227,7 @@ class _SheetFrame extends StatelessWidget {
                 style: TextStyle(
                   color: lq.ink,
                   fontSize: 21,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

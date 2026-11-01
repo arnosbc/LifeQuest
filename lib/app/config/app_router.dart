@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
-import 'package:proyecto_movil/app/config/design_preview_screen.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
@@ -17,42 +16,28 @@ import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump
 import 'package:proyecto_movil/features/brain_dump/presentation/screens/brain_dump_screen.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
-import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
-import 'package:proyecto_movil/features/goals/presentation/screens/goals_screen.dart';
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
-import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
-import 'package:proyecto_movil/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
 import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
-import 'package:proyecto_movil/features/marketplace/presentation/blocs/marketplace_bloc.dart';
-import 'package:proyecto_movil/features/marketplace/presentation/screens/marketplace_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:proyecto_movil/features/missions/presentation/screens/missions_screen.dart';
-import 'package:proyecto_movil/features/profile/domain/entities/theme_realm.dart';
-import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
 import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
 import 'package:proyecto_movil/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
-import 'package:proyecto_movil/features/rpgenie/presentation/blocs/rpgenie_bloc.dart';
-import 'package:proyecto_movil/features/rpgenie/presentation/screens/rpgenie_screen.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
 import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
 import 'package:proyecto_movil/features/stats/presentation/screens/stats_screen.dart';
-import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
-import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
-import 'package:proyecto_movil/features/vision/presentation/blocs/vision_bloc.dart';
-import 'package:proyecto_movil/features/vision/presentation/screens/vision_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 /// Rutas de la app. Aquí se componen las features: cada pantalla recibe por
@@ -143,30 +128,32 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: RoutePaths.stage,
+                path: RoutePaths.missions,
                 builder: (context, state) => BlocProvider(
-                  create: (_) => sl<StageBloc>()..add(const StageRequested()),
+                  create: (_) =>
+                      sl<MissionsBloc>()..add(const MissionsRequested()),
                   child: _ReloadOnShow(
                     location: shellLocation,
-                    path: RoutePaths.stage,
+                    path: RoutePaths.missions,
                     onShown: (c) =>
-                        c.read<StageBloc>().add(const StageRequested()),
-                    child: StageScreen(
-                      onOpenMissions: () => context.go(RoutePaths.missions),
+                        c.read<MissionsBloc>().add(const MissionsRequested()),
+                    child: MissionsScreen(
+                      onStartFocus: () => context.go(RoutePaths.dungeon),
+                      onOpenProjects: () => context.go(RoutePaths.stage),
                     ),
                   ),
                 ),
                 routes: [
                   GoRoute(
-                    path: 'missions',
+                    path: 'projects',
                     builder: (context, state) => Scaffold(
                       backgroundColor: context.lq.background,
                       appBar: AppBar(backgroundColor: context.lq.background),
                       body: BlocProvider(
                         create: (_) =>
-                            sl<MissionsBloc>()..add(const MissionsRequested()),
-                        child: MissionsScreen(
-                          onStartFocus: () => context.go(RoutePaths.dungeon),
+                            sl<StageBloc>()..add(const StageRequested()),
+                        child: StageScreen(
+                          onOpenMissions: () => context.go(RoutePaths.missions),
                         ),
                       ),
                     ),
@@ -204,27 +191,16 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.dungeon,
                     onShown: (c) =>
                         c.read<DungeonBloc>().add(const DungeonRequested()),
-                    // La Mazmorra siempre es oscura (CLAUDE.md §14).
-                    child:
-                        BlocSelector<
-                          AppearanceBloc,
-                          AppearanceState,
-                          ThemeRealm
-                        >(
-                          selector: (state) => state.realm,
-                          builder: (context, realm) => Theme(
-                            data: LifeQuestTheme.build(
-                              questlyRealmOf(realm),
-                              dark: true,
-                            ),
-                            child: Builder(
-                              builder: (context) => ColoredBox(
-                                color: context.lq.background,
-                                child: const DungeonScreen(),
-                              ),
-                            ),
-                          ),
+                    // Foco siempre es oscuro: menos distracción.
+                    child: Theme(
+                      data: LifeQuestTheme.dark,
+                      child: Builder(
+                        builder: (context) => ColoredBox(
+                          color: context.lq.background,
+                          child: const DungeonScreen(),
                         ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -248,12 +224,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                           context.go(RoutePaths.notifications),
                       onOpenHelp: () => context.go(RoutePaths.help),
                       onOpenJournal: () => context.push(RoutePaths.journal),
-                      onOpenMarketplace: () =>
-                          context.push(RoutePaths.marketplace),
                       onOpenSettings: () => context.push(RoutePaths.settings),
                       onOpenStats: () => context.push(RoutePaths.stats),
-                      onOpenVision: () => context.push(RoutePaths.vision),
-                      onOpenInventory: () => context.push(RoutePaths.inventory),
                     ),
                   ),
                 ),
@@ -299,59 +271,17 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             path: 'appearance',
             builder: (context, state) => Scaffold(
               body: SafeArea(
-                child: AppearanceScreen(
-                  onBack: () => context.pop(),
-                  onOpenDesignPreview: kDebugMode
-                      ? () => context.push(RoutePaths.designPreview)
-                      : null,
-                ),
+                child: AppearanceScreen(onBack: () => context.pop()),
               ),
             ),
           ),
-          // Galería de componentes Questly: solo en desarrollo.
-          if (kDebugMode)
-            GoRoute(
-              path: 'diseno',
-              builder: (context, state) => const DesignPreviewScreen(),
-            ),
         ],
-      ),
-      _section(
-        RoutePaths.rpgenie,
-        (context) => BlocProvider(
-          create: (_) => sl<RpgenieBloc>()..add(const RpgenieRequested()),
-          child: RpgenieScreen(
-            onStartFocus: () => context.go(RoutePaths.dungeon),
-          ),
-        ),
       ),
       _section(
         RoutePaths.journal,
         (context) => BlocProvider(
           create: (_) => sl<JournalBloc>()..add(const JournalRequested()),
           child: const JournalScreen(),
-        ),
-      ),
-      _section(
-        RoutePaths.goals,
-        (context) => BlocProvider(
-          create: (_) => sl<GoalsBloc>()..add(const GoalsRequested()),
-          child: GoalsScreen(onCreateGoal: () => context.go(RoutePaths.stage)),
-        ),
-      ),
-      _section(
-        RoutePaths.tavern,
-        (context) => BlocProvider(
-          create: (_) => sl<TavernBloc>()..add(const TavernRequested()),
-          child: const TavernScreen(),
-        ),
-      ),
-      _section(
-        RoutePaths.marketplace,
-        (context) => BlocProvider(
-          create: (_) =>
-              sl<MarketplaceBloc>()..add(const MarketplaceRequested()),
-          child: const MarketplaceScreen(),
         ),
       ),
       _section(
@@ -368,22 +298,6 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         (context) => BlocProvider(
           create: (_) => sl<StatsBloc>()..add(const StatsRequested()),
           child: const StatsScreen(),
-        ),
-      ),
-      _section(
-        RoutePaths.vision,
-        (context) => BlocProvider(
-          create: (_) => sl<VisionBloc>()..add(const VisionRequested()),
-          child: const VisionScreen(),
-        ),
-      ),
-      _section(
-        RoutePaths.inventory,
-        (context) => BlocProvider(
-          create: (_) => sl<InventoryBloc>()..add(const InventoryRequested()),
-          child: InventoryScreen(
-            onOpenMarketplace: () => context.push(RoutePaths.marketplace),
-          ),
         ),
       ),
     ],
@@ -404,7 +318,7 @@ GoRoute _section(String path, WidgetBuilder screen) => GoRoute(
 String _userName(BuildContext context) =>
     switch (context.read<AuthBloc>().state) {
       AuthSuccess(:final user) => user.displayName,
-      _ => 'Héroe',
+      _ => 'de nuevo',
     };
 
 /// Las pestañas viven todo el tiempo (indexedStack): sin esto, lo que cambia en

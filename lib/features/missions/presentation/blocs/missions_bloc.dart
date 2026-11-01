@@ -34,7 +34,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
         emit,
         e.missionId,
         () => _renameMission(RenameParams(e.missionId, e.title)),
-        'Misión renombrada.',
+        'Tarea renombrada.',
       ),
       transformer: droppable(),
     );
@@ -43,7 +43,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
         emit,
         e.missionId,
         () => _deleteMission(e.missionId),
-        'Misión borrada.',
+        'Tarea borrada.',
       ),
       transformer: droppable(),
     );
@@ -92,8 +92,8 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
       emit,
       current.board,
       event.startFocus
-          ? 'Misión creada. ¡Tu sesión de enfoque te espera!'
-          : 'Misión creada. ¡Un paso más hacia tu objetivo!',
+          ? 'Tarea creada. ¡Tu sesión de enfoque te espera!'
+          : 'Tarea creada. ¡Un paso más hacia tu objetivo!',
       focusRequested: event.startFocus,
     );
   }
@@ -110,11 +110,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
       emit(MissionsSuccess(current.board, message: failure.message));
       return;
     }
-    await _reload(
-      emit,
-      current.board,
-      '¡Misión completada! Tu héroe se hace más fuerte.',
-    );
+    await _reload(emit, current.board, '¡Tarea completada!');
   }
 
   /// XP, Monedas y orden los decide el servidor: se vuelven a leer.

@@ -46,13 +46,13 @@ class MissionsRepositoryImpl implements MissionsRepository {
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
-    'invalid_title' => 'Dale a tu misión un nombre de hasta 200 caracteres.',
+    'invalid_title' => 'Dale a tu tarea un nombre de hasta 200 caracteres.',
     'skill_not_found' || 'project_not_found' || 'goal_not_found' =>
-      'Ese vínculo ya no está disponible. Elige otro o deja la misión sin vincular.',
-    'task_not_found' => 'No encontramos esa misión. Desliza para actualizar.',
-    'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+      'Ese vínculo ya no está disponible. Elige otro o deja la tarea sin vincular.',
+    'task_not_found' => 'No encontramos esa tarea. Desliza para actualizar.',
+    'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
     'task_in_use' =>
-      'Esa misión ya tiene Mazmorras jugadas. Complétala en lugar de borrarla.',
+      'Esa tarea ya tiene sesiones de foco. Complétala en lugar de borrarla.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 

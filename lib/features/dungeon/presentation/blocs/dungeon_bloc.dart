@@ -146,9 +146,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     emit(
       board.match(
         (failure) => current.copyWith(busy: false, message: failure.message),
-        (b) => _fresh(
-          b,
-        ).copyWith(message: '¡Entraste a la Mazmorra! A por el primer ciclo.'),
+        (b) => _fresh(b).copyWith(message: 'Foco en marcha. Primer ciclo.'),
       ),
     );
   }
@@ -179,7 +177,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
           now: now,
           phase: DungeonPhase.focus,
           phaseEndsAt: () => now.add(Duration(minutes: session.cycleMinutes)),
-          message: 'Descanso terminado. ¡Siguiente mazmorra!',
+          message: 'Descanso terminado. Siguiente ciclo.',
         ),
       );
       return;
@@ -228,8 +226,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         phaseEndsAt: () => done ? null : now.add(board.breakAfter(cycles)),
         currentTaskId: () => _nextTask(s, taskId),
         message: done
-            ? '¡Último ciclo superado! Termina la sesión para ver tu botín.'
-            : '¡Mazmorra superada! Toma un descanso.',
+            ? '¡Último ciclo superado! Termina la sesión para ver tu resumen.'
+            : 'Ciclo completado. Toma un descanso.',
       ),
     );
   }
@@ -305,7 +303,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         currentTaskId: () => board.session == null
             ? latest.currentTaskId
             : _nextTask(board.session!, latest.currentTaskId),
-        message: '¡Misión completada! Tu héroe se hace más fuerte.',
+        message: '¡Tarea completada!',
       ),
     );
   }

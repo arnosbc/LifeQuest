@@ -89,7 +89,7 @@ void main() {
       const StageSuccess(emptyStageBoard, busy: true),
       const StageSuccess(
         stageBoard,
-        message: 'Proyecto creado. Añádele misiones para avanzar.',
+        message: 'Proyecto creado. Añádele tareas para avanzar.',
       ),
     ],
     verify: (_) => verify(() => createProject(newProject)).called(1),
@@ -145,14 +145,14 @@ void main() {
       const StageSuccess(emptyStageBoard, busy: true),
       const StageSuccess(
         stageBoard,
-        message: '¡Nueva meta! Un jefe aparece en el horizonte.',
+        message: 'Meta creada. Vincúlale tareas para avanzar.',
       ),
     ],
     verify: (_) => verify(() => createGoal(newGoal)).called(1),
   );
 
   blocTest<StageBloc, StageState>(
-    'completar una misión del proyecto vuelve a leer el tablero',
+    'completar una tarea del proyecto vuelve a leer el tablero',
     setUp: () {
       when(() => completeTask('t1')).thenAnswer((_) async => const Right(unit));
       givenBoard(const Right(emptyStageBoard));
@@ -162,10 +162,7 @@ void main() {
     act: (bloc) => bloc.add(const StageTaskCompleted('t1')),
     skip: 1,
     expect: () => [
-      const StageSuccess(
-        emptyStageBoard,
-        message: '¡Misión completada! Tu héroe se hace más fuerte.',
-      ),
+      const StageSuccess(emptyStageBoard, message: '¡Tarea completada!'),
     ],
   );
 }

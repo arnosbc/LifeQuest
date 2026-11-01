@@ -4,8 +4,7 @@ import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly_pressable.dart';
 
-/// Tarjeta: borde de 1 px y sombra sólida de 4 px. Con [onTap] se pulsa
-/// bajando 3 px.
+/// Tarjeta plana con borde de 1 px. Con [onTap] se puede pulsar.
 class QuestlyCard extends StatelessWidget {
   const QuestlyCard({
     super.key,
@@ -27,7 +26,6 @@ class QuestlyCard extends StatelessWidget {
       color: q.card,
       borderRadius: BorderRadius.circular(QRadius.card),
       border: Border.all(color: q.border),
-      boxShadow: qSolidShadow(q.cardShadow),
     );
     if (onTap == null) {
       return Container(decoration: decoration, padding: padding, child: child);

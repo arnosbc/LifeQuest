@@ -47,7 +47,7 @@ class DungeonScreen extends StatelessWidget {
     final session = state.board.session;
     if (session == null) {
       return LifeQuestPage(
-        title: 'Mazmorra',
+        title: 'Foco',
         subtitle: 'DEEP WORKING · Prepara tu mochila',
         children: [
           if (state.summary case final summary?) ...[
@@ -89,7 +89,7 @@ class DungeonScreen extends StatelessWidget {
         ? state.board.breakAfter(session.cyclesDone)
         : Duration(minutes: session.cycleMinutes);
     return LifeQuestPage(
-      title: 'Mazmorra',
+      title: 'Foco',
       subtitle: 'DEEP WORKING · Ciclo $cycle / ${session.maxCycles}',
       children: [
         DungeonTimerRing(

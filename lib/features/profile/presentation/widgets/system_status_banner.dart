@@ -29,7 +29,7 @@ class SystemStatusBanner extends StatelessWidget {
             style: TextStyle(
               color: context.lq.deepGreen,
               fontSize: 8,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

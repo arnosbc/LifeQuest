@@ -35,7 +35,7 @@ void main() {
     expect(entity.earnedTitles, isEmpty);
   });
 
-  test('tasa de finalización y espacio para skills', () {
+  test('tasa de finalización y espacio para áreas', () {
     expect(profile.completionRate, 0.76);
     expect(newProfile.completionRate, isNull);
     expect(profile.canAddSkill, isTrue);

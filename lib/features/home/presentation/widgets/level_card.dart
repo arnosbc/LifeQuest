@@ -16,7 +16,6 @@ class LevelCard extends StatelessWidget {
     final progress = d.xpToNextLevel == 0
         ? 0.0
         : (d.currentXp / d.xpToNextLevel).clamp(0.0, 1.0);
-    final coins = HomeFormat.number(d.coins);
 
     return LifeQuestSurface(
       padding: const EdgeInsets.all(16),
@@ -31,13 +30,11 @@ class LevelCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      d.characterClass == null
-                          ? 'Nivel ${d.level}'
-                          : 'Nivel ${d.level} · ${d.characterClass}',
+                      'Nivel ${d.level}',
                       style: TextStyle(
                         color: context.lq.ink,
                         fontSize: 17,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -50,39 +47,7 @@ class LevelCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Semantics(
-                label: '$coins monedas',
-                excludeSemantics: true,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.lq.softGreen,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.toll_rounded,
-                        size: 16,
-                        color: context.lq.deepGreen,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        coins,
-                        style: TextStyle(
-                          color: context.lq.deepGreen,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              _Streak(days: d.streakDays),
             ],
           ),
           const SizedBox(height: 16),
@@ -119,47 +84,19 @@ class LevelCard extends StatelessWidget {
             value: '${(progress * 100).round()} %',
             child: LinearProgressIndicator(
               value: progress,
-              minHeight: 8,
+              minHeight: 6,
               color: context.lq.green,
               backgroundColor: context.lq.softGreen,
               borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
           ),
-          if (d.isWeakened) ...[
-            const SizedBox(height: 12),
-            // RF-034: avisa sin culpar; nunca bloquea acciones.
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: context.lq.warning.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.favorite_border_rounded,
-                    size: 18,
-                    color: context.lq.warning,
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Tu héroe está débil por ahora: gana un 10 % menos de '
-                      'XP y monedas hasta recuperar su vitalidad.',
-                      style: TextStyle(color: context.lq.ink, fontSize: 13),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: LifeQuestStat(
                   value: '${d.missionsDone} / ${d.missionsTotal}',
-                  label: 'Misiones',
+                  label: 'Tareas',
                 ),
               ),
               const SizedBox(width: 8),
@@ -182,4 +119,43 @@ class LevelCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Racha de hábitos: ámbar con número y texto, nunca solo color.
+class _Streak extends StatelessWidget {
+  const _Streak({required this.days});
+
+  final int days;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Racha de ${days == 1 ? '1 día' : '$days días'}',
+    excludeSemantics: true,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: context.q.mustardTint,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.local_fire_department_outlined,
+            size: 16,
+            color: context.q.mustardInk,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            days == 1 ? '1 día' : '$days días',
+            style: TextStyle(
+              color: context.q.mustardInk,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

@@ -30,7 +30,7 @@ class AccountCard extends StatelessWidget {
                   style: TextStyle(
                     color: lq.deepGreen,
                     fontSize: 17,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -46,7 +46,7 @@ class AccountCard extends StatelessWidget {
                       style: TextStyle(
                         color: lq.ink,
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     if (data != null)

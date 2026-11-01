@@ -1,18 +1,15 @@
-// Renombrar y borrar (028) en Misiones, Hábitos y Taverna: cada bloc marca
+// Renombrar y borrar (028) en Misiones y Hábitos: cada bloc marca
 // el elemento ocupado, llama a su usecase y vuelve a leer.
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart'
     as habits;
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
-import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
-import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 
 import '../helpers/mocks.dart';
 import 'habits/habits_fixtures.dart';
@@ -26,7 +23,7 @@ void main() {
   });
 
   blocTest<MissionsBloc, MissionsState>(
-    'borrar una misión la marca ocupada y vuelve a leer',
+    'borrar una tarea la marca ocupada y vuelve a leer',
     build: () {
       final getBoard = MockGetMissionsBoard();
       final delete = MockDeleteMission();
@@ -44,7 +41,7 @@ void main() {
     act: (bloc) => bloc.add(const MissionDeleted('m1')),
     expect: () => [
       const MissionsSuccess(board, busyMissionId: 'm1'),
-      const MissionsSuccess(board, message: 'Misión borrada.'),
+      const MissionsSuccess(board, message: 'Tarea borrada.'),
     ],
   );
 
@@ -71,35 +68,6 @@ void main() {
     expect: () => [
       const HabitsSuccess(habitsBoard, busyHabitId: 'h1'),
       const HabitsSuccess(habitsBoard, message: 'Hábito renombrado.'),
-    ],
-  );
-
-  const tavern = TavernBoard(
-    npcs: [Npc(id: 'n1', name: 'Vera', skillName: 'Salud')],
-  );
-  blocTest<TavernBloc, TavernState>(
-    'si borrar el NPC falla, conserva la Taverna y avisa',
-    build: () {
-      final getBoard = MockGetTavernBoard();
-      final delete = MockDeleteNpc();
-      when(() => delete('n1')).thenAnswer(
-        (_) async => const Left(ServerFailure('No encontramos ese NPC.')),
-      );
-      return TavernBloc(
-        getBoard: getBoard,
-        createNpc: MockCreateNpc(),
-        suggestMission: MockSuggestNpcMission(),
-        acceptMission: MockAcceptNpcMission(),
-        completeMission: MockCompleteNpcMission(),
-        renameNpc: MockRenameNpc(),
-        deleteNpc: delete,
-      );
-    },
-    seed: () => const TavernSuccess(tavern),
-    act: (bloc) => bloc.add(const NpcDeleted('n1')),
-    expect: () => [
-      const TavernSuccess(tavern, busyKey: 'n1'),
-      const TavernSuccess(tavern, message: 'No encontramos ese NPC.'),
     ],
   );
 }

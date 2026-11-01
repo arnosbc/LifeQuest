@@ -7,14 +7,12 @@ import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/daily_chest_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/dashboard_greeting.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/level_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/priority_mission_card.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/quick_action.dart';
 
-/// Inicio. Necesita un [HomeBloc] por encima (lo provee el router).
+/// Hoy. Necesita un [HomeBloc] por encima (lo provee el router).
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
@@ -25,16 +23,6 @@ class HomeScreen extends StatelessWidget {
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
   final String userName;
   final ValueChanged<int> onNavigate;
-
-  static const _sections = [
-    (Icons.inbox_outlined, 'Brain Dump', RoutePaths.brainDump),
-    (Icons.auto_awesome_outlined, 'RPGenie', RoutePaths.rpgenie),
-    (Icons.edit_note_outlined, 'Misiones', RoutePaths.missions),
-    (Icons.auto_stories_outlined, 'Diario', RoutePaths.journal),
-    (Icons.flag_outlined, 'Objetivos', RoutePaths.goals),
-    (Icons.sports_bar_outlined, 'Taverna', RoutePaths.tavern),
-    (Icons.storefront_outlined, 'Marketplace', RoutePaths.marketplace),
-  ];
 
   // Ritmo vertical: 8 entre título y contenido, 24 entre bloques.
   static const _gap = SizedBox(height: 24);
@@ -47,14 +35,14 @@ class HomeScreen extends StatelessWidget {
         showLifeQuestMessage(context, (state as HomeSuccess).message!),
     builder: (context, state) => switch (state) {
       HomeInitial() || HomeLoading() => Center(
-        child: CircularProgressIndicator(color: context.lq.deepGreen),
+        child: CircularProgressIndicator(color: context.lq.green),
       ),
-      HomeFailure(:final message) => _ErrorView(
+      HomeFailure(:final message) => LifeQuestErrorView(
         message: message,
         onRetry: () => context.read<HomeBloc>().add(const HomeRequested()),
       ),
       HomeSuccess() => RefreshIndicator(
-        color: context.lq.deepGreen,
+        color: context.lq.green,
         onRefresh: () => _refresh(context.read<HomeBloc>()),
         child: _content(context, state),
       ),
@@ -73,39 +61,29 @@ class HomeScreen extends StatelessWidget {
     return ListView(
       // Permite deslizar para refrescar aunque el contenido quepa.
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
       children: [
         DashboardGreeting(
           userName: dashboard.displayName ?? userName,
+          subtitle: _subtitle(dashboard),
           onOpenProfile: () => onNavigate(4),
         ),
-        const SizedBox(height: 20),
-        // La misión va primero: es la única acción primaria de la pantalla.
+        _gap,
         LifeQuestSectionHeading(
-          'MISIÓN PRIORITARIA',
-          action: 'Ver todas',
+          'AHORA',
+          action: 'Ver tareas',
           onTap: () => context.go(RoutePaths.missions),
         ),
         _headingGap,
         PriorityMissionCard(
           mission: dashboard.priorityMission,
-          onContinue: () => context.go(RoutePaths.missions),
+          onContinue: () => onNavigate(3),
           onCreate: () => context.go(RoutePaths.missions),
         ),
-        const SizedBox(height: 8),
-        DailyChestCard(
-          chest: dashboard.chest,
-          busy: state.claimingChest,
-          onClaim: () => context.read<HomeBloc>().add(const HomeChestClaimed()),
-        ),
-        _gap,
-        const LifeQuestSectionHeading('TU HÉROE'),
-        _headingGap,
-        LevelCard(dashboard: dashboard),
         _gap,
         LifeQuestSectionHeading(
           'HÁBITOS DE HOY',
-          action: _streakLabel(dashboard),
+          action: 'Ver todos',
           onTap: () => onNavigate(2),
         ),
         _headingGap,
@@ -117,115 +95,20 @@ class HomeScreen extends StatelessWidget {
           onOpenHabits: () => onNavigate(2),
         ),
         _gap,
-        const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
+        const LifeQuestSectionHeading('TU PROGRESO'),
         _headingGap,
-        _row([
-          QuickAction(
-            icon: Icons.add_box_outlined,
-            label: 'Nueva tarea',
-            onTap: () => context.go(RoutePaths.missions),
-          ),
-          QuickAction(
-            icon: Icons.timer_outlined,
-            label: 'Modo focus',
-            onTap: () => onNavigate(3),
-          ),
-        ]),
-        const SizedBox(height: 8),
-        _row([
-          QuickAction(
-            icon: Icons.monitor_heart_outlined,
-            label: 'Registrar hábito',
-            onTap: () => onNavigate(2),
-          ),
-          QuickAction(
-            icon: Icons.tune_rounded,
-            label: 'Game Master',
-            onTap: () => context.push(RoutePaths.settings),
-          ),
-        ]),
-        _gap,
-        // RF-114: secciones que no caben en la barra inferior.
-        const LifeQuestSectionHeading('EXPLORA EL REINO'),
-        for (var i = 0; i < _sections.length; i += 3) ...[
-          _headingGap,
-          _row([
-            for (final section in _sections.skip(i).take(3))
-              _sectionAction(context, section),
-          ]),
-        ],
+        LevelCard(dashboard: dashboard),
       ],
     );
   }
 
-  static String _streakLabel(HomeDashboard dashboard) =>
-      switch (dashboard.streakDays) {
-        0 => 'Ver todos',
-        1 => 'Racha de 1 día',
-        final days => 'Racha de $days días',
-      };
-
-  Widget _row(List<Widget> children) => IntrinsicHeight(
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var i = 0; i < children.length; i++) ...[
-          if (i > 0) const SizedBox(width: 8),
-          Expanded(child: children[i]),
-        ],
-      ],
-    ),
-  );
-
-  Widget _sectionAction(
-    BuildContext context,
-    (IconData, String, String) section,
-  ) {
-    final (icon, label, path) = section;
-    return QuickAction(
-      icon: icon,
-      label: label,
-      vertical: true,
-      // Misiones vive dentro de la pestaña Stage: se va a ella, no se apila.
-      onTap: () =>
-          path == RoutePaths.missions ? context.go(path) : context.push(path),
-    );
+  static String _subtitle(HomeDashboard d) {
+    final left = (d.missionsTotal - d.missionsDone).clamp(0, d.missionsTotal);
+    return switch (left) {
+      0 when d.missionsTotal > 0 => 'Cumpliste todo lo de hoy.',
+      0 => 'Nada pendiente para hoy.',
+      1 => 'Te queda 1 tarea para hoy.',
+      _ => 'Te quedan $left tareas para hoy.',
+    };
   }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const LifeQuestIconTile(Icons.cloud_off_rounded, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: context.lq.ink, fontSize: 15),
-          ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded, size: 20),
-            label: const Text('Reintentar'),
-            style: FilledButton.styleFrom(
-              backgroundColor: context.lq.deepGreen,
-              foregroundColor: context.lq.onDeepGreen,
-              minimumSize: const Size(48, 48),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

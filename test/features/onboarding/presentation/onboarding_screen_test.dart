@@ -68,11 +68,14 @@ void main() {
     await tapMain(tester, 'Continuar');
 
     // Paso 4: valores del servidor, Normal preseleccionada.
-    expect(find.text('XP ×1,2 · Vida perdida ×0,75'), findsOneWidget);
-    expect(find.text('XP ×0,85 · Vida perdida ×1,25'), findsOneWidget);
-    expect(find.text('Las Monedas son iguales en las tres.'), findsOneWidget);
+    expect(find.text('XP ×1,2'), findsOneWidget);
+    expect(find.text('XP ×0,85'), findsOneWidget);
     expect(
-      find.text('Después solo podrás cambiarla en Configuración.'),
+      find.text('Cambia cuánta XP ganas. Lo puedes ajustar luego.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Después solo podrás cambiarla en Ajustes.'),
       findsOneWidget,
     );
     expect(
@@ -92,7 +95,7 @@ void main() {
     expect(find.text('Guardiana del huerto'), findsOneWidget);
     expect(find.text('Salud física'), findsOneWidget);
     expect(find.text('Difícil'), findsOneWidget);
-    await tapMain(tester, 'Entrar al reino');
+    await tapMain(tester, 'Empezar');
 
     expect(
       submitted(),
@@ -174,6 +177,6 @@ void main() {
     );
     await pump(tester);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.bySemanticsLabel('Preparando tu aventura'), findsOneWidget);
+    expect(find.bySemanticsLabel('Preparando tu espacio'), findsOneWidget);
   });
 }

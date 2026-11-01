@@ -98,7 +98,7 @@ void main() {
   );
 
   blocTest<DungeonBloc, DungeonState>(
-    'con sesión abierta empieza un ciclo completo en la primera misión abierta',
+    'con sesión abierta empieza un ciclo completo en la primera tarea abierta',
     setUp: () => givenBoard(_board(t1Done: true)),
     build: build,
     act: (bloc) => bloc.add(const DungeonRequested()),
@@ -127,9 +127,7 @@ void main() {
         now: now,
         busy: true,
       ),
-      focus(
-        _board(),
-      ).copyWith(message: '¡Entraste a la Mazmorra! A por el primer ciclo.'),
+      focus(_board()).copyWith(message: 'Foco en marcha. Primer ciclo.'),
     ],
   );
 
@@ -156,7 +154,7 @@ void main() {
         now: now,
         phaseEndsAt: now.add(const Duration(minutes: 5)),
         currentTaskId: 't1',
-        message: '¡Mazmorra superada! Toma un descanso.',
+        message: 'Ciclo completado. Toma un descanso.',
       ),
     ],
     verify: (_) => verify(
@@ -188,7 +186,7 @@ void main() {
         now: now,
         phaseEndsAt: now.add(const Duration(minutes: 8)),
         currentTaskId: 't1',
-        message: '¡Mazmorra superada! Toma un descanso.',
+        message: 'Ciclo completado. Toma un descanso.',
       ),
     ],
   );
@@ -214,7 +212,8 @@ void main() {
         phase: DungeonPhase.done,
         now: now,
         currentTaskId: 't1',
-        message: '¡Último ciclo superado! Termina la sesión para ver tu botín.',
+        message:
+            '¡Último ciclo superado! Termina la sesión para ver tu resumen.',
       ),
     ],
   );

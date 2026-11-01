@@ -53,14 +53,14 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
         ),
         const SizedBox(height: 9),
         LifeQuestSectionHeading(
-          'MOCHILA DE MISIONES',
+          'MOCHILA DE TAREAS',
           action: '${_picked.length} / ${widget.board.maxTasks}',
         ),
         const SizedBox(height: 6),
         if (candidates.isEmpty)
           LifeQuestSurface(
             child: Text(
-              'No tienes misiones abiertas. Crea una en Misiones y vuelve a entrar.',
+              'No tienes tareas abiertas. Crea una en Tareas y vuelve a entrar.',
               style: TextStyle(color: context.lq.muted, fontSize: 11),
             ),
           ),
@@ -100,7 +100,7 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.play_arrow_rounded),
-            label: const Text('Entrar a la Mazmorra'),
+            label: const Text('Empezar foco'),
             style: FilledButton.styleFrom(
               backgroundColor: context.lq.deepGreen,
             ),

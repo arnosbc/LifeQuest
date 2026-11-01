@@ -20,12 +20,3 @@ class AppearanceThemeChanged extends AppearanceEvent {
   @override
   List<Object?> get props => [theme];
 }
-
-class AppearanceRealmChanged extends AppearanceEvent {
-  const AppearanceRealmChanged(this.realm);
-
-  final ThemeRealm realm;
-
-  @override
-  List<Object?> get props => [realm];
-}

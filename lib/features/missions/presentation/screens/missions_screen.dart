@@ -5,17 +5,22 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/create_mission_sheet.dart';
-import 'package:proyecto_movil/features/missions/presentation/widgets/mission_importance_card.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/mission_tile.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/prioritized_mission_card.dart';
-import 'package:proyecto_movil/features/missions/presentation/widgets/rp_genie_tip_card.dart';
 
-/// Misiones. Necesita un [MissionsBloc] por encima (lo provee el router).
+/// Tareas. Necesita un [MissionsBloc] por encima (lo provee el router).
 class MissionsScreen extends StatelessWidget {
-  const MissionsScreen({super.key, required this.onStartFocus});
+  const MissionsScreen({
+    super.key,
+    required this.onStartFocus,
+    required this.onOpenProjects,
+  });
 
-  /// Abre la Mazmorra tras "Crear e iniciar Focus".
+  /// Abre Foco tras «Crear y empezar foco».
   final VoidCallback onStartFocus;
+
+  /// Abre Proyectos y metas.
+  final VoidCallback onOpenProjects;
 
   @override
   Widget build(BuildContext context) =>
@@ -32,15 +37,15 @@ class MissionsScreen extends StatelessWidget {
         },
         builder: (context, state) => switch (state) {
           MissionsInitial() || MissionsLoading() => Center(
-            child: CircularProgressIndicator(color: context.lq.deepGreen),
+            child: CircularProgressIndicator(color: context.lq.green),
           ),
-          MissionsFailure(:final message) => _ErrorView(
+          MissionsFailure(:final message) => LifeQuestErrorView(
             message: message,
             onRetry: () =>
                 context.read<MissionsBloc>().add(const MissionsRequested()),
           ),
           MissionsSuccess() => RefreshIndicator(
-            color: context.lq.deepGreen,
+            color: context.lq.green,
             onRefresh: () => _refresh(context.read<MissionsBloc>()),
             child: _content(context, state),
           ),
@@ -87,19 +92,25 @@ class MissionsScreen extends StatelessWidget {
     );
 
     return LifeQuestPage(
-      title: 'Misiones',
-      subtitle: 'Cada paso cuenta para tu siguiente nivel.',
+      title: 'Tareas',
+      subtitle: missions.isEmpty
+          ? 'Nada pendiente.'
+          : '${missions.length} abiertas, la más urgente primero.',
+      trailing: TextButton.icon(
+        onPressed: onOpenProjects,
+        icon: const Icon(Icons.folder_outlined, size: 20),
+        label: const Text('Proyectos'),
+        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+      ),
       children: [
         if (missions.isEmpty)
           LifeQuestSurface(
             child: Text(
-              'No tienes misiones abiertas. Crea la primera y da el siguiente paso.',
-              style: TextStyle(color: context.lq.muted, fontSize: 12),
+              'No tienes tareas abiertas. Crea la primera abajo.',
+              style: TextStyle(color: context.lq.muted, fontSize: 14),
             ),
           )
         else ...[
-          const RpGenieTipCard(),
-          const SizedBox(height: 16),
           PrioritizedMissionCard(
             mission: missions.first,
             now: now,
@@ -107,15 +118,10 @@ class MissionsScreen extends StatelessWidget {
             onComplete: idle ? () => complete(missions.first.id) : null,
             menu: menu(missions.first),
           ),
-          const SizedBox(height: 14),
-          const MissionImportanceCard(),
         ],
         if (missions.length > 1) ...[
           const SizedBox(height: 16),
-          LifeQuestSectionHeading(
-            'OTRAS MISIONES',
-            action: '${missions.length - 1} activas',
-          ),
+          LifeQuestSectionHeading('DESPUÉS', action: '${missions.length - 1}'),
           const SizedBox(height: 7),
           for (final mission in missions.skip(1)) ...[
             MissionTile(
@@ -131,7 +137,7 @@ class MissionsScreen extends StatelessWidget {
         const SizedBox(height: 16),
         SizedBox(
           height: 48,
-          child: OutlinedButton.icon(
+          child: FilledButton.icon(
             onPressed: idle ? () => _createMission(context, state) : null,
             icon: state.saving
                 ? const SizedBox(
@@ -140,36 +146,10 @@ class MissionsScreen extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.add),
-            label: Text(state.saving ? 'Creando misión…' : 'Crear misión'),
+            label: Text(state.saving ? 'Creando tarea…' : 'Nueva tarea'),
           ),
         ),
       ],
     );
   }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: context.lq.ink),
-          ),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: const Text('Reintentar')),
-        ],
-      ),
-    ),
-  );
 }

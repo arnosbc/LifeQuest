@@ -42,10 +42,10 @@ class StatsBoard extends Equatable {
       );
     } else if (xp == 0) {
       notes.add(
-        'Esta semana aún no hay XP: una misión pequeña basta para arrancar.',
+        'Esta semana aún no hay XP: una tarea pequeña basta para arrancar.',
       );
     } else {
-      notes.add('Llevas $xp XP esta semana. Cada misión cuenta, sin prisa.');
+      notes.add('Llevas $xp XP esta semana. Cada tarea cuenta, sin prisa.');
     }
     final bestDay = xpByDay.isEmpty
         ? null
@@ -63,7 +63,7 @@ class StatsBoard extends Equatable {
       notes.add('${topHabits.first.name} es tu hábito más constante del mes.');
     }
     if (focusMinutes > 0 && notes.length < 3) {
-      notes.add('Pasaste $focusMinutes minutos en la Mazmorra.');
+      notes.add('Pasaste $focusMinutes minutos en foco.');
     }
     if (notes.length < 3) {
       notes.add(

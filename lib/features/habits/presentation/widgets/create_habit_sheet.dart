@@ -79,7 +79,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
               'Nuevo hábito',
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: context.lq.ink,
               ),
             ),
@@ -153,7 +153,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             DropdownButtonFormField<String?>(
               initialValue: _skillId,
               isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Área / skill'),
+              decoration: const InputDecoration(labelText: 'Área'),
               items: [
                 const DropdownMenuItem(
                   value: null,

@@ -20,13 +20,20 @@ class LifeQuestErrorView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Icon(Icons.cloud_off_rounded, size: 40, color: context.lq.muted),
+          const SizedBox(height: 16),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(color: context.lq.ink),
+            style: TextStyle(color: context.lq.ink, fontSize: 15),
           ),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: const Text('Reintentar')),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 20),
+            label: const Text('Reintentar'),
+            style: FilledButton.styleFrom(minimumSize: const Size(160, 48)),
+          ),
         ],
       ),
     ),

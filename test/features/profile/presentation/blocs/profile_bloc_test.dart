@@ -96,7 +96,7 @@ void main() {
     );
 
     blocTest<ProfileBloc, ProfileState>(
-      'crear una skill confirma con su nombre',
+      'crear un área confirma con su nombre',
       setUp: () {
         when(
           () => createSkill(any()),
@@ -108,7 +108,7 @@ void main() {
       act: (bloc) => bloc.add(const ProfileSkillCreated('  Salud ')),
       expect: () => [
         const ProfileSuccess(newProfile, saving: true),
-        const ProfileSuccess(profile, message: 'Skill «Salud» creada.'),
+        const ProfileSuccess(profile, message: 'Área «Salud» creada.'),
       ],
     );
 

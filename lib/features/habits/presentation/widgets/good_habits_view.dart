@@ -52,12 +52,12 @@ class GoodHabitsView extends StatelessWidget {
                       style: TextStyle(
                         color: context.lq.ink,
                         fontSize: 12,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Cada hábito positivo suma XP y monedas. Cada día superado refuerza tu progreso.',
+                      'Cada hábito cumplido suma XP y alarga tu racha.',
                       style: TextStyle(
                         color: context.lq.muted,
                         fontSize: 9,

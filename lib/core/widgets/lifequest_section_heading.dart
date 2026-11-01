@@ -26,7 +26,7 @@ class LifeQuestSectionHeading extends StatelessWidget {
               color: context.lq.muted,
               fontSize: 12,
               letterSpacing: .6,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -36,12 +36,12 @@ class LifeQuestSectionHeading extends StatelessWidget {
           onPressed: onTap,
           style: TextButton.styleFrom(
             foregroundColor: context.lq.deepGreen,
-            disabledForegroundColor: context.lq.deepGreen,
+            disabledForegroundColor: context.lq.muted,
             minimumSize: const Size(48, 40),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             textStyle: const TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
             ),
           ),
           child: Text(action!),

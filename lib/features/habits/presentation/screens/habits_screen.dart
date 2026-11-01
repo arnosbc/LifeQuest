@@ -77,7 +77,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
     );
     return LifeQuestPage(
       title: 'Hábitos',
-      subtitle: 'La constancia también es una aventura.',
+      subtitle: 'Lo que repites define tu semana.',
       children: [
         Row(
           children: [

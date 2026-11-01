@@ -13,8 +13,6 @@ import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
-import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
-import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
@@ -83,19 +81,6 @@ void main() {
       );
       return settingsBloc;
     });
-    sl.registerFactory<TavernBloc>(() {
-      final tavernBloc = MockTavernBloc();
-      whenListen(
-        tavernBloc,
-        const Stream<TavernState>.empty(),
-        initialState: const TavernSuccess(
-          TavernBoard(
-            npcs: [Npc(id: 'n1', name: 'Vera', skillName: 'Salud')],
-          ),
-        ),
-      );
-      return tavernBloc;
-    });
     sl.registerFactory<ProfileBloc>(() {
       final profileBloc = MockProfileBloc();
       whenListen(
@@ -134,7 +119,7 @@ void main() {
     await tester.tap(find.text('Crea tu perfil'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Crea tu Héroe'), findsOneWidget);
+    expect(find.text('Crea tu cuenta'), findsOneWidget);
     expect(find.text('Crear cuenta'), findsOneWidget);
   });
 
@@ -163,54 +148,33 @@ void main() {
     expect(find.textContaining(', Ana'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('Taverna'), 200);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Taverna'));
-    await tester.pumpAndSettle();
-    expect(find.text('Vera · Salud'), findsOneWidget);
-
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    expect(find.text('EXPLORA EL REINO'), findsOneWidget);
-
-    // La barra sigue el diseño: Inicio · Stage · Hábitos · Mazmorra · Perfil.
-    for (final tab in ['Inicio', 'Stage', 'Hábitos', 'Mazmorra', 'Perfil']) {
-      expect(
-        find.descendant(
-          of: find.byType(QuestlyNavBar),
-          matching: find.text(tab),
-        ),
-        findsOneWidget,
-      );
-    }
-    await tester.tap(
-      find.descendant(
-        of: find.byType(QuestlyNavBar),
-        matching: find.text('Stage'),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('Lanzamiento de la app'), findsOneWidget);
-    expect(find.textContaining('🔴 Alta'), findsOneWidget);
-    expect(find.text('METAS (JEFES)'), findsOneWidget);
-
-    // Misiones vive dentro de Stage y conserva la barra inferior.
-    await tester.tap(find.text('Ver misiones (1)'));
-    await tester.pumpAndSettle();
-    expect(find.text('Preparar la exposición'), findsOneWidget);
-    expect(find.byType(QuestlyNavBar), findsOneWidget);
-
-    // Tras ir a otra pestaña, tocar Stage abre Stage, no Misiones.
+    // Barra: Hoy · Tareas · Hábitos · Foco · Tú.
     Finder tab(String label) => find.descendant(
       of: find.byType(QuestlyNavBar),
       matching: find.text(label),
     );
-    await tester.tap(tab('Inicio'));
+    for (final label in ['Hoy', 'Tareas', 'Hábitos', 'Foco', 'Tú']) {
+      expect(tab(label), findsOneWidget);
+    }
+
+    // Tareas es la raíz de su pestaña; Proyectos cuelga de ella.
+    await tester.tap(tab('Tareas'));
     await tester.pumpAndSettle();
-    await tester.tap(tab('Stage'));
+    expect(find.text('Preparar la exposición'), findsOneWidget);
+    await tester.tap(find.text('Proyectos'));
     await tester.pumpAndSettle();
-    expect(find.text('METAS (JEFES)'), findsOneWidget);
-    expect(find.text('Preparar la exposición'), findsNothing);
+    expect(find.text('Lanzamiento de la app'), findsOneWidget);
+    expect(find.textContaining('🔴 Alta'), findsOneWidget);
+    expect(find.text('METAS'), findsOneWidget);
+    expect(find.byType(QuestlyNavBar), findsOneWidget);
+
+    // Tocar una pestaña abre su raíz: Tareas, no Proyectos.
+    await tester.tap(tab('Hoy'));
+    await tester.pumpAndSettle();
+    await tester.tap(tab('Tareas'));
+    await tester.pumpAndSettle();
+    expect(find.text('Preparar la exposición'), findsOneWidget);
+    expect(find.text('METAS'), findsNothing);
   });
 
   testWidgets('al volver a una pestaña recarga sus datos', (tester) async {
@@ -239,9 +203,9 @@ void main() {
       of: find.byType(QuestlyNavBar),
       matching: find.text(label),
     );
-    await tester.tap(tab('Perfil'));
+    await tester.tap(tab('Tú'));
     await tester.pumpAndSettle();
-    await tester.tap(tab('Inicio'));
+    await tester.tap(tab('Hoy'));
     await tester.pumpAndSettle();
     verify(() => homeBloc.add(const HomeRequested())).called(1);
   });
@@ -291,9 +255,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Perfil').last);
+    await tester.tap(find.text('Tú').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Configuración'));
+    await tester.tap(find.byTooltip('Ajustes'));
     await tester.pumpAndSettle();
     final signOutButton = find.text('Cerrar sesión');
     await tester.scrollUntilVisible(signOutButton, 200);

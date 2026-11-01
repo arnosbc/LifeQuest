@@ -102,10 +102,10 @@ class StageScreen extends StatelessWidget {
     final board = state.board;
     final idle = !state.busy;
     return LifeQuestPage(
-      title: 'Stage · P.A.R.A.',
+      title: 'Proyectos y metas',
       subtitle: 'Tu centro de mando, todo en un vistazo.',
       trailing: IconButton.filledTonal(
-        tooltip: 'Añadir misión, proyecto, meta o recurso',
+        tooltip: 'Añadir tarea, proyecto, meta o recurso',
         onPressed: idle ? () => _quickAdd(context, board) : null,
         icon: state.busy
             ? const SizedBox(
@@ -119,14 +119,14 @@ class StageScreen extends StatelessWidget {
         // RF-089: orden fijo urgent → high → medium → low → pending.
         LifeQuestSectionHeading(
           'DAILY HIGHLIGHT',
-          action: 'Ver misiones (${board.highlightTotal})',
+          action: 'Ver tareas (${board.highlightTotal})',
           onTap: onOpenMissions,
         ),
         const SizedBox(height: 7),
         if (board.highlight.isEmpty)
           _empty(
             context,
-            'Sin misiones abiertas. Añade una para empezar el día.',
+            'Sin tareas abiertas. Añade una para empezar el día.',
           ),
         for (final item in board.highlight)
           LifeQuestListRow(
@@ -141,24 +141,24 @@ class StageScreen extends StatelessWidget {
         const SizedBox(height: 14),
         // Meta (Boss) → Proyecto → Misión: las metas van primero.
         LifeQuestSectionHeading(
-          'METAS (JEFES)',
+          'METAS',
           action: '${board.goals.length} activas',
         ),
         const SizedBox(height: 7),
         if (board.goals.isEmpty)
           _empty(
             context,
-            'Sin metas activas. Crea una con + y cada misión vinculada le restará vida al jefe.',
+            'Sin metas activas. Crea una con + y vincúlale tareas para medir su avance.',
           ),
         for (final goal in board.goals)
           StageActionRow(
             icon: Icons.emoji_events_outlined,
             title: goal.title,
             subtitle: [
-              '❤ ${goal.bossHp}/${goal.bossMaxHp} de vida del jefe',
+              '${goal.bossMaxHp - goal.bossHp} % completada',
               if (goal.dueDate case final due?)
                 'vence ${due.day}/${due.month}/${due.year}',
-              '${goal.projects} proyectos · ${goal.openTasks} misiones',
+              '${goal.projects} proyectos · ${goal.openTasks} tareas',
               ?goal.skillName,
             ].join(' · '),
             // Barra = vida que le queda al jefe.
@@ -182,7 +182,7 @@ class StageScreen extends StatelessWidget {
         if (board.projects.isEmpty)
           _empty(
             context,
-            'Sin proyectos activos. Un proyecto agrupa misiones de semanas.',
+            'Sin proyectos activos. Un proyecto agrupa tareas de semanas.',
           ),
         for (final project in board.projects)
           StageProjectCard(
@@ -207,19 +207,18 @@ class StageScreen extends StatelessWidget {
           ),
         const SizedBox(height: 14),
         LifeQuestSectionHeading(
-          'ÁREAS (SKILLS)',
+          'ÁREAS (ÁREAS)',
           action: '${board.areas.length}',
         ),
         const SizedBox(height: 7),
-        if (board.areas.isEmpty)
-          _empty(context, 'Crea tus áreas como skills desde tu Perfil.'),
+        if (board.areas.isEmpty) _empty(context, 'Crea tus áreas desde Tú.'),
         for (final area in board.areas)
           LifeQuestListRow(
             icon: Icons.category_outlined,
             title: area.name,
             subtitle:
                 '${area.habits} hábitos · ${area.projects} proyectos · '
-                '${area.openTasks} misiones abiertas',
+                '${area.openTasks} tareas abiertas',
             trailing: 'Nv ${area.level}',
           ),
         const SizedBox(height: 14),

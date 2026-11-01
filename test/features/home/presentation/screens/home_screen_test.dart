@@ -43,18 +43,18 @@ void main() {
     );
   }
 
-  testWidgets('muestra los datos del héroe', (tester) async {
+  testWidgets('muestra la tarea de ahora, hábitos y progreso', (tester) async {
     await pump(tester, HomeSuccess(dashboard));
 
     expect(find.textContaining(', Ana'), findsOneWidget);
     expect(find.text('Preparar presentación del proyecto'), findsOneWidget);
     expect(find.text('Prioridad alta'), findsOneWidget);
-    expect(find.text('+350 XP'), findsOneWidget);
-    expect(find.text('Nivel 24 · Estratega'), findsOneWidget);
+    expect(find.text('Empezar foco'), findsOneWidget);
+    expect(find.text('Nivel 24'), findsOneWidget);
     expect(find.text('Te faltan 4.150 XP para el nivel 25'), findsOneWidget);
-    expect(find.text('2.450'), findsOneWidget);
     expect(find.text('3 / 5'), findsOneWidget);
-    expect(find.text('Racha de 12 días'), findsOneWidget);
+    expect(find.text('12 días'), findsOneWidget);
+    expect(find.text('2.450'), findsNothing);
   });
 
   testWidgets('tocar un hábito pendiente lo registra; uno hecho, no', (
@@ -69,14 +69,14 @@ void main() {
     verifyNever(() => bloc.add(const HomeHabitCompleted('h1')));
   });
 
-  testWidgets('un héroe nuevo ve estados vacíos que invitan a empezar', (
+  testWidgets('una cuenta nueva ve estados vacíos que invitan a empezar', (
     tester,
   ) async {
     await pump(tester, const HomeSuccess(emptyDashboard));
 
     expect(find.textContaining(', Alex'), findsOneWidget);
-    expect(find.text('No tienes misiones pendientes'), findsOneWidget);
-    expect(find.text('Crear misión'), findsOneWidget);
+    expect(find.text('No tienes tareas pendientes'), findsOneWidget);
+    expect(find.text('Crear tarea'), findsOneWidget);
     expect(find.text('Hoy no tienes hábitos programados.'), findsOneWidget);
     expect(find.text('Ver todos'), findsOneWidget);
     expect(find.text('Nivel 1'), findsOneWidget);
@@ -106,7 +106,6 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.textContaining('débil por ahora'), findsOneWidget);
-    expect(find.text('Taverna'), findsOneWidget);
+    expect(find.text('TU PROGRESO'), findsOneWidget);
   });
 }

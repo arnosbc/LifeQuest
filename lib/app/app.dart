@@ -70,15 +70,12 @@ class _AppState extends State<App> {
       BlocProvider.value(value: widget.onboardingBloc),
     ],
     child: BlocBuilder<AppearanceBloc, AppearanceState>(
-      buildWhen: (a, b) => a.theme != b.theme || a.realm != b.realm,
+      buildWhen: (a, b) => a.theme != b.theme,
       builder: (context, state) => MaterialApp.router(
         title: 'LifeQuest',
         debugShowCheckedModeBanner: false,
-        theme: LifeQuestTheme.build(questlyRealmOf(state.realm), dark: false),
-        darkTheme: LifeQuestTheme.build(
-          questlyRealmOf(state.realm),
-          dark: true,
-        ),
+        theme: LifeQuestTheme.light,
+        darkTheme: LifeQuestTheme.dark,
         themeMode: switch (state.theme) {
           ThemePreference.light => ThemeMode.light,
           ThemePreference.dark => ThemeMode.dark,

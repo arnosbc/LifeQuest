@@ -18,7 +18,7 @@ class LifeQuestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.fromLTRB(19, 17, 19, 22),
+    padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
     children: [
       Row(
         children: [
@@ -27,17 +27,19 @@ class LifeQuestPage extends StatelessWidget {
               title,
               style: TextStyle(
                 color: context.lq.ink,
-                fontSize: 21,
-                fontWeight: FontWeight.w800,
+                fontSize: 28,
+                height: 1.2,
+                letterSpacing: -0.6,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
           ?trailing,
         ],
       ),
-      const SizedBox(height: 3),
-      Text(subtitle, style: TextStyle(color: context.lq.muted, fontSize: 13)),
-      const SizedBox(height: 17),
+      const SizedBox(height: 4),
+      Text(subtitle, style: TextStyle(color: context.lq.muted, fontSize: 15)),
+      const SizedBox(height: 24),
       ...children,
     ],
   );

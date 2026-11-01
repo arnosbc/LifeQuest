@@ -28,7 +28,7 @@ class SubpageHeader extends StatelessWidget {
             style: TextStyle(
               color: context.lq.ink,
               fontSize: 21,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

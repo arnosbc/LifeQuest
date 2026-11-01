@@ -15,7 +15,7 @@ class User extends Equatable {
     if (username != null && username!.trim().isNotEmpty) return username!;
     final emailName = email.split('@').first;
     return emailName.isEmpty
-        ? 'Héroe'
+        ? 'de nuevo'
         : emailName[0].toUpperCase() + emailName.substring(1);
   }
 
