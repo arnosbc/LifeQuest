@@ -67,6 +67,8 @@ async function suggest(
         // Sin maxOutputTokens: los modelos que "piensan" lo gastan y no dejan texto.
         generationConfig: { temperature: 0.9 },
       }),
+      // Gemini saturado puede colgarse; sin esto Supabase corta a los 150 s con 546.
+      signal: AbortSignal.timeout(25_000),
     },
   );
   if (!res.ok) {

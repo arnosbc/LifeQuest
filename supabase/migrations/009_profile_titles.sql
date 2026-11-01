@@ -1,6 +1,5 @@
 -- Migración 009 · Perfil: Tesoro del reino y títulos de prestigio (requiere 001–008).
 -- Ejecutar una vez en Supabase → SQL Editor. Se puede volver a ejecutar.
--- Spec: specs/004-profile-update/.
 --
 -- 1. profile_overview: añade el Tesoro, el título activo y los títulos ganados
 --    en la misma carga de 002.

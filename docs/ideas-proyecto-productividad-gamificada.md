@@ -79,12 +79,12 @@ Campos: título, descripción, skill/Área, prioridad, fecha de creación, fecha
 - Se dividen directamente en **tareas**, y estas en subtareas — generando más misiones jugables. (Se retira el nivel intermedio "Historia": mezclaba Scrum con P.A.R.A., que ya es la metodología de organización del proyecto.)
 - El usuario asigna un **rango de tiempo** (inicio–fin) al proyecto completo.
 - Un proyecto puede vincularse opcionalmente a una **Meta** (ver Módulo Goal → Boss Fight) — no es obligatorio, un proyecto puede existir sin meta asociada.
-- El sistema calcula automáticamente la prioridad comparando **trabajo restante** contra **días restantes** → "ritmo necesario". Arranca como **regla simple** (Fase 2) y más adelante lo afina **RPGenie** (Fase 4).
+- El sistema calcula automáticamente la urgencia comparando **trabajo restante** contra **días restantes** → "ritmo necesario". El ritmo actual usa las tareas raíz completadas durante los últimos 14 días; si no hay ninguna en esa ventana, conserva el ritmo acumulado histórico. Se mantienen los umbrales existentes: alta si el ritmo necesario supera 1,5 veces el actual; media si supera 1,2 veces. Este cálculo local reemplaza la propuesta de afinarlo con IA hasta que se decida un proveedor y condiciones de privacidad.
 - Clasificación de urgencia: 🟢 Baja / 🟡 Media / 🔴 Alta.
 - **Decisión tomada:** el cambio de prioridad se **notifica al usuario**, nunca es silencioso. Ejemplo: *"🔔 Tu proyecto 'Proyecto del semestre' pasó a prioridad alta."*
 
 ### 🆕 Estimación automática de recompensa (XP/Monedas)
-Adaptado de la función de IA de LiFE RPG 2.0. Al crear una tarea o proyecto, RPGenie calcula la recompensa — **reglas simples desde la Fase 2**, modelo de IA cuando llegue RPGenie (Fase 4). Regla del diseño: base +10 XP; +10 si el título describe una acción concreta (≥ 5 palabras); +10 prioridad Alta / +5 Media; +10 si está vinculada a una Meta / +5 a un Proyecto. **Siempre entre 10 y 40 XP por tarea.** Las Monedas salen solas (30 % de la XP). El usuario **no la edita a mano**: así se reduce la fatiga de decisión y no se puede inflar.
+Adaptado de la función de IA de LiFE RPG 2.0. La recompensa se calcula localmente por reglas; no se envía el título, la prioridad ni los vínculos de tareas a Gemini. Regla del diseño: base +10 XP; +10 si el título describe una acción concreta (≥ 5 palabras); +10 prioridad Alta / +5 Media; +10 si está vinculada a una Meta / +5 a un Proyecto. **Siempre entre 10 y 40 XP por tarea.** Las Monedas salen solas (30 % de la XP). El usuario **no la edita a mano**: así se reduce la fatiga de decisión y no se puede inflar. La estimación con IA queda pendiente de decidir proveedor y condiciones de privacidad.
 
 ### 🔧 Sistema RPG: skills = Áreas *(sin atributos fijos)*
 Se eliminan los cuatro atributos predefinidos (Conocimiento, Concentración, Disciplina, Energía): no son necesarios para el objetivo del proyecto. El árbol ya no tiene troncos fijos de fábrica.
@@ -277,13 +277,13 @@ Sistema P.A.R.A. (Projects, Areas, Resources, Archive + Tasks/Goals/Events) como
 Pantalla **Estadísticas** (desde el Perfil y el Diario), por semana o por mes: XP ganada, misiones, tiempo en la Mazmorra y racha (cada uno comparado con el periodo anterior); XP por día con vista de tabla; XP por Área; cumplimiento de misiones; hábitos más constantes; y 3 observaciones de RPGenie. El Mapa de calor sigue en Hábitos.
 
 ### 🔧 Sistema de recomendaciones → "RPGenie"
-Asistente de IA (**Fase 4**) que sugiere la siguiente misión según las metas del usuario y su Vision Board, y que también afina el cálculo de prioridad de los proyectos grandes y la estimación de recompensa (que antes funcionan con reglas simples). No agrega complejidad nueva al plan, solo le da identidad y funciones concretas.
+Asistente que actualmente usa reglas locales para la Misión actual, la urgencia de proyectos, la recompensa y las observaciones de Estadísticas. La versión avanzada con IA (**Fase 4**) queda pendiente de decidir proveedor y condiciones de privacidad; no se enviarán datos generales de tareas, metas, Vision Board o actividad a Gemini.
 
-**Vista "Misión actual":** pantalla dedicada donde se muestra la **misión que la IA tiene activa para ti ahora mismo** — qué hacer, de qué apartado viene, su recompensa y **por qué la eligió** — con acceso directo para empezarla en la Mazmorra, "Ya la hice" y "Ahora no" (estoy cansado / poco tiempo / no es prioridad / ya no quiero hacerla), que cambia la misión sin castigo. Se entra desde "¿Por qué esta?" en Inicio.
+**Vista "Misión actual":** pantalla dedicada donde se muestra la **misión recomendada por las reglas locales** — qué hacer, de qué apartado viene, su recompensa y **por qué la eligió** — con acceso directo para empezarla en la Mazmorra, "Ya la hice" y "Ahora no" (estoy cansado / poco tiempo / no es prioridad / ya no quiero hacerla), que cambia la misión sin castigo. Se entra desde "¿Por qué esta?" en Inicio.
 
 **Cómo prioriza (propuesta):** 1) lo que vence antes, 2) lo que más daño hace a los jefes activos, 3) si el usuario dice que está cansado o con poco tiempo, lo más ligero.
 
-**Rol en la Taverna:** RPGenie es quien **diseña las misiones de los NPCs**, ajustándolas a la situación exacta y a la meta actual del usuario.
+**Rol en la Taverna:** la generación Gemini ya implementada diseña misiones usando únicamente contexto del NPC (incluidos sus encargos anteriores para evitar repeticiones); no se amplía a metas, tareas ni actividad general del usuario.
 
 
 ### 🆕 Configuración / "Game Master"
@@ -368,7 +368,7 @@ Criterio: cada fase solo usa cosas que ya existen en fases anteriores.
 - **MVP — Núcleo jugable:** registro/login (+ recuperar contraseña y cerrar sesión), **Onboarding**, **Perfil del Personaje** (nivel, monedas, identidad, tasa de finalización, progreso de nivel), tareas y subtareas, XP, niveles, **Monedas básicas** (mismo evento que da XP), **skills/Áreas básicas** (crear hasta 6, asignar a tareas, subir de nivel), hábitos buenos, rachas, **Mazmorras / Deep Working** (entorno básico), **Brain Dump + GTD Diagnosis Tool**, **Stage · P.A.R.A. básico** (Quick Add + Daily Highlight, donde viven las misiones actuales), **Diario — Bitácora** (historial de misiones), logros.
 - **Fase 2 — Metas y Gamificación:** Proyectos con priorización automática por reglas + notificación de cambio de urgencia, **Goals + S.M.A.R.T. Diagnosis Tool** (vista Goals de P.A.R.A.), Módulo Goal → Boss Fight, Objetivos de Crecimiento, HP/Vitalidad, malos hábitos, Sistema de Dificultad, Pase de Recuperación, **Marketplace** (carrito, My Purchases, Hotel, Mercado negro), estimación de recompensa por reglas, sistema de notificaciones anti-estrés.
 - **Fase 3 — Experiencia y Organización:** Vision Board, Estadísticas + Mapa de calor, Refugio, modo oscuro y temas, **Stage · P.A.R.A. completo** (Areas con conteos, Resources, Archive, Calendario, Upcoming Events).
-- **Fase 4 — Inteligencia:** **RPGenie** (Misión actual, priorización e estimación de recompensa con IA, observaciones de Estadísticas, frecuencia de notificaciones) y **Taverna** (NPCs con misiones generadas por RPGenie).
+- **Fase 4 — Inteligencia:** RPGenie avanzado (priorización contextual y estimación con IA) queda pendiente de decidir proveedor y condiciones de privacidad. La Misión actual, las recompensas y las observaciones de Estadísticas siguen funcionando con reglas locales. Se conserva la generación Gemini existente de misiones NPC, limitada al contexto del NPC y sin ampliarla a datos generales de tareas, metas o actividad del usuario.
 - **Fase 5 — Social:** Comunidad/chat.
 - **⏸️ En pausa (sin fase asignada):** Vault Financiero, Personalización (avatar, temas visuales, cosméticos), modo cooperativo/gremio.
 

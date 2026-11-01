@@ -1,6 +1,5 @@
 -- Migración 015 · Onboarding de 5 pasos (requiere 001–014).
 -- Ejecutar una vez en Supabase → SQL Editor. Se puede volver a ejecutar.
--- Spec: specs/003-onboarding/.
 --
 -- 1. profiles.onboarded_at: fecha en que el jugador terminó o saltó el
 --    Onboarding. Solo pasa de null a now(); después no cambia ni se borra.

@@ -161,13 +161,15 @@ Se calcula a partir de `difficulty` y `estimated_minutes`, multiplicada por la d
 ### Urgencia automática de Proyectos (RF-019/020)
 ```
 ritmo_necesario = trabajo_restante / días_restantes
-ritmo_actual    = trabajo_completado / días_transcurridos
+ritmo_actual    = tareas raíz completadas en los últimos 14 días / 14
+                  (si no hay tareas recientes: trabajo_completado / días_transcurridos)
 
 si ritmo_necesario > ritmo_actual × 1.5 → high   🔴
 si ritmo_necesario > ritmo_actual × 1.2 → medium 🟡
 en otro caso                             → low    🟢
 ```
 Todo cambio de nivel **se notifica siempre** (RF-021). La escala de 3 niveles (`urgency_level`) es la **única escala de urgencia de toda la app**.
+El ritmo móvil y el fallback acumulado se calculan localmente; no requieren enviar información del proyecto a un proveedor de IA.
 
 ### HP / Vitalidad
 - Es un indicador **agregado** de constancia, no ligado a un solo hábito.
@@ -339,7 +341,7 @@ test/                  # refleja lib/; mocks en test/helpers/mocks.dart (mocktai
 - **Tipo de misión** diaria / semanal / épica (RF-050): ¿basta `repeat_rule` o se agrega un enum `mission_type`?
 - **Renombrar enums de dificultad:** `difficulty_scale` → `task_difficulty`, `difficulty_level` → `game_difficulty` (propuesto). `004_structure.sql` ya borra `difficulty_scale`.
 - **Bitácora:** ¿notas propias del usuario? ¿filtro por skill/Área?
-- **RPGenie avanzado:** fórmula de "ritmo necesario" con el ritmo histórico del usuario, y el modelo de IA.
+- **RPGenie avanzado:** queda pendiente decidir proveedor y condiciones de privacidad antes de enviar contexto general del usuario a un modelo. La urgencia de proyectos usa ritmo local de 14 días (fallback al acumulado si no hay tareas recientes); misión actual, recompensa y observaciones siguen con reglas. Se conserva la generación Gemini existente de misiones NPC, limitada al contexto del NPC, sin ampliarla a tareas, metas o actividad general del usuario.
 - Decisiones abiertas del esquema (recompensa de NPC, precio del Refugio, catálogos de títulos, cofre y logros, RF-031): ver `docs/plan-cambios-esquema.md` §7.
 
 ---
@@ -394,9 +396,3 @@ Mientras no existan:
 - La Mazmorra (Deep Working) es siempre oscura y respeta la reducción de movimiento del sistema.
 
 Cuando existan, esta sección se reescribe para apuntar a ellos.
-
-<!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-`specs/003-onboarding/plan.md`
-<!-- SPECKIT END -->
