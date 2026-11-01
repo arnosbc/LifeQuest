@@ -1,45 +1,42 @@
-// Tokens del sistema visual minimal (docs/diseño/DESIGN.md): neutros zinc,
-// un acento índigo, bordes finos y tipografía Inter (assets/fonts).
+// Tokens del mundo «calendario de taco» (docs/diseño/DESIGN.md): suelo de
+// papel, hoja blanca, tinta, un rojo solo para marcas y Archivo (assets/fonts).
 
 import 'package:flutter/material.dart';
 
 abstract final class QColors {
-  // Neutros claro
-  static const bg = Color(0xFFFAFAFA);
+  // Papel claro: suelo gris cálido y hoja blanca.
+  static const bg = Color(0xFFF1EFEA);
   static const card = Color(0xFFFFFFFF);
-  static const border = Color(0xFFE4E4E7);
-  static const track = Color(0xFFF4F4F5);
-  static const line = Color(0xFFF4F4F5);
-  static const text = Color(0xFF18181B);
-  static const text2 = Color(0xFF52525B);
-  static const text3 = Color(0xFF3F3F46);
-  static const inputBorder = Color(0xFFD4D4D8);
-  static const disabled = Color(0xFF71717A);
-  // Neutros oscuro
-  static const bgDark = Color(0xFF09090B);
-  static const cardDark = Color(0xFF18181B);
-  static const borderDark = Color(0xFF27272A);
-  static const trackDark = Color(0xFF27272A);
-  static const textDark = Color(0xFFFAFAFA);
-  static const text2Dark = Color(0xFFA1A1AA);
-  static const inputBorderDark = Color(0xFF3F3F46);
-  // Acento
-  static const accent = Color(0xFF4F46E5);
-  static const accentInk = Color(0xFF3730A3);
-  static const accentInkDark = Color(0xFFA5B4FC);
-  static const accentTint = Color(0xFFEEF2FF);
-  static const accentTintDark = Color(0xFF1E1B4B);
-  // Semánticos: rojo (error, mal hábito), ámbar (aviso, racha), azul (info).
-  static const coral = Color(0xFFDC2626);
-  static const coralInk = Color(0xFFB91C1C);
-  static const coralTint = Color(0xFFFEF2F2);
-  static const mustard = Color(0xFFD97706);
-  static const mustardInk = Color(0xFF92400E);
-  static const mustardTint = Color(0xFFFFFBEB);
-  static const river = Color(0xFF2563EB);
-  static const riverInk = Color(0xFF1D4ED8);
-  static const riverTint = Color(0xFFEFF6FF);
-  static const focus = accent;
+  static const border = Color(0xFFE4E1DA);
+  static const track = Color(0xFFECE9E3);
+  static const line = Color(0xFFE4E1DA);
+  static const text = Color(0xFF111111);
+  static const text2 = Color(0xFF6B6862);
+  static const text3 = Color(0xFF3A3834);
+  static const inputBorder = Color(0xFFD3CFC6);
+  static const disabled = Color(0xFF6B6862);
+  // Papel oscuro.
+  static const bgDark = Color(0xFF141312);
+  static const cardDark = Color(0xFF1E1D1B);
+  static const borderDark = Color(0xFF2E2C29);
+  static const trackDark = Color(0xFF2A2826);
+  static const textDark = Color(0xFFF2F0EB);
+  static const text2Dark = Color(0xFFA6A29A);
+  static const inputBorderDark = Color(0xFF44413C);
+  // Las acciones van en tinta; el rojo solo marca la fecha, lo actual y «ahora».
+  static const mark = Color(0xFFD7262E);
+  static const markDark = Color(0xFFFF6B70);
+  // Semánticos: rojo (error, mal hábito), ámbar (racha), azul (info).
+  static const coral = Color(0xFFD7262E);
+  static const coralInk = Color(0xFFB3261E);
+  static const coralTint = Color(0xFFFBE9EA);
+  static const mustard = Color(0xFFC77700);
+  static const mustardInk = Color(0xFF8A4B00);
+  static const mustardTint = Color(0xFFFBF1DE);
+  static const river = Color(0xFF2B59C3);
+  static const riverInk = Color(0xFF1F449A);
+  static const riverTint = Color(0xFFE8EEFA);
+  static const focus = Color(0xFF2B59C3);
 }
 
 abstract final class QSpace {
@@ -55,9 +52,9 @@ abstract final class QSpace {
 abstract final class QRadius {
   static const chip = 6.0,
       control = 8.0,
-      button = 10.0,
-      block = 12.0,
-      card = 14.0,
+      button = 24.0,
+      block = 10.0,
+      card = 12.0,
       sheet = 20.0,
       pill = 99.0;
 }
@@ -67,13 +64,19 @@ abstract final class QSize {
 }
 
 abstract final class QMotion {
-  static const press = Duration(milliseconds: 80);
+  static const press = Duration(milliseconds: 160);
   static const fade = Duration(milliseconds: 200);
   static const sheet = Duration(milliseconds: 250);
+
+  /// Ease-out fuerte: el toque responde al instante.
+  static const easeOut = Cubic(0.23, 1, 0.32, 1);
+
+  /// Para lo que se mueve dentro de la pantalla.
+  static const easeInOut = Cubic(0.77, 0, 0.175, 1);
 }
 
 abstract final class QText {
-  static const family = 'Inter';
+  static const family = 'Archivo';
 
   static TextStyle _inter(
     Color c,
@@ -90,19 +93,27 @@ abstract final class QText {
     color: c,
   );
 
+  /// El número de la hoja: uno por pantalla, nunca más.
+  static TextStyle numeral(Color c, {double size = 168}) => _inter(
+    c,
+    size,
+    height: 0.86,
+    weight: FontWeight.w900,
+    spacing: -size * 0.04,
+  ).copyWith(fontFeatures: const [FontFeature.tabularFigures()]);
   static TextStyle display(Color c) =>
-      _inter(c, 32, height: 1.15, weight: FontWeight.w700, spacing: -0.8);
+      _inter(c, 32, height: 1.1, weight: FontWeight.w800, spacing: -1);
   static TextStyle title1(Color c) =>
-      _inter(c, 26, height: 1.2, weight: FontWeight.w700, spacing: -0.6);
+      _inter(c, 28, height: 1.15, weight: FontWeight.w800, spacing: -0.8);
   static TextStyle title2(Color c) =>
-      _inter(c, 20, height: 1.25, weight: FontWeight.w600, spacing: -0.3);
+      _inter(c, 20, height: 1.25, weight: FontWeight.w700, spacing: -0.3);
   static TextStyle title3(Color c) =>
       _inter(c, 17, height: 1.3, weight: FontWeight.w600, spacing: -0.2);
   static TextStyle body(Color c) => _inter(c, 15, height: 1.45);
   static TextStyle label(Color c) =>
-      _inter(c, 14, height: 1.3, weight: FontWeight.w500);
+      _inter(c, 15, height: 1.3, weight: FontWeight.w600);
   static TextStyle meta(Color c) =>
-      _inter(c, 12, weight: FontWeight.w500, spacing: 0.2);
+      _inter(c, 12, weight: FontWeight.w600, spacing: 0.3);
   static TextStyle number(Color c, {double size = 15}) => _inter(
     c,
     size,
@@ -116,8 +127,9 @@ ThemeData questlyTheme({required bool dark}) {
   final text = dark ? QColors.textDark : QColors.text;
   final text2 = dark ? QColors.text2Dark : QColors.text2;
   final border = dark ? QColors.borderDark : QColors.border;
-  final ink = dark ? QColors.accentInkDark : QColors.accentInk;
-  final tint = dark ? QColors.accentTintDark : QColors.accentTint;
+  final ink = text;
+  final tint = dark ? QColors.trackDark : QColors.track;
+  final mark = dark ? QColors.markDark : QColors.mark;
   final inputBorder = dark ? QColors.inputBorderDark : QColors.inputBorder;
   OutlineInputBorder outline(Color c, [double w = 1]) => OutlineInputBorder(
     borderRadius: BorderRadius.circular(QRadius.button),
@@ -130,13 +142,13 @@ ThemeData questlyTheme({required bool dark}) {
     scaffoldBackgroundColor: bg,
     colorScheme: ColorScheme(
       brightness: dark ? Brightness.dark : Brightness.light,
-      primary: QColors.accent,
-      onPrimary: Colors.white,
+      primary: text,
+      onPrimary: card,
       secondary: ink,
       onSecondary: card,
       primaryContainer: tint,
       onPrimaryContainer: ink,
-      error: dark ? const Color(0xFFFCA5A5) : QColors.coralInk,
+      error: dark ? QColors.markDark : QColors.coralInk,
       onError: Colors.white,
       surface: card,
       onSurface: text,
@@ -163,11 +175,12 @@ ThemeData questlyTheme({required bool dark}) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: QColors.accent,
-        foregroundColor: Colors.white,
-        disabledBackgroundColor: QColors.disabled,
+        backgroundColor: text,
+        foregroundColor: card,
+        disabledBackgroundColor: border,
+        disabledForegroundColor: text2,
         minimumSize: const Size.fromHeight(QSize.buttonPrimary),
-        textStyle: QText.label(Colors.white).copyWith(fontSize: 15),
+        textStyle: QText.label(card),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(QRadius.button),
         ),
@@ -198,8 +211,31 @@ ThemeData questlyTheme({required bool dark}) {
       fillColor: card,
       enabledBorder: outline(inputBorder),
       border: outline(inputBorder),
-      focusedBorder: outline(QColors.focus, 1.5),
+      focusedBorder: outline(text, 1.5),
       errorBorder: outline(QColors.coralInk),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: text,
+      foregroundColor: card,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: text,
+      linearTrackColor: tint,
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: mark,
+      selectionColor: mark.withValues(alpha: 0.25),
+      selectionHandleColor: mark,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: text,
+      contentTextStyle: QText.body(card),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(QRadius.block),
+      ),
     ),
     materialTapTargetSize: MaterialTapTargetSize.padded,
   );

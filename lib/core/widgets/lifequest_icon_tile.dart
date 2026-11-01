@@ -9,14 +9,8 @@ class LifeQuestIconTile extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: size,
-    height: size,
-    alignment: Alignment.center,
-    decoration: BoxDecoration(
-      color: context.lq.softGreen,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Icon(icon, color: context.lq.deepGreen, size: size * .55),
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: size,
+    child: Icon(icon, color: context.lq.ink, size: size * .6),
   );
 }

@@ -47,7 +47,7 @@ class SessionRewardsCard extends StatelessWidget {
           children: [
             Expanded(
               child: LifeQuestStat(
-                value: '$cycles 🔥',
+                value: '$cycles',
                 label: 'Ciclos completados',
               ),
             ),

@@ -37,7 +37,7 @@ class SettingsScreen extends StatelessWidget {
         showLifeQuestMessage(context, (state as SettingsSuccess).message!),
     builder: (context, state) => LifeQuestPage(
       title: 'Ajustes',
-      subtitle: 'Tus reglas del juego. Cámbialas cuando quieras.',
+      subtitle: 'Cómo funciona Questly para ti.',
       trailing: IconButton(
         onPressed: onBack,
         tooltip: 'Volver al perfil',
@@ -106,6 +106,7 @@ class SettingsScreen extends StatelessWidget {
               foregroundColor: context.lq.ink,
               side: BorderSide(color: context.lq.line),
               textStyle: const TextStyle(
+                fontFamily: 'Archivo',
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
@@ -150,7 +151,7 @@ class SettingsScreen extends StatelessWidget {
                   bloc.add(GameSettingsChanged(settings.withDifficulty(level))),
       ),
       const SizedBox(height: 12),
-      const LifeQuestSectionHeading('REGLAS DEL JUEGO'),
+      const LifeQuestSectionHeading('PREFERENCIAS'),
       const SizedBox(height: 8),
       SettingLink(
         icon: Icons.notifications_active_outlined,

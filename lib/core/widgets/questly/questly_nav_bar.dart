@@ -4,8 +4,8 @@ import 'package:proyecto_movil/core/theme/questly_icons.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Barra inferior de 5 pestañas: la activa lleva una píldora de tinte y el
-/// texto en tinta.
+/// Barra inferior de 5 pestañas sobre el suelo de papel: la activa va en
+/// tinta con un trazo bajo el icono; las demás, en gris.
 class QuestlyNavBar extends StatelessWidget {
   const QuestlyNavBar({
     super.key,
@@ -33,7 +33,7 @@ class QuestlyNavBar extends StatelessWidget {
       label: 'Principal',
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: q.card,
+          color: q.bg,
           border: Border(top: BorderSide(color: q.border)),
         ),
         child: SafeArea(
@@ -76,7 +76,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = context.q;
-    final color = active ? q.ink : q.text2;
+    final color = active ? q.text : q.text2;
     return Semantics(
       button: true,
       selected: active,
@@ -93,9 +93,14 @@ class _NavItem extends StatelessWidget {
                 duration: context.motion(QMotion.press),
                 width: QSize.minTap,
                 height: 28,
+                curve: QMotion.easeOut,
                 decoration: BoxDecoration(
-                  color: active ? q.tint : Colors.transparent,
-                  borderRadius: BorderRadius.circular(QRadius.pill),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: active ? q.text : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
                 ),
                 alignment: Alignment.center,
                 child: QIcon(icon, color: color),
@@ -107,7 +112,7 @@ class _NavItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: QText.label(color).copyWith(
                   fontSize: 12,
-                  fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: active ? FontWeight.w800 : FontWeight.w500,
                 ),
               ),
             ],

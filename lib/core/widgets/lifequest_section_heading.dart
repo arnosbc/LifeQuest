@@ -21,12 +21,11 @@ class LifeQuestSectionHeading extends StatelessWidget {
         child: Semantics(
           header: true,
           child: Text(
-            title,
+            _sentence(title),
             style: TextStyle(
-              color: context.lq.muted,
-              fontSize: 12,
-              letterSpacing: .6,
-              fontWeight: FontWeight.w600,
+              color: context.lq.ink,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -40,6 +39,7 @@ class LifeQuestSectionHeading extends StatelessWidget {
             minimumSize: const Size(48, 40),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             textStyle: const TextStyle(
+              fontFamily: 'Archivo',
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -49,3 +49,8 @@ class LifeQuestSectionHeading extends StatelessWidget {
     ],
   );
 }
+
+/// «RESUMEN DE LA SESIÓN» → «Resumen de la sesión».
+String _sentence(String title) => title.isEmpty
+    ? title
+    : title[0].toUpperCase() + title.substring(1).toLowerCase();

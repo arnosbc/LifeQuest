@@ -48,7 +48,7 @@ class DungeonScreen extends StatelessWidget {
     if (session == null) {
       return LifeQuestPage(
         title: 'Foco',
-        subtitle: 'DEEP WORKING · Prepara tu mochila',
+        subtitle: 'Elige qué harás y cuánto tiempo.',
         children: [
           if (state.summary case final summary?) ...[
             SessionRewardsCard(
@@ -90,7 +90,7 @@ class DungeonScreen extends StatelessWidget {
         : Duration(minutes: session.cycleMinutes);
     return LifeQuestPage(
       title: 'Foco',
-      subtitle: 'DEEP WORKING · Ciclo $cycle / ${session.maxCycles}',
+      subtitle: 'Ciclo $cycle de ${session.maxCycles}',
       children: [
         DungeonTimerRing(
           remaining: state.remaining,
@@ -101,10 +101,8 @@ class DungeonScreen extends StatelessWidget {
               ? 'EN PAUSA'
               : rest
               ? 'DESCANSO'
-              : 'MAZMORRA ACTIVA',
-          footer: state.busy
-              ? 'Guardando tu progreso…'
-              : 'Ciclo $cycle de ${session.maxCycles}',
+              : 'FOCO',
+          footer: state.busy ? 'Guardando tu progreso…' : '',
         ),
         const SizedBox(height: 14),
         DeepWorkSessionCard(
@@ -116,13 +114,14 @@ class DungeonScreen extends StatelessWidget {
               : (id) => bloc.add(DungeonTaskCompleted(id)),
         ),
         const SizedBox(height: 9),
-        SessionRewardsCard(
-          title: 'RECOMPENSAS DE LA SESIÓN',
-          xp: session.xpEarned,
-          coins: session.coinsEarned,
-          cycles: session.cyclesDone,
-          minutes: session.cyclesDone * session.cycleMinutes,
-        ),
+        if (done)
+          SessionRewardsCard(
+            title: 'RESUMEN DE LA SESIÓN',
+            xp: session.xpEarned,
+            coins: session.coinsEarned,
+            cycles: session.cyclesDone,
+            minutes: session.cyclesDone * session.cycleMinutes,
+          ),
         const SizedBox(height: 11),
         if (!done)
           Row(

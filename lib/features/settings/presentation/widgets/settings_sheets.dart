@@ -245,6 +245,7 @@ class _SheetFrame extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   textStyle: const TextStyle(
+                    fontFamily: 'Archivo',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),

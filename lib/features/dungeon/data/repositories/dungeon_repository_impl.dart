@@ -67,8 +67,8 @@ class DungeonRepositoryImpl implements DungeonRepository {
       'Ya tienes una sesión de foco en curso. Desliza para retomarla.',
     'invalid_duration' =>
       'La sesión dura de 30 min a 8 h, en pasos de 30, y cabe al menos un ciclo.',
-    'no_tasks' => 'Elige al menos una tarea para tu mochila.',
-    'session_task_limit' => 'Tu mochila admite hasta 5 tareas.',
+    'no_tasks' => 'Elige al menos una tarea para la sesión.',
+    'session_task_limit' => 'Una sesión admite hasta 5 tareas.',
     'task_not_found' =>
       'Alguna tarea ya no está abierta. Desliza para actualizar.',
     'cycle_not_finished' => 'Al ciclo aún le falta un poco. Sigue concentrado.',

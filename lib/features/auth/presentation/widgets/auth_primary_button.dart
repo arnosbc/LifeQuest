@@ -42,7 +42,11 @@ class AuthPrimaryButton extends StatelessWidget {
         disabledForegroundColor: context.lq.onDeepGreen,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+          fontFamily: 'Archivo',
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     ),
   );

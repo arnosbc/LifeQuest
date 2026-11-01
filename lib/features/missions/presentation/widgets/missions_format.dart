@@ -41,6 +41,12 @@ abstract final class MissionsFormat {
 
   /// "Hoy · 18:00", "Mañana · 09:30", "12 oct · 18:00" o, si ya pasó,
   /// "Pendiente desde el 12 oct" (sin culpa, solo el dato).
+  /// "18:30", o vacío si no tiene fecha.
+  static String time(DateTime? due) => due == null
+      ? ''
+      : '${due.hour.toString().padLeft(2, '0')}:'
+            '${due.minute.toString().padLeft(2, '0')}';
+
   static String due(DateTime? due, DateTime now) {
     if (due == null) return 'Sin fecha límite';
     // En UTC para que un cambio de horario no altere la resta de días.

@@ -30,7 +30,7 @@ class DeepWorkSessionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'SESIÓN DEEP WORKING',
+            'SESIÓN',
             style: TextStyle(
               color: context.lq.muted,
               fontSize: 9,
@@ -59,7 +59,7 @@ class DeepWorkSessionCard extends StatelessWidget {
           ),
           const SizedBox(height: 11),
           Text(
-            'MOCHILA · ${session.tasks.length} tareas · $done completadas',
+            'TAREAS · $done de ${session.tasks.length} hechas',
             style: TextStyle(
               color: context.lq.muted,
               fontSize: 9,

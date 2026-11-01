@@ -15,4 +15,6 @@ export 'package:proyecto_movil/core/widgets/lifequest_page.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_section_heading.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_stat.dart';
 export 'package:proyecto_movil/core/widgets/lifequest_surface.dart';
+export 'package:proyecto_movil/core/widgets/paper_sheet.dart';
+export 'package:proyecto_movil/core/widgets/sheet_row.dart';
 export 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';

@@ -103,7 +103,7 @@ class StageScreen extends StatelessWidget {
     final idle = !state.busy;
     return LifeQuestPage(
       title: 'Proyectos y metas',
-      subtitle: 'Tu centro de mando, todo en un vistazo.',
+      subtitle: 'Lo grande, dividido en tareas.',
       trailing: IconButton.filledTonal(
         tooltip: 'Añadir tarea, proyecto, meta o recurso',
         onPressed: idle ? () => _quickAdd(context, board) : null,
@@ -118,7 +118,7 @@ class StageScreen extends StatelessWidget {
       children: [
         // RF-089: orden fijo urgent → high → medium → low → pending.
         LifeQuestSectionHeading(
-          'DAILY HIGHLIGHT',
+          'LO URGENTE',
           action: 'Ver tareas (${board.highlightTotal})',
           onTap: onOpenMissions,
         ),
@@ -176,7 +176,7 @@ class StageScreen extends StatelessWidget {
         const SizedBox(height: 14),
         LifeQuestSectionHeading(
           'PROYECTOS',
-          action: '${board.projects.length} activos',
+          action: '${board.projects.length}',
         ),
         const SizedBox(height: 7),
         if (board.projects.isEmpty)
@@ -206,10 +206,7 @@ class StageScreen extends StatelessWidget {
                 : null,
           ),
         const SizedBox(height: 14),
-        LifeQuestSectionHeading(
-          'ÁREAS (ÁREAS)',
-          action: '${board.areas.length}',
-        ),
+        LifeQuestSectionHeading('ÁREAS', action: '${board.areas.length}'),
         const SizedBox(height: 7),
         if (board.areas.isEmpty) _empty(context, 'Crea tus áreas desde Tú.'),
         for (final area in board.areas)
@@ -219,7 +216,7 @@ class StageScreen extends StatelessWidget {
             subtitle:
                 '${area.habits} hábitos · ${area.projects} proyectos · '
                 '${area.openTasks} tareas abiertas',
-            trailing: 'Nv ${area.level}',
+            trailing: 'Nivel ${area.level}',
           ),
         const SizedBox(height: 14),
         LifeQuestSectionHeading(
@@ -291,8 +288,8 @@ class StageScreen extends StatelessWidget {
   };
 
   static String _urgencyLabel(StageUrgency urgency) => switch (urgency) {
-    StageUrgency.high => '🔴 Alta',
-    StageUrgency.medium => '🟡 Media',
-    StageUrgency.low => '🟢 Baja',
+    StageUrgency.high => 'Urgencia alta',
+    StageUrgency.medium => 'Urgencia media',
+    StageUrgency.low => 'Urgencia baja',
   };
 }

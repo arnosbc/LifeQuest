@@ -29,13 +29,11 @@ class AppShell extends StatelessWidget {
         // en la Mazmorra: dentro del Deep Working, sin ruido (CLAUDE.md §8).
         floatingActionButton: navigationShell.currentIndex == 3
             ? null
-            : FloatingActionButton.small(
+            : FloatingActionButton(
                 heroTag: 'brain_dump',
-                tooltip: 'Bandeja: anota una idea',
-                backgroundColor: q.accent,
-                foregroundColor: q.onAccent,
+                tooltip: 'Bandeja: anota lo que tengas en mente',
                 onPressed: () => context.push(RoutePaths.brainDump),
-                child: const Icon(Icons.lightbulb_outline),
+                child: const Icon(Icons.add_rounded, size: 28),
               ),
         // Tocar una pestaña siempre abre su pantalla principal: Misiones,
         // abierta desde Inicio, no debe quedarse en lugar de Stage.

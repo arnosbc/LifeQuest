@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:proyecto_movil/core/theme/questly_theme.dart';
+
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 class DungeonTimerRing extends StatelessWidget {
@@ -49,16 +51,8 @@ class DungeonTimerRing extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'TIEMPO RESTANTE',
-                    style: TextStyle(color: context.lq.muted, fontSize: 9),
-                  ),
-                  Text(
                     '$mm:$ss',
-                    style: TextStyle(
-                      color: context.lq.ink,
-                      fontSize: 36,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: QText.numeral(context.lq.ink, size: 46),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -73,7 +67,7 @@ class DungeonTimerRing extends StatelessWidget {
                       label,
                       style: TextStyle(
                         color: context.lq.deepGreen,
-                        fontSize: 8,
+                        fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -81,7 +75,7 @@ class DungeonTimerRing extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     footer,
-                    style: TextStyle(color: context.lq.muted, fontSize: 8),
+                    style: TextStyle(color: context.lq.muted, fontSize: 13),
                   ),
                 ],
               ),

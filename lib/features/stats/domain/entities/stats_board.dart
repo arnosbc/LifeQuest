@@ -68,7 +68,7 @@ class StatsBoard extends Equatable {
     if (notes.length < 3) {
       notes.add(
         bestStreak > 0
-            ? 'Tu racha de $bestStreak días te está esperando 🔥'
+            ? 'Tu racha de $bestStreak días te está esperando.'
             : 'Un hábito bueno hoy enciende una racha nueva.',
       );
     }

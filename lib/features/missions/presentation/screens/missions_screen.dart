@@ -5,8 +5,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/create_mission_sheet.dart';
-import 'package:proyecto_movil/features/missions/presentation/widgets/mission_tile.dart';
-import 'package:proyecto_movil/features/missions/presentation/widgets/prioritized_mission_card.dart';
+import 'package:proyecto_movil/features/missions/presentation/widgets/missions_format.dart';
 
 /// Tareas. Necesita un [MissionsBloc] por encima (lo provee el router).
 class MissionsScreen extends StatelessWidget {
@@ -93,9 +92,9 @@ class MissionsScreen extends StatelessWidget {
 
     return LifeQuestPage(
       title: 'Tareas',
-      subtitle: missions.isEmpty
-          ? 'Nada pendiente.'
-          : '${missions.length} abiertas, la más urgente primero.',
+      subtitle: 'La más urgente arriba.',
+      numeral: '${missions.length}',
+      numeralLabel: missions.length == 1 ? 'abierta' : 'abiertas',
       trailing: TextButton.icon(
         onPressed: onOpenProjects,
         icon: const Icon(Icons.folder_outlined, size: 20),
@@ -104,37 +103,35 @@ class MissionsScreen extends StatelessWidget {
       ),
       children: [
         if (missions.isEmpty)
-          LifeQuestSurface(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
               'No tienes tareas abiertas. Crea la primera abajo.',
-              style: TextStyle(color: context.lq.muted, fontSize: 14),
+              style: TextStyle(color: context.lq.muted, fontSize: 15),
             ),
-          )
-        else ...[
-          PrioritizedMissionCard(
-            mission: missions.first,
-            now: now,
-            busy: state.busyMissionId == missions.first.id,
-            onComplete: idle ? () => complete(missions.first.id) : null,
-            menu: menu(missions.first),
           ),
-        ],
-        if (missions.length > 1) ...[
-          const SizedBox(height: 16),
-          LifeQuestSectionHeading('DESPUÉS', action: '${missions.length - 1}'),
-          const SizedBox(height: 7),
-          for (final mission in missions.skip(1)) ...[
-            MissionTile(
-              mission: mission,
-              now: now,
+        for (final (i, mission) in missions.indexed)
+          SheetRow(
+            current: i == 0,
+            leading: SheetCheck(
+              done: false,
               busy: state.busyMissionId == mission.id,
-              onComplete: idle ? () => complete(mission.id) : null,
-              menu: menu(mission),
+              label: 'Completar ${mission.title}',
+              onTap: idle ? () => complete(mission.id) : null,
             ),
-            const SizedBox(height: 7),
-          ],
-        ],
-        const SizedBox(height: 16),
+            time: MissionsFormat.time(mission.dueDate),
+            title: mission.title,
+            subtitle: [
+              MissionsFormat.due(mission.dueDate, now),
+              MissionsFormat.origin(mission),
+              '${mission.xpReward} XP',
+            ].join(' · '),
+            trailing: menu(mission),
+            action: i == 0
+                ? SheetPill(label: 'Empezar foco', onTap: onStartFocus)
+                : null,
+          ),
+        const SizedBox(height: 20),
         SizedBox(
           height: 48,
           child: FilledButton.icon(

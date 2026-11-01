@@ -144,8 +144,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // El saludo cambia con la hora; el nombre sale del perfil.
-    expect(find.textContaining(', Ana'), findsOneWidget);
+    // Hoy abre con la hoja del día.
+    expect(find.text('Empezar foco'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
 
     // Barra: Hoy · Tareas · Hábitos · Foco · Tú.
@@ -164,8 +164,8 @@ void main() {
     await tester.tap(find.text('Proyectos'));
     await tester.pumpAndSettle();
     expect(find.text('Lanzamiento de la app'), findsOneWidget);
-    expect(find.textContaining('🔴 Alta'), findsOneWidget);
-    expect(find.text('METAS'), findsOneWidget);
+    expect(find.textContaining('Urgencia alta'), findsOneWidget);
+    expect(find.text('Metas'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
 
     // Tocar una pestaña abre su raíz: Tareas, no Proyectos.
@@ -174,7 +174,7 @@ void main() {
     await tester.tap(tab('Tareas'));
     await tester.pumpAndSettle();
     expect(find.text('Preparar la exposición'), findsOneWidget);
-    expect(find.text('METAS'), findsNothing);
+    expect(find.text('Metas'), findsNothing);
   });
 
   testWidgets('al volver a una pestaña recarga sus datos', (tester) async {

@@ -75,9 +75,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
       onDelete: () => bloc.add(HabitDeleted(habit.id)),
       deleteMessage: 'Se borra también su historial y su racha.',
     );
+    final streak = state.board.habits.fold(
+      0,
+      (best, habit) => habit.currentStreak > best ? habit.currentStreak : best,
+    );
     return LifeQuestPage(
       title: 'Hábitos',
       subtitle: 'Lo que repites define tu semana.',
+      numeral: '$streak',
+      numeralLabel: streak == 1 ? 'día de racha' : 'días de racha',
       children: [
         Row(
           children: [

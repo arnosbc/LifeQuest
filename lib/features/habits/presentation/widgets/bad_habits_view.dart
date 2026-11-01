@@ -50,7 +50,7 @@ class BadHabitsView extends StatelessWidget {
         const SizedBox(height: 13),
         LifeQuestSectionHeading(
           'HÁBITOS QUE QUIERO EVITAR',
-          action: '${habits.length} activos',
+          action: '${habits.length}',
         ),
         const SizedBox(height: 7),
         if (habits.isEmpty)

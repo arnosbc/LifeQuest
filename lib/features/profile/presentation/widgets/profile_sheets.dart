@@ -272,7 +272,11 @@ class _PrimaryButton extends StatelessWidget {
         backgroundColor: context.lq.deepGreen,
         foregroundColor: context.lq.onDeepGreen,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+          fontFamily: 'Archivo',
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       child: Text(label),
     ),

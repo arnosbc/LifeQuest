@@ -13,17 +13,18 @@ class LifeQuestSurface extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
 
-  /// Por defecto, la superficie del tema.
+  /// Con color es un bloque relleno; sin color es una sección de la hoja,
+  /// separada solo por un filete (nada de tarjetas dentro de la hoja).
   final Color? color;
 
   @override
   Widget build(BuildContext context) => Container(
     padding: padding,
-    decoration: BoxDecoration(
-      color: color ?? context.lq.surface,
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: context.lq.line),
-    ),
+    decoration: color != null
+        ? BoxDecoration(color: color, borderRadius: BorderRadius.circular(10))
+        : BoxDecoration(
+            border: Border(bottom: BorderSide(color: context.lq.line)),
+          ),
     child: child,
   );
 }

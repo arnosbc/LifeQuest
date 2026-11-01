@@ -29,53 +29,8 @@ class GoodHabitsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final habits = board.good;
-    final streak = habits.fold(
-      0,
-      (best, h) => h.currentStreak > best ? h.currentStreak : best,
-    );
     return Column(
       children: [
-        LifeQuestSurface(
-          color: context.lq.softGreen,
-          child: Row(
-            children: [
-              const Text('🔥', style: TextStyle(fontSize: 24)),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      streak == 0
-                          ? 'Empieza tu racha hoy'
-                          : 'Racha actual $streak ${streak == 1 ? 'día' : 'días'}',
-                      style: TextStyle(
-                        color: context.lq.ink,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'Cada hábito cumplido suma XP y alarga tu racha.',
-                      style: TextStyle(
-                        color: context.lq.muted,
-                        fontSize: 9,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 13),
-        LifeQuestSectionHeading(
-          'BUENOS HÁBITOS',
-          action: '${habits.length} activos',
-        ),
-        const SizedBox(height: 6),
         if (habits.isEmpty)
           LifeQuestSurface(
             child: Text(

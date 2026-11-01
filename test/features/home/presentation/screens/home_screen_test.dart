@@ -46,24 +46,22 @@ void main() {
   testWidgets('muestra la tarea de ahora, hábitos y progreso', (tester) async {
     await pump(tester, HomeSuccess(dashboard));
 
-    expect(find.textContaining(', Ana'), findsOneWidget);
     expect(find.text('Preparar presentación del proyecto'), findsOneWidget);
-    expect(find.text('Prioridad alta'), findsOneWidget);
     expect(find.text('Empezar foco'), findsOneWidget);
-    expect(find.text('Nivel 24'), findsOneWidget);
-    expect(find.text('Te faltan 4.150 XP para el nivel 25'), findsOneWidget);
-    expect(find.text('3 / 5'), findsOneWidget);
-    expect(find.text('12 días'), findsOneWidget);
+    expect(find.text('2 pendientes · racha 12 días'), findsOneWidget);
+    expect(find.text('Leer'), findsOneWidget);
     expect(find.text('2.450'), findsNothing);
   });
 
   testWidgets('tocar un hábito pendiente lo registra; uno hecho, no', (
     tester,
   ) async {
+    final handle = tester.ensureSemantics();
     await pump(tester, HomeSuccess(dashboard));
 
-    await tester.tap(find.text('Agua'));
-    await tester.tap(find.text('Leer'));
+    await tester.tap(find.bySemanticsLabel('Marcar Agua como hecho'));
+    await tester.tap(find.bySemanticsLabel('Leer, hecho hoy'));
+    handle.dispose();
 
     verify(() => bloc.add(const HomeHabitCompleted('h2'))).called(1);
     verifyNever(() => bloc.add(const HomeHabitCompleted('h1')));
@@ -74,12 +72,9 @@ void main() {
   ) async {
     await pump(tester, const HomeSuccess(emptyDashboard));
 
-    expect(find.textContaining(', Alex'), findsOneWidget);
     expect(find.text('No tienes tareas pendientes'), findsOneWidget);
     expect(find.text('Crear tarea'), findsOneWidget);
-    expect(find.text('Hoy no tienes hábitos programados.'), findsOneWidget);
-    expect(find.text('Ver todos'), findsOneWidget);
-    expect(find.text('Nivel 1'), findsOneWidget);
+    expect(find.text('Nada pendiente'), findsOneWidget);
   });
 
   testWidgets('si la carga falla, ofrece reintentar', (tester) async {
@@ -106,6 +101,6 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.text('TU PROGRESO'), findsOneWidget);
+    expect(find.text('Empezar foco'), findsOneWidget);
   });
 }

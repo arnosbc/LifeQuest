@@ -17,7 +17,7 @@ class HabitTabButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
     onTap: onTap,
-    borderRadius: BorderRadius.circular(10),
+    borderRadius: BorderRadius.circular(24),
     child: Container(
       height: 35,
       alignment: Alignment.center,
@@ -26,7 +26,7 @@ class HabitTabButton extends StatelessWidget {
         border: Border.all(
           color: selected ? context.lq.green : context.lq.line,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
         label,

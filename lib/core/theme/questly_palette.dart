@@ -38,20 +38,20 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
     line: dark ? QColors.borderDark : QColors.line,
     text: dark ? QColors.textDark : QColors.text,
     text2: dark ? QColors.text2Dark : QColors.text2,
-    text3: dark ? const Color(0xFFD4D4D8) : QColors.text3,
+    text3: dark ? const Color(0xFFD6D3CC) : QColors.text3,
     inputBorder: dark ? QColors.inputBorderDark : QColors.inputBorder,
-    ink: dark ? QColors.accentInkDark : QColors.accentInk,
-    tint: dark ? QColors.accentTintDark : QColors.accentTint,
-    coralInk: dark ? const Color(0xFFFCA5A5) : QColors.coralInk,
-    coralTint: dark ? const Color(0xFF2A1215) : QColors.coralTint,
-    mustardInk: dark ? const Color(0xFFFCD34D) : QColors.mustardInk,
-    mustardTint: dark ? const Color(0xFF2A2010) : QColors.mustardTint,
-    river: dark ? const Color(0xFF93C5FD) : QColors.river,
-    riverInk: dark ? const Color(0xFFBFDBFE) : QColors.riverInk,
-    riverTint: dark ? const Color(0xFF172036) : QColors.riverTint,
+    ink: dark ? QColors.textDark : QColors.text,
+    tint: dark ? QColors.trackDark : QColors.track,
+    coralInk: dark ? QColors.markDark : QColors.coralInk,
+    coralTint: dark ? const Color(0xFF3A1517) : QColors.coralTint,
+    mustardInk: dark ? const Color(0xFFF5C26B) : QColors.mustardInk,
+    mustardTint: dark ? const Color(0xFF33270F) : QColors.mustardTint,
+    river: dark ? const Color(0xFF8FB0F0) : QColors.river,
+    riverInk: dark ? const Color(0xFFB9CCF5) : QColors.riverInk,
+    riverTint: dark ? const Color(0xFF1A2440) : QColors.riverTint,
     // Fondo de toast y filtro activo.
-    strong: dark ? const Color(0xFFFAFAFA) : QColors.text,
-    toastAction: dark ? QColors.accent : QColors.accentInkDark,
+    strong: dark ? QColors.textDark : QColors.text,
+    toastAction: dark ? QColors.mark : QColors.markDark,
   );
 
   final bool dark;
@@ -62,9 +62,14 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
   final Color river, riverInk, riverTint;
   final Color strong, toastAction;
 
+  /// Acciones en tinta (botones, enlaces, progreso).
+  Color get accent => text;
+  Color get onAccent => card;
+
+  /// El único rojo: la fecha, la tarea en curso y «ahora».
+  Color get mark => dark ? QColors.markDark : QColors.mark;
+
   // Iguales en los dos modos.
-  Color get accent => QColors.accent;
-  Color get onAccent => Colors.white;
   Color get coral => QColors.coral;
   Color get mustard => QColors.mustard;
   Color get focus => QColors.focus;
@@ -72,10 +77,10 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
   Color get onStrong => dark ? QColors.bgDark : QColors.bg;
   Color get destructive => QColors.coralInk;
   Color get onDestructive => Colors.white;
-  Color get toastShadow => const Color(0x2909090B);
-  Color get segmentShadow => const Color(0x1A09090B);
-  Color get sheetScrim => const Color(0x8009090B);
-  Color get dialogScrim => const Color(0x9909090B);
+  Color get toastShadow => const Color(0x29111111);
+  Color get segmentShadow => const Color(0x1A111111);
+  Color get sheetScrim => const Color(0x80111111);
+  Color get dialogScrim => const Color(0x99111111);
 
   @override
   QuestlyPalette copyWith() => this;

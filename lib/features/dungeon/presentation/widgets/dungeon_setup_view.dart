@@ -53,7 +53,7 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
         ),
         const SizedBox(height: 9),
         LifeQuestSectionHeading(
-          'MOCHILA DE TAREAS',
+          'TAREAS PARA ESTA SESIÓN',
           action: '${_picked.length} / ${widget.board.maxTasks}',
         ),
         const SizedBox(height: 6),

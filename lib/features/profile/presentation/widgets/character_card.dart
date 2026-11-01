@@ -93,6 +93,7 @@ class CharacterCard extends StatelessWidget {
                       minimumSize: const Size(48, 48),
                       padding: EdgeInsets.zero,
                       textStyle: const TextStyle(
+                        fontFamily: 'Archivo',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
