@@ -10,7 +10,6 @@ import 'package:proyecto_movil/features/profile/domain/usecases/create_skill.dar
 import 'package:proyecto_movil/features/profile/domain/usecases/delete_skill.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/get_character_profile.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/rename_skill.dart';
-import 'package:proyecto_movil/features/profile/domain/usecases/set_active_title.dart';
 import 'package:proyecto_movil/features/profile/domain/usecases/update_identity.dart';
 
 part 'profile_event.dart';
@@ -23,7 +22,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this._createSkill,
     required this._renameSkill,
     required this._deleteSkill,
-    required this._setActiveTitle,
   }) : super(const ProfileInitial()) {
     // droppable: toques repetidos mientras se guarda se ignoran.
     on<ProfileRequested>(_onRequested, transformer: droppable());
@@ -63,14 +61,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           _save(emit, () => _deleteSkill(event.skillId), 'Área eliminada.'),
       transformer: droppable(),
     );
-    on<ProfileActiveTitleChanged>(
-      (event, emit) => _save(
-        emit,
-        () => _setActiveTitle(event.titleId),
-        _titleMessage(event.titleId),
-      ),
-      transformer: droppable(),
-    );
   }
 
   final GetCharacterProfile _getCharacterProfile;
@@ -78,19 +68,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final CreateSkill _createSkill;
   final RenameSkill _renameSkill;
   final DeleteSkill _deleteSkill;
-  final SetActiveTitle _setActiveTitle;
-
-  String _titleMessage(String? titleId) {
-    if (titleId == null) return 'Ya no muestras ningún título.';
-    final current = state;
-    final name = current is ProfileSuccess
-        ? current.profile.earnedTitles
-              .where((title) => title.id == titleId)
-              .firstOrNull
-              ?.name
-        : null;
-    return name == null ? 'Título actualizado.' : 'Ahora luces «$name».';
-  }
 
   Future<void> _onRequested(
     ProfileRequested event,

@@ -6,6 +6,18 @@ Instrucciones de contexto para trabajar en **LifeQuest**, una app móvil de prod
 
 ---
 
+## 0. Rework en curso (rama `Remaked`, desde 2026-10-31) — manda sobre el resto
+
+El tutor rechazó la versión RPG: crear una tarea (manual o con IA) solo guardaba texto y había muchas pantallas de solo lectura. El rework (plan en 4 fases: limpieza y diseño → tareas que actúan → asistente → integración con el teléfono) cambia esto:
+
+- **Sin ambientación de fantasía.** Nada de reino, héroe, Mazmorra, Taverna, NPC, jefes ni RPGenie en la UI. Términos: **Hoy · Tareas · Hábitos · Foco · Tú**, Bandeja (Brain Dump), Áreas (skills), Proyectos y metas (Stage · P.A.R.A.), Ajustes (Game Master), Historial (Diario).
+- **Juego ligero:** quedan XP, nivel y racha. Se quitaron de la app Tienda/Monedas, Taverna/NPCs, Boss Fight, HP visible, Cofre, Inventario, títulos y Vision Board (features y rutas borradas). Las tablas y RPC económicas siguen en la BD sin uso visible (`shortcut:` limpiarlas en una migración posterior).
+- **Cada función debe actuar en el día real** (agenda, recordatorios, tiempo medido, acciones del sistema), no solo guardar filas. Lo determinista va por reglas en `domain`; la IA (Gemini capa gratis) solo interpreta lenguaje.
+- **Diseño minimal sobrio:** `docs/diseño/DESIGN.md` (zinc + índigo, Inter). Reemplaza «Bosque vivo».
+- Donde este documento hable de la ambientación o de módulos quitados, vale solo como historia del diseño.
+
+---
+
 ## 1. Qué es LifeQuest
 
 App móvil que convierte tareas, hábitos, proyectos y metas reales en misiones de un RPG: **el progreso real del usuario hace progresar a su personaje.**
@@ -385,14 +397,9 @@ Vienen de `docs/ideas-proyecto-productividad-gamificada.md` (versión del paquet
 
 ## 14. Diseño
 
-> **Diseño final entregado (2026-10-28):** sistema «Bosque vivo» (Questly) en `docs/diseño/` (`HANDOFF.md`, `DESIGN.md`, `PRODUCT.md`, tokens y 60 pantallas). El rediseño se hace según **`docs/diseño/PLAN-REDISENO.md`** (solo cambia el diseño; lo que funciona sigue igual) y arranca con `docs/diseño/PROMPT-INICIO.md`. Mientras se migra, lo de abajo aplica a las pantallas aún no revestidas.
+Sistema **minimal sobrio** en `docs/diseño/DESIGN.md` (tokens en `lib/core/theme/questly_theme.dart`, paleta `context.q` y su puente `context.lq`, Inter en `assets/fonts`). El paquete «Bosque vivo» y los temas de reino se retiraron el 2026-10-31.
 
-> **Reinicio (2026-10-18):** `DESIGN.md`, `PRODUCT.md` y el paquete de pantallas se borraron para empezar de cero. Se rehacen tomando como punto de partida `docs/ideas-proyecto-productividad-gamificada.md`.
-
-Mientras no existan:
-- No inventes colores, fuentes, tamaños ni componentes nuevos: no toques la UI salvo que se pida.
-- El código sigue con `LifeQuestColors` / `context.lq` y el modo claro/oscuro de `AppearanceBloc`.
-- **Accesibilidad WCAG 2.1 AA** sigue siendo obligatoria: contraste 4,5:1 (3:1 texto grande), zonas táctiles amplias, `Semantics` en botones de icono y el color nunca va solo.
-- La Mazmorra (Deep Working) es siempre oscura y respeta la reducción de movimiento del sistema.
-
-Cuando existan, esta sección se reescribe para apuntar a ellos.
+- No inventes colores, fuentes ni componentes fuera de los tokens; reutiliza `lib/core/widgets/` y `lib/core/widgets/questly/`.
+- **Accesibilidad WCAG 2.1 AA** obligatoria: contraste 4,5:1 (3:1 texto grande), zonas táctiles ≥ 44 px, `Semantics` en botones de icono y el color nunca va solo.
+- Foco (Deep Working) es siempre oscuro y respeta la reducción de movimiento del sistema.
+- Nada de pantallas que solo informan: cada pantalla tiene una acción principal.
