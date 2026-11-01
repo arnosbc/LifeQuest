@@ -22,49 +22,41 @@ class SettingLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lq = context.lq;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: lq.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-          side: BorderSide(color: lq.line),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(11),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 56),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  LifeQuestIconTile(icon),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            color: lq.ink,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          description,
-                          style: TextStyle(color: lq.muted, fontSize: 12),
-                        ),
-                      ],
+    // Fila de la hoja: sin caja ni icono decorativo, separada por filete.
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 64),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: lq.line)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: lq.ink,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  Icon(Icons.chevron_right_rounded, color: lq.muted),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: TextStyle(color: lq.muted, fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              Icon(Icons.chevron_right_rounded, color: lq.muted),
+            ],
           ),
         ),
       ),

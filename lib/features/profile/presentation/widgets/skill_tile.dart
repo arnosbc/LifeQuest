@@ -12,18 +12,14 @@ class SkillTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: context.lq.surface,
-    shape: RoundedRectangleBorder(
-      side: BorderSide(color: context.lq.line),
-      borderRadius: BorderRadius.circular(11),
-    ),
+    type: MaterialType.transparency,
     child: InkWell(
       onTap: onTap,
-      customBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(11),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: context.lq.line)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -41,7 +37,7 @@ class SkillTile extends StatelessWidget {
             Text(
               'Nivel ${skill.level}',
               style: TextStyle(
-                color: context.lq.deepGreen,
+                color: context.lq.muted,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -50,7 +46,7 @@ class SkillTile extends StatelessWidget {
             const SizedBox(height: 12),
             LinearProgressIndicator(
               value: skill.progress,
-              minHeight: 6,
+              minHeight: 4,
               color: context.lq.green,
               backgroundColor: context.lq.softGreen,
               borderRadius: const BorderRadius.all(Radius.circular(6)),

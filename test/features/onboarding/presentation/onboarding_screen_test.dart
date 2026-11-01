@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:proyecto_movil/app/config/theme.dart';
+import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/onboarding/domain/entities/onboarding_choices.dart';
 import 'package:proyecto_movil/features/onboarding/domain/entities/onboarding_status.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
@@ -84,7 +84,9 @@ void main() {
           of: find.text('Normal'),
           matching: find.byType(InkWell),
         ),
-        matching: find.byIcon(Icons.check_circle_rounded),
+        matching: find.byWidgetPredicate(
+          (w) => w is SheetCheck && w.done,
+        ),
       ),
       findsOneWidget,
     );

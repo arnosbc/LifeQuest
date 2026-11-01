@@ -52,7 +52,7 @@ class DungeonScreen extends StatelessWidget {
         children: [
           if (state.summary case final summary?) ...[
             SessionRewardsCard(
-              title: 'BOTÍN DE LA ÚLTIMA SESIÓN',
+              title: 'TU ÚLTIMA SESIÓN',
               xp: summary.xp,
               coins: summary.coins,
               cycles: summary.cycles,
@@ -133,16 +133,18 @@ class DungeonScreen extends StatelessWidget {
                   label: Text(state.paused ? 'Continuar' : 'Pausar'),
                 ),
               ),
-              const SizedBox(width: 7),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: rest
-                      ? () => bloc.add(const DungeonBreakSkipped())
-                      : null,
-                  icon: const Icon(Icons.skip_next),
-                  label: const Text('Saltar descanso'),
+              // Saltar solo existe durante el descanso: en foco no hay nada
+              // que saltar y un botón apagado solo hace ruido.
+              if (rest) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => bloc.add(const DungeonBreakSkipped()),
+                    icon: const Icon(Icons.skip_next),
+                    label: const Text('Saltar descanso'),
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         const SizedBox(height: 6),
@@ -153,9 +155,6 @@ class DungeonScreen extends StatelessWidget {
             onPressed: state.busy ? null : () => _confirmEnd(context, done),
             icon: const Icon(Icons.stop),
             label: const Text('Finalizar sesión'),
-            style: FilledButton.styleFrom(
-              backgroundColor: context.lq.deepGreen,
-            ),
           ),
         ),
       ],

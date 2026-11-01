@@ -8,7 +8,7 @@ Instrucciones de contexto para trabajar en **LifeQuest**, una app móvil de prod
 
 ## 0. Rework en curso (rama `Remaked`, desde 2026-10-31) — manda sobre el resto
 
-El tutor rechazó la versión RPG: crear una tarea (manual o con IA) solo guardaba texto y había muchas pantallas de solo lectura. El rework (plan en 4 fases: limpieza y diseño → tareas que actúan → asistente → integración con el teléfono) cambia esto:
+El tutor rechazó la versión RPG: crear una tarea (manual o con IA) solo guardaba texto y había muchas pantallas de solo lectura. El rework (plan en 4 fases: limpieza y diseño → tareas que actúan → asistente → integración con el teléfono; **detalle y estado en `docs/plan-rework.md`**, retómalo desde ahí) cambia esto:
 
 - **Sin ambientación de fantasía.** Nada de reino, héroe, Mazmorra, Taverna, NPC, jefes ni RPGenie en la UI. Términos: **Hoy · Tareas · Hábitos · Foco · Tú**, Bandeja (Brain Dump), Áreas (skills), Proyectos y metas (Stage · P.A.R.A.), Ajustes (Game Master), Historial (Diario).
 - **Juego ligero:** quedan XP, nivel y racha. Se quitaron de la app Tienda/Monedas, Taverna/NPCs, Boss Fight, HP visible, Cofre, Inventario, títulos y Vision Board (features y rutas borradas). Las tablas y RPC económicas siguen en la BD sin uso visible (`shortcut:` limpiarlas en una migración posterior).

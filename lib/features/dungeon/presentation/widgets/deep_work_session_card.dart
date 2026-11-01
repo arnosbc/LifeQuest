@@ -25,15 +25,15 @@ class DeepWorkSessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final done = session.tasks.where((t) => t.done).length;
     return LifeQuestSurface(
-      padding: const EdgeInsets.all(11),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'SESIÓN',
+            'Sesión',
             style: TextStyle(
-              color: context.lq.muted,
-              fontSize: 9,
+              color: context.lq.ink,
+              fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -59,16 +59,17 @@ class DeepWorkSessionCard extends StatelessWidget {
           ),
           const SizedBox(height: 11),
           Text(
-            'TAREAS · $done de ${session.tasks.length} hechas',
+            'Tareas · $done de ${session.tasks.length} hechas',
             style: TextStyle(
-              color: context.lq.muted,
-              fontSize: 9,
+              color: context.lq.ink,
+              fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
           ),
+          const SizedBox(height: 2),
           Text(
             'Toca una tarea para concentrarte en ella este ciclo.',
-            style: TextStyle(color: context.lq.muted, fontSize: 9),
+            style: TextStyle(color: context.lq.muted, fontSize: 13),
           ),
           for (final task in session.tasks) _task(context, task),
         ],
@@ -78,49 +79,25 @@ class DeepWorkSessionCard extends StatelessWidget {
 
   Widget _task(BuildContext context, DungeonTask task) {
     final current = task.id == currentTaskId;
-    return Container(
-      margin: const EdgeInsets.only(top: 7),
-      decoration: BoxDecoration(
-        color: current ? context.lq.softGreen : context.lq.background,
-        border: Border.all(
-          color: current ? context.lq.deepGreen : context.lq.line,
-        ),
-        borderRadius: BorderRadius.circular(9),
-      ),
-      // Material propio: el toque del ListTile se ve sobre el fondo.
-      child: Material(
-        type: MaterialType.transparency,
-        child: Semantics(
-          selected: current,
-          child: ListTile(
-            dense: true,
-            onTap: task.done ? null : () => onSelect(task.id),
-            title: Text(
-              task.title,
-              style: TextStyle(
-                color: context.lq.ink,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                decoration: task.done ? TextDecoration.lineThrough : null,
-              ),
-            ),
-            subtitle: Text(
-              '${current ? 'En foco · ' : ''}${task.cycles} ${task.cycles == 1 ? 'ciclo' : 'ciclos'}',
-              style: TextStyle(color: context.lq.muted, fontSize: 9),
-            ),
-            trailing: task.done
-                ? Icon(Icons.check_circle, color: context.lq.green)
-                : IconButton(
-                    tooltip: 'Completar «${task.title}»',
-                    onPressed: onComplete == null
-                        ? null
-                        : () => onComplete!(task.id),
-                    icon: Icon(
-                      Icons.check_circle_outline,
-                      color: context.lq.deepGreen,
-                    ),
-                  ),
+    // Tocar la fila la pone en foco; el check la completa.
+    return Semantics(
+      selected: current,
+      child: InkWell(
+        onTap: task.done ? null : () => onSelect(task.id),
+        child: SheetRow(
+          current: current && !task.done,
+          done: task.done,
+          leading: SheetCheck(
+            done: task.done,
+            label: 'Completar «${task.title}»',
+            onTap: task.done || onComplete == null
+                ? null
+                : () => onComplete!(task.id),
           ),
+          title: task.title,
+          subtitle:
+              '${current ? 'En foco · ' : ''}${task.cycles} '
+              '${task.cycles == 1 ? 'ciclo' : 'ciclos'}',
         ),
       ),
     );

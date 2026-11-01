@@ -8,13 +8,14 @@ import 'package:proyecto_movil/core/widgets/lifequest_surface.dart';
 class LifeQuestListRow extends StatelessWidget {
   const LifeQuestListRow({
     super.key,
-    required this.icon,
+    this.icon,
     required this.title,
     required this.subtitle,
     this.trailing,
   });
 
-  final IconData icon;
+  /// Solo cuando distingue tipos (tarea, hábito…); nunca de adorno.
+  final IconData? icon;
   final String title;
   final String subtitle;
   final String? trailing;
@@ -25,8 +26,10 @@ class LifeQuestListRow extends StatelessWidget {
     child: LifeQuestSurface(
       child: Row(
         children: [
-          LifeQuestIconTile(icon),
-          const SizedBox(width: 12),
+          if (icon case final icon?) ...[
+            LifeQuestIconTile(icon),
+            const SizedBox(width: 12),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

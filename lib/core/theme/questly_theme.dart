@@ -73,6 +73,9 @@ abstract final class QMotion {
 
   /// Para lo que se mueve dentro de la pantalla.
   static const easeInOut = Cubic(0.77, 0, 0.175, 1);
+
+  /// Curva de cajón tipo iOS para las hojas inferiores.
+  static const drawer = Cubic(0.32, 0.72, 0, 1);
 }
 
 abstract final class QText {

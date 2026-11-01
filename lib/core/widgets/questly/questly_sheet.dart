@@ -25,6 +25,7 @@ Future<T?> showQuestlySheet<T>(
     sheetAnimationStyle: AnimationStyle(
       duration: context.motion(QMotion.sheet),
       reverseDuration: context.motion(QMotion.fade),
+      curve: QMotion.drawer,
     ),
     builder: (_) => QuestlySheet(title: title, child: child),
   );

@@ -152,9 +152,16 @@ class SheetCheck extends StatelessWidget {
               padding: const EdgeInsets.all(3),
               child: CircularProgressIndicator(strokeWidth: 2, color: q.text),
             )
-          : done
-          ? Icon(Icons.check_rounded, size: 16, color: q.card)
-          : null,
+          : AnimatedScale(
+              duration: context.motion(QMotion.press),
+              curve: QMotion.easeOut,
+              scale: done ? 1 : 0.8,
+              child: AnimatedOpacity(
+                duration: context.motion(QMotion.press),
+                opacity: done ? 1 : 0,
+                child: Icon(Icons.check_rounded, size: 16, color: q.card),
+              ),
+            ),
     );
     return Semantics(
       button: onTap != null,

@@ -66,11 +66,11 @@ class QuestlyToast extends StatelessWidget {
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
         duration: context.motion(QMotion.sheet),
-        curve: Curves.easeOut,
+        curve: QMotion.easeOut,
         builder: (_, t, child) => Opacity(
           opacity: t,
           child: Transform.translate(
-            offset: Offset(0, 48 * (1 - t)),
+            offset: Offset(0, 24 * (1 - t)),
             child: child,
           ),
         ),

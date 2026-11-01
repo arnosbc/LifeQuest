@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:proyecto_movil/core/widgets/sheet_row.dart';
+
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/core/entities/difficulty.dart';
 
@@ -22,61 +24,56 @@ class DifficultyPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lq = context.lq;
+    // Filas de la hoja, como un grupo de radio: la elegida en negrita con su
+    // check en tinta; nada de tarjetas dentro de la hoja.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final option in options) ...[
+        for (final option in options)
           Semantics(
             selected: option.level == selected,
+            inMutuallyExclusiveGroup: true,
             button: true,
-            child: Material(
-              color: option.level == selected ? lq.softGreen : lq.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-                side: BorderSide(
-                  color: option.level == selected ? lq.deepGreen : lq.line,
-                  width: option.level == selected ? 2 : 1,
+            child: InkWell(
+              onTap: onSelected == null
+                  ? null
+                  : () => onSelected!(option.level),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 64),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: lq.line)),
                 ),
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(11),
-                onTap: onSelected == null
-                    ? null
-                    : () => onSelected!(option.level),
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              difficultyName(option.level),
-                              style: TextStyle(
-                                color: lq.ink,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            difficultyName(option.level),
+                            style: TextStyle(
+                              color: lq.ink,
+                              fontSize: 16,
+                              fontWeight: option.level == selected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'XP ${multiplier(option.xpMultiplier)}',
-                              style: TextStyle(color: lq.muted, fontSize: 13),
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'XP ${multiplier(option.xpMultiplier)}',
+                            style: TextStyle(color: lq.muted, fontSize: 13),
+                          ),
+                        ],
                       ),
-                      if (option.level == selected)
-                        Icon(Icons.check_circle_rounded, color: lq.deepGreen),
-                    ],
-                  ),
+                    ),
+                    SheetCheck(done: option.level == selected),
+                  ],
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 10),
-        ],
       ],
     );
   }

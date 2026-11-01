@@ -57,6 +57,9 @@ Encabezados de sección (`LifeQuestSectionHeading`): 15 / 700 en **tipo oración
 - **`SheetRow`**: check, hora tabular (o icono gris de 18) y título; subtítulo 13 gris; acción debajo alineada al título; filete inferior. `current` = barra roja de 4 a la izquierda y hora en rojo; **una sola fila actual por hoja**. `done` = gris y tachado animado.
 - **`SheetCheck`**: círculo de 24 con borde de tinta 2; hecho = relleno de tinta con check en blanco; `busy` muestra progreso dentro.
 - **`SheetPill`** y `QuestlyButton` primario: píldora en tinta, texto `label` en blanco, alto 48. Secundario: hoja con borde `inputBorder`; tonal: `tint`; destructivo: `coralInk`.
+- **`LifeQuestStat`**: cifra como tipografía (22/800 tabular) con su etiqueta; sin recuadro.
+- **Filas de ajustes y dificultad**: filas de la hoja con filete; la opción elegida va en negrita con `SheetCheck` lleno, sin caja ni icono decorativo.
+- **`LifeQuestListRow`**: el icono es opcional y solo se usa cuando distingue tipos.
 - **`LifeQuestSurface`**: sin color es una sección de la hoja separada por filete (nada de tarjetas dentro de la hoja); con color es un bloque relleno de radio 10.
 - **`QuestlyNavBar`**: 5 pestañas (Hoy · Tareas · Hábitos · Foco · Tú) sobre el suelo con filete superior; activa en tinta con trazo de 2 bajo el icono y etiqueta 800; resto gris 500.
 - **Botón flotante**: tinta, radio 16, abre la Bandeja.
@@ -69,8 +72,10 @@ Encabezados de sección (`LifeQuestSectionHeading`): 15 / 700 en **tipo oración
 |---|---|---|
 | Presión (`QuestlyPressable`, todo lo pulsable): escala 0,97 | 160 ms | `Cubic(0.23, 1, 0.32, 1)` |
 | Marcar fila: relleno del check y tachado | 200 ms | ease-out fuerte |
-| Hoja inferior (salida 200 ms) y toast | 250 ms | ease-out |
-| Diálogo | 200 ms | fundido |
+| Hoja inferior (salida 200 ms) | 250 ms | cajón `Cubic(0.32, 0.72, 0, 1)` (`QMotion.drawer`) |
+| Toast: sube 24 y aparece | 250 ms | ease-out fuerte |
+| Diálogo: de 0,95 a 1 con opacidad, centrado | 200 ms | ease-out fuerte |
+| Check: el visto entra de 0,8 a 1 | 160 ms | ease-out fuerte |
 
 - Sin salpicadura de tinta (`NoSplash`); la respuesta es la escala.
 - Nada anima en acciones que se repiten cientos de veces al día más allá de la presión.

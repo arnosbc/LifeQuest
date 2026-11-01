@@ -20,8 +20,17 @@ Future<T?> showQuestlyDialog<T>(
     barrierLabel: 'Cerrar',
     barrierColor: q.dialogScrim,
     transitionDuration: context.motion(QMotion.fade),
-    transitionBuilder: (_, animation, _, child) =>
-        FadeTransition(opacity: animation, child: child),
+    // El diálogo no nace de la nada: entra desde 0,95 con opacidad, centrado.
+    transitionBuilder: (_, animation, _, child) {
+      final curved = CurvedAnimation(parent: animation, curve: QMotion.easeOut);
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween(begin: 0.95, end: 1.0).animate(curved),
+          child: child,
+        ),
+      );
+    },
     pageBuilder: (context, _, _) => QuestlyDialog(
       title: title,
       message: message,

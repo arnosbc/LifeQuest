@@ -47,7 +47,6 @@ class StageProjectCard extends StatelessWidget {
             child: ExpansionTile(
               tilePadding: const EdgeInsets.symmetric(horizontal: 12),
               childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-              leading: const LifeQuestIconTile(Icons.work_outline),
               title: Text(
                 project.title,
                 maxLines: 2,

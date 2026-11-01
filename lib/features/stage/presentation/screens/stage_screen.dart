@@ -130,11 +130,6 @@ class StageScreen extends StatelessWidget {
           ),
         for (final item in board.highlight)
           LifeQuestListRow(
-            icon: switch (item.bucket) {
-              StageBucket.urgent => Icons.bolt,
-              StageBucket.pending => Icons.hourglass_empty_rounded,
-              _ => Icons.flag_outlined,
-            },
             title: item.title,
             subtitle: _bucketLabel(item.bucket),
           ),
@@ -211,7 +206,6 @@ class StageScreen extends StatelessWidget {
         if (board.areas.isEmpty) _empty(context, 'Crea tus áreas desde Tú.'),
         for (final area in board.areas)
           LifeQuestListRow(
-            icon: Icons.category_outlined,
             title: area.name,
             subtitle:
                 '${area.habits} hábitos · ${area.projects} proyectos · '
@@ -257,7 +251,6 @@ class StageScreen extends StatelessWidget {
         const LifeQuestSectionHeading('ARCHIVO'),
         const SizedBox(height: 7),
         LifeQuestListRow(
-          icon: Icons.inventory_2_outlined,
           title: board.archive.total == 0
               ? 'Tu archivo está vacío'
               : '${board.archive.total} elementos guardados',

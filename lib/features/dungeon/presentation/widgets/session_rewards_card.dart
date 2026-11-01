@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/cycle_duration_card.dart';
 
-/// Lo ganado en la sesión (o el botín final al cerrarla).
+/// Lo ganado en la sesión (o el resumen al cerrarla).
 class SessionRewardsCard extends StatelessWidget {
   const SessionRewardsCard({
     super.key,
@@ -22,40 +22,24 @@ class SessionRewardsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
-    padding: const EdgeInsets.all(11),
+    padding: const EdgeInsets.symmetric(vertical: 12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: context.lq.muted,
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 7),
+        LifeQuestSectionHeading(title),
+        const SizedBox(height: 4),
         Row(
           children: [
             Expanded(
-              child: LifeQuestStat(value: '$xp XP', label: 'XP ganada'),
+              child: LifeQuestStat(value: '$xp', label: 'XP ganada'),
             ),
-          ],
-        ),
-        const SizedBox(height: 7),
-        Row(
-          children: [
             Expanded(
-              child: LifeQuestStat(
-                value: '$cycles',
-                label: 'Ciclos completados',
-              ),
+              child: LifeQuestStat(value: '$cycles', label: 'Ciclos'),
             ),
-            const SizedBox(width: 7),
             Expanded(
               child: LifeQuestStat(
                 value: CycleDurationCard.hours(minutes),
-                label: 'Tiempo efectivo',
+                label: 'En foco',
               ),
             ),
           ],

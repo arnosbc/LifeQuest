@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/app/config/theme.dart';
-import 'package:proyecto_movil/core/theme/questly_palette.dart';
 
 class LifeQuestStat extends StatelessWidget {
   const LifeQuestStat({super.key, required this.value, required this.label});
@@ -11,11 +10,8 @@ class LifeQuestStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-    decoration: BoxDecoration(
-      color: context.q.track,
-      borderRadius: BorderRadius.circular(10),
-    ),
+    // Cifra como tipografía, sin recuadro (los indicadores no son tarjetas).
+    padding: const EdgeInsets.symmetric(vertical: 10),
     child: Column(
       children: [
         Text(
@@ -23,8 +19,8 @@ class LifeQuestStat extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: context.lq.ink,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
             fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/app/config/theme.dart';
-import 'package:proyecto_movil/core/widgets/lifequest_icon_tile.dart';
 import 'package:proyecto_movil/core/widgets/lifequest_surface.dart';
 
 /// Fila con icono, título, detalle y un botón de acción (comprar, atacar,
@@ -32,10 +31,9 @@ class LifeQuestActionRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 7),
     child: LifeQuestSurface(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          LifeQuestIconTile(icon),
-          const SizedBox(width: 9),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,14 +42,14 @@ class LifeQuestActionRow extends StatelessWidget {
                   title,
                   style: TextStyle(
                     color: context.lq.ink,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: TextStyle(color: context.lq.muted, fontSize: 10),
+                  style: TextStyle(color: context.lq.muted, fontSize: 13),
                 ),
               ],
             ),
@@ -60,10 +58,8 @@ class LifeQuestActionRow extends StatelessWidget {
           FilledButton(
             onPressed: busy ? null : onAction,
             style: FilledButton.styleFrom(
-              minimumSize: const Size(48, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              backgroundColor: context.lq.deepGreen,
-              foregroundColor: context.lq.onDeepGreen,
+              minimumSize: const Size(48, 48),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
             ),
             child: busy
                 ? const SizedBox(
@@ -71,7 +67,7 @@ class LifeQuestActionRow extends StatelessWidget {
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(actionLabel, style: const TextStyle(fontSize: 12)),
+                : Text(actionLabel),
           ),
           ?menu,
         ],

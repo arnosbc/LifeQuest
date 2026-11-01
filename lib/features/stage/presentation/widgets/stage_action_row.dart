@@ -35,8 +35,6 @@ class StageActionRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 8, 0, 8),
       child: Row(
         children: [
-          LifeQuestIconTile(icon),
-          const SizedBox(width: 9),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
