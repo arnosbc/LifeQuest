@@ -124,10 +124,13 @@ class _BrainDumpScreenState extends State<BrainDumpScreen> {
         LifeQuestSectionHeading('BANDEJA · ${board.inbox.length}'),
         const SizedBox(height: 7),
         if (board.inbox.isEmpty)
-          LifeQuestListRow(
-            icon: Icons.inbox_outlined,
+          LifeQuestEmptyState(
+            compact: true,
+            illustration: board.convertedToday > 0
+                ? LifeQuestIllustration.done
+                : LifeQuestIllustration.blank,
             title: 'Bandeja vacía',
-            subtitle: board.convertedToday > 0
+            message: board.convertedToday > 0
                 ? 'Hoy convertiste ${board.convertedToday} ideas en acción.'
                 : 'Escribe arriba lo que tengas en mente.',
           ),

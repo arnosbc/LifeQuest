@@ -62,6 +62,7 @@ class HomeScreen extends StatelessWidget {
           minHeight: box.maxHeight - 47,
           onStartFocus: () => onNavigate(3),
           onCreateTask: () => context.go(RoutePaths.missions),
+          onOpenHabits: () => onNavigate(2),
           onCompleteHabit: (id) =>
               context.read<HomeBloc>().add(HomeHabitCompleted(id)),
         ),

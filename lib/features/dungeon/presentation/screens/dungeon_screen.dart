@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/theme/questly_theme.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/deep_work_session_card.dart';
@@ -52,7 +53,7 @@ class DungeonScreen extends StatelessWidget {
         children: [
           if (state.summary case final summary?) ...[
             SessionRewardsCard(
-              title: 'TU ÚLTIMA SESIÓN',
+              title: 'Tu última sesión',
               xp: summary.xp,
               coins: summary.coins,
               cycles: summary.cycles,
@@ -88,6 +89,17 @@ class DungeonScreen extends StatelessWidget {
     final total = rest
         ? state.board.breakAfter(session.cyclesDone)
         : Duration(minutes: session.cycleMinutes);
+    final q = context.q;
+    final accent = done
+        ? q.mustard
+        : state.paused
+        ? q.text2
+        : rest
+        ? q.riverInk
+        : q.mark;
+    final focused = session.tasks
+        .where((t) => t.id == state.currentTaskId && !t.done)
+        .firstOrNull;
     return LifeQuestPage(
       title: 'Foco',
       subtitle: 'Ciclo $cycle de ${session.maxCycles}',
@@ -95,15 +107,40 @@ class DungeonScreen extends StatelessWidget {
         DungeonTimerRing(
           remaining: state.remaining,
           total: total,
+          accent: accent,
           label: done
-              ? 'SESIÓN COMPLETA'
+              ? 'Sesión completa'
               : state.paused
-              ? 'EN PAUSA'
+              ? 'En pausa'
               : rest
-              ? 'DESCANSO'
-              : 'FOCO',
+              ? 'Descanso'
+              : 'Foco',
           footer: state.busy ? 'Guardando tu progreso…' : '',
         ),
+        const SizedBox(height: 16),
+        CycleTrack(
+          total: session.maxCycles,
+          done: session.cyclesDone,
+          accent: accent,
+        ),
+        if (focused != null && !done) ...[
+          const SizedBox(height: 16),
+          LifeQuestSurface(
+            color: context.q.tint,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  rest ? 'Al volver' : 'Ahora mismo',
+                  style: QText.meta(accent),
+                ),
+                const SizedBox(height: 4),
+                Text(focused.title, style: QText.title2(context.q.text)),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 14),
         DeepWorkSessionCard(
           session: session,
@@ -116,7 +153,7 @@ class DungeonScreen extends StatelessWidget {
         const SizedBox(height: 9),
         if (done)
           SessionRewardsCard(
-            title: 'RESUMEN DE LA SESIÓN',
+            title: 'Resumen de la sesión',
             xp: session.xpEarned,
             coins: session.coinsEarned,
             cycles: session.cyclesDone,

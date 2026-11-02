@@ -25,7 +25,6 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
   final _formKey = GlobalKey<FormState>();
   final _title = TextEditingController();
   final _description = TextEditingController();
-  final _natural = TextEditingController();
   final _checklist = <TextEditingController>[];
   _Due _due = _Due.today;
   DateTime? _customDate;
@@ -52,23 +51,10 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
   void dispose() {
     _title.dispose();
     _description.dispose();
-    _natural.dispose();
     for (final item in _checklist) {
       item.dispose();
     }
     super.dispose();
-  }
-
-  void _interpret() {
-    final text = _natural.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      if (_title.text.trim().isEmpty) _title.text = text;
-      if (_description.text.trim().isEmpty) {
-        _description.text = 'Completar: $text';
-      }
-      if (text.toLowerCase().contains('viernes')) _due = _Due.week;
-    });
   }
 
   /// Fin del día elegido (23:59 hora local); "Esta semana" vence el domingo.
@@ -154,24 +140,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
               style: TextStyle(color: context.lq.muted, fontSize: 12),
             ),
             const SizedBox(height: 16),
-            _section('¿QUÉ NECESITAS LOGRAR?'),
-            TextField(
-              controller: _natural,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _interpret(),
-              decoration: InputDecoration(
-                hintText: 'Ej. Preparar la exposición del viernes',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.auto_awesome),
-                  tooltip: 'Convertir en tarea',
-                  onPressed: _interpret,
-                ),
-                helperText:
-                    'Escribe una idea y toca ✨ para completar un borrador.',
-              ),
-            ),
-            const SizedBox(height: 10),
-            _section('DEFINE LA TAREA'),
+            _section('TÍTULO'),
             TextFormField(
               controller: _title,
               maxLength: 200,
@@ -184,16 +153,14 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                   : null,
             ),
             const SizedBox(height: 8),
+            _section('CONTEXTO'),
             TextFormField(
               controller: _description,
-              maxLines: 2,
+              maxLines: 3,
               decoration: const InputDecoration(
-                labelText: '¿Qué significa completarla? *',
-                hintText: 'Criterio de éxito o resultado esperado',
+                labelText: 'Contexto de la tarea',
+                hintText: 'Detalles, enlaces o notas que te ayuden a hacerla',
               ),
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? 'Describe brevemente el resultado esperado'
-                  : null,
             ),
             const SizedBox(height: 14),
             _section('VINCULAR (OPCIONAL)'),

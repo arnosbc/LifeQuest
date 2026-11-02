@@ -51,6 +51,8 @@ void main() {
     expect(find.text('2 pendientes · racha 12 días'), findsOneWidget);
     expect(find.text('Leer'), findsOneWidget);
     expect(find.text('2.450'), findsNothing);
+    expect(find.text('3/5'), findsOneWidget);
+    expect(find.text('Nivel 24'), findsOneWidget);
   });
 
   testWidgets('tocar un hábito pendiente lo registra; uno hecho, no', (
@@ -75,6 +77,7 @@ void main() {
     expect(find.text('No tienes tareas pendientes'), findsOneWidget);
     expect(find.text('Crear tarea'), findsOneWidget);
     expect(find.text('Nada pendiente'), findsOneWidget);
+    expect(find.text('Crear hábito'), findsOneWidget);
   });
 
   testWidgets('si la carga falla, ofrece reintentar', (tester) async {

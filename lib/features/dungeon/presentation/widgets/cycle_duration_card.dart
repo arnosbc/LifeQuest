@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:proyecto_movil/core/theme/questly_theme.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 
 /// Elige el ciclo (25, 30 o 45 min) y la duración total en pasos de 30 min.
@@ -35,14 +36,7 @@ class CycleDurationCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'DURACIÓN DEL CICLO',
-          style: TextStyle(
-            color: context.lq.muted,
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        Text('Duración del ciclo', style: QText.meta(context.q.text2)),
         const SizedBox(height: 7),
         Wrap(
           spacing: 6,
@@ -57,14 +51,7 @@ class CycleDurationCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        Text(
-          'DURACIÓN TOTAL',
-          style: TextStyle(
-            color: context.lq.muted,
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        Text('Tiempo de foco', style: QText.meta(context.q.text2)),
         Row(
           children: [
             IconButton(
@@ -78,11 +65,7 @@ class CycleDurationCard extends StatelessWidget {
               child: Text(
                 '${hours(totalMinutes)} · ${totalMinutes ~/ cycleMinutes} ciclos',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: context.lq.ink,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: QText.title3(context.q.text),
               ),
             ),
             IconButton(
@@ -94,10 +77,7 @@ class CycleDurationCard extends StatelessWidget {
             ),
           ],
         ),
-        Text(
-          breaksNote,
-          style: TextStyle(color: context.lq.muted, fontSize: 9),
-        ),
+        Text(breaksNote, style: QText.meta(context.q.text2)),
       ],
     ),
   );

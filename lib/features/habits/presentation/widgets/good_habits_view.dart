@@ -13,6 +13,7 @@ class GoodHabitsView extends StatelessWidget {
     required this.now,
     required this.busyHabitId,
     required this.onComplete,
+    required this.onCreate,
     this.menuFor,
   });
 
@@ -23,6 +24,9 @@ class GoodHabitsView extends StatelessWidget {
   /// Null mientras otra acción está en curso.
   final ValueChanged<String>? onComplete;
 
+  /// Null mientras otra acción está en curso.
+  final VoidCallback? onCreate;
+
   /// Menú «⋯» de cada hábito.
   final Widget Function(Habit habit)? menuFor;
 
@@ -32,11 +36,12 @@ class GoodHabitsView extends StatelessWidget {
     return Column(
       children: [
         if (habits.isEmpty)
-          LifeQuestSurface(
-            child: Text(
-              'Aún no tienes hábitos buenos. Crea uno pequeño para empezar.',
-              style: TextStyle(color: context.lq.muted, fontSize: 11),
-            ),
+          LifeQuestEmptyState(
+            illustration: LifeQuestIllustration.sprout,
+            title: 'Aún no tienes hábitos buenos',
+            message: 'Crea uno pequeño que puedas repetir cada día.',
+            actionLabel: 'Crear hábito',
+            onAction: onCreate,
           ),
         for (final habit in habits)
           HabitRow(
@@ -48,22 +53,26 @@ class GoodHabitsView extends StatelessWidget {
         const SizedBox(height: 9),
         const LifeQuestSectionHeading('RESUMEN SEMANAL'),
         const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(
-              child: LifeQuestStat(
-                value: '${board.weekXp} XP',
-                label: 'XP obtenida',
+        LifeQuestSurface(
+          color: context.q.tint,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: LifeQuestStat(
+                  value: '${board.weekXp} XP',
+                  label: 'XP obtenida',
+                ),
               ),
-            ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: LifeQuestStat(
-                value: '${board.weekDone} / ${board.weekScheduled}',
-                label: 'Hábitos completados',
+              const SizedBox(width: 7),
+              Expanded(
+                child: LifeQuestStat(
+                  value: '${board.weekDone} / ${board.weekScheduled}',
+                  label: 'Hábitos completados',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 13),
         HabitCalendar(month: now, activeDays: board.monthDays.toSet()),

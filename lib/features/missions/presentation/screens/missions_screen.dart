@@ -90,6 +90,29 @@ class MissionsScreen extends StatelessWidget {
       deleteMessage: 'Se borran también sus subtareas. No se puede deshacer.',
     );
 
+    final current = missions.isEmpty ? null : missions.first.id;
+    Widget row(Mission mission) => SheetRow(
+      current: mission.id == current,
+      leading: SheetCheck(
+        done: false,
+        busy: state.busyMissionId == mission.id,
+        label: 'Completar ${mission.title}',
+        onTap: idle ? () => complete(mission.id) : null,
+      ),
+      time: MissionsFormat.time(mission.dueDate),
+      title: mission.title,
+      subtitle: [
+        MissionsFormat.due(mission.dueDate, now),
+        MissionsFormat.origin(mission),
+        '${mission.xpReward} XP',
+      ].join(' · '),
+      trailing: menu(mission),
+      action: mission.id == current
+          ? SheetPill(label: 'Empezar foco', onTap: onStartFocus)
+          : null,
+    );
+    final groups = _group(missions, now);
+
     return LifeQuestPage(
       title: 'Tareas',
       subtitle: 'La más urgente arriba.',
@@ -103,50 +126,110 @@ class MissionsScreen extends StatelessWidget {
       ),
       children: [
         if (missions.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              'No tienes tareas abiertas. Crea la primera abajo.',
-              style: TextStyle(color: context.lq.muted, fontSize: 15),
+          LifeQuestEmptyState(
+            illustration: LifeQuestIllustration.blank,
+            title: 'No tienes tareas abiertas',
+            message: 'Anota lo siguiente que quieres hacer y empieza por ahí.',
+            actionLabel: 'Nueva tarea',
+            onAction: idle ? () => _createMission(context, state) : null,
+          )
+        else ...[
+          _Summary(groups: groups, missions: missions),
+          for (final (label, group) in groups)
+            if (group.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              LifeQuestSectionHeading('$label · ${group.length}'),
+              for (final mission in group) row(mission),
+            ],
+        ],
+        if (missions.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: idle ? () => _createMission(context, state) : null,
+              icon: state.saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.add),
+              label: Text(state.saving ? 'Creando tarea…' : 'Nueva tarea'),
             ),
           ),
-        for (final (i, mission) in missions.indexed)
-          SheetRow(
-            current: i == 0,
-            leading: SheetCheck(
-              done: false,
-              busy: state.busyMissionId == mission.id,
-              label: 'Completar ${mission.title}',
-              onTap: idle ? () => complete(mission.id) : null,
-            ),
-            time: MissionsFormat.time(mission.dueDate),
-            title: mission.title,
-            subtitle: [
-              MissionsFormat.due(mission.dueDate, now),
-              MissionsFormat.origin(mission),
-              '${mission.xpReward} XP',
-            ].join(' · '),
-            trailing: menu(mission),
-            action: i == 0
-                ? SheetPill(label: 'Empezar foco', onTap: onStartFocus)
-                : null,
-          ),
-        const SizedBox(height: 20),
-        SizedBox(
-          height: 48,
-          child: FilledButton.icon(
-            onPressed: idle ? () => _createMission(context, state) : null,
-            icon: state.saving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.add),
-            label: Text(state.saving ? 'Creando tarea…' : 'Nueva tarea'),
-          ),
-        ),
+        ],
       ],
     );
   }
+
+  /// Hoy (incluye lo que ya venció), próximas y sin fecha; conserva el orden
+  /// de urgencia que trae el servidor dentro de cada grupo.
+  static List<(String, List<Mission>)> _group(
+    List<Mission> missions,
+    DateTime now,
+  ) {
+    final endOfToday = DateTime(now.year, now.month, now.day + 1);
+    bool today(Mission m) =>
+        m.dueDate != null && m.dueDate!.isBefore(endOfToday);
+    return [
+      (
+        'Hoy',
+        [
+          for (final m in missions)
+            if (today(m)) m,
+        ],
+      ),
+      (
+        'Próximas',
+        [
+          for (final m in missions)
+            if (m.dueDate != null && !today(m)) m,
+        ],
+      ),
+      (
+        'Sin fecha',
+        [
+          for (final m in missions)
+            if (m.dueDate == null) m,
+        ],
+      ),
+    ];
+  }
+}
+
+/// Bloque de resumen: cuántas tocan hoy, cuántas después y la XP en juego.
+class _Summary extends StatelessWidget {
+  const _Summary({required this.groups, required this.missions});
+
+  final List<(String, List<Mission>)> groups;
+  final List<Mission> missions;
+
+  @override
+  Widget build(BuildContext context) => LifeQuestSurface(
+    color: context.q.tint,
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    child: Row(
+      children: [
+        Expanded(
+          child: LifeQuestStat(
+            value: '${groups[0].$2.length}',
+            label: 'Para hoy',
+          ),
+        ),
+        Expanded(
+          child: LifeQuestStat(
+            value: '${groups[1].$2.length + groups[2].$2.length}',
+            label: 'Después',
+          ),
+        ),
+        Expanded(
+          child: LifeQuestStat(
+            value: '${missions.fold(0, (sum, m) => sum + m.xpReward)}',
+            label: 'XP en juego',
+          ),
+        ),
+      ],
+    ),
+  );
 }

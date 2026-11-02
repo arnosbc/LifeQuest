@@ -110,6 +110,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             board: state.board,
             busyHabitId: state.busyHabitId,
             onRegister: idle ? (id) => bloc.add(BadHabitRegistered(id)) : null,
+            onCreate: idle ? () => _create(context, state) : null,
             menuFor: menu,
           )
         else
@@ -118,6 +119,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             now: DateTime.now(),
             busyHabitId: state.busyHabitId,
             onComplete: idle ? (id) => bloc.add(GoodHabitCompleted(id)) : null,
+            onCreate: idle ? () => _create(context, state) : null,
             menuFor: menu,
           ),
         const SizedBox(height: 16),

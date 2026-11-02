@@ -10,6 +10,7 @@ class BadHabitsView extends StatelessWidget {
     required this.board,
     required this.busyHabitId,
     required this.onRegister,
+    required this.onCreate,
     this.menuFor,
   });
 
@@ -18,6 +19,9 @@ class BadHabitsView extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final ValueChanged<String>? onRegister;
+
+  /// Null mientras otra acción está en curso.
+  final VoidCallback? onCreate;
 
   /// Menú «⋯» de cada hábito.
   final Widget Function(Habit habit)? menuFor;
@@ -54,33 +58,39 @@ class BadHabitsView extends StatelessWidget {
         ),
         const SizedBox(height: 7),
         if (habits.isEmpty)
-          LifeQuestSurface(
-            child: Text(
-              'No tienes hábitos por evitar. Si quieres cambiar alguno, créalo aquí.',
-              style: TextStyle(color: context.lq.muted, fontSize: 11),
-            ),
+          LifeQuestEmptyState(
+            compact: true,
+            illustration: LifeQuestIllustration.blank,
+            title: 'No tienes hábitos por evitar',
+            message: 'Si quieres cambiar alguno, anótalo y registra cada vez.',
+            actionLabel: 'Crear hábito',
+            onAction: onCreate,
           ),
         for (final habit in habits) _badHabit(context, habit),
         const SizedBox(height: 15),
         const LifeQuestSectionHeading('RESUMEN SEMANAL'),
         const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(
-              child: LifeQuestStat(
-                value:
-                    '${board.badFreeDays} ${board.badFreeDays == 1 ? 'día' : 'días'}',
-                label: 'Sin recaídas',
+        LifeQuestSurface(
+          color: context.q.tint,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: LifeQuestStat(
+                  value:
+                      '${board.badFreeDays} ${board.badFreeDays == 1 ? 'día' : 'días'}',
+                  label: 'Sin recaídas',
+                ),
               ),
-            ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: LifeQuestStat(
-                value: '$todayEvents',
-                label: 'Registros de hoy',
+              const SizedBox(width: 7),
+              Expanded(
+                child: LifeQuestStat(
+                  value: '$todayEvents',
+                  label: 'Registros de hoy',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

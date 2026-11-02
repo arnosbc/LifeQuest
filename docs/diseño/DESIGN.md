@@ -31,7 +31,7 @@ Velos: hoja inferior `#111111` 50 %, diálogo 60 %. El cambio de modo no se inte
 
 | Estilo | Tamaño / peso | Uso |
 |---|---|---|
-| `numeral` | 168 (Hoy), 88 en `LifeQuestPage` / 900, alto 0,86, tracking −4 % | El número de la hoja. **Uno por pantalla.** En rojo solo en Hoy; en tinta en las demás |
+| `numeral` | 88 en `LifeQuestPage`, 36 en la miniatura de Hoy, ~72 en el cronómetro / 900, alto 0,86, tracking −4 % | El número de la hoja. **Uno por pantalla**, en tinta |
 | `display` | 32 / 800, −1 | Título de pantalla sobre el suelo |
 | `title1` | 28 / 800 | Titulares internos |
 | `title2` | 20 / 700 | Secciones grandes, diálogos |
@@ -57,6 +57,10 @@ Encabezados de sección (`LifeQuestSectionHeading`): 15 / 700 en **tipo oración
 - **`SheetRow`**: check, hora tabular (o icono gris de 18) y título; subtítulo 13 gris; acción debajo alineada al título; filete inferior. `current` = barra roja de 4 a la izquierda y hora en rojo; **una sola fila actual por hoja**. `done` = gris y tachado animado.
 - **`SheetCheck`**: círculo de 24 con borde de tinta 2; hecho = relleno de tinta con check en blanco; `busy` muestra progreso dentro.
 - **`SheetPill`** y `QuestlyButton` primario: píldora en tinta, texto `label` en blanco, alto 48. Secundario: hoja con borde `inputBorder`; tonal: `tint`; destructivo: `coralInk`.
+- **`LifeQuestEmptyState`**: ilustración de trazo (`LifeQuestIllustration`: `blank` hoja con lápiz, `done` hoja con visto y sol, `sprout` brote), título `title3`, texto gris y `SheetPill`. Colores del tema: tinta, hoja, `track` y mostaza (`mustard`) como único acento; nunca el rojo. `compact` la reduce dentro de una sección. Ningún estado vacío va sin ilustración ni acción.
+- **Encabezado de Hoy**: saludo con el nombre (`body` gris), día de la semana en `display`, «1 de noviembre» en `title3` gris y, a la derecha, una hoja de calendario en miniatura (franja roja con el mes y el día en `numeral` 36). Debajo, la tira de la semana (L–D) con hoy en un círculo rojo. Sustituye al número gigante.
+- **Foco**: esfera de 60 marcas y arco de 12 con brillo que se vacía, con el color de la fase: rojo `mark` en foco, `riverInk` en descanso, `text2` en pausa y `mustard` al completar. El tiempo va en `numeral` al 24 % del diámetro. Debajo van la pista de ciclos, la tarea en foco en `title2` y, al preparar, «Tu ruta»: ciclos y descansos a escala con la hora de fin.
+- **Resumen del día (Hoy)**: bloque `tint` bajo la fecha con Tareas, Hábitos y Foco (`LifeQuestStat`) y la barra de nivel/XP en tinta. Después, secciones con `LifeQuestSectionHeading`: «Ahora» y «Hábitos de hoy · x/y».
 - **`LifeQuestStat`**: cifra como tipografía (22/800 tabular) con su etiqueta; sin recuadro.
 - **Filas de ajustes y dificultad**: filas de la hoja con filete; la opción elegida va en negrita con `SheetCheck` lleno, sin caja ni icono decorativo.
 - **`LifeQuestListRow`**: el icono es opcional y solo se usa cuando distingue tipos.
@@ -88,7 +92,7 @@ Encabezados de sección (`LifeQuestSectionHeading`): 15 / 700 en **tipo oración
 - **Sí:** cifras tabulares en horas, contadores y el número de la hoja.
 - **Sí:** tono de invitación en los textos («Nada pendiente», «Empezar foco»).
 - **No:** rojo como color de botón, enlace o decoración; no un segundo número gigante en la misma pantalla.
-- **No:** antetítulos en MAYÚSCULAS espaciadas, tarjetas grises dentro de la hoja, chips de fecha, sombras fuera del toast y el segmentado.
+- **No:** antetítulos en MAYÚSCULAS espaciadas, tarjetas grises dentro de la hoja (salvo un bloque de resumen `tint` por pantalla), chips de fecha, sombras fuera del toast y el segmentado.
 - **No:** encuadernación ni talones fuera de Hoy.
 - **No:** ambientación de fantasía (reino, héroe, mazmorra, monedas).
 

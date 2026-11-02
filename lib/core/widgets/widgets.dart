@@ -18,3 +18,4 @@ export 'package:proyecto_movil/core/widgets/lifequest_surface.dart';
 export 'package:proyecto_movil/core/widgets/paper_sheet.dart';
 export 'package:proyecto_movil/core/widgets/sheet_row.dart';
 export 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';
+export 'package:proyecto_movil/core/widgets/lifequest_empty_state.dart';
