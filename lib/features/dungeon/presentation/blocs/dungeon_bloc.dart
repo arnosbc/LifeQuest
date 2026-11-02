@@ -146,9 +146,9 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     emit(
       board.match(
         (failure) => current.copyWith(busy: false, message: failure.message),
-        (b) => _fresh(
-          b,
-        ).copyWith(message: '¡Entraste a la Mazmorra! A por el primer ciclo.'),
+        (b) => _fresh(b).copyWith(
+          message: 'Has iniciado el Modo Foco. Vamos con el primer bloque.',
+        ),
       ),
     );
   }
@@ -179,7 +179,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
           now: now,
           phase: DungeonPhase.focus,
           phaseEndsAt: () => now.add(Duration(minutes: session.cycleMinutes)),
-          message: 'Descanso terminado. ¡Siguiente mazmorra!',
+          message: 'Descanso terminado. Puedes seguir cuando quieras.',
         ),
       );
       return;
@@ -228,8 +228,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         phaseEndsAt: () => done ? null : now.add(board.breakAfter(cycles)),
         currentTaskId: () => _nextTask(s, taskId),
         message: done
-            ? '¡Último ciclo superado! Termina la sesión para ver tu botín.'
-            : '¡Mazmorra superada! Toma un descanso.',
+            ? '¡Bloque completado! Termina la sesión para ver el resumen.'
+            : '¡Bloque completado! Toma un descanso.',
       ),
     );
   }
@@ -321,7 +321,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         ? ''
         : ' En esta sesión llevas ${session.xpEarned} XP '
               'y ${session.coinsEarned} Monedas.';
-    return '¡Misión completada! $gained.$total';
+    return '¡Tarea completada! $gained.$total';
   }
 
   /// El estado actual si sigue listo (los tics lo avanzan mientras esperamos).

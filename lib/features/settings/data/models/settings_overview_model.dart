@@ -27,6 +27,8 @@ class SettingsOverviewModel {
         shortBreakMinutes: intOr('short_break_minutes', 5),
         longBreakMinutes: intOr('long_break_minutes', 15),
         longBreakEveryNCycles: intOr('long_break_every_n_cycles', 4),
+        digestTime: _json['digest_time'] as String?,
+        dailyReminders: _json['daily_reminders'] as bool?,
       ),
       difficulties: [
         for (final d
@@ -54,6 +56,9 @@ class SettingsOverviewModel {
     'short_break_minutes': settings.shortBreakMinutes,
     'long_break_minutes': settings.longBreakMinutes,
     'long_break_every_n_cycles': settings.longBreakEveryNCycles,
+    'digest_time': settings.digestTime,
+    // Solo si el servidor ya tiene la columna (048).
+    'daily_reminders': ?settings.dailyReminders,
   };
 
   static GameDifficulty? _level(Object? name) =>

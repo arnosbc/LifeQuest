@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/rpgenie/domain/entities/current_mission.dart';
 import 'package:proyecto_movil/features/rpgenie/presentation/blocs/rpgenie_bloc.dart';
 
-/// RPGenie v1: la Misión actual por reglas (RF-097). Necesita un
+/// Siguiente paso sugerido por reglas (RF-097). Necesita un
 /// [RpgenieBloc] por encima.
 class RpgenieScreen extends StatelessWidget {
   const RpgenieScreen({super.key, required this.onStartFocus});
 
-  /// Abre la Mazmorra para hacer la misión con foco.
+  /// Abre el Modo Foco sin seleccionar una tarea.
   final VoidCallback onStartFocus;
 
   @override
@@ -46,19 +49,20 @@ class RpgenieScreen extends StatelessWidget {
     final board = state.board;
     final mission = board.mission;
     return LifeQuestPage(
-      title: 'RPGenie',
-      subtitle: 'Tu siguiente paso, elegido para ti.',
+      title: 'Asistente',
+      icon: QIcons.spark,
+      subtitle: 'Una tarea adecuada para continuar.',
       children: [
-        const LifeQuestSectionHeading('MISIÓN ACTUAL'),
+        const LifeQuestSectionHeading('SIGUIENTE PASO'),
         const SizedBox(height: 7),
         if (mission == null)
           LifeQuestListRow(
             icon: Icons.celebration_outlined,
             title: board.openCount == 0
-                ? 'No tienes misiones abiertas'
+                ? 'No tienes tareas abiertas'
                 : 'Apartaste todas por ahora',
             subtitle: board.openCount == 0
-                ? 'Captura algo nuevo en Stage cuando quieras.'
+                ? 'Añade algo nuevo en el Planificador cuando quieras.'
                 : 'Descansa o vuelve a verlas cuando te sientas listo.',
           )
         else
@@ -91,7 +95,7 @@ class RpgenieScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   [
-                    '+${mission.xpReward} XP · +${mission.coinReward} 🪙',
+                    '+${mission.xpReward} XP · +${mission.coinReward} Monedas',
                     ?(mission.goalTitle ??
                         mission.projectTitle ??
                         mission.skillName),
@@ -107,10 +111,9 @@ class RpgenieScreen extends StatelessWidget {
                         child: FilledButton(
                           onPressed: state.busy
                               ? null
-                              : () => bloc.add(
-                                  CurrentMissionCompleted(mission.id),
-                                ),
-                          child: const Text('¡Hecha!'),
+                              : () =>
+                                    context.go(RoutePaths.focusOn(mission.id)),
+                          child: const Text('Empezar en Foco'),
                         ),
                       ),
                     ),
@@ -120,7 +123,7 @@ class RpgenieScreen extends StatelessWidget {
                         height: 48,
                         child: OutlinedButton(
                           onPressed: state.busy ? null : onStartFocus,
-                          child: const Text('A la Mazmorra'),
+                          child: const Text('Abrir Modo Foco'),
                         ),
                       ),
                     ),
@@ -142,7 +145,7 @@ class RpgenieScreen extends StatelessWidget {
             child: Text('Volver a ver las ${board.skippedCount} apartadas'),
           ),
         const SizedBox(height: 14),
-        const LifeQuestSectionHeading('CÓMO ELIJO TU MISIÓN'),
+        const LifeQuestSectionHeading('CÓMO ELIJO TU SIGUIENTE PASO'),
         const SizedBox(height: 7),
         // RF-097: crítico → urgencia 🔴 > 🟡 > 🟢 → fecha límite más próxima.
         const LifeQuestListRow(

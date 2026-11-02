@@ -59,6 +59,8 @@ class _NotificationSheetState extends State<_NotificationSheet> {
   late String? _start = widget.settings.silenceStart;
   late String? _end = widget.settings.silenceEnd;
   late bool _bypass = widget.settings.criticalBypassSilence;
+  late String? _digest = widget.settings.digestTime;
+  late bool? _reminders = widget.settings.dailyReminders;
 
   Future<String?> _pickTime(String current) async {
     final [hour, minute] = current.split(':').map(int.parse).toList();
@@ -77,17 +79,35 @@ class _NotificationSheetState extends State<_NotificationSheet> {
     final silence = _start != null;
     return _SheetFrame(
       title: 'Avisos',
-      onSave: () => Navigator.pop(
-        context,
-        widget.settings.withNotifications(
-          dailyLimit: _limit,
-          silenceStart: _start,
-          silenceEnd: _end,
-          // Sin ventana de silencio no hay nada que saltar.
-          criticalBypassSilence: silence && _bypass,
-        ),
-      ),
+      onSave: () {
+        final saved = widget.settings
+            .withNotifications(
+              dailyLimit: _limit,
+              silenceStart: _start,
+              silenceEnd: _end,
+              // Sin ventana de silencio no hay nada que saltar.
+              criticalBypassSilence: silence && _bypass,
+            )
+            .withDigest(_digest);
+        Navigator.pop(
+          context,
+          // Sin la migración 048 el interruptor no existe: no se toca.
+          switch (_reminders) {
+            final bool on => saved.withReminders(on),
+            null => saved,
+          },
+        );
+      },
       children: [
+        if (_reminders case final on?)
+          _Switch(
+            title: 'Recordatorios durante el día',
+            subtitle: on
+                ? 'Hasta 5 al día si tienes algo pendiente, y uno para tu racha'
+                : 'Solo llegan los avisos de rachas y tareas vencidas',
+            value: on,
+            onChanged: (v) => setState(() => _reminders = v),
+          ),
         _Switch(
           title: 'Límite diario de avisos',
           subtitle: _limit == null
@@ -139,9 +159,26 @@ class _NotificationSheetState extends State<_NotificationSheet> {
             onChanged: (on) => setState(() => _bypass = on),
           ),
         ],
+        _Switch(
+          title: 'Resumen diario a una hora',
+          subtitle: _digest == null
+              ? 'Los avisos informativos llegan juntos a las 08:00'
+              : 'Los avisos informativos llegan juntos a las $_digest',
+          value: _digest != null,
+          onChanged: (on) => setState(() => _digest = on ? '20:00' : null),
+        ),
+        if (_digest case final digest?)
+          _TimeRow(
+            label: 'A las',
+            value: digest,
+            onTap: () async {
+              final time = await _pickTime(digest);
+              if (time != null) setState(() => _digest = time);
+            },
+          ),
         const SizedBox(height: 4),
         Text(
-          'Durante una Mazmorra, los avisos no críticos esperan solos.',
+          'Durante el Modo Foco, los avisos no críticos esperan solos.',
           style: TextStyle(color: lq.muted, fontSize: 12),
         ),
       ],
@@ -165,7 +202,7 @@ class _BreaksSheetState extends State<_BreaksSheet> {
 
   @override
   Widget build(BuildContext context) => _SheetFrame(
-    title: 'Descansos de la Mazmorra',
+    title: 'Descansos del Modo Foco',
     onSave: () => Navigator.pop(
       context,
       widget.settings.withBreaks(

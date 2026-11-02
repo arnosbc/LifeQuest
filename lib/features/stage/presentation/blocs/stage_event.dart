@@ -30,7 +30,7 @@ class StageGoalCreated extends StageEvent {
   List<Object?> get props => [goal];
 }
 
-/// El usuario completó una misión desde su proyecto.
+/// El usuario completó una tarea desde su proyecto.
 class StageTaskCompleted extends StageEvent {
   const StageTaskCompleted(this.taskId);
 

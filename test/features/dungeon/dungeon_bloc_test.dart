@@ -87,7 +87,7 @@ void main() {
   );
 
   blocTest<DungeonBloc, DungeonState>(
-    'completar una misión dice lo ganado y el total de la sesión',
+    'completar una tarea dice lo ganado y el total de la sesión',
     setUp: () {
       when(
         () => completeTask('t1'),
@@ -116,12 +116,12 @@ void main() {
     skip: 1,
     expect: () => [
       isA<DungeonReady>()
-          .having((s) => s.currentTaskId, 'siguiente misión', 't2')
-          .having((s) => s.board.session!.missionsDone, 'misiones', 1)
+          .having((s) => s.currentTaskId, 'siguiente tarea', 't2')
+          .having((s) => s.board.session!.missionsDone, 'tareas', 1)
           .having(
             (s) => s.message,
             'aviso',
-            '¡Misión completada! +25 XP · +8 Monedas. '
+            '¡Tarea completada! +25 XP · +8 Monedas. '
                 'En esta sesión llevas 35 XP y 11 Monedas.',
           ),
     ],
@@ -172,9 +172,9 @@ void main() {
         now: now,
         busy: true,
       ),
-      focus(
-        _board(),
-      ).copyWith(message: '¡Entraste a la Mazmorra! A por el primer ciclo.'),
+      focus(_board()).copyWith(
+        message: 'Has iniciado el Modo Foco. Vamos con el primer bloque.',
+      ),
     ],
   );
 
@@ -201,7 +201,7 @@ void main() {
         now: now,
         phaseEndsAt: now.add(const Duration(minutes: 5)),
         currentTaskId: 't1',
-        message: '¡Mazmorra superada! Toma un descanso.',
+        message: '¡Bloque completado! Toma un descanso.',
       ),
     ],
     verify: (_) => verify(
@@ -233,7 +233,7 @@ void main() {
         now: now,
         phaseEndsAt: now.add(const Duration(minutes: 8)),
         currentTaskId: 't1',
-        message: '¡Mazmorra superada! Toma un descanso.',
+        message: '¡Bloque completado! Toma un descanso.',
       ),
     ],
   );
@@ -259,7 +259,7 @@ void main() {
         phase: DungeonPhase.done,
         now: now,
         currentTaskId: 't1',
-        message: '¡Último ciclo superado! Termina la sesión para ver tu botín.',
+        message: '¡Bloque completado! Termina la sesión para ver el resumen.',
       ),
     ],
   );

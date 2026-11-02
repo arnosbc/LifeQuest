@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/tavern/presentation/widgets/create_npc_sheet.dart';
 import 'package:proyecto_movil/features/tavern/presentation/widgets/npc_documents_sheet.dart';
-import 'package:proyecto_movil/features/tavern/presentation/widgets/npc_mission_guide_sheet.dart';
 
 /// Taverna: NPCs que piden misiones reales. Necesita un [TavernBloc] encima.
 class TavernScreen extends StatelessWidget {
@@ -49,7 +52,7 @@ class TavernScreen extends StatelessWidget {
       maxLength: 60,
       onRename: (name) => bloc.add(NpcRenamed(npc.id, name)),
       onDelete: () => bloc.add(NpcDeleted(npc.id)),
-      deleteMessage: 'Sus misiones se conservan como misiones sueltas.',
+      deleteMessage: 'Sus tareas guiadas se conservan como tareas sueltas.',
     );
 
     Future<void> ask(Npc npc) async {
@@ -57,12 +60,12 @@ class TavernScreen extends StatelessWidget {
       if (!free &&
           !await confirmLifeQuest(
             context,
-            title: 'Pedir misión ya',
+            title: 'Solicitar tarea guiada',
             message:
-                '${npc.name} tendrá una misión gratis a las '
+                '${npc.name} podrá proponerte una tarea guiada gratis a las '
                 '${LifeQuestDates.dayTime(npc.freeAt!)}. '
-                '¿Pedirla ahora por ${board.instantCost} Monedas?',
-            confirmLabel: 'Pedir ahora',
+                '¿Solicitarla ahora por ${board.instantCost} Monedas?',
+            confirmLabel: 'Solicitar',
           )) {
         return;
       }
@@ -93,7 +96,7 @@ class TavernScreen extends StatelessWidget {
         case AttachNpcDocument(:final document):
           showLifeQuestMessage(
             context,
-            'RPGenie está leyendo «${document.title}». Puede tardar un minuto.',
+            'El Asistente está leyendo «${document.title}». Puede tardar un minuto.',
           );
           bloc.add(NpcDocumentAdded(document));
         case RemoveNpcDocumentAction(document: final doc):
@@ -101,7 +104,7 @@ class TavernScreen extends StatelessWidget {
                 context,
                 title: 'Quitar documento',
                 message:
-                    '${npc.name} dejará de usar «${doc.title}» para sus misiones.',
+                    '${npc.name} dejará de usar «${doc.title}» para sus tareas guiadas.',
                 confirmLabel: 'Quitar',
               ) &&
               context.mounted) {
@@ -113,33 +116,33 @@ class TavernScreen extends StatelessWidget {
     }
 
     return LifeQuestPage(
-      title: 'Taverna',
-      subtitle: 'Los personajes de tu reino tienen encargos para ti.',
+      title: 'Mentores',
+      icon: QIcons.users,
+      subtitle: 'Tus mentores te proponen tareas guiadas para aprender.',
       children: [
         LifeQuestSectionHeading(
-          'NPCs · ${board.npcs.length}/${board.npcLimit}',
+          'MENTORES · ${board.npcs.length}/${board.npcLimit}',
         ),
         const SizedBox(height: 7),
         if (board.npcs.isEmpty)
           const LifeQuestListRow(
-            icon: Icons.sports_bar_outlined,
-            title: 'La Taverna está tranquila',
+            icon: Icons.person_add_alt_1_outlined,
+            title: 'Aún no tienes mentores',
             subtitle:
-                'Invita a tu primer NPC: te pedirá misiones de una de tus skills.',
+                'Añade un mentor para recibir tareas guiadas relacionadas con una de tus áreas.',
           ),
         for (final npc in board.npcs) ...[
           if (npc.openMission case final mission?) ...[
             LifeQuestActionRow(
               icon: Icons.person_outline,
               title: '${npc.name} · ${npc.skillName}',
-              subtitle: 'Misión: ${mission.title} · +${mission.xpReward} XP',
-              actionLabel: 'Cumplir',
+              subtitle:
+                  'Tarea guiada: ${mission.title} · +${mission.xpReward} XP',
+              actionLabel: 'Empezar en Foco',
               busy: state.busyKey == npc.id,
               menu: menu(npc),
               onAction: idle
-                  ? () => bloc.add(
-                      NpcMissionCompleted(npcId: npc.id, taskId: mission.id),
-                    )
+                  ? () => context.go(RoutePaths.focusOn(mission.id))
                   : null,
             ),
           ] else
@@ -148,11 +151,11 @@ class TavernScreen extends StatelessWidget {
               title: '${npc.name} · ${npc.skillName}',
               subtitle: [
                 npc.nobleMission ?? _frequency(npc.frequency),
-                if (npc.completed > 0) '${npc.completed} cumplidas',
+                if (npc.completed > 0) '${npc.completed} tareas completadas',
               ].join(' · '),
               actionLabel: npc.isFree(now)
-                  ? 'Pedir misión'
-                  : '${board.instantCost} 🪙',
+                  ? 'Solicitar tarea'
+                  : '${board.instantCost} Monedas',
               busy: state.busyKey == npc.id,
               menu: menu(npc),
               onAction: idle ? () => ask(npc) : null,
@@ -165,16 +168,7 @@ class TavernScreen extends StatelessWidget {
                   context,
                   icon: Icons.menu_book_outlined,
                   label: 'Ver guía: pasos y pistas',
-                  onPressed: () => showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    useSafeArea: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => NpcMissionGuideSheet(
-                      npcName: npc.name,
-                      mission: mission,
-                    ),
-                  ),
+                  onPressed: () => context.push(RoutePaths.task(mission.id)),
                 ),
               _link(
                 context,
@@ -190,7 +184,7 @@ class TavernScreen extends StatelessWidget {
         const SizedBox(height: 16),
         if (board.skills.isEmpty)
           Text(
-            'Crea una skill en tu Perfil para invitar NPCs.',
+            'Crea un área en tu Perfil para añadir mentores.',
             textAlign: TextAlign.center,
             style: TextStyle(color: context.lq.muted, fontSize: 12),
           )
@@ -208,8 +202,8 @@ class TavernScreen extends StatelessWidget {
                   : const Icon(Icons.add),
               label: Text(
                 board.full
-                    ? 'Taverna llena · mejora el Estandarte'
-                    : 'Nuevo NPC',
+                    ? 'Límite alcanzado · mejora Más mentores'
+                    : 'Nuevo mentor',
               ),
             ),
           ),
@@ -234,8 +228,8 @@ class TavernScreen extends StatelessWidget {
   );
 
   static String _frequency(NpcFrequency f) => switch (f) {
-    NpcFrequency.daily => 'Te visita a diario',
-    NpcFrequency.weekly => 'Te visita cada semana',
-    NpcFrequency.monthly => 'Te visita cada mes',
+    NpcFrequency.daily => 'Propuestas diarias',
+    NpcFrequency.weekly => 'Propuestas semanales',
+    NpcFrequency.monthly => 'Propuestas mensuales',
   };
 }

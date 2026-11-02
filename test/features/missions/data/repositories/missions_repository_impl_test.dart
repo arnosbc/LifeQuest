@@ -40,7 +40,7 @@ void main() {
     ).thenThrow(const ServerException(code: 'task_not_open'));
     expect(
       await repository.completeMission('t1'),
-      const Left(ServerFailure('Esa misión ya estaba cerrada. ¡Una menos!')),
+      const Left(ServerFailure('Esa tarea ya estaba cerrada. ¡Una menos!')),
     );
   });
 

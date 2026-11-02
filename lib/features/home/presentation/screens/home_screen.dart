@@ -4,17 +4,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/daily_chest_card.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/dashboard_greeting.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/level_card.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/priority_mission_card.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/home_link_card.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/how_it_works_sheet.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/next_step_card.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/progress_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/quick_action.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/today_list.dart';
 
-/// Inicio. Necesita un [HomeBloc] por encima (lo provee el router).
+/// Inicio = Hoy (Main.dc.html con DESIGN.md v2, plan S2): progreso, Siguiente
+/// paso, tareas de hoy y hábitos de hoy, todo marcable aquí mismo.
+/// Necesita un [HomeBloc] por encima (lo provee el router).
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
@@ -30,19 +35,18 @@ class HomeScreen extends StatelessWidget {
   /// Avisos sin leer para la campana (los trae el router).
   final int unreadNotifications;
 
-  static const _sections = [
-    (Icons.inbox_outlined, 'Brain Dump', RoutePaths.brainDump),
-    (Icons.auto_awesome_outlined, 'RPGenie', RoutePaths.rpgenie),
-    (Icons.edit_note_outlined, 'Misiones', RoutePaths.missions),
-    (Icons.auto_stories_outlined, 'Diario', RoutePaths.journal),
-    (Icons.flag_outlined, 'Objetivos', RoutePaths.goals),
-    (Icons.sports_bar_outlined, 'Taverna', RoutePaths.tavern),
-    (Icons.storefront_outlined, 'Marketplace', RoutePaths.marketplace),
+  // RF-114: secciones que no caben en la barra inferior.
+  static const _tools = [
+    (Icons.description_outlined, 'Documentos', RoutePaths.documents),
+    (Icons.inbox_outlined, 'Bandeja de ideas', RoutePaths.brainDump),
+    (Icons.auto_awesome_outlined, 'Asistente', RoutePaths.rpgenie),
+    (Icons.flag_outlined, 'Metas', RoutePaths.goals),
+    (Icons.groups_outlined, 'Mentores', RoutePaths.tavern),
+    (Icons.history_rounded, 'Actividad', RoutePaths.journal),
+    (Icons.redeem_outlined, 'Recompensas', RoutePaths.marketplace),
   ];
 
-  // Ritmo vertical: 8 entre título y contenido, 24 entre bloques.
-  static const _gap = SizedBox(height: 24);
-  static const _headingGap = SizedBox(height: 8);
+  static const _gap = SizedBox(height: 20);
 
   @override
   Widget build(BuildContext context) => BlocConsumer<HomeBloc, HomeState>(
@@ -51,14 +55,14 @@ class HomeScreen extends StatelessWidget {
         showLifeQuestMessage(context, (state as HomeSuccess).message!),
     builder: (context, state) => switch (state) {
       HomeInitial() || HomeLoading() => Center(
-        child: CircularProgressIndicator(color: context.lq.deepGreen),
+        child: CircularProgressIndicator(color: context.q.ink),
       ),
-      HomeFailure(:final message) => _ErrorView(
+      HomeFailure(:final message) => LifeQuestErrorView(
         message: message,
         onRetry: () => context.read<HomeBloc>().add(const HomeRequested()),
       ),
       HomeSuccess() => RefreshIndicator(
-        color: context.lq.deepGreen,
+        color: context.q.ink,
         onRefresh: () => _refresh(context.read<HomeBloc>()),
         child: _content(context, state),
       ),
@@ -73,93 +77,159 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _content(BuildContext context, HomeSuccess state) {
-    final dashboard = state.dashboard;
+    final d = state.dashboard;
+    final bloc = context.read<HomeBloc>();
+    final next = d.priorityMission;
+    final today = [
+      for (final t in d.todayTasks)
+        if (t.id != next?.id) t,
+    ];
+    final busyNext = next != null && state.busyTaskId == next.id;
     return ListView(
       // Permite deslizar para refrescar aunque el contenido quepa.
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: const EdgeInsets.only(bottom: 96),
       children: [
-        DashboardGreeting(
-          userName: dashboard.displayName ?? userName,
-          onOpenProfile: () => onNavigate(4),
-          onOpenNotifications: () => context.go(RoutePaths.notifications),
-          unreadNotifications: unreadNotifications,
+        QuestlyHero(
+          kicker: '¡Qué bueno verte de nuevo!',
+          heading: 'Hola, ${d.displayName ?? userName}',
+          icon: QIcons.home,
+          onAction: () => context.go(RoutePaths.notifications),
+          actionLabel: unreadNotifications > 0
+              ? 'Avisos, $unreadNotifications sin leer'
+              : 'Avisos',
+          actionIcon: QIcons.bell,
+          badge: unreadNotifications > 0
+              ? (unreadNotifications > 9 ? '9+' : '$unreadNotifications')
+              : null,
         ),
-        const SizedBox(height: 20),
-        // La misión va primero: es la única acción primaria de la pantalla.
-        LifeQuestSectionHeading(
-          'MISIÓN PRIORITARIA',
-          action: 'Ver todas',
-          onTap: () => context.go(RoutePaths.missions),
-        ),
-        _headingGap,
-        PriorityMissionCard(
-          mission: dashboard.priorityMission,
-          onContinue: () => context.go(RoutePaths.missions),
-          onCreate: () => context.go(RoutePaths.missions),
-        ),
-        const SizedBox(height: 8),
-        DailyChestCard(
-          chest: dashboard.chest,
-          busy: state.claimingChest,
-          onClaim: () => context.read<HomeBloc>().add(const HomeChestClaimed()),
-        ),
-        _gap,
-        const LifeQuestSectionHeading('TU HÉROE'),
-        _headingGap,
-        LevelCard(dashboard: dashboard),
-        _gap,
-        LifeQuestSectionHeading(
-          'HÁBITOS DE HOY',
-          action: _streakLabel(dashboard),
-          onTap: () => onNavigate(2),
-        ),
-        _headingGap,
-        HabitStrip(
-          habits: dashboard.habits,
-          busyHabitId: state.busyHabitId,
-          onComplete: (id) =>
-              context.read<HomeBloc>().add(HomeHabitCompleted(id)),
-          onOpenHabits: () => onNavigate(2),
-        ),
-        _gap,
-        const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
-        _headingGap,
-        _row([
-          QuickAction(
-            icon: Icons.add_box_outlined,
-            label: 'Nueva tarea',
-            onTap: () => context.go(RoutePaths.missions),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const _MotivationBanner(),
+              _gap,
+              _SectionTitle(
+                'Tus metas',
+                action: 'Ver todas',
+                onAction: () => context.push(RoutePaths.goals),
+              ),
+              if (d.topGoal case final g?) ...[
+                TopGoalCard(
+                  title: g.title,
+                  progress: g.progress,
+                  onTap: () => context.push(RoutePaths.goals),
+                ),
+                const SizedBox(height: QSpace.m),
+              ],
+              QuestlyButton(
+                label: 'Agregar meta',
+                icon: QIcons.plus,
+                onPressed: () => context.go(RoutePaths.stage),
+              ),
+              _gap,
+              ProgressCard(
+                dashboard: d,
+                onOpenProfile: () => onNavigate(4),
+                onExplain: (topic) => showHowItWorks(context, topic),
+              ),
+              _gap,
+              _SectionTitle(
+                'Siguiente paso',
+                action: next == null ? null : '¿Por qué esta?',
+                onAction: () => context.push(RoutePaths.rpgenie),
+              ),
+              NextStepCard(
+                mission: next,
+                busy: busyNext,
+                onFocus: () => context.go(RoutePaths.focusOn(next!.id)),
+                onCreate: () => context.go(RoutePaths.missions),
+              ),
+              if (d.mentorTask case final m?) ...[
+                const SizedBox(height: QSpace.m),
+                HomeLinkCard(
+                  icon: QIcons.users,
+                  kicker: 'Mentores',
+                  title: '${m.mentor} te dejó una tarea guiada',
+                  detail: '${m.title} · +${m.xpReward} XP',
+                  tint: context.q.riverTint,
+                  ink: context.q.riverInk,
+                  onTap: () => context.push(RoutePaths.task(m.id)),
+                ),
+              ],
+              if (d.inboxCount > 0) ...[
+                const SizedBox(height: QSpace.m),
+                HomeLinkCard(
+                  icon: QIcons.inbox,
+                  kicker: 'Bandeja de ideas',
+                  title: d.inboxCount == 1
+                      ? '1 idea espera que la ordenes'
+                      : '${d.inboxCount} ideas esperan que las ordenes',
+                  detail: 'Vacía tu cabeza aquí y decide después',
+                  tint: context.q.mustardTint,
+                  ink: context.q.mustardInk,
+                  onTap: () => context.push(RoutePaths.brainDump),
+                ),
+              ],
+              if (today.isNotEmpty) ...[
+                _gap,
+                _SectionTitle(
+                  'Hoy',
+                  action: 'Ver todas',
+                  onAction: () => context.go(RoutePaths.missions),
+                ),
+                TodayList(
+                  tasks: today,
+                  busyTaskId: state.busyTaskId,
+                  onFocus: (id) => context.go(RoutePaths.focusOn(id)),
+                ),
+              ],
+              _gap,
+              _SectionTitle(
+                'Hábitos de hoy',
+                action: _streakLabel(d),
+                onAction: () => onNavigate(2),
+              ),
+              HabitStrip(
+                habits: d.habits,
+                busyHabitId: state.busyHabitId,
+                onComplete: (id) => bloc.add(HomeHabitCompleted(id)),
+                onOpenHabits: () => onNavigate(2),
+              ),
+              const SizedBox(height: QSpace.m),
+              DailyChestCard(
+                chest: d.chest,
+                busy: state.claimingChest,
+                onClaim: () => bloc.add(const HomeChestClaimed()),
+              ),
+              _gap,
+              const _SectionTitle('Más herramientas'),
+              for (var i = 0; i < _tools.length; i += 3) ...[
+                if (i > 0) const SizedBox(height: QSpace.s),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final (j, (icon, label, path))
+                          in _tools.skip(i).take(3).indexed) ...[
+                        if (j > 0) const SizedBox(width: QSpace.s),
+                        Expanded(
+                          child: QuickAction(
+                            icon: icon,
+                            label: label,
+                            vertical: true,
+                            onTap: () => context.push(path),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ],
           ),
-          QuickAction(
-            icon: Icons.timer_outlined,
-            label: 'Modo focus',
-            onTap: () => onNavigate(3),
-          ),
-        ]),
-        const SizedBox(height: 8),
-        _row([
-          QuickAction(
-            icon: Icons.monitor_heart_outlined,
-            label: 'Registrar hábito',
-            onTap: () => onNavigate(2),
-          ),
-          QuickAction(
-            icon: Icons.tune_rounded,
-            label: 'Game Master',
-            onTap: () => context.push(RoutePaths.settings),
-          ),
-        ]),
-        _gap,
-        // RF-114: secciones que no caben en la barra inferior.
-        const LifeQuestSectionHeading('EXPLORA EL REINO'),
-        for (var i = 0; i < _sections.length; i += 3) ...[
-          _headingGap,
-          _row([
-            for (final section in _sections.skip(i).take(3))
-              _sectionAction(context, section),
-          ]),
-        ],
+        ),
       ],
     );
   }
@@ -170,68 +240,94 @@ class HomeScreen extends StatelessWidget {
         1 => 'Racha de 1 día',
         final days => 'Racha de $days días',
       };
-
-  Widget _row(List<Widget> children) => IntrinsicHeight(
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var i = 0; i < children.length; i++) ...[
-          if (i > 0) const SizedBox(width: 8),
-          Expanded(child: children[i]),
-        ],
-      ],
-    ),
-  );
-
-  Widget _sectionAction(
-    BuildContext context,
-    (IconData, String, String) section,
-  ) {
-    final (icon, label, path) = section;
-    return QuickAction(
-      icon: icon,
-      label: label,
-      vertical: true,
-      // Misiones vive dentro de la pestaña Stage: se va a ella, no se apila.
-      onTap: () =>
-          path == RoutePaths.missions ? context.go(path) : context.push(path),
-    );
-  }
 }
 
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
+/// «Cada pequeño paso también es progreso.» con montañas a la derecha.
+class _MotivationBanner extends StatelessWidget {
+  const _MotivationBanner();
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Container(
+      height: 96,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: q.tint,
+        borderRadius: BorderRadius.circular(QRadius.card),
+        boxShadow: qSolidShadow(q.cardShadow),
+      ),
+      child: Stack(
         children: [
-          const LifeQuestIconTile(Icons.cloud_off_rounded, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: context.lq.ink, fontSize: 15),
+          const Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: 170,
+            child: ShaderMask(
+              shaderCallback: _fadeLeft,
+              blendMode: BlendMode.dstIn,
+              child: LifeQuestLandscape(alignment: Alignment(0, .6)),
+            ),
           ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded, size: 20),
-            label: const Text('Reintentar'),
-            style: FilledButton.styleFrom(
-              backgroundColor: context.lq.deepGreen,
-              foregroundColor: context.lq.onDeepGreen,
-              minimumSize: const Size(48, 48),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 150, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Cada pequeño paso también es progreso.',
+                style: QText.label(q.text).copyWith(height: 1.4),
+              ),
             ),
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
+
+  // El paisaje se funde con el fondo hacia el texto.
+  static Shader _fadeLeft(Rect r) => const LinearGradient(
+    colors: [Color(0x00000000), Color(0xFF000000)],
+    stops: [0, .45],
+  ).createShader(r);
+}
+
+/// Título de bloque (title3) con un enlace opcional a la derecha.
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.title, {this.action, this.onAction});
+
+  final String title;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: QSpace.s),
+      child: Row(
+        children: [
+          Expanded(
+            child: Semantics(
+              header: true,
+              child: Text(title, style: QText.title3(q.text)),
+            ),
+          ),
+          if (action != null)
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(
+                foregroundColor: q.ink,
+                minimumSize: const Size(48, QSize.minTap),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+              ),
+              child: Text(
+                action!,
+                style: QText.label(q.ink).copyWith(fontSize: 13),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }

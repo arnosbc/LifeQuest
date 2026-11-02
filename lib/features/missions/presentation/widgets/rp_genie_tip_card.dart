@@ -25,7 +25,7 @@ class RpGenieTipCard extends StatelessWidget {
               ),
               SizedBox(height: 5),
               Text(
-                'He revisado tu campaña, objetivos y plazos. Esta es la misión más importante para ti ahora.',
+                'Revisé tus metas y plazos. Esta es la tarea más importante para ti ahora.',
                 style: TextStyle(
                   color: context.lq.muted,
                   fontSize: 10,

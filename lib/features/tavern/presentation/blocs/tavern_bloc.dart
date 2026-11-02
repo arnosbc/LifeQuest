@@ -38,7 +38,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
         emit,
         'new_npc',
         () => _createNpc(e.npc),
-        '${e.npc.name} llegó a tu Taverna.',
+        'Añadiste a ${e.npc.name} como mentor.',
       ),
       transformer: droppable(),
     );
@@ -50,7 +50,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
         () => _acceptMission(
           AcceptNpcMissionParams(npcId: e.npcId, title: e.title),
         ),
-        'Misión aceptada. Ya está en tu Stage.',
+        'Tarea guiada añadida al Planificador.',
       ),
       transformer: droppable(),
     );
@@ -59,7 +59,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
         emit,
         e.npcId,
         () => _completeMission(e.taskId),
-        '¡Misión cumplida! Tu NPC está orgulloso.',
+        '¡Tarea guiada completada! Sigue así.',
       ),
       transformer: droppable(),
     );
@@ -68,7 +68,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
         emit,
         e.npcId,
         () => _renameNpc(RenameParams(e.npcId, e.name)),
-        'NPC renombrado.',
+        'Mentor renombrado.',
       ),
       transformer: droppable(),
     );
@@ -77,7 +77,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
         emit,
         e.npcId,
         () => _deleteNpc(e.npcId),
-        'El NPC dejó la Taverna. Sus misiones siguen en tu Stage.',
+        'El mentor se quitó. Sus tareas guiadas siguen en el Planificador.',
       ),
       transformer: droppable(),
     );
@@ -86,8 +86,8 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
         emit,
         e.document.npcId,
         () => _addDocument(e.document),
-        'RPGenie leyó «${e.document.title}». '
-        'Las próximas misiones saldrán de sus temas.',
+        'El Asistente leyó «${e.document.title}». '
+        'Las próximas tareas guiadas tendrán en cuenta sus temas.',
       ),
       transformer: droppable(),
     );
@@ -133,7 +133,7 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
     );
   }
 
-  /// RPGenie redacta la misión y se acepta (cobra si no es gratis). Si la IA
+  /// El Asistente propone la tarea y se acepta (cobra si no es gratis). Si la IA
   /// falla no se crea nada ni se cobra: solo se avisa.
   Future<void> _onMissionRequested(
     NpcMissionRequested event,
@@ -152,9 +152,20 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
           message: suggested.match(
             (failure) => failure.message,
             (_) =>
-                'RPGenie no logró idear una misión ahora. '
+                'El Asistente no pudo proponer una tarea ahora. '
                 'Inténtalo en un rato.',
           ),
+        ),
+      );
+      return;
+    }
+    if (suggestion.structured?.steps.isNotEmpty != true) {
+      emit(
+        TavernSuccess(
+          current.board,
+          message:
+              'No se pudieron preparar los pasos de esta tarea. '
+              'No se creó ni se cobró; inténtalo de nuevo más tarde.',
         ),
       );
       return;
@@ -167,9 +178,10 @@ class TavernBloc extends Bloc<TavernEvent, TavernState> {
           npcId: npc.id,
           title: suggestion.title,
           description: suggestion.guide,
+          guide: suggestion.structured,
         ),
       ),
-      'Nueva misión de ${npc.name}: ${suggestion.title}',
+      'Nueva tarea guiada de ${npc.name}: ${suggestion.title}',
     );
   }
 

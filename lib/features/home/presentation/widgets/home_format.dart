@@ -17,6 +17,34 @@ abstract final class HomeFormat {
     'dic',
   ];
 
+  static const _monthNames = [
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
+  ];
+  static const _weekdays = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+  ];
+
+  /// "Jueves 29 de octubre" (kicker del Hero del Inicio).
+  static String longDate(DateTime d) =>
+      '${_weekdays[d.weekday - 1]} ${d.day} de ${_monthNames[d.month - 1]}';
+
   /// 12450 → "12.450".
   static String number(int value) {
     final digits = value.abs().toString().replaceAllMapped(

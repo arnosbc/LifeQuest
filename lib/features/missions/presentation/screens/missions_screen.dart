@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
@@ -10,7 +14,7 @@ import 'package:proyecto_movil/features/missions/presentation/widgets/mission_ti
 import 'package:proyecto_movil/features/missions/presentation/widgets/prioritized_mission_card.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/rp_genie_tip_card.dart';
 
-/// Misiones. Necesita un [MissionsBloc] por encima (lo provee el router).
+/// Tareas. Necesita un [MissionsBloc] por encima (lo provee el router).
 class MissionsScreen extends StatelessWidget {
   const MissionsScreen({super.key, required this.onStartFocus});
 
@@ -61,6 +65,7 @@ class MissionsScreen extends StatelessWidget {
     final bloc = context.read<MissionsBloc>();
     final result = await showModalBottomSheet<CreateMissionResult>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -74,8 +79,8 @@ class MissionsScreen extends StatelessWidget {
     final now = DateTime.now();
     final missions = state.board.missions;
     final idle = state.busyMissionId == null && !state.saving;
-    void complete(String id) =>
-        context.read<MissionsBloc>().add(MissionCompleted(id));
+    // 040: se completan dentro del Modo Foco.
+    void complete(String id) => context.go(RoutePaths.focusOn(id));
     Widget menu(Mission mission) => LifeQuestItemMenu(
       name: mission.title,
       enabled: idle,
@@ -83,17 +88,18 @@ class MissionsScreen extends StatelessWidget {
           context.read<MissionsBloc>().add(MissionRenamed(mission.id, title)),
       onDelete: () =>
           context.read<MissionsBloc>().add(MissionDeleted(mission.id)),
-      deleteMessage: 'Se borran también sus subtareas. No se puede deshacer.',
+      deleteMessage: 'Se borran también sus pasos. No se puede deshacer.',
     );
 
     return LifeQuestPage(
-      title: 'Misiones',
-      subtitle: 'Cada paso cuenta para tu siguiente nivel.',
+      title: 'Tareas',
+      icon: QIcons.focus,
+      subtitle: 'Cada tarea completada suma a tu nivel.',
       children: [
         if (missions.isEmpty)
           LifeQuestSurface(
             child: Text(
-              'No tienes misiones abiertas. Crea la primera y da el siguiente paso.',
+              'No tienes tareas abiertas. Crea la primera y da el siguiente paso.',
               style: TextStyle(color: context.lq.muted, fontSize: 12),
             ),
           )
@@ -106,6 +112,7 @@ class MissionsScreen extends StatelessWidget {
             busy: state.busyMissionId == missions.first.id,
             onComplete: idle ? () => complete(missions.first.id) : null,
             menu: menu(missions.first),
+            onOpen: () => context.push(RoutePaths.task(missions.first.id)),
           ),
           const SizedBox(height: 14),
           const MissionImportanceCard(),
@@ -113,7 +120,7 @@ class MissionsScreen extends StatelessWidget {
         if (missions.length > 1) ...[
           const SizedBox(height: 16),
           LifeQuestSectionHeading(
-            'OTRAS MISIONES',
+            'OTRAS TAREAS',
             action: '${missions.length - 1} activas',
           ),
           const SizedBox(height: 7),
@@ -124,6 +131,7 @@ class MissionsScreen extends StatelessWidget {
               busy: state.busyMissionId == mission.id,
               onComplete: idle ? () => complete(mission.id) : null,
               menu: menu(mission),
+              onOpen: () => context.push(RoutePaths.task(mission.id)),
             ),
             const SizedBox(height: 7),
           ],
@@ -140,7 +148,7 @@ class MissionsScreen extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.add),
-            label: Text(state.saving ? 'Creando misión…' : 'Crear misión'),
+            label: Text(state.saving ? 'Creando tarea…' : 'Crear tarea'),
           ),
         ),
       ],

@@ -90,7 +90,7 @@ class AddSkillTile extends StatelessWidget {
             Icon(Icons.add_rounded, color: context.lq.deepGreen),
             const SizedBox(height: 4),
             Text(
-              'Añadir skill',
+              'Añadir área',
               style: TextStyle(
                 color: context.lq.deepGreen,
                 fontSize: 13,

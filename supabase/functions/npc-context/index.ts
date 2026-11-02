@@ -8,8 +8,13 @@
 // Markdown o texto. Si algo falla, borra el archivo y no guarda nada.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { encodeBase64 } from 'jsr:@std/encoding@1/base64';
-import { strFromU8, unzipSync } from 'npm:fflate@0.8.2';
+import {
+  documentPart,
+  kindOf,
+  type DocKind,
+} from '../_shared/file_parts.ts';
+
+export { docxText, documentPart, kindOf } from '../_shared/file_parts.ts';
 
 const SYSTEM = [
   'Eres RPGenie, el asistente de una app de productividad con estilo RPG.',
@@ -29,49 +34,6 @@ const SYSTEM = [
 const SUMMARY_MAX = 8000;
 /// Texto máximo que se envía a Gemini (≈ 80 k tokens).
 const TEXT_MAX = 300_000;
-
-export type DocKind = 'pdf' | 'docx' | 'text';
-
-/// Tipo de documento según la extensión; null si no se acepta.
-export function kindOf(path: string): DocKind | null {
-  const ext = path.toLowerCase().split('.').pop();
-  if (ext === 'pdf') return 'pdf';
-  if (ext === 'docx') return 'docx';
-  if (ext === 'md' || ext === 'markdown' || ext === 'txt') return 'text';
-  return null;
-}
-
-const ENTITIES: Record<string, string> = {
-  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
-};
-
-/// Texto de un .docx: un .zip cuyo cuerpo está en word/document.xml.
-/// Cada párrafo (<w:p>) pasa a ser una línea.
-export function docxText(bytes: Uint8Array): string {
-  const files = unzipSync(bytes, { filter: (f) => f.name === 'word/document.xml' });
-  const xml = files['word/document.xml'];
-  if (!xml) return '';
-  return strFromU8(xml)
-    .replace(/<w:tab\/>/g, '\t')
-    .replace(/<w:br\/>|<w:p\/>|<\/w:p>/g, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (m, e: string) =>
-      e[0] === '#'
-        ? String.fromCodePoint(parseInt(e[1] === 'x' ? e.slice(2) : e.slice(1), e[1] === 'x' ? 16 : 10))
-        : ENTITIES[e] ?? m)
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
-
-/// Parte del mensaje a Gemini con el documento; null si no tiene texto.
-export function documentPart(kind: DocKind, bytes: Uint8Array): Record<string, unknown> | null {
-  if (kind === 'pdf') {
-    return { inlineData: { mimeType: 'application/pdf', data: encodeBase64(bytes) } };
-  }
-  const text = (kind === 'docx' ? docxText(bytes) : new TextDecoder().decode(bytes)).trim();
-  return text ? { text: `Documento:\n${text.slice(0, TEXT_MAX)}` } : null;
-}
 
 async function summarize(part: Record<string, unknown>): Promise<{ summary?: string; reason?: string }> {
   const model = Deno.env.get('GEMINI_MODEL');

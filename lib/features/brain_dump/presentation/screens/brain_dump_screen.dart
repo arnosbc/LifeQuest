@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/entities/brain_dump_board.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
@@ -100,7 +101,8 @@ class _BrainDumpScreenState extends State<BrainDumpScreen> {
     final board = state.board;
     final idle = state.busyKey == null;
     return LifeQuestPage(
-      title: 'Brain Dump',
+      title: 'Bandeja de ideas',
+      icon: QIcons.inbox,
       subtitle: 'Saca de tu cabeza todo lo pendiente. Luego decides.',
       children: [
         Row(

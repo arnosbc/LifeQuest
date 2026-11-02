@@ -10,6 +10,9 @@
 > **v3 (2026-10-29), decisiones cerradas:** se mantiene la gamificación (XP, niveles, Monedas,
 > rachas); se aprueban los nombres de la columna «Ahora» de §3.1; la XP de una tarea guiada **se
 > reparte entre sus pasos** (§6.1). El nombre de la app sigue abierto.
+>
+> **v4 (2026-10-29):** el usuario aprueba el avance secuencial de pasos y la revisión orientativa
+> de evidencias con Gemini. Los archivos no se guardan en LifeQuest y la IA no autoriza el avance.
 
 ---
 
@@ -32,6 +35,10 @@ guiadas eso se cumple **paso a paso**, no solo al final.
 ---
 
 ## 2. Reglas que respeta todo el plan
+
+- **Las tareas se hacen en Modo Foco** (decisión del 2026-10-29, migración 040): completar una tarea o
+  marcar sus pasos solo se puede dentro de una sesión de Foco. Todo «completar» fuera del Foco es
+  «Empezar en Foco». Las subtareas son pasos y cualquier tarea se puede dividir en pasos.
 
 - **Anti-trampa (CLAUDE.md §8):** la IA y la animación solo *muestran* y *sugieren*. XP, Monedas y
   Constancia siguen saliendo de las RPC `SECURITY DEFINER`, y las animaciones leen la respuesta del servidor.
@@ -59,7 +66,7 @@ Monedas y recompensas siguen existiendo, con el lenguaje común de apps como Duo
 
 | Antes (UI) | Ahora | Alternativa (descartada) | En el código (no cambia) |
 |---|---|---|---|
-| LifeQuest / Questly | **Decisión abierta** (ver §11) | — | `proyecto_movil` |
+| LifeQuest / Questly | **LifeQuest** (decidido el 2026-10-29) | — | `proyecto_movil` (id del paquete, no cambia) |
 | Personaje · Perfil del personaje | Perfil | — | `profiles`, `character_stats` |
 | «¿Quién eres en este reino?» | «¿En quién te quieres convertir?» | «Tu propósito» | `identity_statement` |
 | Skill | Área | — | `skills` |
@@ -152,6 +159,8 @@ Pendientes (sin fecha)           → S4 Visión y Metas juntas · R2 Tu primera 
 ## 5. Fase A — Sentir el progreso (sin SQL o casi)
 
 ### A1 · Momento de recompensa
+> **Hecho (2026-10-29), con A2 y A5:** migración `037_reward_feedback.sql` + `RewardFeed` + `RewardMomentListener`. Falta A3 en las pantallas (las barras de Inicio y Perfil aún no se animan) y A4.
+
 - **Qué ve el usuario:** al completar una tarea, un hábito o un bloque de foco aparece una tarjeta
   breve con «+25 XP · +8 Monedas», la XP sube a la barra de nivel y el área muestra su propio «+25».
   Con constancia baja se ve «−25 % por constancia baja · cómo recuperarla». Se cierra sola en unos 2 s
@@ -193,6 +202,8 @@ Pendientes (sin fecha)           → S4 Visión y Metas juntas · R2 Tu primera 
 *recorrido que se completa*.
 
 ### B1 · Guía con pasos reales
+> **Hecho (2026-10-29), con B2 y B6:** migración `039_task_steps.sql` (`tasks.guide`, `task_steps`, `attach_task_guide`, `toggle_task_step`, `task_detail` y `complete_task` que paga lo que falte), `npc-mission` devuelve `structured`, Mentores guarda los pasos al aceptar y la feature `guided_task` (`/task/:id`) muestra el paso de ahora, las pistas de a una, los pasos marcables y «Cómo avanzó». Sin columna de pistas por paso: las pistas son de la tarea. Falta B3, B4, B5 y B7.
+
 - **Qué ve el usuario:** la tarea guiada abre con su **objetivo** («Al terminar sabrás resolver
   sistemas 2×2 por sustitución») y una lista de **pasos que se marcan**, cada uno con su «¿Para qué?»
   y un tiempo orientativo («≈ 10 min»). Arriba se ve «Paso 2 de 4» y una barra de avance.
@@ -252,6 +263,14 @@ pasos paga todo; no se puede tocar un paso de otro usuario (RLS); el tope diario
 - **Por qué:** se ve un solo paso a la vez, así que la tarea no abruma (punto de entrada claro).
   Las pistas por partes dejan pensar antes de dar la respuesta.
 - **Necesita:** solo UI sobre B1. El estado lo guarda el servidor, así que se puede retomar en otro momento.
+
+### B2.1 · Avance secuencial y revisión de evidencia
+- Los pasos de una tarea generada se crean ligados a esa misma tarea y en una sola transacción. Si no se pueden guardar, la tarea tampoco se crea ni se cobra.
+- Solo se puede completar el primer paso pendiente. El siguiente se habilita al terminar el actual; el servidor aplica la misma regla aunque se omita la interfaz.
+- En el paso actual se pueden adjuntar hasta 5 archivos (imágenes JPG/PNG/HEIC, PDF, DOCX, TXT o Markdown). El total de una revisión no supera 10 MB.
+- Gemini analiza los archivos para dar una observación y una sugerencia. Es una ayuda orientativa: **no bloquea el avance ni decide la XP**.
+- Antes de enviar se informa que el contenido se procesará con Gemini, que LifeQuest no conserva los archivos y que no se deben incluir datos personales o sensibles. La app y Storage no guardan las evidencias ni el resultado de la revisión.
+- La Edge Function valida que el paso pertenezca a la cuenta autenticada y no registra el contenido de los archivos.
 
 ### B3 · «Me atasqué»
 - **Qué ve el usuario:** el usuario elige qué le pasa (no entiendo el concepto / no sé cómo empezar /
@@ -371,6 +390,8 @@ Aprobadas el 2026-10-29: S1, S2, S3, S5, R1, U1 y U2. Las demás quedan como pen
   `shortcut:` frases ambiguas como «el 5» a fin de mes; se mejoran con F1 si hacen falta.
 
 ### S2 · Inicio = Hoy
+> **Hecho (2026-10-29):** migración `038_home_today.sql` (`today_tasks`), usecase `CompleteTodayTask` y el Inicio revestido (Hero, Tu progreso, Siguiente paso con ✓, Hoy, Hábitos de hoy, Recompensa diaria y Más herramientas).
+
 - **Qué ve el usuario:** de arriba abajo:
   1. Una franja con nivel, XP y Constancia.
   2. **Siguiente paso** (una tarjeta, con «Empezar»).
@@ -406,7 +427,7 @@ Quedan **3 categorías** en una sola pantalla:
 
 **Se mantiene** la Recompensa diaria del Inicio (`claim_daily_chest`): es gratis y de monto fijo.
 
-**Migración `038_simple_rewards.sql`** (con aprobación, en este orden y en una transacción):
+**Migración `041_simple_rewards.sql`** (con aprobación, en este orden y en una transacción):
 1. Devolver Elixires y Cofres guardados: sumar a `coins` y escribir una fila en `quest_log_entries`
    por usuario («Devolución: artículo retirado»). Necesita un valor nuevo en el enum de origen
    (p. ej. `refund`).
@@ -512,7 +533,7 @@ de nuevo); el total de Monedas por usuario antes y después es igual a Monedas +
 
 | Paso | Bloque | Por qué en este orden | SQL |
 |---|---|---|---|
-| 0 | Identidad comercial (§3) + **S3** | Va con el rediseño en curso. Quitar antes de revestir deja menos pantallas que rediseñar | `037_commercial_copy`, `038_simple_rewards` |
+| 0 | Identidad comercial (§3) + **S3** | Va con el rediseño en curso. Quitar antes de revestir deja menos pantallas que rediseñar | `037_commercial_copy`, `041_simple_rewards` |
 | 1 | A1 + A2 + A3 | El mayor cambio de sensación con el menor costo | Mínimo |
 | 2 | **S1 + S2** | Crear y usar todo desde dos lugares. Va con el rediseño de Inicio y Crear | `home_dashboard` |
 | 3 | B1 + B2 + B6 | La IA ya entrega la guía estructurada: falta guardarla y recorrerla | `tasks.guide`, `task_steps` |
@@ -539,8 +560,7 @@ dos usuarios), domain → data → presentation, `flutter analyze` y `flutter te
 los pasos (§6.1); S3 aprobado (se quitan Mercado negro como sección, Elixir, Cofre misterioso y Tesoro);
 S1, S2, S5, R1, U1 y U2 entran al plan. **Propuesta para cerrar:** RF-050 se resuelve con `repeat_rule` (U1).
 
-1. **Nombre de la app:** «LifeQuest» y «Questly» siguen sonando a juego. Lo decide el usuario más
-   adelante; mientras tanto el plan sigue con el nombre actual.
+1. ~~**Nombre de la app**~~ → **LifeQuest** (decidido el 2026-10-29; ya aplicado en Android, iOS, web, Windows, macOS y Linux).
 2. **Nombre propio del Asistente:** ¿solo «Asistente» o un nombre de marca?
 3. **Carpetas y rutas:** ¿se renombran también las carpetas de features y las rutas (`tavern` →
    `mentors`) o solo la UI?

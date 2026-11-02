@@ -60,23 +60,23 @@ class MarketplaceRepositoryImpl implements MarketplaceRepository {
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
     'not_enough_coins' =>
-      'Aún te faltan Monedas. Cada misión te acerca a este premio.',
+      'Aún te faltan Monedas. Cada tarea te acerca a esta recompensa.',
     'daily_limit_reached' => 'Ya lo compraste hoy. Vuelve mañana por otro.',
     'active_limit_reached' =>
-      'Ya tienes un Elixir guardado. Úsalo en tu próxima Mazmorra.',
+      'Ya tienes una bonificación guardada para tu próxima sesión de Modo Foco.',
     'monthly_limit_reached' =>
-      'Ya lo canjeaste este mes. El Mercado negro se repone el día 1.',
+      'Ya lo usaste este mes. Podrás volver a usarlo el próximo mes.',
     'too_many_passes' =>
-      'Ya guardas el máximo de Pases. Úsalos cuando haga falta.',
+      'Ya tienes el máximo de protectores de racha guardados.',
     'nothing_to_recover' =>
-      'Esa racha ya no se puede salvar, pero tu récord sigue guardado.',
+      'Esa racha ya no se puede reparar, pero tu récord sigue guardado.',
     'no_pass' =>
-      'No tienes Pases guardados. Puedes conseguir uno en el Mercado negro.',
-    'habit_required' => 'Elige qué racha quieres salvar.',
+      'No tienes protectores de racha guardados. Puedes conseguir uno en Recompensas.',
+    'habit_required' => 'Elige qué racha quieres reparar.',
     'max_level' => 'Esta mejora ya está al nivel máximo. ¡Buen trabajo!',
     'elixir_already_active' =>
-      'Ya tienes un Elixir activo para tu próxima Mazmorra.',
-    'no_elixir' => 'No tienes Elixires guardados.',
+      'Ya tienes una bonificación activa para tu próxima sesión de Modo Foco.',
+    'no_elixir' => 'No tienes bonificaciones guardadas.',
     'item_not_found' || 'item_not_available' =>
       'Ese ítem ya no está disponible. Desliza para actualizar.',
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',

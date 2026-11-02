@@ -12,6 +12,7 @@ class MissionTile extends StatelessWidget {
     required this.busy,
     required this.onComplete,
     this.menu,
+    this.onOpen,
   });
 
   final Mission mission;
@@ -23,6 +24,9 @@ class MissionTile extends StatelessWidget {
 
   /// Menú «⋯» (renombrar, borrar).
   final Widget? menu;
+
+  /// Abre la tarea con sus pasos (tarea guiada).
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
@@ -36,27 +40,30 @@ class MissionTile extends StatelessWidget {
         ),
         const SizedBox(width: 9),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                mission.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: context.lq.ink,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+          child: InkWell(
+            onTap: onOpen,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  mission.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: context.lq.ink,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              Text(
-                '${MissionsFormat.due(mission.dueDate, now)} · '
-                '${MissionsFormat.origin(mission)}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: context.lq.muted, fontSize: 9),
-              ),
-            ],
+                Text(
+                  '${MissionsFormat.due(mission.dueDate, now)} · '
+                  '${MissionsFormat.origin(mission)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: context.lq.muted, fontSize: 9),
+                ),
+              ],
+            ),
           ),
         ),
         Text(
@@ -82,8 +89,11 @@ class MissionTile extends StatelessWidget {
         else
           IconButton(
             onPressed: onComplete,
-            tooltip: 'Completar «${mission.title}»',
-            icon: Icon(Icons.check_circle_outline, color: context.lq.deepGreen),
+            tooltip: 'Empezar en Foco «${mission.title}»',
+            icon: Icon(
+              Icons.play_circle_outline_rounded,
+              color: context.lq.deepGreen,
+            ),
           ),
         ?menu,
       ],

@@ -72,7 +72,7 @@ class HabitRow extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 4, top: 4),
                             child: Text(
-                              '🔥 ${habit.currentStreak}',
+                              'Racha ${habit.currentStreak}',
                               style: TextStyle(
                                 color: context.lq.muted,
                                 fontSize: 8,

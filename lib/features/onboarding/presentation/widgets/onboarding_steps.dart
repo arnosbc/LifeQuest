@@ -1,25 +1,44 @@
 import 'package:flutter/material.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/onboarding/domain/entities/onboarding_choices.dart';
 import 'package:proyecto_movil/features/onboarding/domain/entities/onboarding_status.dart';
 
-// shortcut: textos provisionales hasta que exista PRODUCT.md.
+// Textos de PRODUCT.md v2 y plan-funcionalidades-asistente.md §3.1 (sin fantasía).
 
 class WelcomeStep extends StatelessWidget {
   const WelcomeStep({super.key});
 
+  static const _promises = [
+    (
+      QIcons.focus,
+      'Tareas que suman',
+      'Cada tarea completada te da XP y Monedas.',
+    ),
+    (
+      QIcons.flag,
+      'Metas con avance visible',
+      'Cada paso acerca tu meta al 100 %.',
+    ),
+    (QIcons.leaf, 'Sin culpa', 'Si fallas un día, descansas y sigues.'),
+  ];
+
   @override
-  Widget build(BuildContext context) => const Column(
+  Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      _Title('Bienvenido a LifeQuest'),
-      _Body('Tu progreso real hace progresar a tu personaje.'),
-      SizedBox(height: 20),
-      LifeQuestSurface(
-        padding: EdgeInsets.all(16),
-        child: _Body('Tarea → XP y Monedas → Nivel'),
+      const _Heading(
+        kicker: 'Bienvenido a LifeQuest',
+        title: 'Organiza, avanza y ve cómo creces',
+        lead:
+            'Soy tu Asistente. Te ayudo a convertir lo que quieres lograr en '
+            'pasos concretos y a ver tu progreso real.',
       ),
+      for (final (icon, title, text) in _promises) ...[
+        const SizedBox(height: QSpace.s),
+        _Promise(icon: icon, title: title, text: text),
+      ],
     ],
   );
 }
@@ -33,19 +52,25 @@ class IdentityStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _Title('¿Quién eres en este reino?'),
-      const _Body('Puedes dejarlo para después.'),
-      const SizedBox(height: 16),
+      const _Heading(
+        kicker: 'Tu propósito',
+        title: '¿En quién te quieres convertir?',
+        lead:
+            'Una frase que te recuerde para qué haces esto. Puedes dejarlo '
+            'para después.',
+      ),
+      const SizedBox(height: QSpace.l),
       TextField(
         controller: controller,
         maxLength: OnboardingChoices.identityMaxLength,
         minLines: 3,
         maxLines: 5,
         textCapitalization: TextCapitalization.sentences,
-        decoration: const InputDecoration(
-          labelText: 'Tu identidad',
-          hintText: 'Ej.: Una estratega que termina lo que empieza.',
-          border: OutlineInputBorder(),
+        style: QText.body(context.q.text).copyWith(fontSize: 16),
+        decoration: _fieldDecoration(
+          context,
+          label: 'Tu propósito',
+          hint: 'Ej.: Una persona que termina lo que empieza.',
         ),
       ),
     ],
@@ -70,37 +95,43 @@ class SkillStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _Title('¿Qué área de tu vida quieres hacer crecer?'),
-      const _Body('Será tu primera skill. Puedes dejarlo para después.'),
-      const SizedBox(height: 16),
-      TextField(
-        controller: controller,
-        maxLength: OnboardingChoices.skillMaxLength,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: const InputDecoration(
-          labelText: 'Nombre de la skill',
-          border: OutlineInputBorder(),
-        ),
+      const _Heading(
+        kicker: 'Tu primera área',
+        title: '¿Qué quieres hacer crecer?',
+        lead:
+            'Lo que completes en esta área la hará subir de nivel. Puedes '
+            'dejarlo para después y añadir más luego.',
       ),
-      const SizedBox(height: 8),
+      const SizedBox(height: QSpace.l),
       // Escucha el campo para marcar la sugerencia que coincide.
       ListenableBuilder(
         listenable: controller,
         builder: (context, _) => Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: QSpace.s,
+          runSpacing: QSpace.s,
           children: [
             for (final name in suggestions)
-              ChoiceChip(
-                label: Text(name),
+              QuestlyFilterChip(
+                label: name,
                 selected: controller.text.trim() == name,
-                materialTapTargetSize: MaterialTapTargetSize.padded,
-                onSelected: (_) => controller.value = TextEditingValue(
+                onTap: () => controller.value = TextEditingValue(
                   text: name,
                   selection: TextSelection.collapsed(offset: name.length),
                 ),
               ),
           ],
+        ),
+      ),
+      const SizedBox(height: QSpace.m),
+      TextField(
+        controller: controller,
+        maxLength: OnboardingChoices.skillMaxLength,
+        textCapitalization: TextCapitalization.sentences,
+        style: QText.body(context.q.text).copyWith(fontSize: 16),
+        decoration: _fieldDecoration(
+          context,
+          label: 'Nombre del área',
+          hint: 'O escribe la tuya: ej. Guitarra',
         ),
       ),
     ],
@@ -123,24 +154,24 @@ class DifficultyStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _Title('Elige tu dificultad'),
-      if (DifficultyPicker.sameCoins(options))
-        const _Body('Las Monedas son iguales en las tres.'),
-      const SizedBox(height: 16),
+      _Heading(
+        kicker: 'Tu ritmo',
+        title: '¿A qué ritmo quieres avanzar?',
+        lead: DifficultyPicker.sameCoins(options)
+            ? 'Cambia cuánta XP ganas y cuánta Constancia pierdes. Las Monedas '
+                  'son iguales en los tres.'
+            : 'Cambia cuánta XP ganas y cuánta Constancia pierdes.',
+      ),
+      const SizedBox(height: QSpace.l),
       DifficultyPicker(
         options: options,
         selected: selected,
         onSelected: onSelected,
       ),
-      const SizedBox(height: 6),
-      Row(
-        children: [
-          Icon(Icons.info_outline_rounded, size: 18, color: context.lq.muted),
-          const SizedBox(width: 6),
-          const Expanded(
-            child: _Body('Después solo podrás cambiarla en Configuración.'),
-          ),
-        ],
+      const SizedBox(height: QSpace.xs),
+      Text(
+        'Después solo podrás cambiarlo en Ajustes.',
+        style: QText.body(context.q.text2).copyWith(fontSize: 13),
       ),
     ],
   );
@@ -162,17 +193,19 @@ class SummaryStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _Title('¡Todo listo!'),
-      const _Body('Esto es lo que elegiste. Puedes cambiarlo cuando quieras.'),
-      const SizedBox(height: 16),
-      LifeQuestSurface(
-        padding: const EdgeInsets.all(16),
+      const _Heading(
+        kicker: 'Todo listo',
+        title: '¡Tu cuenta está lista!',
+        lead: 'Esto es lo que elegiste. Puedes cambiarlo cuando quieras.',
+      ),
+      const SizedBox(height: QSpace.l),
+      QuestlyCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _Row('Identidad', _or(identity, 'Sin identidad por ahora')),
-            _Row('Skill', _or(skill, 'Sin skill por ahora')),
-            _Row('Dificultad', difficultyName(difficulty)),
+            _Row('Propósito', _or(identity, 'Sin propósito por ahora')),
+            _Row('Área', _or(skill, 'Sin área por ahora')),
+            _Row('Ritmo', difficultyName(difficulty)),
           ],
         ),
       ),
@@ -183,36 +216,101 @@ class SummaryStep extends StatelessWidget {
       value.trim().isEmpty ? empty : value.trim();
 }
 
-class _Title extends StatelessWidget {
-  const _Title(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: Semantics(
-      header: true,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: context.lq.ink,
-          fontSize: 21,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    ),
+InputDecoration _fieldDecoration(
+  BuildContext context, {
+  required String label,
+  required String hint,
+}) {
+  final q = context.q;
+  OutlineInputBorder border(Color color, [double width = 1.5]) =>
+      OutlineInputBorder(
+        borderRadius: BorderRadius.circular(QRadius.button),
+        borderSide: BorderSide(color: color, width: width),
+      );
+  return InputDecoration(
+    labelText: label,
+    hintText: hint,
+    labelStyle: QText.label(q.text2),
+    hintStyle: QText.body(q.text2),
+    filled: true,
+    fillColor: q.card,
+    enabledBorder: border(q.inputBorder),
+    focusedBorder: border(q.ink, 2),
   );
 }
 
-class _Body extends StatelessWidget {
-  const _Body(this.text);
+class _Heading extends StatelessWidget {
+  const _Heading({
+    required this.kicker,
+    required this.title,
+    required this.lead,
+  });
 
+  final String kicker;
+  final String title;
+  final String lead;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(kicker.toUpperCase(), style: QText.meta(q.ink)),
+        const SizedBox(height: 6),
+        Semantics(
+          header: true,
+          child: Text(
+            title,
+            style: QText.title1(q.text).copyWith(fontSize: 28, height: 1.12),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(lead, style: QText.body(q.text2)),
+      ],
+    );
+  }
+}
+
+class _Promise extends StatelessWidget {
+  const _Promise({required this.icon, required this.title, required this.text});
+
+  final QIcons icon;
+  final String title;
   final String text;
 
   @override
-  Widget build(BuildContext context) =>
-      Text(text, style: TextStyle(color: context.lq.muted, fontSize: 14));
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return QuestlyCard(
+      padding: const EdgeInsets.all(QSpace.m),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: q.tint,
+              borderRadius: BorderRadius.circular(QRadius.control),
+            ),
+            alignment: Alignment.center,
+            child: QIcon(icon, color: q.ink),
+          ),
+          const SizedBox(width: QSpace.m),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: QText.label(q.text).copyWith(fontSize: 15)),
+                const SizedBox(height: 2),
+                Text(text, style: QText.body(q.text2).copyWith(fontSize: 13)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Row extends StatelessWidget {
@@ -222,25 +320,17 @@ class _Row extends StatelessWidget {
   final String value;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 90,
-          child: Text(label, style: TextStyle(color: context.lq.muted)),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              color: context.lq.ink,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 90, child: Text(label, style: QText.body(q.text2))),
+          Expanded(child: Text(value, style: QText.label(q.text))),
+        ],
+      ),
+    );
+  }
 }

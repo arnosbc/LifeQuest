@@ -115,6 +115,7 @@ CREATE TABLE public.tasks (
   parent_task_id uuid,
   title text NOT NULL,
   description text,
+  guide jsonb,
   category text,
   priority USER-DEFINED NOT NULL DEFAULT 'low'::urgency_level,
   due_date timestamp with time zone,
@@ -136,6 +137,22 @@ CREATE TABLE public.tasks (
   CONSTRAINT tasks_goal_id_fkey FOREIGN KEY (goal_id) REFERENCES public.goals(id),
   CONSTRAINT tasks_skill_id_fkey FOREIGN KEY (skill_id) REFERENCES public.skills(id),
   CONSTRAINT tasks_npc_id_fkey FOREIGN KEY (npc_id) REFERENCES public.npcs(id)
+);
+CREATE TABLE public.task_steps (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  task_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  position integer NOT NULL CHECK (position BETWEEN 1 AND 8),
+  title text NOT NULL CHECK (length(title) BETWEEN 1 AND 300),
+  done_at timestamp with time zone,
+  paid_at timestamp with time zone,
+  paid_xp integer NOT NULL DEFAULT 0 CHECK (paid_xp >= 0),
+  paid_coins integer NOT NULL DEFAULT 0 CHECK (paid_coins >= 0),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT task_steps_pkey PRIMARY KEY (id),
+  CONSTRAINT task_steps_task_position_key UNIQUE (task_id, position),
+  CONSTRAINT task_steps_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id) ON DELETE CASCADE,
+  CONSTRAINT task_steps_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 CREATE TABLE public.resources (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

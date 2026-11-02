@@ -13,8 +13,14 @@ import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
+import 'package:proyecto_movil/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/change_password.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/screens/brain_dump_screen.dart';
+import 'package:proyecto_movil/features/documents/presentation/blocs/document_editor_cubit.dart';
+import 'package:proyecto_movil/features/documents/presentation/blocs/documents_cubit.dart';
+import 'package:proyecto_movil/features/documents/presentation/screens/document_editor_screen.dart';
+import 'package:proyecto_movil/features/documents/presentation/screens/documents_screen.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
 import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
@@ -36,6 +42,7 @@ import 'package:proyecto_movil/features/missions/presentation/screens/missions_s
 import 'package:proyecto_movil/features/profile/domain/entities/theme_realm.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
 import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
@@ -53,6 +60,8 @@ import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.da
 import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
 import 'package:proyecto_movil/features/vision/presentation/blocs/vision_bloc.dart';
 import 'package:proyecto_movil/features/vision/presentation/screens/vision_screen.dart';
+import 'package:proyecto_movil/features/guided_task/presentation/blocs/guided_task_bloc.dart';
+import 'package:proyecto_movil/features/guided_task/presentation/screens/guided_task_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 /// Rutas de la app. Aquí se componen las features: cada pantalla recibe por
@@ -71,11 +80,12 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
       final signedIn = authBloc.state is AuthSuccess;
       final location = state.matchedLocation;
       final atAuth = const [
+        RoutePaths.welcome,
         RoutePaths.login,
         RoutePaths.register,
         RoutePaths.checkEmail,
       ].contains(location);
-      if (!signedIn) return atAuth ? null : RoutePaths.login;
+      if (!signedIn) return atAuth ? null : RoutePaths.welcome;
       // Mientras se consulta también va al Onboarding (muestra un indicador),
       // así quien lo tiene pendiente nunca ve Inicio antes (FR-001).
       final onboarding = onboardingBloc.state is! OnboardingNotNeeded;
@@ -89,6 +99,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
       GoRoute(
         path: RoutePaths.onboarding,
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.welcome,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: RoutePaths.login,
@@ -179,7 +193,6 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: 'missions',
                     builder: (context, state) => Scaffold(
                       backgroundColor: context.lq.background,
-                      appBar: AppBar(backgroundColor: context.lq.background),
                       body: BlocProvider(
                         create: (_) =>
                             sl<MissionsBloc>()..add(const MissionsRequested()),
@@ -238,7 +251,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                             child: Builder(
                               builder: (context) => ColoredBox(
                                 color: context.lq.background,
-                                child: const DungeonScreen(),
+                                child: DungeonScreen(
+                                  initialTaskId:
+                                      state.uri.queryParameters['task'],
+                                ),
                               ),
                             ),
                           ),
@@ -252,9 +268,14 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             routes: [
               GoRoute(
                 path: RoutePaths.profile,
-                builder: (context, state) => BlocProvider(
-                  create: (_) =>
-                      sl<ProfileBloc>()..add(const ProfileRequested()),
+                builder: (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (_) =>
+                          sl<ProfileBloc>()..add(const ProfileRequested()),
+                    ),
+                    BlocProvider(create: (_) => sl<ProfileLookCubit>()..load()),
+                  ],
                   child: _ReloadOnShow(
                     location: shellLocation,
                     path: RoutePaths.profile,
@@ -272,6 +293,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       onOpenStats: () => context.push(RoutePaths.stats),
                       onOpenVision: () => context.push(RoutePaths.vision),
                       onOpenInventory: () => context.push(RoutePaths.inventory),
+                      onSignOut: () =>
+                          context.read<AuthBloc>().add(const LogoutRequested()),
                     ),
                   ),
                 ),
@@ -308,6 +331,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                 onSignOut: () =>
                     context.read<AuthBloc>().add(const LogoutRequested()),
                 onOpenAppearance: () => context.push(RoutePaths.appearance),
+                onChangePassword: (password) async =>
+                    (await sl<ChangePassword>()(
+                      password,
+                    )).match((failure) => failure.message, (_) => null),
               ),
             ),
           ),
@@ -342,6 +369,53 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             onStartFocus: () => context.go(RoutePaths.dungeon),
           ),
         ),
+      ),
+      GoRoute(
+        path: RoutePaths.guidedTask,
+        builder: (context, state) => Scaffold(
+          backgroundColor: context.lq.background,
+          body: SafeArea(
+            child: BlocProvider(
+              create: (_) =>
+                  sl<GuidedTaskBloc>()
+                    ..add(GuidedTaskRequested(state.pathParameters['id']!)),
+              child: GuidedTaskScreen(
+                onStartFocus: (id) => context.go(RoutePaths.focusOn(id)),
+                onOpenDocument: (id, title) =>
+                    context.push(RoutePaths.documentForTask(id, title)),
+              ),
+            ),
+          ),
+        ),
+      ),
+      _section(
+        RoutePaths.documents,
+        (context) => BlocProvider(
+          create: (_) => sl<DocumentsCubit>()..load(),
+          child: DocumentsScreen(
+            onOpen: (id) => context.push(RoutePaths.documentById(id)),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.document,
+        builder: (context, state) {
+          final query = state.uri.queryParameters;
+          return Scaffold(
+            backgroundColor: context.lq.background,
+            body: SafeArea(
+              child: BlocProvider(
+                create: (_) => sl<DocumentEditorCubit>()
+                  ..open(
+                    id: query['id'],
+                    taskId: query['task'],
+                    title: query['title'],
+                  ),
+                child: DocumentEditorScreen(onBack: () => context.pop()),
+              ),
+            ),
+          );
+        },
       ),
       _section(
         RoutePaths.journal,
@@ -407,12 +481,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
 }
 
 /// Secciones del menú (RF-114) que no caben en la barra inferior: pantalla
-/// completa con botón de volver. Siguen el tema claro/oscuro (`context.lq`).
+/// completa; el Hero de `LifeQuestPage` trae «Volver». Siguen el tema claro/oscuro.
 GoRoute _section(String path, WidgetBuilder screen) => GoRoute(
   path: path,
   builder: (context, state) => Scaffold(
     backgroundColor: context.lq.background,
-    appBar: AppBar(backgroundColor: context.lq.background),
     body: SafeArea(child: screen(context)),
   ),
 );
@@ -420,7 +493,7 @@ GoRoute _section(String path, WidgetBuilder screen) => GoRoute(
 String _userName(BuildContext context) =>
     switch (context.read<AuthBloc>().state) {
       AuthSuccess(:final user) => user.displayName,
-      _ => 'Héroe',
+      _ => 'tú',
     };
 
 int _unread(NotificationsState state) =>

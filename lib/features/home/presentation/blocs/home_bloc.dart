@@ -7,6 +7,7 @@ import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/claim_daily_chest.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_today_task.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 
 part 'home_event.dart';
@@ -17,6 +18,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this._getHomeDashboard,
     required this._completeHabit,
     required this._claimDailyChest,
+    required this._completeTask,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HomeInitial()) {
@@ -24,11 +26,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeRequested>(_onRequested, transformer: droppable());
     on<HomeHabitCompleted>(_onHabitCompleted, transformer: droppable());
     on<HomeChestClaimed>(_onChestClaimed, transformer: droppable());
+    on<HomeTaskCompleted>(_onTaskCompleted, transformer: droppable());
   }
 
   final GetHomeDashboard _getHomeDashboard;
   final CompleteHabit _completeHabit;
   final ClaimDailyChest _claimDailyChest;
+  final CompleteTodayTask _completeTask;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(
@@ -47,6 +51,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         (failure) => current is HomeSuccess
             ? HomeSuccess(current.dashboard, message: failure.message)
             : HomeFailure(failure.message),
+        HomeSuccess.new,
+      ),
+    );
+  }
+
+  Future<void> _onTaskCompleted(
+    HomeTaskCompleted event,
+    Emitter<HomeState> emit,
+  ) async {
+    final current = state;
+    if (current is! HomeSuccess) return;
+    emit(HomeSuccess(current.dashboard, busyTaskId: event.taskId));
+    final completed = await _completeTask(event.taskId);
+    if (completed case Left(value: final failure)) {
+      emit(HomeSuccess(current.dashboard, message: failure.message));
+      return;
+    }
+    // Lo ganado lo muestra el momento de recompensa; aquí solo se recarga.
+    final reloaded = await _getHomeDashboard(_clock());
+    emit(
+      reloaded.match(
+        (failure) => HomeSuccess(current.dashboard, message: failure.message),
         HomeSuccess.new,
       ),
     );
@@ -96,8 +122,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(
       reloaded.match(
         (failure) => HomeSuccess(current.dashboard, message: failure.message),
-        (dashboard) =>
-            HomeSuccess(dashboard, message: '¡Cofre abierto! +$coins Monedas.'),
+        (dashboard) => HomeSuccess(
+          dashboard,
+          message: 'Recompensa diaria cobrada: +$coins Monedas.',
+        ),
       ),
     );
   }

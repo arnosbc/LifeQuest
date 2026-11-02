@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.14.0+17
+version: 1.15.0+18
 
 environment:
   sdk: ^3.12.2
@@ -50,6 +50,16 @@ dependencies:
   flutter_local_notifications: ^22.3.3
   workmanager: ^0.10.10
   url_launcher: ^6.3.3
+  image_picker: ^1.2.4
+  path_provider: ^2.1.6
+  google_sign_in: ^7.2.0
+  video_player: ^2.14.1
+  markdown: ^7.3.1
+  flutter_markdown_plus: ^1.0.12
+  pdf: ^3.13.1
+  archive: ^4.6.0
+  share_plus: ^13.3.1
+  highlight: ^0.7.0
 
 # shortcut: path_provider_foundation >= 2.5 compila un hook nativo (objective_c)
 # que falla con espacios en la ruta del usuario en Windows; quitar cuando
@@ -115,3 +125,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  # Familia por defecto del tema (texto sin estilo Questly propio).
+  fonts:
+    - family: DM Sans
+      fonts:
+        - asset: assets/google_fonts/DMSans-Regular.ttf
+        - asset: assets/google_fonts/DMSans-Medium.ttf
+          weight: 500
+        - asset: assets/google_fonts/DMSans-Bold.ttf
+          weight: 700

@@ -96,8 +96,10 @@ class StageRepositoryImpl implements StageRepository {
     'invalid_due_date' => 'Elige una fecha límite de hoy en adelante.',
     'smart_incomplete' =>
       'Completa las cinco preguntas S.M.A.R.T. para darle forma a tu meta.',
-    'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
-    'task_not_found' => 'No encontramos esa misión. Desliza para actualizar.',
+    'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
+    'task_not_found' => 'No encontramos esa tarea. Desliza para actualizar.',
+    'task_steps_pending' =>
+      'Completa los pasos de esta tarea para poder terminarla.',
     'invalid_url' => 'Escribe un enlace que empiece por http:// o https://.',
     'invalid_content' => 'Escribe la nota (hasta 10 000 caracteres).',
     'invalid_path' || 'upload_failed' =>
@@ -109,7 +111,7 @@ class StageRepositoryImpl implements StageRepository {
     'project_has_open_tasks' =>
       'A este proyecto aún le quedan misiones abiertas. ¡Ya casi!',
     'project_has_no_completed_tasks' =>
-      'Completa al menos una misión del proyecto para cerrarlo.',
+      'Completa al menos una tarea del proyecto para cerrarlo.',
     'project_no_real_work' =>
       'Las misiones de este proyecto se cerraron muy rápido. Avanza en una más y vuelve a intentarlo.',
     'project_not_open' => 'Ese proyecto ya estaba cerrado.',

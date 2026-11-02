@@ -4,7 +4,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/missions_format.dart';
 
-/// La primera misión del Daily Highlight (RF-089).
+/// La primera tarea del Daily Highlight (RF-089).
 class PrioritizedMissionCard extends StatelessWidget {
   const PrioritizedMissionCard({
     super.key,
@@ -13,6 +13,7 @@ class PrioritizedMissionCard extends StatelessWidget {
     required this.busy,
     required this.onComplete,
     this.menu,
+    this.onOpen,
   });
 
   final Mission mission;
@@ -25,6 +26,9 @@ class PrioritizedMissionCard extends StatelessWidget {
   /// Menú «⋯» (renombrar, borrar).
   final Widget? menu;
 
+  /// Abre la tarea con sus pasos (tarea guiada).
+  final VoidCallback? onOpen;
+
   @override
   Widget build(BuildContext context) => LifeQuestSurface(
     padding: const EdgeInsets.all(14),
@@ -35,7 +39,7 @@ class PrioritizedMissionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'MISIÓN PRIORIZADA',
+              'TAREA PRIORIZADA',
               style: TextStyle(
                 color: context.lq.deepGreen,
                 fontSize: 10,
@@ -43,7 +47,11 @@ class PrioritizedMissionCard extends StatelessWidget {
               ),
             ),
             menu ??
-                Icon(Icons.shield_outlined, color: context.lq.green, size: 19),
+                Icon(
+                  Icons.check_circle_outline,
+                  color: context.lq.green,
+                  size: 19,
+                ),
           ],
         ),
         const SizedBox(height: 11),
@@ -74,7 +82,7 @@ class PrioritizedMissionCard extends StatelessWidget {
         if (mission.subtasksTotal > 0)
           _detail(
             context,
-            'Subtareas',
+            'Pasos',
             '${mission.subtasksDone} de ${mission.subtasksTotal}',
           ),
         const Divider(height: 20),
@@ -84,6 +92,18 @@ class PrioritizedMissionCard extends StatelessWidget {
           '${mission.xpReward} XP    ·    ${mission.coinReward} monedas',
         ),
         const SizedBox(height: 9),
+        if (onOpen != null) ...[
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: busy ? null : onOpen,
+              icon: const Icon(Icons.format_list_numbered_rounded),
+              label: const Text('Ver pasos y pistas'),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
         SizedBox(
           width: double.infinity,
           height: 48,
@@ -95,8 +115,8 @@ class PrioritizedMissionCard extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.check_rounded),
-            label: Text(busy ? 'Completando…' : 'Completar misión'),
+                : const Icon(Icons.play_arrow_rounded),
+            label: Text(busy ? 'Abriendo…' : 'Empezar en Foco'),
             style: FilledButton.styleFrom(backgroundColor: context.lq.green),
           ),
         ),

@@ -40,6 +40,18 @@ class HabitsBoardModel {
       for (final d in json['month_days'] as List<dynamic>? ?? const [])
         (d as num).toInt(),
     ],
+    // 042; antes, el mapa de calor sale de month_days con intensidad 1.
+    monthHeat: json['month_heat'] is Map
+        ? {
+            for (final e in (json['month_heat'] as Map).entries)
+              int.parse('${e.key}'): (e.value as num).toInt(),
+          }
+        : {
+            for (final d in json['month_days'] as List<dynamic>? ?? const [])
+              (d as num).toInt(): 1,
+          },
+    monthDone: _int(json['month_done']),
+    yearDone: _int(json['year_done']),
     skills: [
       for (final s in _list('skills'))
         HabitSkill(id: s['id'] as String, name: s['name'] as String),

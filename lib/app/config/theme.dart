@@ -4,16 +4,16 @@ import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_realm.dart';
 
-/// Paleta fija (Bosque claro de «Bosque vivo»). Las pantallas aún no migradas
+/// Paleta fija (lavanda clara de LifeQuest). Las pantallas aún no migradas
 /// la usan directamente; las migradas leen `context.lq` o `context.q`.
 abstract final class LifeQuestColors {
-  static const green = Color(0xFF2E7D4F);
-  static const deepGreen = Color(0xFF1F5C39);
+  static const green = Color(0xFF7C5CC4);
+  static const deepGreen = Color(0xFF5B3FA8);
   static const ink = QColors.text;
   static const muted = QColors.text2;
   static const background = QColors.bg;
   static const line = QColors.border;
-  static const softGreen = Color(0xFFE1F0E6);
+  static const softGreen = Color(0xFFEFE9FB);
   static const outline = QColors.inputBorder;
   static const error = QColors.coralInk;
   // Pérdida de HP y malos hábitos: solo relleno o iconos, nunca texto pequeño.

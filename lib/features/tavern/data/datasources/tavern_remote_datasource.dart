@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/tavern/data/models/tavern_board_model.dart';
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
+import 'package:proyecto_movil/core/entities/task_guide.dart';
 
 /// RPCs de la Taverna (019) y `complete_task` (005). Lanza
 /// [ServerException] o [NetworkException].
@@ -16,7 +18,13 @@ abstract class TavernRemoteDataSource {
 
   Future<NpcMissionSuggestion?> suggestMission(String npcId);
 
-  Future<void> acceptMission(String npcId, String title, {String? description});
+  /// La tarea y [guide] se crean juntas para no dejar pasos sin asignar.
+  Future<void> acceptMission(
+    String npcId,
+    String title, {
+    String? description,
+    TaskGuide? guide,
+  });
 
   Future<void> completeMission(String taskId);
 
@@ -50,9 +58,12 @@ const _contentTypes = {
 };
 
 class TavernRemoteDataSourceImpl implements TavernRemoteDataSource {
-  const TavernRemoteDataSourceImpl(this._client);
+  const TavernRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<TavernBoardModel> getBoard() => _guard(
@@ -84,6 +95,7 @@ class TavernRemoteDataSourceImpl implements TavernRemoteDataSource {
           return NpcMissionSuggestion(
             title: title,
             guide: guide is String && guide.isNotEmpty ? guide : null,
+            structured: _guide(data?['structured']),
           );
         }
         // Motivo de la Edge Function (p. ej. gemini_429) para el aviso.
@@ -105,16 +117,47 @@ class TavernRemoteDataSourceImpl implements TavernRemoteDataSource {
     String npcId,
     String title, {
     String? description,
-  }) => _rpc('accept_npc_mission', {
-    'p_npc_id': npcId,
-    'p_title': title,
-    // Solo con guía: sin ella la llamada vale también antes de la 031.
-    'p_description': ?description,
+    TaskGuide? guide,
+  }) => _guard(() async {
+    await _client.rpc<dynamic>(
+      'accept_npc_mission',
+      params: {
+        'p_npc_id': npcId,
+        'p_title': title,
+        'p_description': description,
+        'p_guide': guide?.toJson(),
+      },
+    );
   });
 
+  static TaskGuide? _guide(Object? raw) {
+    if (raw is! Map) return null;
+    List<String> list(Object? v) => v is List
+        ? [
+            for (final x in v)
+              if (x is String && x.isNotEmpty) x,
+          ]
+        : const [];
+    final steps = list(raw['steps']);
+    if (steps.isEmpty) return null;
+    final objective = raw['objective'];
+    return TaskGuide(
+      objective: objective is String && objective.isNotEmpty ? objective : null,
+      steps: steps,
+      hints: list(raw['hints']),
+      search: list(raw['search']),
+    );
+  }
+
   @override
-  Future<void> completeMission(String taskId) =>
-      _rpc('complete_task', {'p_task_id': taskId});
+  Future<void> completeMission(String taskId) => _guard(
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_task',
+        params: {'p_task_id': taskId},
+      ),
+    ),
+  );
 
   @override
   Future<void> addDocument(NewNpcDocument document) => _guard(() async {

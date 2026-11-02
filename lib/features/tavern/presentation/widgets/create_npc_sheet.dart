@@ -60,7 +60,7 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Nuevo NPC',
+              'Nuevo mentor',
               style: TextStyle(
                 color: context.lq.ink,
                 fontSize: 18,
@@ -69,7 +69,7 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Un personaje que te pedirá misiones de una de tus skills.',
+              'Una persona que te propondrá tareas guiadas relacionadas con un área.',
               style: TextStyle(color: context.lq.muted, fontSize: 12),
             ),
             const SizedBox(height: 14),
@@ -84,13 +84,13 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               initialValue: _skillId,
-              decoration: const InputDecoration(labelText: 'Skill que entrena'),
+              decoration: const InputDecoration(labelText: 'Área que acompaña'),
               items: [
                 for (final s in widget.skills)
                   DropdownMenuItem(value: s.id, child: Text(s.name)),
               ],
               onChanged: (v) => setState(() => _skillId = v),
-              validator: (v) => v == null ? 'Elige una skill.' : null,
+              validator: (v) => v == null ? 'Elige un área.' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -98,17 +98,18 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
               maxLength: 300,
               maxLines: 2,
               decoration: const InputDecoration(
-                labelText: 'Noble misión',
+                labelText: 'Propósito del mentor',
                 hintText: 'Ej.: fundamentos de diseño gráfico',
-                helperText: 'RPGenie te propondrá misiones sobre este tema.',
+                helperText:
+                    'El Asistente propondrá tareas guiadas sobre este tema.',
               ),
               validator: (v) => (v ?? '').trim().isEmpty
-                  ? 'Cuéntale a RPGenie sobre qué serán sus misiones.'
+                  ? 'Describe el propósito de este mentor.'
                   : null,
             ),
             const SizedBox(height: 8),
             Text(
-              '¿Cada cuánto te visita?',
+              '¿Con qué frecuencia propone tareas?',
               style: TextStyle(color: context.lq.ink, fontSize: 13),
             ),
             const SizedBox(height: 6),
@@ -132,7 +133,7 @@ class _CreateNpcSheetState extends State<CreateNpcSheet> {
               height: 48,
               child: FilledButton(
                 onPressed: _save,
-                child: const Text('Invitar a la Taverna'),
+                child: const Text('Añadir mentor'),
               ),
             ),
           ],

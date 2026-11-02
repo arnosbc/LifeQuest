@@ -5,10 +5,10 @@ import { buildPrompt, cleanTitle, formatGuide, parseSuggestion } from './index.t
 Deno.test('buildPrompt usa la noble misión como tema y lista las anteriores', () => {
   const npc = { name: 'Iris', noble_mission: 'Fundamentos de diseño gráfico', frequency: 'weekly', skills: { name: 'Diseño' } };
   const prompt = buildPrompt(npc, ['Estudia la rueda de color']);
-  assertEquals(prompt.split('\n')[0], 'Tema (noble misión): Fundamentos de diseño gráfico');
+  assertEquals(prompt.split('\n')[0], 'Tema (propósito del mentor): Fundamentos de diseño gráfico');
   assertEquals(prompt.includes('- Estudia la rueda de color'), true);
   // NPC antiguo sin noble misión: la skill hace de tema.
-  assertEquals(buildPrompt({ ...npc, noble_mission: null }, []).split('\n')[0], 'Tema (noble misión): Diseño');
+  assertEquals(buildPrompt({ ...npc, noble_mission: null }, []).split('\n')[0], 'Tema (propósito del mentor): Diseño');
 });
 
 Deno.test('buildPrompt añade el resumen de los documentos de contexto', () => {

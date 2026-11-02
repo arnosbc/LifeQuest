@@ -12,6 +12,7 @@ class DeepWorkSessionCard extends StatelessWidget {
     required this.currentTaskId,
     required this.onSelect,
     required this.onComplete,
+    this.onOpenSteps,
   });
 
   final DungeonSession session;
@@ -20,6 +21,9 @@ class DeepWorkSessionCard extends StatelessWidget {
 
   /// Null mientras otra acción está en curso.
   final ValueChanged<String>? onComplete;
+
+  /// Abre los pasos de la tarea (tarea guiada).
+  final ValueChanged<String>? onOpenSteps;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,7 @@ class DeepWorkSessionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'SESIÓN DEEP WORKING',
+            'SESIÓN DE FOCO',
             style: TextStyle(
               color: context.lq.muted,
               fontSize: 9,
@@ -59,7 +63,7 @@ class DeepWorkSessionCard extends StatelessWidget {
           ),
           const SizedBox(height: 11),
           Text(
-            'MOCHILA · ${session.tasks.length} misiones · $done completadas',
+            'TAREAS · ${session.tasks.length} · $done completadas',
             style: TextStyle(
               color: context.lq.muted,
               fontSize: 9,
@@ -67,7 +71,7 @@ class DeepWorkSessionCard extends StatelessWidget {
             ),
           ),
           Text(
-            'Toca una misión para concentrarte en ella este ciclo.',
+            'Toca una tarea para concentrarte en ella durante este bloque.',
             style: TextStyle(color: context.lq.muted, fontSize: 9),
           ),
           for (final task in session.tasks) _task(context, task),
@@ -105,20 +109,35 @@ class DeepWorkSessionCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              '${current ? 'En foco · ' : ''}${task.cycles} ${task.cycles == 1 ? 'ciclo' : 'ciclos'}',
+              '${current ? 'En foco · ' : ''}${task.cycles} '
+              '${task.cycles == 1 ? 'bloque' : 'bloques'}',
               style: TextStyle(color: context.lq.muted, fontSize: 9),
             ),
             trailing: task.done
                 ? Icon(Icons.check_circle, color: context.lq.green)
-                : IconButton(
-                    tooltip: 'Completar «${task.title}»',
-                    onPressed: onComplete == null
-                        ? null
-                        : () => onComplete!(task.id),
-                    icon: Icon(
-                      Icons.check_circle_outline,
-                      color: context.lq.deepGreen,
-                    ),
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (onOpenSteps != null)
+                        IconButton(
+                          tooltip: 'Pasos de «${task.title}»',
+                          onPressed: () => onOpenSteps!(task.id),
+                          icon: Icon(
+                            Icons.format_list_numbered_rounded,
+                            color: context.lq.deepGreen,
+                          ),
+                        ),
+                      IconButton(
+                        tooltip: 'Completar «${task.title}»',
+                        onPressed: onComplete == null
+                            ? null
+                            : () => onComplete!(task.id),
+                        icon: Icon(
+                          Icons.check_circle_outline,
+                          color: context.lq.deepGreen,
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ),

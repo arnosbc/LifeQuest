@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/marketplace/domain/entities/market_board.dart';
 import 'package:proyecto_movil/features/marketplace/presentation/blocs/marketplace_bloc.dart';
 
-/// Marketplace: Hotel, Mercado, Mercado negro y Refugio. Gastar nunca toca
-/// la XP ni el nivel. Necesita un [MarketplaceBloc] por encima.
+/// Recompensas, protección de rachas y mejoras. Gastar nunca toca la XP ni el
+/// nivel. Necesita un [MarketplaceBloc] por encima.
 class MarketplaceScreen extends StatelessWidget {
   const MarketplaceScreen({super.key});
 
-  static const _refuge = {
-    'huerto': (Icons.grass, 'Huerto', '+1 de vida al día por nivel'),
+  static const _improvements = {
+    'huerto': (
+      Icons.favorite_outline,
+      'Bienestar',
+      '+1 de Constancia al día por nivel',
+    ),
     'biblioteca': (
-      Icons.menu_book_outlined,
-      'Biblioteca de RPGenie',
-      '+1 misión ligera al día por nivel',
+      Icons.auto_awesome_outlined,
+      'Asistente',
+      '+1 tarea guiada al día por nivel',
     ),
     'estandarte': (
-      Icons.flag_outlined,
-      'Estandarte del gremio',
-      '+1 NPC en la Taverna por nivel',
+      Icons.groups_outlined,
+      'Más mentores',
+      '+1 mentor por nivel',
     ),
   };
 
@@ -73,10 +78,14 @@ class MarketplaceScreen extends StatelessWidget {
     final recover = board.blackMarket
         .where((i) => i.code == 'recuperar_racha')
         .firstOrNull;
+    final protector = board.blackMarket
+        .where((i) => i.code == 'pase_recuperacion')
+        .firstOrNull;
     final hpFull = board.hpCurrent >= board.hpMax;
 
     return LifeQuestPage(
-      title: 'Marketplace',
+      title: 'Recompensas',
+      icon: QIcons.coin,
       subtitle: 'Disfruta lo que has ganado. Tu avance no se toca.',
       children: [
         LifeQuestSurface(
@@ -89,14 +98,7 @@ class MarketplaceScreen extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: LifeQuestStat(
-                  label: 'Tesoro',
-                  value: '${board.treasury}',
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: LifeQuestStat(
-                  label: 'Vida',
+                  label: 'Constancia',
                   value: '${board.hpCurrent}/${board.hpMax}',
                 ),
               ),
@@ -105,18 +107,18 @@ class MarketplaceScreen extends StatelessWidget {
         ),
         if (board.brokenStreaks.isNotEmpty) ...[
           const SizedBox(height: 14),
-          const LifeQuestSectionHeading('RACHAS POR SALVAR'),
+          const LifeQuestSectionHeading('RACHAS POR RECUPERAR'),
           const SizedBox(height: 7),
           for (final s in board.brokenStreaks)
             LifeQuestActionRow(
               icon: Icons.local_fire_department_outlined,
               title: '${s.name} · ${s.streak} días',
               subtitle:
-                  'Puedes salvarla hasta el '
+                  'Puedes repararla hasta el '
                   '${LifeQuestDates.dayTime(s.deadline)}',
               actionLabel: board.passes > 0
-                  ? 'Usar Pase'
-                  : '${recover?.cost ?? '—'} 🪙',
+                  ? 'Proteger racha'
+                  : '${recover?.cost ?? '—'} Monedas',
               busy:
                   state.busyKey == s.habitId ||
                   state.busyKey == 'recuperar_racha',
@@ -126,7 +128,7 @@ class MarketplaceScreen extends StatelessWidget {
                   ? () => bloc.add(RecoveryPassUsed(s.habitId))
                   : recover != null && recover.available
                   ? () => buy(
-                      'Recuperar racha',
+                      'Reparar racha',
                       recover.cost,
                       BlackMarketItemBought(recover.code, habitId: s.habitId),
                     )
@@ -134,77 +136,47 @@ class MarketplaceScreen extends StatelessWidget {
             ),
         ],
         const SizedBox(height: 14),
-        const LifeQuestSectionHeading('HOTEL'),
+        const LifeQuestSectionHeading('RECUPERAR CONSTANCIA'),
         const SizedBox(height: 7),
         for (final i in board.items.where((i) => i.category == 'hotel'))
           _itemRow(
             i,
             state,
             enabled: idle && !hpFull,
-            note: hpFull ? 'Tu vida está completa' : null,
-            onBuy: () => buy(i.name, i.cost, MarketItemBought(i.code)),
+            note: hpFull ? 'Tu Constancia está al máximo' : null,
+            onBuy: () => buy(_itemName(i), i.cost, MarketItemBought(i.code)),
           ),
-        const SizedBox(height: 14),
-        const LifeQuestSectionHeading('MERCADO'),
-        const SizedBox(height: 7),
-        for (final i in board.items.where((i) => i.category == 'mercado'))
+        if (protector != null) ...[
+          const SizedBox(height: 14),
+          const LifeQuestSectionHeading('PROTEGER RACHA'),
+          const SizedBox(height: 7),
           _itemRow(
-            i,
+            protector,
             state,
             enabled: idle,
-            onBuy: () => buy(i.name, i.cost, MarketItemBought(i.code)),
-          ),
-        if (board.elixirActive)
-          const LifeQuestListRow(
-            icon: Icons.bolt,
-            title: 'Elixir activo',
-            subtitle: 'Tu próxima Mazmorra dará ×1,5 de XP.',
-          )
-        else if (board.elixirsStored > 0)
-          LifeQuestActionRow(
-            icon: Icons.science_outlined,
-            title: 'Elixir guardado',
-            subtitle: 'Actívalo antes de entrar a la Mazmorra.',
-            actionLabel: 'Activar',
-            busy: state.busyKey == 'elixir_activate',
-            onAction: idle ? () => bloc.add(const ElixirActivated()) : null,
-          ),
-        const SizedBox(height: 14),
-        const LifeQuestSectionHeading('MERCADO NEGRO'),
-        const SizedBox(height: 7),
-        for (final i in board.blackMarket)
-          if (i.code == 'pase_recuperacion')
-            _itemRow(
-              i,
-              state,
-              enabled: idle,
-              note: 'Guardados: ${board.passes} · 1 al mes',
-              onBuy: () => buy(i.name, i.cost, BlackMarketItemBought(i.code)),
-            )
-          else
-            LifeQuestListRow(
-              icon: Icons.restore,
-              title: i.name,
-              subtitle: i.available
-                  ? 'Úsalo cuando una racha se rompa (48 h) · 1 al mes'
-                  : 'Ya lo usaste este mes',
-              trailing: '${i.cost} 🪙',
+            note: 'Disponibles: ${board.passes}',
+            onBuy: () => buy(
+              'Protector de racha',
+              protector.cost,
+              BlackMarketItemBought(protector.code),
             ),
+          ),
+        ],
         const SizedBox(height: 14),
-        const LifeQuestSectionHeading('REFUGIO'),
+        const LifeQuestSectionHeading('MEJORAS'),
         const SizedBox(height: 7),
         for (final b in board.refuge)
           LifeQuestActionRow(
-            icon: _refuge[b.building]?.$1 ?? Icons.home_outlined,
+            icon: _improvements[b.building]?.$1 ?? Icons.home_outlined,
             title:
-                '${_refuge[b.building]?.$2 ?? b.building} · '
+                '${_improvements[b.building]?.$2 ?? b.building} · '
                 'nivel ${b.level}/${b.maxLevel}',
-            subtitle: _refuge[b.building]?.$3 ?? '',
-            actionLabel: b.price == null ? 'Máximo' : '${b.price} 🪙',
+            subtitle: _improvements[b.building]?.$3 ?? '',
+            actionLabel: b.price == null ? 'Máximo' : '${b.price} Monedas',
             busy: state.busyKey == b.building,
             onAction: idle && b.price != null
                 ? () => buy(
-                    'Mejorar ${_refuge[b.building]?.$2 ?? b.building}',
+                    'Mejorar ${_improvements[b.building]?.$2 ?? b.building}',
                     b.price!,
                     RefugeUpgraded(b.building),
                   )
@@ -222,18 +194,31 @@ class MarketplaceScreen extends StatelessWidget {
     String? note,
   }) => LifeQuestActionRow(
     icon: switch (item.category) {
-      'hotel' => Icons.hotel_outlined,
-      'mercado_negro' => Icons.confirmation_number_outlined,
-      _ => Icons.science_outlined,
+      'hotel' => Icons.favorite_outline,
+      'mercado_negro' => Icons.verified_outlined,
+      _ => Icons.card_giftcard_outlined,
     },
-    title: item.name,
+    title: _itemName(item),
     subtitle: [
-      ?item.description,
+      if (item.category == 'hotel')
+        'Recupera Constancia.'
+      else if (item.code == 'pase_recuperacion')
+        'Protege una racha durante un día fallido.'
+      else
+        ?item.description,
       if (!item.available) 'Disponible de nuevo pronto',
       ?note,
     ].join(' · '),
-    actionLabel: '${item.cost} 🪙',
+    actionLabel: '${item.cost} Monedas',
     busy: state.busyKey == item.code,
     onAction: enabled && item.available ? onBuy : null,
   );
+
+  static String _itemName(MarketItem item) => switch (item.code) {
+    'siesta' => 'Recuperación breve',
+    'posada' => 'Recuperación amplia',
+    'banquete' => 'Recuperación completa',
+    'pase_recuperacion' => 'Protector de racha',
+    _ => item.name,
+  };
 }

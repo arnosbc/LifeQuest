@@ -22,6 +22,16 @@ class HomeHabitCompleted extends HomeEvent {
   List<Object?> get props => [habitId];
 }
 
+/// El usuario completó una tarea desde el Inicio.
+class HomeTaskCompleted extends HomeEvent {
+  const HomeTaskCompleted(this.taskId);
+
+  final String taskId;
+
+  @override
+  List<Object?> get props => [taskId];
+}
+
 /// El usuario abrió el cofre del día.
 class HomeChestClaimed extends HomeEvent {
   const HomeChestClaimed();

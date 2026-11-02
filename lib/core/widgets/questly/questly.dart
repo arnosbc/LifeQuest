@@ -1,7 +1,8 @@
-// Componentes del sistema «Bosque vivo» (docs/diseño/PLAN-REDISENO.md §4).
+// Componentes del sistema visual de LifeQuest (lavanda).
 export 'package:proyecto_movil/core/theme/questly_icons.dart';
 export 'package:proyecto_movil/core/theme/questly_palette.dart';
 export 'package:proyecto_movil/core/theme/questly_theme.dart';
+export 'package:proyecto_movil/core/widgets/questly/lifequest_brand.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_button.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_card.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_chip.dart';

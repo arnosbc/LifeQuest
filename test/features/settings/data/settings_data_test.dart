@@ -79,7 +79,30 @@ void main() {
         'short_break_minutes': 5,
         'long_break_minutes': 15,
         'long_break_every_n_cycles': 4,
+        'digest_time': null,
       });
+    });
+
+    test('recordatorios del día: solo se guardan si el servidor los tiene', () {
+      // Sin la migración 048 la respuesta no trae la clave: no se escribe.
+      final before = SettingsOverviewModel.fromJson({}).toEntity().settings;
+      expect(before.dailyReminders, isNull);
+      expect(
+        SettingsOverviewModel.toRow(before).containsKey('daily_reminders'),
+        isFalse,
+      );
+      final after = SettingsOverviewModel.fromJson({
+        'daily_reminders': true,
+      }).toEntity().settings;
+      expect(after.dailyReminders, isTrue);
+      expect(
+        SettingsOverviewModel.toRow(
+          after.withReminders(false),
+        )['daily_reminders'],
+        isFalse,
+      );
+      // Cambiar otra cosa conserva el interruptor.
+      expect(after.withDigest('20:00').dailyReminders, isTrue);
     });
   });
 

@@ -50,10 +50,9 @@ void main() {
     expect(find.text('Preparar presentación del proyecto'), findsOneWidget);
     expect(find.text('Prioridad alta'), findsOneWidget);
     expect(find.text('+350 XP'), findsOneWidget);
-    expect(find.text('Nivel 24 · Estratega'), findsOneWidget);
+    expect(find.text('Experto · Nivel 24'), findsOneWidget);
     expect(find.text('Te faltan 4.150 XP para el nivel 25'), findsOneWidget);
     expect(find.text('2.450'), findsOneWidget);
-    expect(find.text('3 / 5'), findsOneWidget);
     expect(find.text('Racha de 12 días'), findsOneWidget);
   });
 
@@ -75,11 +74,11 @@ void main() {
     await pump(tester, const HomeSuccess(emptyDashboard));
 
     expect(find.textContaining(', Alex'), findsOneWidget);
-    expect(find.text('No tienes misiones pendientes'), findsOneWidget);
-    expect(find.text('Crear misión'), findsOneWidget);
+    expect(find.text('No tienes tareas pendientes'), findsOneWidget);
+    expect(find.text('Crear tarea'), findsOneWidget);
     expect(find.text('Hoy no tienes hábitos programados.'), findsOneWidget);
     expect(find.text('Ver todos'), findsOneWidget);
-    expect(find.text('Nivel 1'), findsOneWidget);
+    expect(find.text('Inicial · Nivel 1'), findsOneWidget);
   });
 
   testWidgets('si la carga falla, ofrece reintentar', (tester) async {
@@ -106,7 +105,7 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.textContaining('débil por ahora'), findsOneWidget);
-    expect(find.text('Taverna'), findsOneWidget);
+    expect(find.textContaining('Constancia está baja'), findsOneWidget);
+    expect(find.text('Mentores'), findsOneWidget);
   });
 }

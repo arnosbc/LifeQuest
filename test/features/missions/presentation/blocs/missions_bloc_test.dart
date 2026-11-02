@@ -70,7 +70,7 @@ void main() {
       const MissionsSuccess(emptyBoard, saving: true),
       const MissionsSuccess(
         board,
-        message: 'Misión creada. ¡Tu sesión de enfoque te espera!',
+        message: 'Tarea creada. Tu sesión de foco te espera.',
         focusRequested: true,
       ),
     ],
@@ -105,10 +105,7 @@ void main() {
     act: (bloc) => bloc.add(const MissionCompleted('t1')),
     expect: () => [
       const MissionsSuccess(board, busyMissionId: 't1'),
-      const MissionsSuccess(
-        emptyBoard,
-        message: '¡Misión completada! Tu héroe se hace más fuerte.',
-      ),
+      const MissionsSuccess(emptyBoard, message: '¡Tarea completada!'),
     ],
   );
 }

@@ -101,7 +101,7 @@ void main() {
         BrainDumpSuccess(board, busyKey: 't1'),
         BrainDumpSuccess(
           board,
-          message: '¡Meta creada! Ya te espera como jefe en tu Stage.',
+          message: '¡Meta creada! Ya te espera en tu Planificador.',
         ),
       ],
       verify: (_) => verify(() => convertToGoal(goal)).called(1),

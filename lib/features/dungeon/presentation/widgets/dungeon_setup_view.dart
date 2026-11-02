@@ -11,12 +11,16 @@ class DungeonSetupView extends StatefulWidget {
     required this.board,
     required this.busy,
     required this.onStart,
+    this.initialTaskId,
   });
 
   final DungeonBoard board;
   final bool busy;
   final void Function(int totalMinutes, int cycleMinutes, List<String> taskIds)
   onStart;
+
+  /// Llega marcada desde «Empezar en Foco».
+  final String? initialTaskId;
 
   @override
   State<DungeonSetupView> createState() => _DungeonSetupViewState();
@@ -26,6 +30,25 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
   int _cycle = 25;
   int _total = 60;
   final List<String> _picked = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pickInitial();
+  }
+
+  @override
+  void didUpdateWidget(DungeonSetupView old) {
+    super.didUpdateWidget(old);
+    if (old.initialTaskId != widget.initialTaskId) _pickInitial();
+  }
+
+  void _pickInitial() {
+    final id = widget.initialTaskId;
+    if (id == null || _picked.contains(id)) return;
+    if (_picked.length >= widget.board.maxTasks) return;
+    if (widget.board.candidates.any((t) => t.id == id)) _picked.add(id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +76,14 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
         ),
         const SizedBox(height: 9),
         LifeQuestSectionHeading(
-          'MOCHILA DE MISIONES',
+          'TAREAS DE LA SESIÓN',
           action: '${_picked.length} / ${widget.board.maxTasks}',
         ),
         const SizedBox(height: 6),
         if (candidates.isEmpty)
           LifeQuestSurface(
             child: Text(
-              'No tienes misiones abiertas. Crea una en Misiones y vuelve a entrar.',
+              'No tienes tareas abiertas. Crea una en el Planificador y vuelve al Modo Foco.',
               style: TextStyle(color: context.lq.muted, fontSize: 11),
             ),
           ),
@@ -82,7 +105,7 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
           ),
         const SizedBox(height: 9),
         Text(
-          'Recompensa estimada: ${cycles * widget.board.cycleXp} XP por $cycles ciclos',
+          'XP estimada: ${cycles * widget.board.cycleXp} por $cycles bloques',
           textAlign: TextAlign.center,
           style: TextStyle(color: context.lq.muted, fontSize: 11),
         ),
@@ -100,7 +123,7 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.play_arrow_rounded),
-            label: const Text('Entrar a la Mazmorra'),
+            label: const Text('Empezar Modo Foco'),
             style: FilledButton.styleFrom(
               backgroundColor: context.lq.deepGreen,
             ),

@@ -22,6 +22,9 @@ class HabitsBoard extends Equatable {
     this.weekScheduled = 0,
     this.badFreeDays = 7,
     this.monthDays = const [],
+    this.monthHeat = const {},
+    this.monthDone = 0,
+    this.yearDone = 0,
     this.skills = const [],
   });
 
@@ -39,6 +42,13 @@ class HabitsBoard extends Equatable {
 
   /// Días del mes en curso con al menos un hábito bueno cumplido.
   final List<int> monthDays;
+
+  /// Registros de hábitos buenos por día del mes (mapa de calor, 042).
+  final Map<int, int> monthHeat;
+
+  /// Registros de hábitos buenos del mes y del año (042).
+  final int monthDone;
+  final int yearDone;
   final List<HabitSkill> skills;
 
   List<Habit> get good =>
@@ -54,6 +64,9 @@ class HabitsBoard extends Equatable {
     weekScheduled,
     badFreeDays,
     monthDays,
+    monthHeat,
+    monthDone,
+    yearDone,
     skills,
   ];
 }

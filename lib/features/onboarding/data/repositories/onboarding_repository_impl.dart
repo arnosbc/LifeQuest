@@ -44,10 +44,10 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(ServerException error) => switch (error.code) {
-    'skill_exists' => 'Ya tienes una skill con ese nombre.',
-    'skill_limit_reached' => 'Ya tienes el máximo de skills.',
+    'skill_exists' => 'Ya tienes un área con ese nombre.',
+    'skill_limit_reached' => 'Ya tienes el máximo de áreas.',
     _ when error.statusCode == '23514' =>
-      'Usa una identidad de hasta 280 caracteres y una skill de hasta 40.',
-    _ => 'No pudimos guardar tu aventura. Inténtalo de nuevo.',
+      'Usa una identidad de hasta 280 caracteres y un nombre de área de hasta 40.',
+    _ => 'No pudimos guardar tus preferencias. Inténtalo de nuevo.',
   };
 }

@@ -125,7 +125,13 @@ void main() {
         ),
       ),
     );
-    for (final label in ['Inicio', 'Planificador', 'Hábitos', 'Foco', 'Perfil']) {
+    for (final label in [
+      'Inicio',
+      'Planificador',
+      'Hábitos',
+      'Foco',
+      'Perfil',
+    ]) {
       expect(find.text(label), findsOneWidget);
     }
     expect(

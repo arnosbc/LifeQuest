@@ -7,6 +7,12 @@ abstract final class AppConstants {
   /// públicas por diseño: los datos los protege el RLS.
   static const supabaseKey = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
 
+  /// ID de cliente «Aplicación web» de Google Cloud (el mismo que usa el
+  /// proveedor Google de Supabase). Vacío: «Continuar con Google» lo avisa.
+  static const googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+  );
+
   static void ensureSupabaseConfigured() {
     if (supabaseUrl.isEmpty || supabaseKey.isEmpty) {
       throw StateError(

@@ -32,6 +32,71 @@ class PriorityMission extends Equatable {
   ];
 }
 
+/// Tarea de la lista «Hoy» del Inicio: vence hoy, ya venció o es de prioridad
+/// alta (038, plan S2).
+class TodayTask extends Equatable {
+  const TodayTask({
+    required this.id,
+    required this.title,
+    required this.priority,
+    required this.xpReward,
+    this.dueDate,
+    this.overdue = false,
+  });
+
+  final String id;
+  final String title;
+  final UrgencyLevel priority;
+  final int xpReward;
+  final DateTime? dueDate;
+  final bool overdue;
+
+  @override
+  List<Object?> get props => [id, title, priority, xpReward, dueDate, overdue];
+}
+
+/// La última tarea abierta de un mentor (041).
+class MentorTask extends Equatable {
+  const MentorTask({
+    required this.id,
+    required this.title,
+    required this.mentor,
+    required this.xpReward,
+  });
+
+  final String id;
+  final String title;
+  final String mentor;
+  final int xpReward;
+
+  @override
+  List<Object?> get props => [id, title, mentor, xpReward];
+}
+
+/// La meta activa que vence antes (041). El avance es la vida que ya se le
+/// quitó, solo para mostrarlo (0–100 %).
+class TopGoal extends Equatable {
+  const TopGoal({
+    required this.id,
+    required this.title,
+    required this.hp,
+    required this.maxHp,
+    this.dueDate,
+  });
+
+  final String id;
+  final String title;
+  final int hp;
+  final int maxHp;
+  final DateTime? dueDate;
+
+  int get progress =>
+      maxHp <= 0 ? 0 : ((maxHp - hp) * 100 / maxHp).round().clamp(0, 100);
+
+  @override
+  List<Object?> get props => [id, title, hp, maxHp, dueDate];
+}
+
 /// Hábito bueno programado para hoy.
 class TodayHabit extends Equatable {
   const TodayHabit({required this.id, required this.name, required this.done});
@@ -84,6 +149,10 @@ class HomeDashboard extends Equatable {
     this.displayName,
     this.characterClass,
     this.priorityMission,
+    this.todayTasks = const [],
+    this.mentorTask,
+    this.inboxCount = 0,
+    this.topGoal,
     this.chest = const DailyChest(),
   });
 
@@ -101,6 +170,14 @@ class HomeDashboard extends Equatable {
 
   /// Null cuando no hay misiones abiertas.
   final PriorityMission? priorityMission;
+
+  /// Lista «Hoy»; puede incluir la [priorityMission] (la pantalla la quita).
+  final List<TodayTask> todayTasks;
+
+  /// Tarjetas del Inicio (041): null o 0 si no hay.
+  final MentorTask? mentorTask;
+  final int inboxCount;
+  final TopGoal? topGoal;
   final List<TodayHabit> habits;
   final int habitsDone;
   final int habitsTotal;
@@ -124,6 +201,10 @@ class HomeDashboard extends Equatable {
     hpMax,
     isWeakened,
     priorityMission,
+    todayTasks,
+    mentorTask,
+    inboxCount,
+    topGoal,
     habits,
     habitsDone,
     habitsTotal,

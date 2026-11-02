@@ -3,7 +3,7 @@
     <!-- Avisos en el dispositivo (Android 13+ pide permiso al usuario). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-        android:label="proyecto_movil"
+        android:label="LifeQuest"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

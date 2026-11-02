@@ -35,6 +35,7 @@ void main() {
     getHomeDashboard: getHomeDashboard,
     completeHabit: completeHabit,
     claimDailyChest: claimChest,
+    completeTask: MockCompleteTodayTask(),
     clock: () => now,
   );
 
@@ -129,7 +130,10 @@ void main() {
     act: (bloc) => bloc.add(const HomeChestClaimed()),
     expect: () => [
       HomeSuccess(dashboard, claimingChest: true),
-      HomeSuccess(dashboard, message: '¡Cofre abierto! +15 Monedas.'),
+      HomeSuccess(
+        dashboard,
+        message: 'Recompensa diaria cobrada: +15 Monedas.',
+      ),
     ],
   );
 

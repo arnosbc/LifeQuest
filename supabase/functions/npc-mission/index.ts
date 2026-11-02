@@ -13,19 +13,19 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const SYSTEM = [
-  'Eres RPGenie, el asistente de una app de productividad con estilo RPG.',
-  'Un NPC le pide al jugador una misión real. La «noble misión» del NPC es el TEMA:',
-  'la misión debe practicar o estudiar ese tema de forma concreta',
+  'Eres el Asistente de una app de productividad que enseña paso a paso.',
+  'Un mentor le propone a la persona una tarea guiada real. El propósito del mentor es el TEMA:',
+  'la tarea debe practicar o estudiar ese tema de forma concreta',
   '(p. ej. tema «fundamentos de diseño gráfico» → «Diseña 3 composiciones aplicando la regla de tercios»).',
-  'No repitas las misiones anteriores; avanza poco a poco dentro del tema.',
-  'Si recibes documentos de contexto (p. ej. el plan de la asignatura), la misión debe salir',
-  'de uno de sus temas: sigue el orden del documento, elige el primer tema que las misiones',
+  'No repitas las tareas anteriores; avanza poco a poco dentro del tema.',
+  'Si recibes documentos de contexto (p. ej. el plan de la asignatura), la tarea debe salir',
+  'de uno de sus temas: sigue el orden del documento, elige el primer tema que las tareas',
   'anteriores aún no cubran y nómbralo en el objetivo.',
-  'Supón que el jugador es principiante en el tema: la misión debe poder hacerse hoy',
+  'Supón que la persona es principiante en el tema: la tarea debe poder hacerse hoy',
   'sin conocer el tema de antemano.',
   'Todo en español, en tono de invitación, sin emojis.',
   'Devuelve:',
-  '- title: la misión en 15 palabras como máximo, sin comillas.',
+  '- title: la tarea en 15 palabras como máximo, sin comillas.',
   '- objective: 1 o 2 frases con qué aprenderá y por qué le sirve.',
   '- steps: de 2 a 5 pasos concretos. Si el tema se practica con ejercicios',
   '(matemáticas, programación, idiomas…), escribe los ejercicios completos con sus datos',
@@ -102,6 +102,32 @@ export function parseSuggestion(text: unknown): { title: string | null; guide: s
   return { title: cleanTitle(text), guide: null };
 }
 
+/// Guía con estructura para attach_task_guide (039): pasos marcables, pistas
+/// que se muestran a pedido y búsquedas. Null si no trae pasos.
+export function parseGuide(text: unknown): {
+  objective: string | null;
+  steps: string[];
+  hints: string[];
+  search: string[];
+} | null {
+  if (typeof text !== 'string') return null;
+  try {
+    const raw = JSON.parse(text);
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+    const steps = texts(raw.steps, 5);
+    if (!steps.length) return null;
+    const objective = typeof raw.objective === 'string' ? raw.objective.trim() : '';
+    return {
+      objective: objective || null,
+      steps,
+      hints: texts(raw.hints, 4),
+      search: texts(raw.search, 2),
+    };
+  } catch {
+    return null;
+  }
+}
+
 type Npc = {
   name: string;
   noble_mission: string | null;
@@ -115,7 +141,7 @@ type ContextDoc = { title: string; ai_summary: string | null };
 /// (sin datos personales): en la capa gratis Google puede usarlo para entrenar.
 export function buildPrompt(npc: Npc, previous: string[], docs: ContextDoc[] = []): string {
   return [
-    `Tema (noble misión): ${npc.noble_mission ?? npc.skills?.name ?? 'general'}`,
+    `Tema (propósito del mentor): ${npc.noble_mission ?? npc.skills?.name ?? 'general'}`,
     `Skill: ${npc.skills?.name ?? 'general'}`,
     `NPC: ${npc.name} · visita ${npc.frequency}`,
     ...docs
@@ -130,7 +156,12 @@ async function suggest(
   npc: Npc,
   previous: string[],
   docs: ContextDoc[],
-): Promise<{ title: string | null; guide?: string | null; reason?: string }> {
+): Promise<{
+  title: string | null;
+  guide?: string | null;
+  structured?: ReturnType<typeof parseGuide>;
+  reason?: string;
+}> {
   const prompt = buildPrompt(npc, previous, docs);
   const model = Deno.env.get('GEMINI_MODEL');
   const started = Date.now();
@@ -166,8 +197,9 @@ async function suggest(
     return { title: null, reason: `gemini_${res.status}` };
   }
   const data = await res.json();
-  const { title, guide } = parseSuggestion(data?.candidates?.[0]?.content?.parts?.[0]?.text);
-  if (title) return { title, guide };
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  const { title, guide } = parseSuggestion(text);
+  if (title) return { title, guide, structured: parseGuide(text) };
   console.error('gemini sin texto', JSON.stringify(data).slice(0, 500));
   return { title: null, reason: `sin_texto_${data?.candidates?.[0]?.finishReason ?? 'vacio'}` };
 }

@@ -67,6 +67,9 @@ enum QIcons {
   archive('<path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/>'),
   plus('<path d="M12 5v14M5 12h14"/>'),
   edit('<path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/>'),
+  share(
+    '<path d="M12 3v12M7 8l5-5 5 5M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/>',
+  ),
   bell('<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/>'),
   back('<path d="M15 6l-6 6 6 6"/>'),
   close('<path d="M6 6l12 12M18 6L6 18"/>');

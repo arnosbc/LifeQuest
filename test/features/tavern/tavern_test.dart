@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/core/entities/task_guide.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/tavern/data/models/tavern_board_model.dart';
@@ -17,6 +18,9 @@ import '../../helpers/mocks.dart';
 
 const vera = Npc(id: 'n1', name: 'Vera', skillName: 'Salud');
 const board = TavernBoard(npcs: [vera], npcLimit: 3);
+
+// Guía con pasos: sin ellos el bloc no crea la tarea guiada.
+const guide = TaskGuide(steps: ['Boceto a lápiz', 'Versión en blanco y negro']);
 
 void main() {
   test('TavernBoardModel convierte tavern_overview', () {
@@ -153,7 +157,7 @@ void main() {
     );
 
     blocTest<TavernBloc, TavernState>(
-      'adjuntar un documento lo envía y avisa cuando RPGenie lo leyó',
+      'adjuntar un documento lo envía y avisa cuando el Asistente lo leyó',
       setUp: () => when(
         () => addDocument(any()),
       ).thenAnswer((_) async => const Right(unit)),
@@ -165,7 +169,7 @@ void main() {
         const TavernSuccess(
           board,
           message:
-              'RPGenie leyó «Plan». Las próximas misiones saldrán de sus temas.',
+              'El Asistente leyó «Plan». Las próximas tareas guiadas tendrán en cuenta sus temas.',
         ),
       ],
       verify: (_) => verify(() => addDocument(plan)).called(1),
@@ -201,7 +205,7 @@ void main() {
     );
 
     blocTest<TavernBloc, TavernState>(
-      'aceptar una misión la crea y vuelve a leer',
+      'aceptar una tarea guiada la crea y vuelve a leer',
       setUp: () =>
           when(() => accept(any())).thenAnswer((_) async => const Right(unit)),
       build: build,
@@ -212,7 +216,7 @@ void main() {
         const TavernSuccess(board, busyKey: 'n1'),
         const TavernSuccess(
           board,
-          message: 'Misión aceptada. Ya está en tu Stage.',
+          message: 'Tarea guiada añadida al Planificador.',
         ),
       ],
       verify: (_) => verify(
@@ -229,6 +233,7 @@ void main() {
             NpcMissionSuggestion(
               title: 'Diseña 3 logos',
               guide: 'Empieza en blanco y negro',
+              structured: guide,
             ),
           ),
         );
@@ -241,7 +246,7 @@ void main() {
         const TavernSuccess(board, busyKey: 'n1'),
         const TavernSuccess(
           board,
-          message: 'Nueva misión de Vera: Diseña 3 logos',
+          message: 'Nueva tarea guiada de Vera: Diseña 3 logos',
         ),
       ],
       verify: (_) => verify(
@@ -250,9 +255,30 @@ void main() {
             npcId: 'n1',
             title: 'Diseña 3 logos',
             description: 'Empieza en blanco y negro',
+            guide: guide,
           ),
         ),
       ).called(1),
+    );
+
+    blocTest<TavernBloc, TavernState>(
+      'si RPGenie no trae pasos, avisa y no crea ni cobra nada',
+      setUp: () => when(() => suggest('n1')).thenAnswer(
+        (_) async => const Right(NpcMissionSuggestion(title: 'Diseña 3 logos')),
+      ),
+      build: build,
+      seed: () => const TavernSuccess(board),
+      act: (bloc) => bloc.add(const NpcMissionRequested(vera)),
+      expect: () => [
+        const TavernSuccess(board, busyKey: 'n1'),
+        const TavernSuccess(
+          board,
+          message:
+              'No se pudieron preparar los pasos de esta tarea. '
+              'No se creó ni se cobró; inténtalo de nuevo más tarde.',
+        ),
+      ],
+      verify: (_) => verifyNever(() => accept(any())),
     );
 
     blocTest<TavernBloc, TavernState>(

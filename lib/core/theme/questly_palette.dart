@@ -20,13 +20,14 @@ class QHeroTone {
 
   final Color bg, dot, shape1, shape2, shape3, kicker;
 
+  // Lavanda de LifeQuest (tema por defecto).
   static const forest = QHeroTone(
-    bg: Color(0xFF1F5C39),
-    dot: Color(0xFFF2C66B),
-    shape1: Color(0xFF2E7D4F),
-    shape2: Color(0xFF276B44),
-    shape3: Color(0xFF174A2E),
-    kicker: Color(0xFFCFE8D7),
+    bg: Color(0xFF7C5CC4),
+    dot: Color(0xFFFFFFFF),
+    shape1: Color(0xFF8E70D3),
+    shape2: Color(0xFFA48BDD),
+    shape3: Color(0xFF6A4BB3),
+    kicker: Color(0xFFEDE6FB),
   );
   static const river = QHeroTone(
     bg: Color(0xFF24396B),
@@ -53,12 +54,12 @@ class QHeroTone {
     kicker: Color(0xFFF5E3B0),
   );
   static const night = QHeroTone(
-    bg: Color(0xFF0E1B14),
-    dot: Color(0xFFE9EFE6),
-    shape1: Color(0xFF1C2C24),
-    shape2: Color(0xFF16241D),
-    shape3: Color(0xFF0B140F),
-    kicker: Color(0xFF9FDCB4),
+    bg: Color(0xFF2A2142),
+    dot: Color(0xFFEDE6FB),
+    shape1: Color(0xFF362A55),
+    shape2: Color(0xFF41336A),
+    shape3: Color(0xFF221B36),
+    kicker: Color(0xFFCDBDF5),
   );
 
   static QHeroTone of(QuestlyRealm realm) => switch (realm) {
@@ -69,8 +70,8 @@ class QHeroTone {
   };
 
   // Comunes a todos los tonos.
-  static const text = Color(0xFFF3F6EF);
-  static const actionBg = Color(0x24F3F6EF); // rgba(243,246,239,.14)
+  static const text = Color(0xFFFFFFFF);
+  static const actionBg = Color(0x24FFFFFF);
   static const badgeBg = Color(0xFFF2C66B);
   static const badgeText = Color(0xFF1A1F1B);
 }
@@ -118,10 +119,10 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
       card: dark ? QColors.cardDark : QColors.card,
       border: dark ? QColors.borderDark : QColors.border,
       track: dark ? QColors.trackDark : QColors.track,
-      line: dark ? const Color(0xFF24362C) : QColors.line,
+      line: dark ? const Color(0xFF2A2339) : QColors.line,
       text: dark ? QColors.textDark : QColors.text,
       text2: dark ? QColors.text2Dark : QColors.text2,
-      text3: dark ? const Color(0xFFCFDACF) : QColors.text3,
+      text3: dark ? const Color(0xFFD6CFE6) : QColors.text3,
       inputBorder: dark ? QColors.inputBorderDark : QColors.inputBorder,
       accent: r.accent,
       onAccent: r.onAccent,
@@ -129,7 +130,7 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
       tint: dark ? r.tintDark : r.tint,
       // questly.css: sombra del botón principal según el tema.
       buttonShadow: switch (realm) {
-        QuestlyRealm.bosque => const Color(0xFF1F5C39),
+        QuestlyRealm.bosque => const Color(0xFF7C5CC4),
         QuestlyRealm.rio => const Color(0xFF24396B),
         QuestlyRealm.brasa => const Color(0xFF7A2716),
         QuestlyRealm.oro => const Color(0xFF8A6200),
@@ -137,7 +138,7 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
       tonalBorder: realm == QuestlyRealm.oro
           ? const Color(0xFFB9890F)
           : r.accent,
-      cardShadow: dark ? const Color(0xFF0B140F) : QColors.border,
+      cardShadow: dark ? const Color(0xFF000000) : const Color(0xFF7C5CC4),
       coralInk: dark ? const Color(0xFFF5B8A8) : QColors.coralInk,
       coralTint: dark ? const Color(0xFF3A1F1A) : QColors.coralTint,
       mustardInk: dark ? const Color(0xFFF5D896) : QColors.mustardInk,
@@ -146,7 +147,7 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
       riverInk: dark ? const Color(0xFFB9CBF0) : QColors.riverInk,
       riverTint: dark ? const Color(0xFF1E2A44) : QColors.riverTint,
       // Fondo de toast y filtro activo (#1E2A22, en oscuro #2C4036).
-      strong: dark ? const Color(0xFF2C4036) : QColors.text,
+      strong: dark ? const Color(0xFF3D3354) : QColors.text,
       toastAction: r.inkDark,
       hero: dark ? QHeroTone.night : QHeroTone.of(realm),
     );
@@ -173,10 +174,10 @@ class QuestlyPalette extends ThemeExtension<QuestlyPalette> {
   Color get destructive => QColors.coralInk;
   Color get destructiveShadow => const Color(0xFF7A2716);
   Color get onDestructive => Colors.white;
-  Color get toastShadow => const Color(0x381E2A22); // rgba(30,42,34,.22)
-  Color get segmentShadow => const Color(0x1F1E2A22); // rgba(30,42,34,.12)
-  Color get sheetScrim => const Color(0x80122218); // rgba(18,34,24,.5)
-  Color get dialogScrim => const Color(0x99122218); // rgba(18,34,24,.6)
+  Color get toastShadow => const Color(0x382A2346);
+  Color get segmentShadow => const Color(0x1F2A2346);
+  Color get sheetScrim => const Color(0x801A1430);
+  Color get dialogScrim => const Color(0x991A1430);
 
   @override
   QuestlyPalette copyWith() => this;

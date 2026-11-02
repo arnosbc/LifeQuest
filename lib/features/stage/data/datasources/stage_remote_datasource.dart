@@ -9,6 +9,7 @@ import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_resource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 
 /// RPCs de Stage · P.A.R.A. en Supabase. Lanza [ServerException] o
 /// [NetworkException].
@@ -35,9 +36,12 @@ abstract class StageRemoteDataSource {
 }
 
 class StageRemoteDataSourceImpl implements StageRemoteDataSource {
-  const StageRemoteDataSourceImpl(this._client);
+  const StageRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<StageBoardModel> getBoard(String day) => _guard(
@@ -50,8 +54,8 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
   );
 
   @override
-  Future<void> createProject(NewProject project) => _guard(
-    () => _client.rpc<void>(
+  Future<void> createProject(NewProject project) => _guard(() async {
+    await _client.rpc<void>(
       'create_project',
       params: {
         'p_title': project.title,
@@ -63,12 +67,16 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
         'p_skill_id': project.skillId,
         'p_goal_id': project.goalId,
       },
-    ),
-  );
+    );
+    _rewards?.announce(
+      'Nuevo proyecto: ${project.title}',
+      'Divídelo en tareas y avanza paso a paso.',
+    );
+  });
 
   @override
-  Future<void> createGoal(NewGoal goal) => _guard(
-    () => _client.rpc<void>(
+  Future<void> createGoal(NewGoal goal) => _guard(() async {
+    await _client.rpc<void>(
       'create_goal',
       params: {
         'p_title': goal.title,
@@ -80,12 +88,21 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
         'p_timebound': goal.timebound,
         'p_skill_id': goal.skillId,
       },
-    ),
-  );
+    );
+    _rewards?.announce(
+      'Nueva meta: ${goal.title}',
+      'Cada pequeño paso también es progreso.',
+    );
+  });
 
   @override
   Future<void> completeTask(String taskId) => _guard(
-    () => _client.rpc<void>('complete_task', params: {'p_task_id': taskId}),
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_task',
+        params: {'p_task_id': taskId},
+      ),
+    ),
   );
 
   /// Fecha local como `yyyy-MM-dd` (columnas `date`).
@@ -186,9 +203,11 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
 
   @override
   Future<void> completeProject(String projectId) => _guard(
-    () => _client.rpc<void>(
-      'complete_project',
-      params: {'p_project_id': projectId},
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_project',
+        params: {'p_project_id': projectId},
+      ),
     ),
   );
 

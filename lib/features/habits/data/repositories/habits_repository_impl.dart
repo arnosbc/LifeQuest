@@ -81,7 +81,7 @@ class HabitsRepositoryImpl implements HabitsRepository {
     'invalid_severity' => 'Elige qué tanto te afecta: leve, media o grave.',
     'invalid_days' => 'Elige al menos un día de la semana.',
     'skill_not_found' =>
-      'Esa skill ya no está disponible. Elige otra o deja el hábito sin vincular.',
+      'Esa área ya no está disponible. Elige otra o deja el hábito sin vincular.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

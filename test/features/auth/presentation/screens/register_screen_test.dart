@@ -35,8 +35,8 @@ void main() {
       );
 
   Future<void> tapCreateAccount(WidgetTester tester) async {
-    await tester.ensureVisible(find.text('Crear cuenta'));
-    await tester.tap(find.text('Crear cuenta'));
+    await tester.ensureVisible(find.text('Registrarse'));
+    await tester.tap(find.text('Registrarse'));
     await tester.pumpAndSettle();
   }
 
@@ -50,10 +50,9 @@ void main() {
       tester.getSemantics(find.byTooltip('Mostrar contraseña').first),
       isSemantics(isButton: true, isTextField: false),
     );
-    final password = tester
-        .getSemantics(find.byType(EditableText).at(2))
-        .getSemanticsData();
-    expect(password.label, 'Contraseña');
+    final passwordNode = tester.getSemantics(find.byType(EditableText).at(2));
+    expect(passwordNode, isSemantics(isTextField: true));
+    expect(passwordNode.getSemanticsData().label, startsWith('Contraseña'));
     expect(
       tester.getSemantics(find.byType(Checkbox)),
       isSemantics(label: 'Acepto los términos y condiciones'),
@@ -71,7 +70,9 @@ void main() {
     await tapCreateAccount(tester);
 
     expect(
-      find.text('Revisa el correo: parece que falta algo (ej.: tu@correo.com).'),
+      find.text(
+        'Revisa el correo: parece que falta algo (ej.: tu@correo.com).',
+      ),
       findsOneWidget,
     );
     expect(find.text('Acepta los términos para continuar.'), findsOneWidget);

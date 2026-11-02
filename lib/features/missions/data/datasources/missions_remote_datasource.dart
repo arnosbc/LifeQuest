@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/missions/data/models/missions_board_model.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 
 /// RPCs de Misiones en Supabase. Lanza [ServerException] o [NetworkException].
 abstract class MissionsRemoteDataSource {
@@ -21,9 +22,12 @@ abstract class MissionsRemoteDataSource {
 }
 
 class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
-  const MissionsRemoteDataSourceImpl(this._client);
+  const MissionsRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<MissionsBoardModel> getBoard() => _guard(() async {
@@ -32,8 +36,8 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
   });
 
   @override
-  Future<void> createMission(NewMission mission) => _guard(
-    () => _client.rpc<void>(
+  Future<void> createMission(NewMission mission) => _guard(() async {
+    await _client.rpc<void>(
       'create_task',
       params: {
         'p_title': mission.title,
@@ -45,12 +49,21 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
         'p_goal_id': mission.goalId,
         'p_subtasks': mission.subtasks,
       },
-    ),
-  );
+    );
+    _rewards?.announce(
+      'Nueva tarea: ${mission.title}',
+      'Agregada a tus pendientes. ¡Tú puedes!',
+    );
+  });
 
   @override
   Future<void> completeMission(String missionId) => _guard(
-    () => _client.rpc<void>('complete_task', params: {'p_task_id': missionId}),
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_task',
+        params: {'p_task_id': missionId},
+      ),
+    ),
   );
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej. `task_not_open`);

@@ -10,7 +10,6 @@ import 'package:proyecto_movil/features/auth/presentation/widgets/auth_footer_li
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_header.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_primary_button.dart';
-import 'package:proyecto_movil/features/auth/presentation/widgets/auth_tabs.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/social_login_buttons.dart';
 
@@ -59,20 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
       listener: (context, state) => _showNotice((state as AuthFailure).message),
       child: AuthFormLayout(
         formKey: _formKey,
-        header: const AuthHeader(),
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+        padding: const EdgeInsets.fromLTRB(24, 32, 24, 20),
         children: [
-          const AuthTabs(register: false),
-          const SizedBox(height: 14),
-          const AuthTitle(
-            title: 'Bienvenido de vuelta',
-            lead: 'Tu racha y tus tareas te esperan.',
-          ),
-          const SizedBox(height: 14),
+          const AuthHeader(subtitle: 'Inicia sesión en tu cuenta'),
+          const SizedBox(height: 28),
           CustomTextField(
             controller: _emailController,
             label: 'Correo electrónico',
-            hint: 'tu@correo.com',
+            icon: Icons.mail_outline_rounded,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.email],
@@ -84,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
           CustomTextField(
             controller: _passwordController,
             label: 'Contraseña',
-            hint: 'Tu contraseña',
+            icon: Icons.lock_outline_rounded,
             isPassword: true,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
@@ -93,34 +86,43 @@ class _LoginScreenState extends State<LoginScreen> {
                 ? 'Mínimo 6 caracteres.'
                 : null,
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => _showNotice(
-                'La recuperación de contraseña estará disponible pronto.',
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: q.ink,
-                minimumSize: const Size(48, QSize.minTap),
-                padding: EdgeInsets.zero,
-              ),
-              child: Text('¿Olvidaste tu contraseña?', style: QText.label(q.ink)),
-            ),
-          ),
-          const SizedBox(height: QSpace.xs),
+          const SizedBox(height: QSpace.xl),
           AuthPrimaryButton(
             label: 'Iniciar sesión',
             onPressed: _onLoginPressed,
             isLoading: context.watch<AuthBloc>().state is AuthLoading,
           ),
-          const Spacer(),
-          const SizedBox(height: 14),
-          SocialLoginButtons(onNotice: _showNotice),
+          const SizedBox(height: QSpace.s),
+          Center(
+            child: TextButton(
+              onPressed: () => _showNotice(
+                'La recuperación de contraseña estará disponible pronto.',
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: q.text,
+                minimumSize: const Size(48, QSize.minTap),
+              ),
+              child: Text(
+                '¿Olvidaste tu contraseña?',
+                style: QText.body(q.text).copyWith(fontSize: 14),
+              ),
+            ),
+          ),
+          const SizedBox(height: QSpace.m),
+          SocialLoginButtons(
+            onGoogle: context.watch<AuthBloc>().state is AuthLoading
+                ? null
+                : () => context.read<AuthBloc>().add(
+                    const GoogleLoginRequested(),
+                  ),
+          ),
+          const SizedBox(height: QSpace.s),
           AuthFooterLink(
-            question: '¿Aún no tienes cuenta?',
+            question: '¿No tienes una cuenta?',
             linkLabel: 'Regístrate',
             onTap: () => context.push(RoutePaths.register),
           ),
+          const Spacer(),
         ],
       ),
     );

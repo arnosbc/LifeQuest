@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/rpgenie/data/models/rpgenie_board_model.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 
 /// RPCs de RPGenie: `current_mission` (022) y `complete_task` (005).
 /// Lanza [ServerException] o [NetworkException].
@@ -15,9 +16,12 @@ abstract class RpgenieRemoteDataSource {
 }
 
 class RpgenieRemoteDataSourceImpl implements RpgenieRemoteDataSource {
-  const RpgenieRemoteDataSourceImpl(this._client);
+  const RpgenieRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<RpgenieBoardModel> getCurrentMission(List<String> skip) => _guard(
@@ -31,7 +35,12 @@ class RpgenieRemoteDataSourceImpl implements RpgenieRemoteDataSource {
 
   @override
   Future<void> completeMission(String taskId) => _guard(
-    () => _client.rpc<void>('complete_task', params: {'p_task_id': taskId}),
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_task',
+        params: {'p_task_id': taskId},
+      ),
+    ),
   );
 
   /// Las funciones SQL lanzan su motivo como mensaje; se pasa como

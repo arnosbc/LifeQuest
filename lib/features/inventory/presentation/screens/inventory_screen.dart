@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/inventory/domain/entities/inventory_board.dart';
 import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
 
-/// Inventario y logros: pestañas Objetos y Logros. Necesita un
+/// Logros y objetos disponibles. Necesita un
 /// [InventoryBloc] por encima.
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key, required this.onOpenMarketplace});
 
-  /// Los objetos se usan o se consiguen en el Marketplace.
+  /// Los objetos se consultan en Recompensas.
   final VoidCallback onOpenMarketplace;
 
   @override
@@ -45,8 +46,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
               );
             },
             child: LifeQuestPage(
-              title: 'Inventario',
-              subtitle: 'Lo que llevas en tu mochila y lo que has logrado.',
+              title: 'Logros',
+              icon: QIcons.trophy,
+              subtitle: 'Tus insignias y objetos disponibles.',
               children: [
                 SegmentedButton<bool>(
                   segments: const [
@@ -69,26 +71,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
       );
 
   List<Widget> _items(InventoryBoard b) => [
-    LifeQuestListRow(
-      icon: Icons.science_outlined,
-      title: 'Elixir de enfoque',
-      subtitle: b.elixirActive
-          ? 'Uno activo para tu próxima Mazmorra'
-          : '×1,5 de XP en una Mazmorra',
-      trailing: '×${b.elixirs}',
-    ),
-    LifeQuestListRow(
-      icon: Icons.confirmation_number_outlined,
-      title: 'Pase de Recuperación',
-      subtitle: 'Salva una racha rota (48 h)',
-      trailing: '×${b.passes}',
-    ),
-    if (b.chests > 0)
+    if (b.passes > 0)
       LifeQuestListRow(
-        icon: Icons.redeem_outlined,
-        title: 'Cofre misterioso',
-        subtitle: 'Pronto podrás abrirlo',
-        trailing: '×${b.chests}',
+        icon: Icons.verified_outlined,
+        title: 'Protector de racha',
+        subtitle: 'Disponible para proteger una racha.',
+        trailing: '×${b.passes}',
+      )
+    else
+      const LifeQuestListRow(
+        icon: Icons.verified_outlined,
+        title: 'No tienes protectores de racha',
+        subtitle: 'Puedes conseguir uno en Recompensas.',
       ),
     const SizedBox(height: 8),
     SizedBox(
@@ -96,19 +90,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
       child: OutlinedButton.icon(
         onPressed: widget.onOpenMarketplace,
         icon: const Icon(Icons.storefront_outlined),
-        label: const Text('Ir al Marketplace'),
+        label: const Text('Ver Recompensas'),
       ),
     ),
   ];
 
   List<Widget> _achievements(InventoryBoard b) => [
-    const LifeQuestSectionHeading('TÍTULOS DE PRESTIGIO'),
+    const LifeQuestSectionHeading('INSIGNIAS'),
     const SizedBox(height: 7),
     if (b.titles.isEmpty)
       const LifeQuestListRow(
         icon: Icons.workspace_premium_outlined,
-        title: 'Aún sin títulos',
-        subtitle: 'Se ganan venciendo jefes y alcanzando hitos.',
+        title: 'Aún no tienes insignias',
+        subtitle: 'Se consiguen al completar logros y subir de nivel.',
       ),
     for (final t in b.titles)
       LifeQuestListRow(
@@ -140,7 +134,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             else
               'Por desbloquear',
           ].join(' · '),
-          trailing: a.rewardCoins > 0 ? '${a.rewardCoins} 🪙' : null,
+          trailing: a.rewardCoins > 0 ? '${a.rewardCoins} Monedas' : null,
         ),
     ],
   ];

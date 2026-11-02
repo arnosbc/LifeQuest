@@ -141,7 +141,7 @@ void main() {
       const StageSuccess(emptyStageBoard, busy: true),
       const StageSuccess(
         stageBoard,
-        message: 'Proyecto creado. Añádele misiones para avanzar.',
+        message: 'Proyecto creado. Añádele tareas para avanzar.',
       ),
     ],
     verify: (_) => verify(() => createProject(newProject)).called(1),
@@ -197,7 +197,7 @@ void main() {
       const StageSuccess(emptyStageBoard, busy: true),
       const StageSuccess(
         stageBoard,
-        message: '¡Nueva meta! Un jefe aparece en el horizonte.',
+        message: '¡Nueva meta! Cada tarea vinculada la hará avanzar.',
       ),
     ],
     verify: (_) => verify(() => createGoal(newGoal)).called(1),
@@ -214,10 +214,7 @@ void main() {
     act: (bloc) => bloc.add(const StageTaskCompleted('t1')),
     skip: 1,
     expect: () => [
-      const StageSuccess(
-        emptyStageBoard,
-        message: '¡Misión completada! Tu héroe se hace más fuerte.',
-      ),
+      const StageSuccess(emptyStageBoard, message: '¡Tarea completada!'),
     ],
   );
 }

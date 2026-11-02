@@ -4,14 +4,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/app/background/notifications_worker.dart';
 import 'package:proyecto_movil/app/config/constants.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:proyecto_movil/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:proyecto_movil/features/auth/domain/repositories/auth_repository.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/change_password.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/get_current_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/login_with_google.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/features/documents/data/datasources/documents_local_datasource.dart';
+import 'package:proyecto_movil/features/documents/data/datasources/documents_remote_datasource.dart';
+import 'package:proyecto_movil/features/documents/data/repositories/documents_repository_impl.dart';
+import 'package:proyecto_movil/features/documents/domain/repositories/documents_repository.dart';
+import 'package:proyecto_movil/features/documents/domain/usecases/documents_usecases.dart';
+import 'package:proyecto_movil/features/documents/presentation/blocs/document_editor_cubit.dart';
+import 'package:proyecto_movil/features/documents/presentation/blocs/documents_cubit.dart';
 import 'package:proyecto_movil/features/dungeon/data/datasources/dungeon_remote_datasource.dart';
 import 'package:proyecto_movil/features/dungeon/data/repositories/dungeon_repository_impl.dart';
 import 'package:proyecto_movil/features/dungeon/domain/repositories/dungeon_repository.dart';
@@ -41,6 +51,7 @@ import 'package:proyecto_movil/features/home/data/repositories/home_repository_i
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/claim_daily_chest.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_today_task.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/journal/data/datasources/journal_remote_datasource.dart';
@@ -74,6 +85,11 @@ import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding
 import 'package:proyecto_movil/features/profile/data/datasources/appearance_local_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/repositories/appearance_repository_impl.dart';
+import 'package:proyecto_movil/features/profile/data/datasources/profile_look_local_datasource.dart';
+import 'package:proyecto_movil/features/profile/data/repositories/profile_look_repository_impl.dart';
+import 'package:proyecto_movil/features/profile/domain/repositories/profile_look_repository.dart';
+import 'package:proyecto_movil/features/profile/domain/usecases/profile_look_usecases.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:proyecto_movil/features/profile/domain/repositories/appearance_repository.dart';
 import 'package:proyecto_movil/features/profile/domain/repositories/profile_repository.dart';
@@ -158,6 +174,7 @@ import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/delete_npc.dart';
 import 'package:proyecto_movil/features/notifications/data/datasources/notifications_local_datasource.dart';
+import 'package:proyecto_movil/features/notifications/domain/entities/app_notification.dart';
 import 'package:proyecto_movil/features/notifications/data/datasources/notifications_remote_datasource.dart';
 import 'package:proyecto_movil/features/notifications/data/repositories/notifications_repository_impl.dart';
 import 'package:proyecto_movil/features/notifications/domain/repositories/notifications_repository.dart';
@@ -167,6 +184,15 @@ import 'package:proyecto_movil/features/notifications/domain/usecases/enable_dev
 import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
 import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
+import 'package:proyecto_movil/features/guided_task/data/datasources/guided_task_remote_datasource.dart';
+import 'package:proyecto_movil/features/guided_task/data/repositories/guided_task_repository_impl.dart';
+import 'package:proyecto_movil/features/guided_task/domain/repositories/guided_task_repository.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/complete_guided_task.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/get_guided_task.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/review_guided_step.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/set_guided_steps.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/toggle_guided_step.dart';
+import 'package:proyecto_movil/features/guided_task/presentation/blocs/guided_task_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -175,6 +201,8 @@ final sl = GetIt.instance;
 Future<void> initDependencies() async {
   // Externos
   sl.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+  // Recompensas que pagó el servidor, para el momento de recompensa (AppShell).
+  sl.registerLazySingleton(RewardFeed.new);
 
   // ---------- Auth ----------
   // Bloc: singleton porque la sesión es de toda la app.
@@ -182,6 +210,7 @@ Future<void> initDependencies() async {
     () => AuthBloc(
       getCurrentUser: sl(),
       loginUser: sl(),
+      loginWithGoogle: sl(),
       registerUser: sl(),
       logoutUser: sl(),
     ),
@@ -190,6 +219,8 @@ Future<void> initDependencies() async {
   // Usecases
   sl.registerLazySingleton(() => GetCurrentUser(sl()));
   sl.registerLazySingleton(() => LoginUser(sl()));
+  sl.registerLazySingleton(() => LoginWithGoogle(sl()));
+  sl.registerLazySingleton(() => ChangePassword(sl()));
   sl.registerLazySingleton(() => RegisterUser(sl()));
   sl.registerLazySingleton(() => LogoutUser(sl()));
 
@@ -198,7 +229,74 @@ Future<void> initDependencies() async {
 
   // Datasources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(sl()),
+    () => AuthRemoteDataSourceImpl(
+      sl(),
+      googleWebClientId: AppConstants.googleWebClientId,
+    ),
+  );
+
+  // ---------- Taller de documentos (046) ----------
+  sl.registerFactory(
+    () => DocumentsCubit(
+      getLocal: sl(),
+      sync: sl(),
+      create: sl(),
+      save: sl(),
+      delete: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => DocumentEditorCubit(
+      getLocal: sl(),
+      create: sl(),
+      save: sl(),
+      export: sl(),
+      snapshot: sl(),
+      versions: sl(),
+      addImage: sl(),
+      resolveImage: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetLocalDocuments(sl()));
+  sl.registerLazySingleton(() => SyncDocuments(sl()));
+  sl.registerLazySingleton(() => CreateDocument(sl()));
+  sl.registerLazySingleton(() => SaveDocument(sl()));
+  sl.registerLazySingleton(() => DeleteDocument(sl()));
+  sl.registerLazySingleton(() => ExportDocument(sl()));
+  sl.registerLazySingleton(() => SnapshotDocument(sl()));
+  sl.registerLazySingleton(() => GetDocumentVersions(sl()));
+  sl.registerLazySingleton(() => AddDocumentImage(sl()));
+  sl.registerLazySingleton(() => ResolveDocumentImage(sl()));
+  sl.registerLazySingleton<DocumentsRepository>(
+    () => DocumentsRepositoryImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<DocumentsLocalDataSource>(
+    DocumentsLocalDataSourceImpl.new,
+  );
+  sl.registerLazySingleton<DocumentsRemoteDataSource>(
+    () => DocumentsRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Tarea guiada (039) ----------
+  sl.registerFactory(
+    () => GuidedTaskBloc(
+      getTask: sl(),
+      toggleStep: sl(),
+      completeTask: sl(),
+      reviewStep: sl(),
+      setSteps: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => SetGuidedSteps(sl()));
+  sl.registerLazySingleton(() => GetGuidedTask(sl()));
+  sl.registerLazySingleton(() => ToggleGuidedStep(sl()));
+  sl.registerLazySingleton(() => ReviewGuidedStep(sl()));
+  sl.registerLazySingleton(() => CompleteGuidedTask(sl()));
+  sl.registerLazySingleton<GuidedTaskRepository>(
+    () => GuidedTaskRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<GuidedTaskRemoteDataSource>(
+    () => GuidedTaskRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Home ----------
@@ -208,14 +306,16 @@ Future<void> initDependencies() async {
       getHomeDashboard: sl(),
       completeHabit: sl(),
       claimDailyChest: sl(),
+      completeTask: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetHomeDashboard(sl()));
   sl.registerLazySingleton(() => CompleteHabit(sl()));
   sl.registerLazySingleton(() => ClaimDailyChest(sl()));
+  sl.registerLazySingleton(() => CompleteTodayTask(sl()));
   sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
   sl.registerLazySingleton<HomeRemoteDataSource>(
-    () => HomeRemoteDataSourceImpl(sl()),
+    () => HomeRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Misiones ----------
@@ -237,7 +337,7 @@ Future<void> initDependencies() async {
     () => MissionsRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<MissionsRemoteDataSource>(
-    () => MissionsRemoteDataSourceImpl(sl()),
+    () => MissionsRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Mazmorra ----------
@@ -281,7 +381,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => RegisterBadHabit(sl()));
   sl.registerLazySingleton<HabitsRepository>(() => HabitsRepositoryImpl(sl()));
   sl.registerLazySingleton<HabitsRemoteDataSource>(
-    () => HabitsRemoteDataSourceImpl(sl()),
+    () => HabitsRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Stage · P.A.R.A. ----------
@@ -307,7 +407,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => CompleteProject(sl()));
   sl.registerLazySingleton<StageRepository>(() => StageRepositoryImpl(sl()));
   sl.registerLazySingleton<StageRemoteDataSource>(
-    () => StageRemoteDataSourceImpl(sl()),
+    () => StageRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Marketplace ----------
@@ -359,7 +459,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => CompleteNpcMission(sl()));
   sl.registerLazySingleton<TavernRepository>(() => TavernRepositoryImpl(sl()));
   sl.registerLazySingleton<TavernRemoteDataSource>(
-    () => TavernRemoteDataSourceImpl(sl()),
+    () => TavernRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Diario ----------
@@ -381,7 +481,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => ArchiveGoal(sl()));
   sl.registerLazySingleton<GoalsRepository>(() => GoalsRepositoryImpl(sl()));
   sl.registerLazySingleton<GoalsRemoteDataSource>(
-    () => GoalsRemoteDataSourceImpl(sl()),
+    () => GoalsRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- RPGenie ----------
@@ -394,7 +494,7 @@ Future<void> initDependencies() async {
     () => RpgenieRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<RpgenieRemoteDataSource>(
-    () => RpgenieRemoteDataSourceImpl(sl()),
+    () => RpgenieRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Brain Dump ----------
@@ -458,6 +558,22 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetNotifications(sl()));
   sl.registerLazySingleton(() => MarkNotificationsRead(sl()));
   _registerDeviceNotifications();
+  // Lo que el usuario crea se avisa al momento en el teléfono.
+  sl<RewardFeed>().notices.listen((notice) {
+    final now = DateTime.now();
+    sl<NotificationsLocalDataSource>()
+        .show([
+          AppNotification(
+            id: 'local:${now.microsecondsSinceEpoch}',
+            kind: NotificationKind.motivational,
+            title: notice.$1,
+            description: notice.$2,
+            createdAt: now,
+          ),
+        ])
+        // Sin permiso o sin plugin no hay dónde mostrarlo: no es un error.
+        .catchError((Object _) {});
+  });
 
   // ---------- Onboarding ----------
   // Bloc: singleton porque el router lo consulta en toda la app.
@@ -526,6 +642,19 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => SaveThemeRealm(sl()));
   sl.registerLazySingleton<AppearanceRepository>(
     () => AppearanceRepositoryImpl(sl()),
+  );
+  // Apariencia del Perfil (foto, emoji, personaje, luz, fondo), en el móvil.
+  sl.registerFactory(
+    () => ProfileLookCubit(getLook: sl(), saveLook: sl(), importMedia: sl()),
+  );
+  sl.registerLazySingleton(() => GetProfileLook(sl()));
+  sl.registerLazySingleton(() => SaveProfileLook(sl()));
+  sl.registerLazySingleton(() => ImportProfileMedia(sl()));
+  sl.registerLazySingleton<ProfileLookRepository>(
+    () => ProfileLookRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<ProfileLookLocalDataSource>(
+    () => ProfileLookLocalDataSourceImpl(SharedPreferencesAsync()),
   );
   sl.registerLazySingleton<AppearanceLocalDataSource>(
     () => AppearanceLocalDataSourceImpl(SharedPreferencesAsync()),

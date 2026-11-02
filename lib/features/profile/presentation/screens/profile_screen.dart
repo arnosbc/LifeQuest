@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/profile_look.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/account_action_tile.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/character_card.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/hero_status_card.dart';
-import 'package:proyecto_movil/features/profile/presentation/widgets/profile_quick_link.dart';
+import 'package:proyecto_movil/features/profile/presentation/widgets/profile_look_sheet.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_sheets.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/skill_tile.dart';
 
-/// Perfil del Personaje. Necesita un [ProfileBloc] (lo provee el router).
+/// Perfil del usuario. Necesita un [ProfileBloc] (lo provee el router).
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
@@ -25,6 +28,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenStats,
     required this.onOpenVision,
     required this.onOpenInventory,
+    this.onSignOut,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -37,6 +41,9 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onOpenStats;
   final VoidCallback onOpenVision;
   final VoidCallback onOpenInventory;
+
+  /// Sin él no se muestra «Cerrar sesión».
+  final VoidCallback? onSignOut;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<ProfileBloc, ProfileState>(
@@ -117,123 +124,142 @@ class ProfileScreen extends StatelessWidget {
       }
     }
 
-    return LifeQuestPage(
-      title: 'Perfil',
-      subtitle: 'Tu progreso, a tu manera.',
-      trailing: IconButton(
-        onPressed: onOpenSettings,
-        tooltip: 'Configuración',
-        icon: const Icon(Icons.settings_outlined, size: 22),
-        color: lq.ink,
-        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
-      ),
+    void customize() =>
+        showProfileLookSheet(context, onEditIdentity: editIdentity);
+
+    Widget divider() => Divider(height: 1, indent: 54, color: lq.line);
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 96),
       children: [
-        // Guardando o refrescando: una línea fina, sin tapar el contenido.
-        SizedBox(
-          height: 3,
-          child: saving
-              ? LinearProgressIndicator(
-                  color: lq.deepGreen,
-                  backgroundColor: Colors.transparent,
-                )
-              : null,
+        BlocBuilder<ProfileLookCubit, ProfileLook>(
+          builder: (context, look) => CharacterCard(
+            name: name,
+            profile: profile,
+            look: look,
+            onEditIdentity: editIdentity,
+            onChooseTitle: chooseTitle,
+            onCustomize: customize,
+          ),
         ),
-        const SizedBox(height: 8),
-        CharacterCard(
-          name: name,
-          profile: profile,
-          onEditIdentity: editIdentity,
-          onChooseTitle: chooseTitle,
-        ),
-        const SizedBox(height: 12),
-        HeroStatusCard(profile: profile),
-        const SizedBox(height: 28),
-        const LifeQuestSectionHeading('ACCESOS RÁPIDOS'),
-        const SizedBox(height: 8),
-        // Dos filas de 3: seis en una fila no caben en un teléfono.
-        _group(
-          padding: const EdgeInsets.all(6),
-          child: Column(
-            children: [
-              for (final row in [
-                [
-                  ProfileQuickLink(
-                    icon: Icons.menu_book_outlined,
-                    label: 'Diario',
-                    onTap: onOpenJournal,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.insights_outlined,
-                    label: 'Estadísticas',
-                    onTap: onOpenStats,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.visibility_outlined,
-                    label: 'Vision Board',
-                    onTap: onOpenVision,
-                  ),
-                ],
-                [
-                  ProfileQuickLink(
-                    icon: Icons.inventory_2_outlined,
-                    label: 'Inventario y logros',
-                    onTap: onOpenInventory,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.storefront_outlined,
-                    label: 'Marketplace',
-                    onTap: onOpenMarketplace,
-                  ),
-                  ProfileQuickLink(
-                    icon: Icons.tune_rounded,
-                    label: 'Configuración',
-                    onTap: onOpenSettings,
-                  ),
-                ],
-              ])
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [for (final link in row) Expanded(child: link)],
+        // La hoja clara se monta sobre la cabecera morada.
+        Transform.translate(
+          offset: const Offset(0, -24),
+          child: Container(
+            decoration: BoxDecoration(
+              color: lq.background,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(28),
+              ),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Guardando o refrescando: una línea fina, sin tapar nada.
+                SizedBox(
+                  height: 3,
+                  child: saving
+                      ? LinearProgressIndicator(
+                          color: lq.deepGreen,
+                          backgroundColor: Colors.transparent,
+                        )
+                      : null,
                 ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 28),
-        LifeQuestSectionHeading(
-          'ÁRBOL DE HABILIDADES',
-          action: '${profile.skills.length} / ${profile.skillLimit}',
-        ),
-        if (profile.skills.isEmpty) ...[
-          const SizedBox(height: 4),
-          Text(
-            'Las skills son tus áreas de vida. Cada misión y hábito que '
-            'vincules a una la hará crecer.',
-            style: TextStyle(color: lq.muted, fontSize: 13, height: 1.4),
-          ),
-        ],
-        for (final pair in _pairs([
-          for (final skill in profile.skills)
-            SkillTile(skill: skill, onTap: () => editSkill(skill)),
-          if (profile.canAddSkill) AddSkillTile(onTap: addSkill),
-        ])) ...[const SizedBox(height: 8), _row(pair)],
-        const SizedBox(height: 28),
-        const LifeQuestSectionHeading('CUENTA'),
-        const SizedBox(height: 8),
-        _group(
-          child: Column(
-            children: [
-              AccountActionTile(
-                icon: Icons.notifications_outlined,
-                title: 'Notificaciones',
-                onTap: onOpenNotifications,
-              ),
-              Divider(height: 1, indent: 54, color: lq.line),
-              AccountActionTile(
-                icon: Icons.help_outline,
-                title: 'Ayuda',
-                onTap: onOpenHelp,
-              ),
-            ],
+                const SizedBox(height: 4),
+                _group(
+                  child: Column(
+                    children: [
+                      AccountActionTile(
+                        icon: Icons.person_outline_rounded,
+                        title: 'Personalizar perfil',
+                        onTap: customize,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.menu_book_outlined,
+                        title: 'Actividad',
+                        onTap: onOpenJournal,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.insights_outlined,
+                        title: 'Estadísticas',
+                        onTap: onOpenStats,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.visibility_outlined,
+                        title: 'Visión',
+                        onTap: onOpenVision,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.inventory_2_outlined,
+                        title: 'Logros',
+                        onTap: onOpenInventory,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.storefront_outlined,
+                        title: 'Recompensas',
+                        onTap: onOpenMarketplace,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.notifications_outlined,
+                        title: 'Notificaciones',
+                        onTap: onOpenNotifications,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.settings_outlined,
+                        title: 'Configuración',
+                        onTap: onOpenSettings,
+                      ),
+                      divider(),
+                      AccountActionTile(
+                        icon: Icons.help_outline,
+                        title: 'Ayuda',
+                        onTap: onOpenHelp,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                HeroStatusCard(profile: profile),
+                const SizedBox(height: 28),
+                LifeQuestSectionHeading(
+                  'TUS ÁREAS',
+                  action: '${profile.skills.length} / ${profile.skillLimit}',
+                ),
+                if (profile.skills.isEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Las áreas son las partes de tu vida que quieres hacer '
+                    'crecer. Cada tarea y hábito que vincules a una la hará '
+                    'subir de nivel.',
+                    style: TextStyle(
+                      color: lq.muted,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+                for (final pair in _pairs([
+                  for (final skill in profile.skills)
+                    SkillTile(skill: skill, onTap: () => editSkill(skill)),
+                  if (profile.canAddSkill) AddSkillTile(onTap: addSkill),
+                ])) ...[const SizedBox(height: 8), _row(pair)],
+                if (onSignOut != null) ...[
+                  const SizedBox(height: 28),
+                  QuestlyButton(
+                    label: 'Cerrar sesión',
+                    variant: QuestlyButtonVariant.tonal,
+                    onPressed: onSignOut,
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ],

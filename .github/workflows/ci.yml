@@ -1,0 +1,61 @@
+# Integración continua de LifeQuest: en cada push y pull request revisa el
+# código Flutter (análisis + tests) y las migraciones SQL (tests sobre PGlite).
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# Un push nuevo a la misma rama cancela la revisión anterior.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter · análisis y tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.8
+          channel: stable
+          cache: true
+
+      - name: Dependencias
+        run: flutter pub get
+
+      - name: Formato
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Análisis
+        run: flutter analyze
+
+      - name: Tests
+        run: flutter test
+
+  sql:
+    name: Migraciones SQL · tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: supabase/tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: supabase/tests/package-lock.json
+
+      - name: Dependencias
+        run: npm ci
+
+      - name: Tests (001–049)
+        run: npm test

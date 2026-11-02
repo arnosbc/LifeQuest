@@ -7,12 +7,12 @@ sealed class MissionsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Cargar o refrescar la pantalla Misiones.
+/// Cargar o refrescar la pantalla Tareas.
 class MissionsRequested extends MissionsEvent {
   const MissionsRequested();
 }
 
-/// El usuario guardó una misión nueva; [startFocus] abre luego la Mazmorra.
+/// El usuario guardó una tarea nueva; [startFocus] abre luego la Mazmorra.
 class MissionCreated extends MissionsEvent {
   const MissionCreated(this.mission, {this.startFocus = false});
 
@@ -23,7 +23,7 @@ class MissionCreated extends MissionsEvent {
   List<Object?> get props => [mission, startFocus];
 }
 
-/// El usuario marcó una misión como completada.
+/// El usuario marcó una tarea como completada.
 class MissionCompleted extends MissionsEvent {
   const MissionCompleted(this.missionId);
 

@@ -13,7 +13,13 @@ class HomeDashboardModel {
   HomeDashboard toEntity() {
     final mission = json['priority_mission'] as Map<String, dynamic>?;
     final chest = json['daily_chest'] as Map<String, dynamic>?;
+    // 041; antes no llegan y las tarjetas no se muestran.
+    final mentor = json['mentor_task'] as Map<String, dynamic>?;
+    final goal = json['top_goal'] as Map<String, dynamic>?;
     final habits = (json['habits'] as List<dynamic>? ?? const [])
+        .cast<Map<String, dynamic>>();
+    // today_tasks llega desde la migración 038; antes, lista vacía.
+    final today = (json['today_tasks'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
     return HomeDashboard(
       displayName: _text(json['display_name']),
@@ -39,6 +45,37 @@ class HomeDashboardModel {
               dueDate: mission['due_date'] == null
                   ? null
                   : DateTime.parse(mission['due_date'] as String).toLocal(),
+            ),
+      todayTasks: [
+        for (final task in today)
+          TodayTask(
+            id: task['id'] as String,
+            title: task['title'] as String,
+            priority: UrgencyLevel.values.byName(task['priority'] as String),
+            xpReward: _int(task['xp_reward']),
+            dueDate: _date(task['due_date']),
+            overdue: task['overdue'] as bool? ?? false,
+          ),
+      ],
+      mentorTask: mentor == null
+          ? null
+          : MentorTask(
+              id: mentor['id'] as String,
+              title: mentor['title'] as String,
+              mentor: mentor['mentor'] as String,
+              xpReward: _int(mentor['xp_reward']),
+            ),
+      inboxCount: _int(json['inbox_count']),
+      topGoal: goal == null
+          ? null
+          : TopGoal(
+              id: goal['id'] as String,
+              title: goal['title'] as String,
+              hp: _int(goal['hp'], 100),
+              maxHp: _int(goal['max_hp'], 100),
+              dueDate: goal['due_date'] is String
+                  ? DateTime.parse(goal['due_date'] as String)
+                  : null,
             ),
       habits: [
         for (final habit in habits)
@@ -67,6 +104,9 @@ class HomeDashboardModel {
 
   static int _int(Object? value, [int fallback = 0]) =>
       (value as num?)?.toInt() ?? fallback;
+
+  static DateTime? _date(Object? value) =>
+      value is String ? DateTime.parse(value).toLocal() : null;
 
   static String? _text(Object? value) =>
       value is String && value.trim().isNotEmpty ? value.trim() : null;

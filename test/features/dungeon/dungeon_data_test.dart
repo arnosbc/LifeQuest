@@ -144,7 +144,7 @@ void main() {
         ),
         const Left(
           ServerFailure(
-            'Ya tienes una Mazmorra en curso. Desliza para retomarla.',
+            'Ya tienes una sesión de Modo Foco en curso. Desliza para retomarla.',
           ),
         ),
       );

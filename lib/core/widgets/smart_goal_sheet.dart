@@ -106,7 +106,7 @@ class _SmartGoalSheetState extends State<SmartGoalSheet> {
     spacing: 8,
     children: [
       Text(
-        'Área / skill',
+        'Área',
         style: TextStyle(
           color: context.lq.ink,
           fontSize: 14,
@@ -132,7 +132,7 @@ class _SmartGoalSheetState extends State<SmartGoalSheet> {
       ),
       if (widget.skills.isEmpty)
         Text(
-          'Aún no tienes skills. Créalas en tu Perfil para vincular tus metas.',
+          'Aún no tienes áreas. Créalas en tu Perfil para vincular tus metas.',
           style: TextStyle(color: context.lq.muted, fontSize: 12),
         ),
     ],
@@ -243,7 +243,7 @@ class _SmartGoalSheetState extends State<SmartGoalSheet> {
               height: 48,
               child: FilledButton.icon(
                 onPressed: _save,
-                icon: const Icon(Icons.emoji_events_outlined),
+                icon: const Icon(Icons.flag_outlined),
                 label: const Text('Crear meta'),
               ),
             ),

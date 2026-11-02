@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/lifequest_brand.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_footer_link.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
-import 'package:proyecto_movil/features/auth/presentation/widgets/auth_header.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_primary_button.dart';
 
 /// Tras crear la cuenta, cuando Supabase pide confirmar el correo antes de
@@ -22,9 +22,9 @@ class CheckEmailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AuthFormLayout(
-    header: const AuthHeader(height: 170),
-    padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
+    padding: const EdgeInsets.fromLTRB(24, 32, 24, 12),
     children: [
+      const Center(child: LifeQuestLogo(size: 72)),
       const Spacer(),
       const SizedBox(height: 32),
       const Center(child: _MailSeal()),

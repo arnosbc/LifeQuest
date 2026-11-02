@@ -108,7 +108,7 @@ void main() {
       act: (bloc) => bloc.add(const ProfileSkillCreated('  Salud ')),
       expect: () => [
         const ProfileSuccess(newProfile, saving: true),
-        const ProfileSuccess(profile, message: 'Skill «Salud» creada.'),
+        const ProfileSuccess(profile, message: 'Área «Salud» creada.'),
       ],
     );
 

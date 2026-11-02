@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/vision/domain/entities/vision_board.dart';
 import 'package:proyecto_movil/features/vision/presentation/blocs/vision_bloc.dart';
@@ -53,8 +54,9 @@ class _VisionScreenState extends State<VisionScreen> {
     final idle = state.busyKey == null;
     final identity = state.board.identity;
     return LifeQuestPage(
-      title: 'Vision Board',
-      subtitle: 'Hacia dónde va tu aventura.',
+      title: 'Visión',
+      icon: QIcons.star,
+      subtitle: 'Hacia dónde quieres ir.',
       children: [
         if (identity != null && identity.isNotEmpty) ...[
           LifeQuestSurface(
@@ -104,7 +106,7 @@ class _VisionScreenState extends State<VisionScreen> {
           const LifeQuestListRow(
             icon: Icons.flag_outlined,
             title: 'Aún no hay metas ni proyectos abiertos',
-            subtitle: 'Créalos en Stage y vincúlalos aquí.',
+            subtitle: 'Créalos en el Planificador y vincúlalos aquí.',
           ),
         for (final item in state.board.items)
           SwitchListTile(

@@ -5,6 +5,7 @@ import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/tavern/data/datasources/tavern_remote_datasource.dart';
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/domain/repositories/tavern_repository.dart';
+import 'package:proyecto_movil/core/entities/task_guide.dart';
 
 class TavernRepositoryImpl implements TavernRepository {
   const TavernRepositoryImpl(this._remote);
@@ -28,8 +29,14 @@ class TavernRepositoryImpl implements TavernRepository {
     required String npcId,
     required String title,
     String? description,
+    TaskGuide? guide,
   }) => _done(
-    () => _remote.acceptMission(npcId, title, description: description),
+    () => _remote.acceptMission(
+      npcId,
+      title,
+      description: description,
+      guide: guide,
+    ),
   );
 
   @override
@@ -71,10 +78,10 @@ class TavernRepositoryImpl implements TavernRepository {
       return Left(
         ServerFailure(switch (error.code) {
           'suggestion_failed' =>
-            'RPGenie no pudo crear la misión ahora '
+            'El Asistente no pudo proponer la tarea ahora '
                 '(código ${error.statusCode}). Inténtalo en un rato.',
           'document_failed' =>
-            'RPGenie no pudo leer el documento ahora '
+            'El Asistente no pudo leer el documento ahora '
                 '(código ${error.statusCode}). Inténtalo en un rato.',
           _ => _messageFor(error.code),
         }),
@@ -85,21 +92,23 @@ class TavernRepositoryImpl implements TavernRepository {
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
     'npc_limit_reached' =>
-      'Tu Taverna está llena. Mejora el Estandarte del Refugio para recibir más NPCs.',
-    'invalid_name' => 'Dale a tu NPC un nombre de hasta 60 caracteres.',
-    'skill_not_found' => 'Elige la skill que entrenará este NPC.',
+      'Alcanzaste el límite de mentores. Mejora Más mentores para ampliarlo.',
+    'invalid_name' => 'Escribe un nombre de hasta 60 caracteres.',
+    'skill_not_found' => 'Elige el área que acompañará este mentor.',
     'invalid_noble_mission' =>
-      'Escribe la noble misión (hasta 300 caracteres): es el tema de sus misiones.',
-    'invalid_title' => 'Escribe la misión en hasta 200 caracteres.',
+      'Describe el propósito del mentor en hasta 300 caracteres.',
+    'invalid_title' => 'Escribe el nombre de la tarea en hasta 200 caracteres.',
     'invalid_description' =>
-      'La guía de la misión es demasiado larga. Pídela de nuevo en un rato.',
+      'La guía es demasiado larga. Solicita otra en un rato.',
+    'invalid_guide' =>
+      'No se pudieron guardar los pasos de la tarea. Inténtalo de nuevo.',
     'npc_mission_open' =>
-      'Este NPC ya te dio una misión. Cúmplela y te propondrá otra.',
-    'npc_not_found' => 'No encontramos ese NPC. Desliza para actualizar.',
+      'Este mentor ya tiene una tarea guiada abierta. Complétala antes de solicitar otra.',
+    'npc_not_found' => 'No encontramos ese mentor. Desliza para actualizar.',
     'not_enough_coins' =>
-      'Aún te faltan Monedas para pedirla ya. Pronto será gratis.',
+      'Aún te faltan Monedas para solicitarla ahora. Pronto podrás hacerlo gratis.',
     'npc_document_limit' =>
-      'Este NPC ya tiene ${NewNpcDocument.maxPerNpc} documentos. '
+      'Este mentor ya tiene ${NewNpcDocument.maxPerNpc} documentos. '
           'Quita uno para adjuntar otro.',
     'unsupported_type' => 'Sube el documento en PDF, Word (.docx) o Markdown.',
     'empty_document' || 'unreadable_document' =>
@@ -108,8 +117,10 @@ class TavernRepositoryImpl implements TavernRepository {
       'No se pudo subir el archivo. Revisa tu conexión y reintenta.',
     'document_not_found' =>
       'Ese documento ya no está. Desliza para actualizar.',
-    'task_not_found' || 'task_not_open' =>
-      'Esa misión ya no está abierta. Desliza para actualizar.',
+    'task_not_found' ||
+    'task_not_open' => 'Esa tarea ya no está abierta. Desliza para actualizar.',
+    'task_steps_pending' =>
+      'Completa los pasos de esta tarea para poder terminarla.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

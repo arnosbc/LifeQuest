@@ -19,7 +19,7 @@ class QuickAddSheet extends StatelessWidget {
         context,
         QuickAddKind.mission,
         Icons.flag_outlined,
-        'Misión',
+        'Tarea',
         'Un paso concreto que puedes completar',
       ),
       _option(
@@ -27,14 +27,14 @@ class QuickAddSheet extends StatelessWidget {
         QuickAddKind.project,
         Icons.work_outline,
         'Proyecto',
-        'Un resultado de semanas con varias misiones',
+        'Un resultado de semanas con varias tareas',
       ),
       _option(
         context,
         QuickAddKind.goal,
-        Icons.emoji_events_outlined,
+        Icons.flag_outlined,
         'Meta',
-        'Un logro de meses: se convierte en un jefe a derrotar',
+        'Un logro de meses, con su avance de 0 a 100 %',
       ),
       _option(
         context,
@@ -154,14 +154,14 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
         ),
         const SizedBox(height: 8),
         _linkDropdown(
-          'Área / skill',
+          'Área',
           _skillId,
           widget.skills,
           (v) => setState(() => _skillId = v),
         ),
         const SizedBox(height: 8),
         _linkDropdown(
-          'Meta (completarlo le resta vida al jefe)',
+          'Meta (completarlo la hace avanzar)',
           _goalId,
           widget.goals,
           (v) => setState(() => _goalId = v),

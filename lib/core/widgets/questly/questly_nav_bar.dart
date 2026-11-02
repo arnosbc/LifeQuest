@@ -4,8 +4,8 @@ import 'package:proyecto_movil/core/theme/questly_icons.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Barra inferior de 5 pestañas (Main.dc.html): la activa lleva una píldora
-/// de tinte y el texto en tinta.
+/// Barra inferior de 5 pestañas: blanca con sombra suave; la activa va en
+/// lavanda con el texto en negrita.
 class QuestlyNavBar extends StatelessWidget {
   const QuestlyNavBar({
     super.key,
@@ -34,7 +34,10 @@ class QuestlyNavBar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: q.card,
-          border: Border(top: BorderSide(color: q.border)),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(QRadius.sheet),
+          ),
+          boxShadow: qSolidShadow(q.cardShadow, y: -8),
         ),
         child: SafeArea(
           top: false,
@@ -76,7 +79,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = context.q;
-    final color = active ? q.ink : q.text2;
+    final color = active ? q.accent : q.text2;
     return Semantics(
       button: true,
       selected: active,
@@ -89,16 +92,15 @@ class _NavItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedContainer(
-                duration: context.motion(QMotion.press),
-                width: QSize.minTap,
+              SizedBox(
                 height: 28,
-                decoration: BoxDecoration(
-                  color: active ? q.tint : Colors.transparent,
-                  borderRadius: BorderRadius.circular(QRadius.pill),
+                child: Center(
+                  child: QIcon(
+                    icon,
+                    color: color,
+                    strokeWidth: active ? 2.4 : 1.8,
+                  ),
                 ),
-                alignment: Alignment.center,
-                child: QIcon(icon, color: color),
               ),
               const SizedBox(height: 3),
               // «Planificador» no cabe a 12 px en 360 de ancho: se encoge un

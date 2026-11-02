@@ -14,6 +14,8 @@ Future<T?> showQuestlySheet<T>(
   final q = context.q;
   return showModalBottomSheet<T>(
     context: context,
+    // Por encima de la barra inferior y del botón flotante.
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,

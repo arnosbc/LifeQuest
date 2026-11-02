@@ -13,7 +13,7 @@ class LifeQuestStat extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
     decoration: BoxDecoration(
       color: context.lq.softGreen,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
     ),
     child: Column(
       children: [

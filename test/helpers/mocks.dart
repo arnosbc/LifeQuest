@@ -1,6 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/features/profile/domain/entities/profile_look.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
+
 import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart'
@@ -51,6 +54,7 @@ import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_dataso
 import 'package:proyecto_movil/features/auth/domain/repositories/auth_repository.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/get_current_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/login_with_google.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
@@ -72,6 +76,7 @@ import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.da
 import 'package:proyecto_movil/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/claim_daily_chest.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_today_task.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
@@ -119,6 +124,9 @@ import 'package:proyecto_movil/features/stage/domain/usecases/get_resource_url.d
 import 'package:proyecto_movil/features/stage/domain/usecases/get_stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 
+class MockProfileLookCubit extends MockCubit<ProfileLook>
+    implements ProfileLookCubit {}
+
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
@@ -128,6 +136,8 @@ class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 class MockGetCurrentUser extends Mock implements GetCurrentUser {}
 
 class MockLoginUser extends Mock implements LoginUser {}
+
+class MockLoginWithGoogle extends Mock implements LoginWithGoogle {}
 
 class MockRegisterUser extends Mock implements RegisterUser {}
 
@@ -178,6 +188,8 @@ class MockGetHomeDashboard extends Mock implements GetHomeDashboard {}
 class MockCompleteHabit extends Mock implements CompleteHabit {}
 
 class MockClaimDailyChest extends Mock implements ClaimDailyChest {}
+
+class MockCompleteTodayTask extends Mock implements CompleteTodayTask {}
 
 class MockMissionsBloc extends MockBloc<MissionsEvent, MissionsState>
     implements MissionsBloc {}

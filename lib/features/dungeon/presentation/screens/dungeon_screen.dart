@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/deep_work_session_card.dart';
@@ -8,9 +11,12 @@ import 'package:proyecto_movil/features/dungeon/presentation/widgets/dungeon_set
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/dungeon_timer_ring.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/session_rewards_card.dart';
 
-/// Mazmorra. Necesita un [DungeonBloc] por encima (lo provee el router).
+/// Modo Foco. Necesita un [DungeonBloc] por encima (lo provee el router).
 class DungeonScreen extends StatelessWidget {
-  const DungeonScreen({super.key});
+  const DungeonScreen({super.key, this.initialTaskId});
+
+  /// Tarea que llega elegida desde «Empezar en Foco» (`?task=`).
+  final String? initialTaskId;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<DungeonBloc, DungeonState>(
@@ -47,12 +53,13 @@ class DungeonScreen extends StatelessWidget {
     final session = state.board.session;
     if (session == null) {
       return LifeQuestPage(
-        title: 'Mazmorra',
-        subtitle: 'DEEP WORKING · Prepara tu mochila',
+        title: 'Modo Foco',
+        icon: QIcons.focus,
+        subtitle: 'Elige tus tareas y concéntrate sin ruido.',
         children: [
           if (state.summary case final summary?) ...[
             SessionRewardsCard(
-              title: 'BOTÍN DE LA ÚLTIMA SESIÓN',
+              title: 'LO QUE GANASTE EN LA ÚLTIMA SESIÓN',
               xp: summary.xp,
               coins: summary.coins,
               cycles: summary.cycles,
@@ -67,6 +74,7 @@ class DungeonScreen extends StatelessWidget {
           ],
           DungeonSetupView(
             board: state.board,
+            initialTaskId: initialTaskId,
             busy: state.busy,
             onStart: (total, cycle, tasks) => bloc.add(
               DungeonStarted(
@@ -90,8 +98,9 @@ class DungeonScreen extends StatelessWidget {
         ? state.board.breakAfter(session.cyclesDone)
         : Duration(minutes: session.cycleMinutes);
     return LifeQuestPage(
-      title: 'Mazmorra',
-      subtitle: 'DEEP WORKING · Ciclo $cycle / ${session.maxCycles}',
+      title: 'Modo Foco',
+      icon: QIcons.focus,
+      subtitle: 'Bloque $cycle de ${session.maxCycles}',
       children: [
         DungeonTimerRing(
           remaining: state.remaining,
@@ -102,10 +111,10 @@ class DungeonScreen extends StatelessWidget {
               ? 'EN PAUSA'
               : rest
               ? 'DESCANSO'
-              : 'MAZMORRA ACTIVA',
+              : 'EN FOCO',
           footer: state.busy
               ? 'Guardando tu progreso…'
-              : 'Ciclo $cycle de ${session.maxCycles}',
+              : 'Bloque $cycle de ${session.maxCycles}',
         ),
         const SizedBox(height: 14),
         DeepWorkSessionCard(
@@ -115,6 +124,12 @@ class DungeonScreen extends StatelessWidget {
           onComplete: state.busy
               ? null
               : (id) => bloc.add(DungeonTaskCompleted(id)),
+          // Los pasos se marcan aquí, con la sesión abierta; al volver se
+          // relee la sesión por si el último paso completó la tarea.
+          onOpenSteps: (id) async {
+            await context.push(RoutePaths.task(id));
+            bloc.add(const DungeonRequested());
+          },
         ),
         const SizedBox(height: 9),
         SessionRewardsCard(

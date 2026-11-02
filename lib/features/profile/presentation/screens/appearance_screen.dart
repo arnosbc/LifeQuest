@@ -68,7 +68,7 @@ class AppearanceScreen extends StatelessWidget {
                     ThemePreference.light =>
                       'Fondo de niebla y superficies blancas.',
                     ThemePreference.dark =>
-                      'Fondo de bosque nocturno, más cómodo con poca luz.',
+                      'Fondo violeta nocturno, más cómodo con poca luz.',
                     ThemePreference.system =>
                       'Cambia entre claro y oscuro según tu teléfono.',
                   },

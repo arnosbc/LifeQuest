@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
+import 'package:proyecto_movil/core/entities/task_guide.dart';
 
 /// Contrato de la Taverna. La capa data lo implementa.
 abstract class TavernRepository {
@@ -18,6 +19,7 @@ abstract class TavernRepository {
     required String npcId,
     required String title,
     String? description,
+    TaskGuide? guide,
   });
 
   /// Cumple la misión; el servidor paga XP, Monedas y skill.

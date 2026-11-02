@@ -1,6 +1,8 @@
 /// Rutas de la app. Las features navegan con estas constantes, sin importar
 /// pantallas de otras features.
 abstract final class RoutePaths {
+  // Bienvenida con «Comenzar», antes del login.
+  static const welcome = '/welcome';
   static const login = '/login';
   static const register = '/register';
   static const checkEmail = '/check-email';
@@ -36,8 +38,24 @@ abstract final class RoutePaths {
   static const marketplace = '/marketplace';
   static const brainDump = '/brain-dump';
 
+  // Taller de documentos (046, specs/006).
+  static const documents = '/documents';
+  static const document = '/document';
+  static String documentById(String id) => '$document?id=$id';
+  static String documentForTask(String taskId, String title) => Uri(
+    path: document,
+    queryParameters: {'task': taskId, 'title': title},
+  ).toString();
+
   // Desde Perfil (§13).
   static const stats = '/stats';
   static const vision = '/vision';
   static const inventory = '/inventory';
+
+  // Tarea guiada con sus pasos (039, plan B1–B2).
+  static const guidedTask = '/task/:id';
+  static String task(String id) => '/task/$id';
+
+  /// Modo Foco con la tarea ya elegida (040: las tareas se completan en Foco).
+  static String focusOn(String taskId) => '$dungeon?task=$taskId';
 }

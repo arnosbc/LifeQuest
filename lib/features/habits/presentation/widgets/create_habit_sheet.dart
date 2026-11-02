@@ -135,7 +135,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
               ),
             ] else ...[
               Text(
-                '¿Cuánto te afecta? Cada registro resta esa vida.',
+                '¿Cuánto te afecta? Cada registro resta esa Constancia.',
                 style: TextStyle(color: context.lq.muted, fontSize: 12),
               ),
               const SizedBox(height: 6),
@@ -153,7 +153,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             DropdownButtonFormField<String?>(
               initialValue: _skillId,
               isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Área / skill'),
+              decoration: const InputDecoration(labelText: 'Área'),
               items: [
                 const DropdownMenuItem(
                   value: null,
