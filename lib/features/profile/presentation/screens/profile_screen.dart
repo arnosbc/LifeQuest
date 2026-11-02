@@ -29,6 +29,7 @@ class ProfileScreen extends StatelessWidget {
     required this.onOpenVision,
     required this.onOpenInventory,
     this.onSignOut,
+    this.onAddHomeWidget,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -44,6 +45,9 @@ class ProfileScreen extends StatelessWidget {
 
   /// Sin él no se muestra «Cerrar sesión».
   final VoidCallback? onSignOut;
+
+  /// Coloca el widget «Mi día»; sin él no se muestra la opción.
+  final VoidCallback? onAddHomeWidget;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<ProfileBloc, ProfileState>(
@@ -205,6 +209,14 @@ class ProfileScreen extends StatelessWidget {
                         onTap: onOpenMarketplace,
                       ),
                       divider(),
+                      if (onAddHomeWidget case final add?) ...[
+                        AccountActionTile(
+                          icon: Icons.widgets_outlined,
+                          title: 'Widget en la pantalla de inicio',
+                          onTap: add,
+                        ),
+                        divider(),
+                      ],
                       AccountActionTile(
                         icon: Icons.notifications_outlined,
                         title: 'Notificaciones',

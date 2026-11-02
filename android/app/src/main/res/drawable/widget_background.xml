@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo del widget: degradado lavanda con esquinas de 24 dp. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#7C5CC4"
+        android:endColor="#5B3FA8" />
+    <corners android:radius="24dp" />
+</shape>

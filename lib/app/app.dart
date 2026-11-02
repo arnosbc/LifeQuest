@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_router.dart';
+import 'package:proyecto_movil/app/home_screen_widget.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
@@ -38,7 +39,7 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends State<App> with WidgetsBindingObserver {
   late final GoRouter _router = createAppRouter(
     widget.authBloc,
     widget.onboardingBloc,
@@ -53,6 +54,33 @@ class _AppState extends State<App> {
     // Si la sesión caducó con la app cerrada, el dispositivo deja de recibir.
     if (!_signedIn) widget.disableDeviceNotifications?.call(const NoParams());
     _auth = widget.authBloc.stream.listen(_onAuth);
+    // Tocar el widget «Mi día» abre Inicio o el Foco con la tarea.
+    WidgetsBinding.instance.addObserver(this);
+    _openFromWidget();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _openFromWidget();
+  }
+
+  /// Al abrir en frío el router aún consulta el Onboarding y, al terminar,
+  /// manda a Inicio: se espera a que termine para no perder el destino.
+  Future<void> _openFromWidget() async {
+    final route = HomeScreenWidget.routeFor(
+      await HomeScreenWidget.takePendingLink(),
+    );
+    if (route == null || !_signedIn) return;
+    if (widget.onboardingBloc.state is! OnboardingNotNeeded) {
+      try {
+        await widget.onboardingBloc.stream
+            .firstWhere((s) => s is OnboardingNotNeeded)
+            .timeout(const Duration(seconds: 10));
+      } on Object {
+        return; // sigue pendiente: el Onboarding va primero
+      }
+    }
+    if (mounted) _router.go(route);
   }
 
   /// Al iniciar sesión se consulta si toca el Onboarding; al cerrarla se
@@ -70,12 +98,14 @@ class _AppState extends State<App> {
       );
     } else {
       widget.disableDeviceNotifications?.call(const NoParams());
+      HomeScreenWidget.clear();
     }
   }
 
   @override
   void dispose() {
     _auth.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _router.dispose();
     super.dispose();
   }

@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
+import 'package:proyecto_movil/app/home_screen_widget.dart';
+import 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';
 import 'package:proyecto_movil/app/config/design_preview_screen.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
@@ -149,22 +151,28 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                             ..add(const NotificationsRequested()),
                     ),
                   ],
-                  child: _ReloadOnShow(
-                    location: shellLocation,
-                    path: RoutePaths.home,
-                    onShown: (c) {
-                      c.read<HomeBloc>().add(const HomeRequested());
-                      c.read<NotificationsBloc>().add(
-                        const NotificationsRequested(),
-                      );
-                    },
-                    child: BlocBuilder<NotificationsBloc, NotificationsState>(
-                      buildWhen: (a, b) => _unread(a) != _unread(b),
-                      builder: (context, notifications) => HomeScreen(
-                        userName: _userName(context),
-                        unreadNotifications: _unread(notifications),
-                        onNavigate: (tab) =>
-                            StatefulNavigationShell.of(context).goBranch(tab),
+                  child: BlocListener<HomeBloc, HomeState>(
+                    // El widget «Mi día» se actualiza con cada carga del Inicio.
+                    listenWhen: (_, state) => state is HomeSuccess,
+                    listener: (_, state) =>
+                        HomeScreenWidget.show((state as HomeSuccess).dashboard),
+                    child: _ReloadOnShow(
+                      location: shellLocation,
+                      path: RoutePaths.home,
+                      onShown: (c) {
+                        c.read<HomeBloc>().add(const HomeRequested());
+                        c.read<NotificationsBloc>().add(
+                          const NotificationsRequested(),
+                        );
+                      },
+                      child: BlocBuilder<NotificationsBloc, NotificationsState>(
+                        buildWhen: (a, b) => _unread(a) != _unread(b),
+                        builder: (context, notifications) => HomeScreen(
+                          userName: _userName(context),
+                          unreadNotifications: _unread(notifications),
+                          onNavigate: (tab) =>
+                              StatefulNavigationShell.of(context).goBranch(tab),
+                        ),
                       ),
                     ),
                   ),
@@ -295,6 +303,15 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       onOpenInventory: () => context.push(RoutePaths.inventory),
                       onSignOut: () =>
                           context.read<AuthBloc>().add(const LogoutRequested()),
+                      onAddHomeWidget: () async {
+                        if (!await HomeScreenWidget.pin() && context.mounted) {
+                          showLifeQuestMessage(
+                            context,
+                            'Mantén presionada tu pantalla de inicio → Widgets '
+                            '→ LifeQuest para agregarlo.',
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),
