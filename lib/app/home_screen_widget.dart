@@ -17,6 +17,9 @@ abstract final class HomeScreenWidget {
       HomeWidget.saveWidgetData<int>('streak', d.streakDays),
       HomeWidget.saveWidgetData<int>('hp', d.hpCurrent),
       HomeWidget.saveWidgetData<int>('level', d.level),
+      // Misiones de hoy = las que abren el cofre del día.
+      HomeWidget.saveWidgetData<int>('missions_done', d.chest.progress),
+      HomeWidget.saveWidgetData<int>('missions_goal', d.chest.required),
       HomeWidget.saveWidgetData<String>('next_task_id', next?.id),
       HomeWidget.saveWidgetData<String>('next_task_title', next?.title),
     ]);
@@ -30,6 +33,7 @@ abstract final class HomeScreenWidget {
       HomeWidget.saveWidgetData<int>('streak', 0),
       HomeWidget.saveWidgetData<int>('hp', 0),
       HomeWidget.saveWidgetData<int>('level', 1),
+      HomeWidget.saveWidgetData<int>('missions_done', 0),
       HomeWidget.saveWidgetData<String>('next_task_id', null),
       HomeWidget.saveWidgetData<String>('next_task_title', null),
     ]);

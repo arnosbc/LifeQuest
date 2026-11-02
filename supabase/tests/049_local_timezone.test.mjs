@@ -47,10 +47,11 @@ ok('049: una tarea de hoy a las 23:59 cuenta en el recordatorio de la noche');
 // Job del día D: vence lo de D (aunque sea 23:59 local), no lo de la madrugada de D+1.
 const tomorrow = (await one(`insert into tasks (user_id, title, due_date)
   values ($1, 'Mañana', '2026-11-01 00:30-05') returning id`, [U1])).id;
-const kept = (await one(`insert into habits (user_id, name, type, current_streak)
-  values ($1, 'Leer', 'good', 5) returning id`, [U1])).id;
-const lost = (await one(`insert into habits (user_id, name, type, current_streak)
-  values ($1, 'Correr', 'good', 3) returning id`, [U1])).id;
+// Creados antes de D: el job ignora hábitos creados después del día que revisa.
+const kept = (await one(`insert into habits (user_id, name, type, current_streak, created_at)
+  values ($1, 'Leer', 'good', 5, '2026-10-01') returning id`, [U1])).id;
+const lost = (await one(`insert into habits (user_id, name, type, current_streak, created_at)
+  values ($1, 'Correr', 'good', 3, '2026-10-01') returning id`, [U1])).id;
 // «Leer» se hizo el 31 a las 21:00 en Colombia (ya 1 de nov en UTC).
 await db.query(`insert into habit_records (habit_id, user_id, completed_on) values ($1, $2, '${D}')`, [kept, U1]);
 const hpBefore = (await one(`select hp_current from character_stats where user_id = $1`, [U1])).hp_current;

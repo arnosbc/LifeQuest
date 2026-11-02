@@ -10,7 +10,8 @@ import es.antonborri.home_widget.HomeWidgetProvider
 
 /**
  * Widget «Mi día»: dibuja lo que la app guardó con HomeWidget.saveWidgetData
- * (home_widget_sync.dart). Tocarlo abre Inicio; el botón abre Foco con la tarea.
+ * (home_screen_widget.dart). Tocarlo abre Inicio; la barra de misiones abre
+ * Foco con la siguiente tarea.
  */
 class LifeQuestWidgetProvider : HomeWidgetProvider() {
 
@@ -21,33 +22,31 @@ class LifeQuestWidgetProvider : HomeWidgetProvider() {
       widgetData: SharedPreferences,
   ) {
     val signedIn = widgetData.getBoolean("signed_in", false)
+    val streak = widgetData.getInt("streak", 0)
+    val done = widgetData.getInt("missions_done", 0)
+    val goal = widgetData.getInt("missions_goal", 3).coerceAtLeast(1)
     val taskId = widgetData.getString("next_task_id", null)
-    val title = widgetData.getString("next_task_title", null)
 
     for (id in appWidgetIds) {
       val views = RemoteViews(context.packageName, R.layout.lifequest_widget).apply {
-        setTextViewText(R.id.widget_streak, "🔥 ${widgetData.getInt("streak", 0)} d")
-        setTextViewText(R.id.widget_hp, "❤ ${widgetData.getInt("hp", 0)}")
-        setTextViewText(R.id.widget_level, "Nv ${widgetData.getInt("level", 1)}")
+        setTextViewText(R.id.widget_streak, if (streak == 1) "1 día" else "$streak días")
         setTextViewText(
             R.id.widget_title,
             when {
-              !signedIn -> "Inicia sesión para ver tu día"
-              title != null -> title
-              else -> "Todo al día. Crea tu siguiente tarea"
+              !signedIn -> "Inicia sesión para empezar"
+              streak > 0 -> "¡Tu aventura continúa!"
+              else -> "¡Empieza tu aventura!"
             },
         )
-        setTextViewText(
-            R.id.widget_button,
-            if (signedIn && taskId != null) "▶  Empezar en Foco" else "Abrir LifeQuest",
-        )
+        setProgressBar(R.id.widget_progress, goal, done.coerceIn(0, goal), false)
+        setTextViewText(R.id.widget_missions_text, "$done de $goal misiones de hoy")
         setOnClickPendingIntent(
             R.id.widget_root,
             HomeWidgetLaunchIntent.getActivity(
                 context, MainActivity::class.java, Uri.parse("lifequest://home")),
         )
         setOnClickPendingIntent(
-            R.id.widget_button,
+            R.id.widget_missions,
             HomeWidgetLaunchIntent.getActivity(
                 context,
                 MainActivity::class.java,
