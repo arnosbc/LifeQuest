@@ -27,6 +27,7 @@ class SettingsOverviewModel {
         shortBreakMinutes: intOr('short_break_minutes', 5),
         longBreakMinutes: intOr('long_break_minutes', 15),
         longBreakEveryNCycles: intOr('long_break_every_n_cycles', 4),
+        aiEnabled: _json['ai_enabled'] as bool? ?? false,
       ),
       difficulties: [
         for (final d
@@ -44,7 +45,7 @@ class SettingsOverviewModel {
     );
   }
 
-  /// Columnas de `game_master_settings` que el jugador puede escribir (003, 007).
+  /// Columnas de `game_master_settings` que el jugador puede escribir (003, 007, 033).
   static Map<String, Object?> toRow(GameSettings settings) => {
     'difficulty': settings.difficulty.name,
     'notification_daily_limit': settings.notificationDailyLimit,
@@ -54,6 +55,7 @@ class SettingsOverviewModel {
     'short_break_minutes': settings.shortBreakMinutes,
     'long_break_minutes': settings.longBreakMinutes,
     'long_break_every_n_cycles': settings.longBreakEveryNCycles,
+    'ai_enabled': settings.aiEnabled,
   };
 
   static GameDifficulty? _level(Object? name) =>

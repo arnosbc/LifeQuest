@@ -26,7 +26,7 @@ Principios:
 | 0 · Base | ✅ Hecha (`bfc64ea`) |
 | 1 · Quitar fantasía y diseño nuevo | ✅ Hecha (v2.0.0 y v2.1.0, diseño «Calendario de taco») |
 | 2 · Tareas que actúan | ✅ Hecha en código (v2.3.0); falta aplicar 032 en Supabase y probar en un teléfono |
-| 3 · Asistente | ⏳ Pendiente |
+| 3 · Asistente | ✅ Hecha en código (v2.4.0); falta aplicar 033, desplegar la Edge Function `assistant` y probar en un teléfono |
 | 4 · Integración con el teléfono | ⏳ Pendiente |
 
 ## Fase 1 · Hecho
@@ -69,6 +69,10 @@ Principios:
 - `Replan`: lo vencido o con bloque pasado sin hacer va al siguiente hueco de hoy o mañana.
 - `SpreadDates`: reparte subtareas de forma uniforme hasta la fecha límite del proyecto.
 - La UI muestra la propuesta como vista previa; se acepta con un toque (lote de `schedule_task`) o se ajusta.
+
+**Hecho (reglas):** feature `assistant` con `DayPlanner` (`planDay`, `replan`, `spreadDates`; jornada fija de 8:00 a 22:00, huecos de 15 min) y tests. En Hoy, «Armar mi día» (en el título Agenda, si hay tareas sin hora) y «Replanificar lo atrasado» (si hay bloques pasados sin hacer) abren una vista previa; «Aceptar» llama `schedule_task` por bloque, recarga Hoy y reprograma los avisos. Lee las tareas de `missions_overview`, sin migración nueva.
+
+**Hecho (captura e IA):** `LocalParser` (hoy, mañana, días, «el 15», horas, «en N min», «cada …», duración, aviso, urgente) con tests; barra «Escribe una tarea…» en Hoy y botón flotante → hoja «Anotar» con chips que se quitan, «Dividir en pasos» (IA + `spreadDates`, subtareas con fecha) y «A la Bandeja» (`capture_thought`). `InterpretCapture` usa la IA solo si está activa y con cupo, y si falla cae a las reglas. Edge Function `supabase/functions/assistant` (`index.ts` + `sanitize.ts`, test con `node --experimental-strip-types --test supabase/functions/assistant/sanitize_test.ts`). `033_assistant.sql`: `ai_enabled` (apagado), `ai_usage` + `consume_ai_call` (tope 40 en `game_rules`), `assistant_status`, `settings_overview` con `ai_enabled`; interruptor en Ajustes con aviso de privacidad. **Pendiente:** el área (skill) no se deduce del texto; la voz va en la fase 4.
 
 **IA** (Edge Function `supabase/functions/assistant`, Gemini capa gratis; el `fetch`, el timeout de 25 s y el `reason` se recuperan de la `npc-mission` borrada, ver commit `8dd09f2`):
 - `parse`: texto → `{title, scheduled_at, due_date, estimated_minutes, repeat_rule, reminder_minutes, priority, area, kind}` («gym mañana 6pm cada lunes»). Sin IA: parser local en `domain` (hoy, mañana, días de la semana, HH:mm, «cada …», «en N min»).

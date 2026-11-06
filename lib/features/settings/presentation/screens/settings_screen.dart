@@ -165,6 +165,33 @@ class SettingsScreen extends StatelessWidget {
         description: breaksSummary(settings),
         onTap: saving ? null : () => edit(showBreaksSheet),
       ),
+      SettingLink(
+        icon: Icons.auto_awesome_outlined,
+        title: 'Asistente con IA',
+        description: settings.aiEnabled
+            ? 'Activado · hasta 40 notas al día con Gemini'
+            : 'Apagado · tus notas se entienden con reglas en el teléfono',
+        onTap: saving
+            ? null
+            : () async {
+                final enable = !settings.aiEnabled;
+                if (enable &&
+                    !await confirmLifeQuest(
+                      context,
+                      title: '¿Activar la IA?',
+                      message:
+                          'Lo que escribas en «Anotar» y los títulos que '
+                          'dividas en pasos se envían a Gemini (Google). En '
+                          'su capa gratis, Google puede usar ese texto para '
+                          'mejorar sus modelos. No envíes datos sensibles. '
+                          'Puedes apagarla cuando quieras.',
+                      confirmLabel: 'Activar',
+                    )) {
+                  return;
+                }
+                bloc.add(GameSettingsChanged(settings.withAi(enable)));
+              },
+      ),
     ];
   }
 

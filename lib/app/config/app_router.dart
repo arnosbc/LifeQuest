@@ -7,7 +7,12 @@ import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/app/capture_sheet.dart';
 import 'package:proyecto_movil/app/reminder_actions.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly_sheet.dart';
+import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
+import 'package:proyecto_movil/features/assistant/presentation/blocs/assistant_bloc.dart';
+import 'package:proyecto_movil/features/assistant/presentation/widgets/plan_preview.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
@@ -123,11 +128,25 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                           b is HomeSuccess &&
                           a.dashboard.agenda != b.dashboard.agenda,
                       listener: (_, _) => ReminderActions.sync(),
-                      child: HomeScreen(
-                        userName: _userName(context),
-                        onNavigate: (tab) =>
-                            StatefulNavigationShell.of(context).goBranch(tab),
-                        onStartFocus: (id) => context.go(_focusPath(id)),
+                      child: Builder(
+                        builder: (homeContext) => HomeScreen(
+                          userName: _userName(context),
+                          onNavigate: (tab) =>
+                              StatefulNavigationShell.of(context).goBranch(tab),
+                          onStartFocus: (id) => context.go(_focusPath(id)),
+                          onPlanDay: () =>
+                              _openPlan(homeContext, PlanMode.planDay),
+                          onReplan: () =>
+                              _openPlan(homeContext, PlanMode.replan),
+                          onCapture: () async {
+                            if (await openCaptureSheet(homeContext) &&
+                                homeContext.mounted) {
+                              homeContext.read<HomeBloc>().add(
+                                const HomeRequested(),
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -351,6 +370,22 @@ String _userName(BuildContext context) =>
 /// Las pestañas viven todo el tiempo (indexedStack): sin esto, lo que cambia en
 /// otra (XP, vida, Monedas, misiones) no se vería hasta reiniciar la app.
 /// Al volver a [path] pide los datos otra vez, sin cargador.
+/// Vista previa del asistente; si se acepta, Hoy se recarga y los avisos se
+/// reprograman. [context] debe estar debajo del HomeBloc.
+Future<void> _openPlan(BuildContext context, PlanMode mode) async {
+  final accepted = await showQuestlySheet<bool>(
+    context,
+    title: mode == PlanMode.planDay ? 'Armar mi día' : 'Replanificar',
+    child: BlocProvider(
+      create: (_) => sl<AssistantBloc>()..add(AssistantPlanRequested(mode)),
+      child: const PlanPreview(),
+    ),
+  );
+  if (accepted != true || !context.mounted) return;
+  context.read<HomeBloc>().add(const HomeRequested());
+  ReminderActions.sync();
+}
+
 /// Foco con la tarea en la mochila (`?task=<id>`).
 String _focusPath(String? taskId) => taskId == null
     ? RoutePaths.dungeon

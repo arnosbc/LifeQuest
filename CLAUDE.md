@@ -69,7 +69,7 @@ Los documentos viven en el Project de claude.ai "LifeQuest". Cuando dos fuentes 
 | Backend / BaaS | **Supabase**: Auth (`auth.users`), PostgREST, RLS, Storage, Edge Functions, `pg_cron` | ✅ Decidido por el esquema |
 | Frontend móvil | **Flutter / Dart** | 🟡 Stack considerado, aún sin confirmación formal |
 | Lógica de servidor | Funciones Postgres (`plpgsql`, `SECURITY DEFINER`, expuestas por RPC) y Edge Functions | ✅ Patrón recomendado (ver §8) |
-| IA (RPGenie) | **Reglas simples** en todo, salvo el título de la misión de NPC: Edge Function `npc-mission` con **Gemini capa gratis** (secrets `GEMINI_API_KEY`, `GEMINI_MODEL`; solo se envían datos del NPC) | 🟡 Gemini elegido 2026-10-28 |
+| IA (asistente) | **Reglas** para todo lo determinista (`features/assistant`: `DayPlanner`, `LocalParser`). La IA solo interpreta lenguaje: Edge Function `supabase/functions/assistant` (`parse`, `breakdown`) con **Gemini capa gratis** (secrets `GEMINI_API_KEY`, `GEMINI_MODEL`), apagada por defecto (`game_master_settings.ai_enabled`) y con tope diario (`consume_ai_call`, `033_assistant.sql`). Solo se envía el texto escrito o el título | 🟡 Gemini elegido 2026-10-28; `npc-mission` se borró en el rework |
 
 Alternativas evaluadas y descartadas de hecho al elegir Supabase: Node.js + Express propio, Firebase/Firestore.
 

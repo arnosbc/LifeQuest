@@ -15,6 +15,9 @@ class HomeScreen extends StatelessWidget {
     required this.userName,
     required this.onNavigate,
     required this.onStartFocus,
+    required this.onPlanDay,
+    required this.onReplan,
+    required this.onCapture,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -23,6 +26,9 @@ class HomeScreen extends StatelessWidget {
 
   /// Abre Foco con la tarea en la mochila.
   final ValueChanged<String> onStartFocus;
+  final VoidCallback onPlanDay;
+  final VoidCallback onReplan;
+  final VoidCallback onCapture;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<HomeBloc, HomeState>(
@@ -65,6 +71,9 @@ class HomeScreen extends StatelessWidget {
           // Encuadernación (≈35) y margen de arriba: la hoja llega a la barra.
           minHeight: box.maxHeight - 47,
           onStartFocus: onStartFocus,
+          onPlanDay: onPlanDay,
+          onReplan: onReplan,
+          onCapture: onCapture,
           onCreateTask: () => context.go(RoutePaths.missions),
           onOpenHabits: () => onNavigate(2),
           onCompleteHabit: (id) =>

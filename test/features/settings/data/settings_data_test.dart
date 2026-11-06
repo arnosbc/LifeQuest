@@ -79,6 +79,7 @@ void main() {
         'short_break_minutes': 5,
         'long_break_minutes': 15,
         'long_break_every_n_cycles': 4,
+        'ai_enabled': false,
       });
     });
   });

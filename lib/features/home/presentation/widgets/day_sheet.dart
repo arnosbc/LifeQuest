@@ -17,6 +17,9 @@ class DaySheet extends StatelessWidget {
     required this.onCompleteHabit,
     required this.onOpenHabits,
     required this.onScheduleTask,
+    required this.onPlanDay,
+    required this.onReplan,
+    required this.onCapture,
     this.busyHabitId,
     this.minHeight = 0,
   });
@@ -34,6 +37,15 @@ class DaySheet extends StatelessWidget {
 
   /// Pone o mueve una tarea en la agenda de hoy.
   final void Function(String taskId, DateTime at) onScheduleTask;
+
+  /// El asistente llena los huecos libres de hoy (vista previa).
+  final VoidCallback onPlanDay;
+
+  /// El asistente reubica lo atrasado (vista previa).
+  final VoidCallback onReplan;
+
+  /// Abre «Anotar»: escribir una tarea en lenguaje normal.
+  final VoidCallback onCapture;
   final String? busyHabitId;
 
   static const weekdays = [
@@ -133,7 +145,9 @@ class DaySheet extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 18),
+          _CaptureBar(onTap: onCapture),
+          const SizedBox(height: 16),
           _DayProgress(dashboard: d),
           const SizedBox(height: 20),
           const PaperRule(),
@@ -181,7 +195,19 @@ class DaySheet extends StatelessWidget {
           const SizedBox(height: 20),
           LifeQuestSectionHeading(
             d.agenda.isEmpty ? 'Agenda' : 'Agenda · ${d.agenda.length}',
+            action: d.unscheduled.isEmpty ? null : 'Armar mi día',
+            onTap: d.unscheduled.isEmpty ? null : onPlanDay,
           ),
+          if (d.agenda.any((b) => !b.done && b.end.isBefore(now)))
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: onReplan,
+                icon: const Icon(Icons.update_rounded, size: 20),
+                label: const Text('Replanificar lo atrasado'),
+                style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+              ),
+            ),
           if (d.agenda.isEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -299,6 +325,55 @@ class DaySheet extends StatelessWidget {
       ? ''
       : '${due.hour.toString().padLeft(2, '0')}:'
             '${due.minute.toString().padLeft(2, '0')}';
+}
+
+/// Parece un campo de texto: abre «Anotar» (la voz llega en la fase 4).
+class _CaptureBar extends StatelessWidget {
+  const _CaptureBar({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Semantics(
+      button: true,
+      label: 'Anotar una tarea',
+      excludeSemantics: true,
+      child: Material(
+        color: q.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(QRadius.card),
+          side: BorderSide(color: q.line),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(QRadius.card),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Row(
+                children: [
+                  Icon(Icons.edit_outlined, size: 20, color: q.text2),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Escribe una tarea: «gym mañana 6pm»',
+                      style: QText.body(q.text2),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Resumen del día en un bloque: tareas, hábitos y foco, y el nivel debajo.

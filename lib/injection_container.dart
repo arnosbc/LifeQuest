@@ -3,6 +3,16 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:proyecto_movil/features/assistant/data/datasources/assistant_remote_datasource.dart';
+import 'package:proyecto_movil/features/assistant/data/repositories/assistant_repository_impl.dart';
+import 'package:proyecto_movil/features/assistant/domain/repositories/assistant_repository.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/apply_day_plan.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/get_day_plan.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capture.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
+import 'package:proyecto_movil/features/assistant/presentation/blocs/assistant_bloc.dart';
+import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/snooze_mission.dart';
 import 'package:proyecto_movil/features/reminders/data/datasources/reminders_local_datasource.dart';
@@ -187,6 +197,23 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<MissionsRemoteDataSource>(
     () => MissionsRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Asistente ----------
+  sl.registerFactory(() => AssistantBloc(getDayPlan: sl(), applyDayPlan: sl()));
+  sl.registerLazySingleton(() => GetDayPlan(sl()));
+  sl.registerFactory(
+    () => CaptureBloc(interpret: sl(), breakDown: sl(), save: sl()),
+  );
+  sl.registerLazySingleton(() => InterpretCapture(sl()));
+  sl.registerLazySingleton(() => BreakDownTask(sl()));
+  sl.registerLazySingleton(() => SaveCapture(sl()));
+  sl.registerLazySingleton(() => ApplyDayPlan(sl()));
+  sl.registerLazySingleton<AssistantRepository>(
+    () => AssistantRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<AssistantRemoteDataSource>(
+    () => AssistantRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Recordatorios ----------

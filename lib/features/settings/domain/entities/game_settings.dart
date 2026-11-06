@@ -15,6 +15,7 @@ class GameSettings extends Equatable {
     this.shortBreakMinutes = 5,
     this.longBreakMinutes = 15,
     this.longBreakEveryNCycles = 4,
+    this.aiEnabled = false,
   });
 
   // Mismos rangos que los checks de 016_settings.sql.
@@ -40,6 +41,9 @@ class GameSettings extends Equatable {
   final int longBreakMinutes;
   final int longBreakEveryNCycles;
 
+  /// El asistente usa IA (Gemini capa gratis, 033). Apagado por defecto.
+  final bool aiEnabled;
+
   bool get isValid {
     bool within(int value, ({int min, int max}) range) =>
         value >= range.min && value <= range.max;
@@ -51,6 +55,18 @@ class GameSettings extends Equatable {
         within(longBreakEveryNCycles, longBreakEveryRange);
   }
 
+  GameSettings withAi(bool value) => GameSettings(
+    difficulty: difficulty,
+    notificationDailyLimit: notificationDailyLimit,
+    silenceStart: silenceStart,
+    silenceEnd: silenceEnd,
+    criticalBypassSilence: criticalBypassSilence,
+    shortBreakMinutes: shortBreakMinutes,
+    longBreakMinutes: longBreakMinutes,
+    longBreakEveryNCycles: longBreakEveryNCycles,
+    aiEnabled: value,
+  );
+
   GameSettings withDifficulty(GameDifficulty value) => GameSettings(
     difficulty: value,
     notificationDailyLimit: notificationDailyLimit,
@@ -60,6 +76,7 @@ class GameSettings extends Equatable {
     shortBreakMinutes: shortBreakMinutes,
     longBreakMinutes: longBreakMinutes,
     longBreakEveryNCycles: longBreakEveryNCycles,
+    aiEnabled: aiEnabled,
   );
 
   GameSettings withNotifications({
@@ -76,6 +93,7 @@ class GameSettings extends Equatable {
     shortBreakMinutes: shortBreakMinutes,
     longBreakMinutes: longBreakMinutes,
     longBreakEveryNCycles: longBreakEveryNCycles,
+    aiEnabled: aiEnabled,
   );
 
   GameSettings withBreaks({
@@ -91,6 +109,7 @@ class GameSettings extends Equatable {
     shortBreakMinutes: shortMinutes,
     longBreakMinutes: longMinutes,
     longBreakEveryNCycles: longEveryNCycles,
+    aiEnabled: aiEnabled,
   );
 
   @override
@@ -103,6 +122,7 @@ class GameSettings extends Equatable {
     shortBreakMinutes,
     longBreakMinutes,
     longBreakEveryNCycles,
+    aiEnabled,
   ];
 }
 
