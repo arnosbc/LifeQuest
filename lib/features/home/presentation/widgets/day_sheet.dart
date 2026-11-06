@@ -20,6 +20,8 @@ class DaySheet extends StatelessWidget {
     required this.onPlanDay,
     required this.onReplan,
     required this.onCapture,
+    required this.onVoice,
+    required this.onConnectCalendar,
     this.busyHabitId,
     this.minHeight = 0,
   });
@@ -46,6 +48,10 @@ class DaySheet extends StatelessWidget {
 
   /// Abre «Anotar»: escribir una tarea en lenguaje normal.
   final VoidCallback onCapture;
+
+  /// Abre «Anotar» dictando.
+  final VoidCallback onVoice;
+  final VoidCallback onConnectCalendar;
   final String? busyHabitId;
 
   static const weekdays = [
@@ -146,7 +152,7 @@ class DaySheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          _CaptureBar(onTap: onCapture),
+          _CaptureBar(onTap: onCapture, onVoice: onVoice),
           const SizedBox(height: 16),
           _DayProgress(dashboard: d),
           const SizedBox(height: 20),
@@ -208,7 +214,20 @@ class DaySheet extends StatelessWidget {
                 style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
               ),
             ),
-          if (d.agenda.isEmpty)
+          if (d.calendarAccess == CalendarAccess.notAsked)
+            _ConnectCalendar(onConnect: onConnectCalendar),
+          for (final event in d.events)
+            SheetRow(
+              leading: const SizedBox(
+                width: 24,
+                child: Icon(Icons.event_outlined, size: 20),
+              ),
+              time: _time(event.start),
+              title: event.title,
+              subtitle: 'Calendario · hasta las ${_time(event.end)}',
+              muted: event.end.isBefore(now),
+            ),
+          if (d.agenda.isEmpty && d.events.isEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
@@ -329,9 +348,10 @@ class DaySheet extends StatelessWidget {
 
 /// Parece un campo de texto: abre «Anotar» (la voz llega en la fase 4).
 class _CaptureBar extends StatelessWidget {
-  const _CaptureBar({required this.onTap});
+  const _CaptureBar({required this.onTap, required this.onVoice});
 
   final VoidCallback onTap;
+  final VoidCallback onVoice;
 
   @override
   Widget build(BuildContext context) {
@@ -361,15 +381,55 @@ class _CaptureBar extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Escribe una tarea: «gym mañana 6pm»',
+                      'Escribe o dicta: «gym mañana 6pm»',
                       style: QText.body(q.text2),
                       overflow: TextOverflow.ellipsis,
                     ),
+                  ),
+                  IconButton(
+                    tooltip: 'Dictar una tarea',
+                    onPressed: onVoice,
+                    icon: Icon(Icons.mic_none_rounded, color: q.text),
                   ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Invita a conectar el calendario antes de pedir el permiso del sistema.
+class _ConnectCalendar extends StatelessWidget {
+  const _ConnectCalendar({required this.onConnect});
+
+  final VoidCallback onConnect;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: LifeQuestSurface(
+        color: q.tint,
+        padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Conecta tu calendario y la agenda no chocará con tus '
+                'eventos. Solo se lee en tu teléfono; no se sube.',
+                style: QText.body(q.text2),
+              ),
+            ),
+            TextButton(
+              onPressed: onConnect,
+              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+              child: const Text('Conectar'),
+            ),
+          ],
         ),
       ),
     );

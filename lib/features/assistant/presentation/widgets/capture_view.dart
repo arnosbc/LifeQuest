@@ -9,14 +9,39 @@ import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_blo
 /// Contenido de la hoja «Anotar»: escribir, revisar los chips y confirmar.
 /// Al guardar cierra la hoja con `true`.
 class CaptureView extends StatefulWidget {
-  const CaptureView({super.key});
+  const CaptureView({
+    super.key,
+    this.initialText,
+    this.startListening = false,
+    this.preferInbox = false,
+  });
+
+  /// Texto compartido desde otra app: se interpreta al abrir.
+  final String? initialText;
+
+  /// Abrir dictando (micrófono de la barra de Hoy).
+  final bool startListening;
+
+  /// Lo compartido va por defecto a la Bandeja.
+  final bool preferInbox;
 
   @override
   State<CaptureView> createState() => _CaptureViewState();
 }
 
 class _CaptureViewState extends State<CaptureView> {
-  final _text = TextEditingController();
+  late final _text = TextEditingController(text: widget.initialText);
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<CaptureBloc>();
+    if (widget.initialText case final text? when text.trim().isNotEmpty) {
+      bloc.add(CaptureSubmitted(text));
+    } else if (widget.startListening) {
+      bloc.add(const CaptureListenRequested());
+    }
+  }
 
   @override
   void dispose() {
@@ -31,43 +56,68 @@ class _CaptureViewState extends State<CaptureView> {
   Widget build(BuildContext context) => BlocConsumer<CaptureBloc, CaptureState>(
     listenWhen: (_, s) =>
         s is CaptureSaved ||
+        (s is CaptureWriting && s.heard != null) ||
         (s is CapturePreview && s.message != null) ||
         (s is CaptureWriting && s.message != null),
-    listener: (context, state) => switch (state) {
-      CaptureSaved() => Navigator.pop(context, true),
-      CapturePreview(:final message?) ||
-      CaptureWriting(:final message?) => showLifeQuestMessage(context, message),
-      _ => null,
+    listener: (context, state) {
+      if (state case CaptureWriting(:final heard?)) {
+        _text.text = heard;
+        if (state.message == null) return;
+      }
+      _notify(context, state);
     },
     builder: (context, state) => switch (state) {
-      CaptureWriting(:final busy) => _writing(busy),
+      CaptureWriting(:final busy, :final listening) => _writing(
+        busy,
+        listening,
+      ),
       CapturePreview() => _preview(context, state),
       CaptureSaved() => const SizedBox(height: 120),
     },
   );
 
-  Widget _writing(bool busy) => Column(
+  void _notify(BuildContext context, CaptureState state) => switch (state) {
+    CaptureSaved() => Navigator.pop(context, true),
+    CapturePreview(:final message?) ||
+    CaptureWriting(:final message?) => showLifeQuestMessage(context, message),
+    _ => null,
+  };
+
+  Widget _writing(bool busy, bool listening) => Column(
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       TextField(
         controller: _text,
         autofocus: true,
-        enabled: !busy,
+        enabled: !busy && !listening,
         maxLength: 500,
         minLines: 1,
         maxLines: 3,
         textInputAction: TextInputAction.done,
         onSubmitted: (_) => _submit(),
-        decoration: const InputDecoration(
-          labelText: '¿Qué tienes en mente?',
+        decoration: InputDecoration(
+          labelText: listening ? 'Te escucho…' : '¿Qué tienes en mente?',
           hintText: 'gym mañana 6pm cada lunes',
+          suffixIcon: IconButton(
+            tooltip: listening ? 'Dejar de dictar' : 'Dictar',
+            onPressed: busy
+                ? null
+                : () => context.read<CaptureBloc>().add(
+                    listening
+                        ? const CaptureListenStopped()
+                        : const CaptureListenRequested(),
+                  ),
+            icon: Icon(
+              listening ? Icons.stop_circle_outlined : Icons.mic_none_rounded,
+            ),
+          ),
         ),
       ),
       const SizedBox(height: 12),
       QuestlyButton(
         label: busy ? 'Entendiendo…' : 'Continuar',
-        onPressed: busy ? null : _submit,
+        onPressed: busy || listening ? null : _submit,
       ),
     ],
   );
@@ -176,12 +226,12 @@ class _CaptureViewState extends State<CaptureView> {
         QuestlyButton(
           label: state.busy
               ? 'Guardando…'
-              : d.isNote
+              : d.isNote || widget.preferInbox
               ? 'Guardar en la Bandeja'
               : 'Crear tarea',
           onPressed: state.busy
               ? null
-              : () => bloc.add(const CaptureConfirmed()),
+              : () => bloc.add(CaptureConfirmed(toInbox: widget.preferInbox)),
         ),
         const SizedBox(height: 8),
         Row(
@@ -198,11 +248,13 @@ class _CaptureViewState extends State<CaptureView> {
             if (!d.isNote)
               Expanded(
                 child: QuestlyButton(
-                  label: 'A la Bandeja',
+                  label: widget.preferInbox ? 'Crear tarea' : 'A la Bandeja',
                   variant: QuestlyButtonVariant.text,
                   onPressed: state.busy
                       ? null
-                      : () => bloc.add(const CaptureConfirmed(toInbox: true)),
+                      : () => bloc.add(
+                          CaptureConfirmed(toInbox: !widget.preferInbox),
+                        ),
                 ),
               ),
           ],

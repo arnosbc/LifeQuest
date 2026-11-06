@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:proyecto_movil/app/config/app_shell.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/capture_sheet.dart';
+import 'package:proyecto_movil/app/home_widget_sync.dart';
 import 'package:proyecto_movil/app/reminder_actions.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly_sheet.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
@@ -122,12 +123,26 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     onShown: (c) =>
                         c.read<HomeBloc>().add(const HomeRequested()),
                     // La agenda cambió: reprograma los avisos.
-                    child: BlocListener<HomeBloc, HomeState>(
-                      listenWhen: (a, b) =>
-                          a is HomeSuccess &&
-                          b is HomeSuccess &&
-                          a.dashboard.agenda != b.dashboard.agenda,
-                      listener: (_, _) => ReminderActions.sync(),
+                    child: MultiBlocListener(
+                      listeners: [
+                        BlocListener<HomeBloc, HomeState>(
+                          listenWhen: (a, b) =>
+                              a is HomeSuccess &&
+                              b is HomeSuccess &&
+                              a.dashboard.agenda != b.dashboard.agenda,
+                          listener: (_, _) => ReminderActions.sync(),
+                        ),
+                        // El widget de inicio muestra lo mismo que Hoy.
+                        BlocListener<HomeBloc, HomeState>(
+                          listenWhen: (a, b) =>
+                              b is HomeSuccess &&
+                              (a is! HomeSuccess || a.dashboard != b.dashboard),
+                          listener: (_, state) => HomeWidgetSync.update(
+                            (state as HomeSuccess).dashboard,
+                            DateTime.now(),
+                          ),
+                        ),
+                      ],
                       child: Builder(
                         builder: (homeContext) => HomeScreen(
                           userName: _userName(context),
@@ -138,14 +153,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                               _openPlan(homeContext, PlanMode.planDay),
                           onReplan: () =>
                               _openPlan(homeContext, PlanMode.replan),
-                          onCapture: () async {
-                            if (await openCaptureSheet(homeContext) &&
-                                homeContext.mounted) {
-                              homeContext.read<HomeBloc>().add(
-                                const HomeRequested(),
-                              );
-                            }
-                          },
+                          onCapture: () => _capture(homeContext),
+                          onVoice: () => _capture(homeContext, listen: true),
                         ),
                       ),
                     ),
@@ -384,6 +393,13 @@ Future<void> _openPlan(BuildContext context, PlanMode mode) async {
   if (accepted != true || !context.mounted) return;
   context.read<HomeBloc>().add(const HomeRequested());
   ReminderActions.sync();
+}
+
+/// «Anotar» desde Hoy; si se guardó algo, Hoy se recarga.
+Future<void> _capture(BuildContext context, {bool listen = false}) async {
+  if (await openCaptureSheet(context, listen: listen) && context.mounted) {
+    context.read<HomeBloc>().add(const HomeRequested());
+  }
 }
 
 /// Foco con la tarea en la mochila (`?task=<id>`).

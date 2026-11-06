@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 
+import 'package:proyecto_movil/core/calendar/phone_event.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/assistant/data/datasources/assistant_remote_datasource.dart';
@@ -9,9 +10,15 @@ import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dar
 import 'package:proyecto_movil/features/assistant/domain/repositories/assistant_repository.dart';
 
 class AssistantRepositoryImpl implements AssistantRepository {
-  const AssistantRepositoryImpl(this._remote);
+  const AssistantRepositoryImpl(this._remote, this._calendar);
 
   final AssistantRemoteDataSource _remote;
+  final PhoneCalendar _calendar;
+
+  @override
+  Future<List<Busy>> getBusy(DateTime from, DateTime to) async => [
+    for (final e in await _calendar.events(from, to)) Busy(e.start, e.end),
+  ];
 
   @override
   Future<Either<Failure, List<PlanTask>>> getOpenTasks() => _run(

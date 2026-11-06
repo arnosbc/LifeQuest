@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart' show Left;
 
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
+import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
 
@@ -16,6 +18,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this._getHomeDashboard,
     required this._completeHabit,
     required this._scheduleTask,
+    required this._connectCalendar,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HomeInitial()) {
@@ -23,11 +26,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeRequested>(_onRequested, transformer: droppable());
     on<HomeHabitCompleted>(_onHabitCompleted, transformer: droppable());
     on<HomeTaskScheduled>(_onTaskScheduled, transformer: droppable());
+    on<HomeCalendarConnected>(_onCalendarConnected, transformer: droppable());
   }
 
   final GetHomeDashboard _getHomeDashboard;
   final CompleteHabit _completeHabit;
   final ScheduleTask _scheduleTask;
+  final ConnectCalendar _connectCalendar;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(
@@ -49,6 +54,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         HomeSuccess.new,
       ),
     );
+  }
+
+  Future<void> _onCalendarConnected(
+    HomeCalendarConnected event,
+    Emitter<HomeState> emit,
+  ) async {
+    await _connectCalendar(const NoParams());
+    final current = state;
+    final reloaded = await _getHomeDashboard(_clock());
+    reloaded.match((failure) {
+      if (current is HomeSuccess) {
+        emit(HomeSuccess(current.dashboard, message: failure.message));
+      }
+    }, (dashboard) => emit(HomeSuccess(dashboard)));
   }
 
   Future<void> _onTaskScheduled(

@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "com.example.proyecto_movil"
-    compileSdk = flutter.compileSdkVersion
+    // receive_sharing_intent exige compilar contra 37 (minSdk y targetSdk no cambian).
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

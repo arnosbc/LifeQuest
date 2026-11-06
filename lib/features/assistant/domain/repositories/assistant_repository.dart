@@ -13,6 +13,9 @@ abstract class AssistantRepository {
   /// Pone cada bloque en la agenda (`schedule_task`).
   Future<Either<Failure, Unit>> applyBlocks(List<ProposedBlock> blocks);
 
+  /// Eventos del calendario del teléfono entre [from] y [to] (vacío sin permiso).
+  Future<List<Busy>> getBusy(DateTime from, DateTime to);
+
   Future<Either<Failure, AiStatus>> getAiStatus();
 
   /// La IA convierte el texto en tarea (Edge Function `assistant`).

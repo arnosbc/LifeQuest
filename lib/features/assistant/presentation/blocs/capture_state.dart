@@ -7,15 +7,23 @@ sealed class CaptureState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Campo de texto; [busy] mientras se interpreta.
+/// Campo de texto; [busy] mientras se interpreta, [listening] mientras se
+/// dicta ([heard] es lo reconocido hasta ahora).
 class CaptureWriting extends CaptureState {
-  const CaptureWriting({this.busy = false, this.message});
+  const CaptureWriting({
+    this.busy = false,
+    this.listening = false,
+    this.heard,
+    this.message,
+  });
 
   final bool busy;
+  final bool listening;
+  final String? heard;
   final String? message;
 
   @override
-  List<Object?> get props => [busy, message];
+  List<Object?> get props => [busy, listening, heard, message];
 }
 
 class CapturePreview extends CaptureState {

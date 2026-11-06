@@ -15,11 +15,19 @@ class GetDayPlan implements UseCase<DayPlan, PlanMode> {
   final DateTime Function() _clock;
 
   @override
-  Future<Either<Failure, DayPlan>> call(PlanMode mode) async =>
-      (await _repository.getOpenTasks()).map(
-        (tasks) => switch (mode) {
-          PlanMode.planDay => DayPlanner.planDay(tasks, _clock()),
-          PlanMode.replan => DayPlanner.replan(tasks, _clock()),
-        },
-      );
+  Future<Either<Failure, DayPlan>> call(PlanMode mode) async {
+    final now = _clock();
+    final today = DateTime(now.year, now.month, now.day);
+    // Hoy y mañana: replan puede pasar lo atrasado al día siguiente.
+    final (tasks, events) = await (
+      _repository.getOpenTasks(),
+      _repository.getBusy(today, today.add(const Duration(days: 2))),
+    ).wait;
+    return tasks.map(
+      (tasks) => switch (mode) {
+        PlanMode.planDay => DayPlanner.planDay(tasks, now, events: events),
+        PlanMode.replan => DayPlanner.replan(tasks, now, events: events),
+      },
+    );
+  }
 }

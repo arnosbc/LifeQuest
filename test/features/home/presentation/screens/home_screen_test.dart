@@ -42,6 +42,7 @@ void main() {
                 onPlanDay: () {},
                 onReplan: () {},
                 onCapture: () {},
+                onVoice: () {},
               ),
             ),
           ),

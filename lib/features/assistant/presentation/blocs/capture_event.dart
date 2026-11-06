@@ -17,6 +17,16 @@ class CaptureSubmitted extends CaptureEvent {
   List<Object?> get props => [text];
 }
 
+/// Empezar a dictar.
+class CaptureListenRequested extends CaptureEvent {
+  const CaptureListenRequested();
+}
+
+/// Dejar de dictar (lo oído hasta ahí se interpreta).
+class CaptureListenStopped extends CaptureEvent {
+  const CaptureListenStopped();
+}
+
 /// Quitó o cambió un chip de la vista previa.
 class CaptureDraftEdited extends CaptureEvent {
   const CaptureDraftEdited(this.draft);

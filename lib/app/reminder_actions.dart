@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:proyecto_movil/app/config/constants.dart';
+import 'package:proyecto_movil/app/background_boot.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/complete_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/snooze_mission.dart';
@@ -52,15 +50,5 @@ abstract final class ReminderActions {
 /// Botón pulsado con la app cerrada: corre en otro isolate, sin main().
 @pragma('vm:entry-point')
 Future<void> onBackgroundResponse(NotificationResponse response) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  // La sesión guardada se restaura al inicializar Supabase.
-  await Supabase.initialize(
-    url: AppConstants.supabaseUrl,
-    publishableKey: AppConstants.supabaseKey,
-  );
-  final auth = Supabase.instance.client.auth;
-  if (auth.currentSession == null) return;
-  if (auth.currentSession!.isExpired) await auth.refreshSession();
-  await initDependencies();
-  await ReminderActions._handle(response);
+  if (await bootInBackground()) await ReminderActions._handle(response);
 }

@@ -13,10 +13,13 @@ import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capt
 import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
 
+import '../../helpers/mocks.dart';
+
 class _Repo extends Mock implements AssistantRepository {}
 
 void main() {
   late _Repo repo;
+  late MockListenVoice voice;
   // Jueves 5 nov 2026, 14:00.
   final now = DateTime(2026, 11, 5, 14);
   const aiDraft = TaskDraft(title: 'Gimnasio', priority: 2);
@@ -26,7 +29,10 @@ void main() {
     registerFallbackValue(const TaskDraft(title: ''));
     registerFallbackValue(<DraftStep>[]);
   });
-  setUp(() => repo = _Repo());
+  setUp(() {
+    repo = _Repo();
+    voice = MockListenVoice();
+  });
 
   void givenStatus(AiStatus status) =>
       when(repo.getAiStatus).thenAnswer((_) async => Right(status));
@@ -91,6 +97,7 @@ void main() {
       interpret: InterpretCapture(repo, clock: () => now),
       breakDown: BreakDownTask(repo, clock: () => now),
       save: SaveCapture(repo),
+      listen: voice,
     );
 
     blocTest<CaptureBloc, CaptureState>(
@@ -125,6 +132,45 @@ void main() {
       verify: (_) => verify(
         () => repo.createTask(const TaskDraft(title: 'Comprar pan'), const []),
       ).called(1),
+    );
+
+    blocTest<CaptureBloc, CaptureState>(
+      'dictar muestra lo que oye y al terminar lo interpreta',
+      setUp: () {
+        givenStatus(AiStatus.off);
+        when(
+          () => voice(),
+        ).thenAnswer((_) => Stream.fromIterable(['leer', 'leer hoy']));
+      },
+      build: build,
+      act: (bloc) => bloc.add(const CaptureListenRequested()),
+      expect: () => [
+        const CaptureWriting(listening: true),
+        const CaptureWriting(listening: true, heard: 'leer'),
+        const CaptureWriting(listening: true, heard: 'leer hoy'),
+        const CaptureWriting(busy: true),
+        CapturePreview(
+          draft: TaskDraft(
+            title: 'Leer',
+            dueDate: DateTime(2026, 11, 5, 23, 59),
+          ),
+          usedAi: false,
+          aiAvailable: false,
+        ),
+      ],
+    );
+
+    blocTest<CaptureBloc, CaptureState>(
+      'si el micrófono falla avisa y deja escribir',
+      setUp: () => when(
+        () => voice(),
+      ).thenAnswer((_) => Stream<String>.error('Sin micrófono.')),
+      build: build,
+      act: (bloc) => bloc.add(const CaptureListenRequested()),
+      expect: () => [
+        const CaptureWriting(listening: true),
+        const CaptureWriting(heard: '', message: 'Sin micrófono.'),
+      ],
     );
 
     blocTest<CaptureBloc, CaptureState>(

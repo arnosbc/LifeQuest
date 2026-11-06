@@ -2,6 +2,9 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/core/calendar/phone_event.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/listen_voice.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
 import 'package:proyecto_movil/features/reminders/domain/usecases/sync_reminders.dart';
 
@@ -148,6 +151,37 @@ class MockGetHomeDashboard extends Mock implements GetHomeDashboard {}
 class MockCompleteHabit extends Mock implements CompleteHabit {}
 
 class MockScheduleTask extends Mock implements ScheduleTask {}
+
+class MockConnectCalendar extends Mock implements ConnectCalendar {}
+
+class MockListenVoice extends Mock implements ListenVoice {}
+
+/// Calendario del teléfono de prueba: fijo, sin plugin.
+class FakePhoneCalendar implements PhoneCalendar {
+  FakePhoneCalendar({this.granted = false, this.list = const []});
+
+  bool granted;
+  final List<PhoneEvent> list;
+  final requested = <(DateTime, DateTime)>[];
+  int asked = 0;
+
+  @override
+  Future<CalendarAccess> access() async =>
+      granted ? CalendarAccess.granted : CalendarAccess.denied;
+
+  @override
+  Future<CalendarAccess> requestAccess() async {
+    asked++;
+    granted = true;
+    return CalendarAccess.granted;
+  }
+
+  @override
+  Future<List<PhoneEvent>> events(DateTime from, DateTime to) async {
+    requested.add((from, to));
+    return granted ? list : const [];
+  }
+}
 
 class MockSyncReminders extends Mock implements SyncReminders {}
 

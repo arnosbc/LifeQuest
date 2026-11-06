@@ -8,11 +8,17 @@ import 'package:proyecto_movil/features/assistant/data/repositories/assistant_re
 import 'package:proyecto_movil/features/assistant/domain/repositories/assistant_repository.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/apply_day_plan.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/get_day_plan.dart';
+import 'package:proyecto_movil/features/assistant/data/datasources/speech_voice_input.dart';
+import 'package:proyecto_movil/features/assistant/domain/repositories/voice_input.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/listen_voice.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capture.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/assistant_bloc.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
+import 'package:proyecto_movil/core/calendar/device_phone_calendar.dart';
+import 'package:proyecto_movil/core/calendar/phone_event.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/snooze_mission.dart';
 import 'package:proyecto_movil/features/reminders/data/datasources/reminders_local_datasource.dart';
@@ -166,12 +172,16 @@ Future<void> initDependencies() async {
       getHomeDashboard: sl(),
       completeHabit: sl(),
       scheduleTask: sl(),
+      connectCalendar: sl(),
     ),
   );
   sl.registerLazySingleton(() => ScheduleTask(sl()));
   sl.registerLazySingleton(() => GetHomeDashboard(sl()));
   sl.registerLazySingleton(() => CompleteHabit(sl()));
-  sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
+  sl.registerLazySingleton<HomeRepository>(
+    () => HomeRepositoryImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton(() => ConnectCalendar(sl()));
   sl.registerLazySingleton<HomeRemoteDataSource>(
     () => HomeRemoteDataSourceImpl(sl()),
   );
@@ -199,18 +209,26 @@ Future<void> initDependencies() async {
     () => MissionsRemoteDataSourceImpl(sl()),
   );
 
+  // ---------- Calendario del teléfono (core: lo leen Hoy y el Asistente) ----------
+  sl.registerLazySingleton<PhoneCalendar>(
+    () => DevicePhoneCalendar(SharedPreferencesAsync()),
+  );
+
   // ---------- Asistente ----------
   sl.registerFactory(() => AssistantBloc(getDayPlan: sl(), applyDayPlan: sl()));
   sl.registerLazySingleton(() => GetDayPlan(sl()));
   sl.registerFactory(
-    () => CaptureBloc(interpret: sl(), breakDown: sl(), save: sl()),
+    () =>
+        CaptureBloc(interpret: sl(), breakDown: sl(), save: sl(), listen: sl()),
   );
+  sl.registerLazySingleton(() => ListenVoice(sl()));
+  sl.registerLazySingleton<VoiceInput>(SpeechVoiceInput.new);
   sl.registerLazySingleton(() => InterpretCapture(sl()));
   sl.registerLazySingleton(() => BreakDownTask(sl()));
   sl.registerLazySingleton(() => SaveCapture(sl()));
   sl.registerLazySingleton(() => ApplyDayPlan(sl()));
   sl.registerLazySingleton<AssistantRepository>(
-    () => AssistantRepositoryImpl(sl()),
+    () => AssistantRepositoryImpl(sl(), sl()),
   );
   sl.registerLazySingleton<AssistantRemoteDataSource>(
     () => AssistantRemoteDataSourceImpl(sl()),

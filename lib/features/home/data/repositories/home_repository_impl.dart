@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 
+import 'package:proyecto_movil/core/calendar/phone_event.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/home/data/datasources/home_remote_datasource.dart';
@@ -7,9 +8,10 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
 
 class HomeRepositoryImpl implements HomeRepository {
-  const HomeRepositoryImpl(this._remote);
+  const HomeRepositoryImpl(this._remote, this._calendar);
 
   final HomeRemoteDataSource _remote;
+  final PhoneCalendar _calendar;
 
   @override
   Future<Either<Failure, HomeDashboard>> getDashboard(DateTime now) =>
@@ -18,8 +20,19 @@ class HomeRepositoryImpl implements HomeRepository {
           day: _day(now),
           utcOffsetMinutes: now.timeZoneOffset.inMinutes,
         );
-        return model.toEntity();
+        final start = DateTime(now.year, now.month, now.day);
+        final (access, events) = await (
+          _calendar.access(),
+          _calendar.events(start, start.add(const Duration(days: 1))),
+        ).wait;
+        return model.toEntity().withCalendar(access, events);
       });
+
+  @override
+  Future<Either<Failure, Unit>> connectCalendar() async {
+    await _calendar.requestAccess();
+    return const Right(unit);
+  }
 
   @override
   Future<Either<Failure, Unit>> completeHabit({

@@ -1,5 +1,10 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:proyecto_movil/core/calendar/phone_event.dart';
+
+export 'package:proyecto_movil/core/calendar/phone_event.dart'
+    show CalendarAccess, PhoneEvent;
+
 /// Única escala de urgencia de la app (`urgency_level`).
 enum UrgencyLevel { low, medium, high }
 
@@ -105,6 +110,8 @@ class HomeDashboard extends Equatable {
     this.priorityMission,
     this.agenda = const [],
     this.unscheduled = const [],
+    this.events = const [],
+    this.calendarAccess = CalendarAccess.denied,
   });
 
   final String? displayName;
@@ -135,6 +142,36 @@ class HomeDashboard extends Equatable {
   final List<AgendaBlock> agenda;
   final List<UnscheduledTask> unscheduled;
 
+  /// Eventos de hoy del calendario del teléfono (fase 4).
+  final List<PhoneEvent> events;
+  final CalendarAccess calendarAccess;
+
+  /// El mismo día con los eventos del teléfono.
+  HomeDashboard withCalendar(CalendarAccess access, List<PhoneEvent> events) =>
+      HomeDashboard(
+        displayName: displayName,
+        characterClass: characterClass,
+        level: level,
+        currentXp: currentXp,
+        xpToNextLevel: xpToNextLevel,
+        coins: coins,
+        hpCurrent: hpCurrent,
+        hpMax: hpMax,
+        isWeakened: isWeakened,
+        priorityMission: priorityMission,
+        habits: habits,
+        habitsDone: habitsDone,
+        habitsTotal: habitsTotal,
+        streakDays: streakDays,
+        missionsDone: missionsDone,
+        missionsTotal: missionsTotal,
+        focusMinutes: focusMinutes,
+        agenda: agenda,
+        unscheduled: unscheduled,
+        events: events,
+        calendarAccess: access,
+      );
+
   @override
   List<Object?> get props => [
     displayName,
@@ -156,5 +193,7 @@ class HomeDashboard extends Equatable {
     focusMinutes,
     agenda,
     unscheduled,
+    events,
+    calendarAccess,
   ];
 }

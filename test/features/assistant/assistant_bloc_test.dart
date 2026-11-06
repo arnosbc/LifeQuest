@@ -24,10 +24,14 @@ void main() {
   );
   final plan = DayPlan(mode: PlanMode.planDay, blocks: [block]);
 
-  setUpAll(() => registerFallbackValue(<ProposedBlock>[]));
+  setUpAll(() {
+    registerFallbackValue(<ProposedBlock>[]);
+    registerFallbackValue(DateTime(2026));
+  });
   setUp(() {
     repo = _Repo();
     when(repo.getOpenTasks).thenAnswer((_) async => const Right([task]));
+    when(() => repo.getBusy(any(), any())).thenAnswer((_) async => const []);
   });
 
   AssistantBloc build() => AssistantBloc(
@@ -70,4 +74,18 @@ void main() {
       AssistantProposal(plan, message: 'sin red'),
     ],
   );
+
+  test('armar el día esquiva los eventos del calendario', () async {
+    when(() => repo.getBusy(any(), any())).thenAnswer(
+      (_) async => [Busy(DateTime(2026, 11, 5, 9), DateTime(2026, 11, 5, 10))],
+    );
+    final plan = await GetDayPlan(repo, clock: () => now)(PlanMode.planDay);
+    expect(
+      plan.getOrElse((_) => throw StateError('falló')).blocks.single.start,
+      DateTime(2026, 11, 5, 10),
+    );
+    verify(
+      () => repo.getBusy(DateTime(2026, 11, 5), DateTime(2026, 11, 7)),
+    ).called(1);
+  });
 }

@@ -19,4 +19,7 @@ abstract class HomeRepository {
     required String taskId,
     required DateTime? at,
   });
+
+  /// Pide el permiso del calendario del teléfono (tras explicar para qué).
+  Future<Either<Failure, Unit>> connectCalendar();
 }

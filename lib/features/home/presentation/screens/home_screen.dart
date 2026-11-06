@@ -18,6 +18,7 @@ class HomeScreen extends StatelessWidget {
     required this.onPlanDay,
     required this.onReplan,
     required this.onCapture,
+    required this.onVoice,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -29,6 +30,7 @@ class HomeScreen extends StatelessWidget {
   final VoidCallback onPlanDay;
   final VoidCallback onReplan;
   final VoidCallback onCapture;
+  final VoidCallback onVoice;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<HomeBloc, HomeState>(
@@ -74,6 +76,9 @@ class HomeScreen extends StatelessWidget {
           onPlanDay: onPlanDay,
           onReplan: onReplan,
           onCapture: onCapture,
+          onVoice: onVoice,
+          onConnectCalendar: () =>
+              context.read<HomeBloc>().add(const HomeCalendarConnected()),
           onCreateTask: () => context.go(RoutePaths.missions),
           onOpenHabits: () => onNavigate(2),
           onCompleteHabit: (id) =>

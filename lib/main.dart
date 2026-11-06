@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/app/config/constants.dart';
+import 'package:proyecto_movil/app/home_widget_sync.dart';
 import 'package:proyecto_movil/app/observers/app_bloc_observer.dart';
 import 'package:proyecto_movil/app/reminder_actions.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
@@ -20,6 +22,8 @@ Future<void> main() async {
   );
   await initDependencies();
   await ReminderActions.init();
+  // «✓» del widget de inicio, también con la app cerrada.
+  await HomeWidget.registerInteractivityCallback(onWidgetAction);
   Bloc.observer = const AppBlocObserver();
 
   // Se resuelve la sesión guardada antes de pintar, para que el router no

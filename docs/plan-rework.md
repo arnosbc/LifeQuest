@@ -27,7 +27,7 @@ Principios:
 | 1 · Quitar fantasía y diseño nuevo | ✅ Hecha (v2.0.0 y v2.1.0, diseño «Calendario de taco») |
 | 2 · Tareas que actúan | ✅ Hecha en código (v2.3.0); falta aplicar 032 en Supabase y probar en un teléfono |
 | 3 · Asistente | ✅ Hecha en código (v2.4.0); falta aplicar 033, desplegar la Edge Function `assistant` y probar en un teléfono |
-| 4 · Integración con el teléfono | ⏳ Pendiente |
+| 4 · Integración con el teléfono | ✅ Hecha en código; falta probar en un teléfono |
 
 ## Fase 1 · Hecho
 - Borradas las features `tavern`, `marketplace`, `inventory`, `vision`, `rpgenie`, la pantalla de `goals`, el Cofre y la Edge Function `npc-mission`.
@@ -81,6 +81,14 @@ Principios:
 - **Captura:** barra «Escribe o dicta…» en Hoy y en el botón flotante → vista previa con chips (fecha, hora, repetir, aviso, área) → Confirmar. Si no es tarea, va a la Bandeja.
 
 ## Fase 4 · Integración con el teléfono
+
+**Hecho:**
+- **Voz:** micrófono en la barra de Hoy y en «Anotar» (`speech_to_text`, idioma del teléfono); al terminar la frase se interpreta sola. `VoiceInput` en `assistant/domain`, `SpeechVoiceInput` en data.
+- **Calendario:** `device_calendar_plus` (el `device_calendar` original no compila con AGP 9 y choca con `timezone` 0.11). Contrato `PhoneCalendar` en `core/calendar` porque lo leen Hoy y el Asistente. Hoy muestra los eventos del día e invita a «Conectar» antes de pedir el permiso; sin permiso todo sigue igual. `PlanDay`/`Replan` esquivan los eventos de hoy y mañana. No se escribe en el calendario (era opcional).
+- **Compartir:** `receive_sharing_intent` (exige `compileSdk = 37`). Texto o enlaces abren «Guardar lo compartido» con la Bandeja como acción principal; si no hay sesión, espera a que la haya.
+- **Widget:** `home_widget` + `QuestlyWidgetProvider.kt` (próximas 3 tareas de hoy; «✓» completa con `onWidgetAction` en segundo plano). Se actualiza cada vez que cambia Hoy y se vacía al cerrar sesión. `app/background_boot.dart` arranca Supabase para los botones del aviso y del widget.
+- Avisos de Android: `home_widget` aún aplica el plugin de Kotlin (KGP); Flutter avisa que en el futuro fallará.
+
 - **Voz:** `speech_to_text` en la barra de captura; el texto pasa por `parse`.
 - **Calendario:** `device_calendar`; lee hoy y mañana para que la agenda y `PlanDay` no choquen; opcional escribir los bloques de Foco en un calendario «Questly». Pide permiso con explicación y funciona aunque se niegue.
 - **Compartir:** `receive_sharing_intent`; texto o enlaces desde otra app abren la vista previa de captura (por defecto a la Bandeja).

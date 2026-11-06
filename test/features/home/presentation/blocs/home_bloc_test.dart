@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
@@ -15,6 +16,7 @@ void main() {
   late MockGetHomeDashboard getHomeDashboard;
   late MockCompleteHabit completeHabit;
   late MockScheduleTask scheduleTask;
+  late MockConnectCalendar connectCalendar;
   final now = DateTime(2026, 10, 17, 9);
   const failure = ServerFailure('Algo salió mal.');
 
@@ -27,12 +29,14 @@ void main() {
     getHomeDashboard = MockGetHomeDashboard();
     completeHabit = MockCompleteHabit();
     scheduleTask = MockScheduleTask();
+    connectCalendar = MockConnectCalendar();
   });
 
   HomeBloc build() => HomeBloc(
     getHomeDashboard: getHomeDashboard,
     completeHabit: completeHabit,
     scheduleTask: scheduleTask,
+    connectCalendar: connectCalendar,
     clock: () => now,
   );
 
@@ -146,4 +150,22 @@ void main() {
       expect: () => [HomeSuccess(dashboard, message: failure.message)],
     );
   });
+
+  blocTest<HomeBloc, HomeState>(
+    'conectar el calendario pide el permiso y vuelve a leer el día',
+    setUp: () {
+      givenDashboard(Right(dashboard));
+      when(
+        () => connectCalendar(const NoParams()),
+      ).thenAnswer((_) async => const Right(unit));
+    },
+    build: build,
+    seed: () => HomeSuccess(dashboard),
+    act: (bloc) => bloc.add(const HomeCalendarConnected()),
+    expect: () => const <HomeState>[],
+    verify: (_) {
+      verify(() => connectCalendar(const NoParams())).called(1);
+      verify(() => getHomeDashboard(now)).called(1);
+    },
+  );
 }

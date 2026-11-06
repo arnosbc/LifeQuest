@@ -14,14 +14,43 @@ import '../../home_fixtures.dart';
 void main() {
   late MockHomeRemoteDataSource remote;
   late HomeRepositoryImpl repository;
+  late FakePhoneCalendar calendar;
   final now = DateTime(2026, 3, 7, 22, 15);
 
   setUp(() {
     remote = MockHomeRemoteDataSource();
-    repository = HomeRepositoryImpl(remote);
+    calendar = FakePhoneCalendar();
+    repository = HomeRepositoryImpl(remote, calendar);
   });
 
   group('getDashboard', () {
+    test('suma los eventos de hoy del calendario si hay permiso', () async {
+      final event = PhoneEvent(
+        title: 'Cita',
+        start: DateTime(2026, 3, 7, 10),
+        end: DateTime(2026, 3, 7, 11),
+      );
+      calendar = FakePhoneCalendar(granted: true, list: [event]);
+      repository = HomeRepositoryImpl(remote, calendar);
+      when(
+        () => remote.getDashboard(
+          day: any(named: 'day'),
+          utcOffsetMinutes: any(named: 'utcOffsetMinutes'),
+        ),
+      ).thenAnswer((_) async => HomeDashboardModel.fromJson(dashboardJson));
+
+      final result = (await repository.getDashboard(
+        now,
+      )).getOrElse((_) => throw StateError('falló'));
+
+      expect(result.events, [event]);
+      expect(result.calendarAccess, CalendarAccess.granted);
+      expect(calendar.requested.single, (
+        DateTime(2026, 3, 7),
+        DateTime(2026, 3, 8),
+      ));
+    });
+
     test('pide el día local y su desfase con UTC', () async {
       when(
         () => remote.getDashboard(

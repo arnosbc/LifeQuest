@@ -6,6 +6,7 @@ import 'package:fpdart/fpdart.dart' show Left;
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capture.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/listen_voice.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
 
 part 'capture_event.dart';
@@ -17,7 +18,10 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
     required this._interpret,
     required this._breakDown,
     required this._save,
+    required this._listen,
   }) : super(const CaptureWriting()) {
+    on<CaptureListenRequested>(_onListen, transformer: droppable());
+    on<CaptureListenStopped>((_, _) => _listen.stop());
     on<CaptureSubmitted>(_onSubmitted, transformer: droppable());
     on<CaptureDraftEdited>(_onEdited);
     on<CaptureBreakdownRequested>(_onBreakdown, transformer: droppable());
@@ -28,6 +32,39 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
   final InterpretCapture _interpret;
   final BreakDownTask _breakDown;
   final SaveCapture _save;
+  final ListenVoice _listen;
+
+  /// Dicta y, al terminar la frase, la interpreta como si se hubiera escrito.
+  Future<void> _onListen(
+    CaptureListenRequested event,
+    Emitter<CaptureState> emit,
+  ) async {
+    if (state is! CaptureWriting) return;
+    emit(const CaptureWriting(listening: true));
+    var heard = '';
+    String? error;
+    await emit.forEach<String>(
+      _listen(),
+      onData: (text) {
+        heard = text;
+        return CaptureWriting(listening: true, heard: text);
+      },
+      onError: (e, _) {
+        error = e is String ? e : 'No pude escucharte. Escribe la tarea.';
+        return CaptureWriting(heard: heard, message: error);
+      },
+    );
+    if (error != null) return;
+    if (heard.trim().isEmpty) {
+      emit(
+        const CaptureWriting(
+          message: 'No escuché nada. Inténtalo de nuevo o escríbelo.',
+        ),
+      );
+      return;
+    }
+    await _onSubmitted(CaptureSubmitted(heard), emit);
+  }
 
   Future<void> _onSubmitted(
     CaptureSubmitted event,

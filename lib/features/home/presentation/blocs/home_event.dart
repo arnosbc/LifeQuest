@@ -23,6 +23,11 @@ class HomeTaskScheduled extends HomeEvent {
   List<Object?> get props => [taskId, at];
 }
 
+/// El usuario aceptó conectar el calendario del teléfono.
+class HomeCalendarConnected extends HomeEvent {
+  const HomeCalendarConnected();
+}
+
 /// El usuario marcó un hábito bueno como cumplido hoy.
 class HomeHabitCompleted extends HomeEvent {
   const HomeHabitCompleted(this.habitId);
