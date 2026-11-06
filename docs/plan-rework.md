@@ -25,7 +25,7 @@ Principios:
 |---|---|
 | 0 · Base | ✅ Hecha (`bfc64ea`) |
 | 1 · Quitar fantasía y diseño nuevo | ✅ Hecha (v2.0.0 y v2.1.0, diseño «Calendario de taco») |
-| 2 · Tareas que actúan | ⏳ Pendiente |
+| 2 · Tareas que actúan | ✅ Hecha en código (v2.3.0); falta aplicar 032 en Supabase y probar en un teléfono |
 | 3 · Asistente | ⏳ Pendiente |
 | 4 · Integración con el teléfono | ⏳ Pendiente |
 
@@ -52,7 +52,11 @@ Principios:
 - `habits.reminder_time time`.
 - RPC `schedule_task(id, at, minutes)` y `snooze_task(id, minutes)`; `create_task` acepta los campos nuevos.
 
-**Flutter:**
+**Hecho (032):** columnas, `check` de `repeat_rule`, siguiente ocurrencia por trigger al completar (en hora local con `game_master_settings.time_zone`, que el cliente debe guardar al abrir), `schedule_task`, `snooze_task`, `create_task` ampliado, `end_dungeon` reparte los minutos medidos `missions_overview` devuelve la agenda, `day_agenda` alimenta Hoy y `sync_reminders` guarda la zona horaria y lista los avisos. Tests: `supabase/tests/032_scheduling.test.mjs`. ⚠️ Falta aplicarla en Supabase.
+
+**Hecho (Flutter):** hoja de tarea con hora, duración, aviso y repetición; fila con repetición y minutos de foco; Hoy con «Ahora» (bloque en curso), Agenda y «Sin hora» (botones Mover / Poner hora con selector de hora, en vez de arrastrar); feature `reminders` (`SyncReminders` corre la ventana de silencio y tiene tests) y `app/reminder_actions.dart` con Hecha / Posponer 1 h también con la app cerrada. Se sincroniza al iniciar sesión, al volver a la app y al cambiar tareas o agenda; al cerrar sesión se borran. Hábitos: hora de aviso al crear (no se edita después). «Empezar foco» en Hoy y Tareas abre Foco con esa tarea en la mochila (`/dungeon?task=<id>`). **Falta:** aplicar 032 en Supabase y la prueba en un teléfono Android.
+
+**Flutter (plan original):**
 - **Agenda por horas en Hoy:** debajo del número del día, rejilla de horas con las tareas programadas y los eventos del calendario (fase 4); arrastrar con `LongPressDraggable`/`DragTarget` → `schedule_task`; «Sin hora» con lo pendiente. La fila actual sigue siendo la única en rojo, con la línea «ahora».
 - **Recordatorios** en `lib/core/reminders/` (`flutter_local_notifications` + `timezone` + `flutter_timezone`): tareas con hora, hábitos con hora y fin de ciclo de Foco. Botones **Hecha** y **Posponer 1 h** con un handler en segundo plano que inicia Supabase con la sesión guardada y llama a `complete_task` / `snooze_task`. Reprogramar al abrir y al cambiar; cancelar al completar o borrar. Respetar la ventana de silencio y el tono de invitación (CLAUDE.md §7). Android: `POST_NOTIFICATIONS`, alarmas inexactas.
 - **Repetición:** selector en la hoja de crear o editar tarea.

@@ -21,6 +21,8 @@ class CreateMissionSheet extends StatefulWidget {
 
 enum _Due { none, today, tomorrow, week, custom }
 
+enum _Repeat { none, daily, weekdays, weekly, monthly }
+
 class _CreateMissionSheetState extends State<CreateMissionSheet> {
   final _formKey = GlobalKey<FormState>();
   final _title = TextEditingController();
@@ -32,6 +34,10 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
   String? _skillId;
   String? _projectId;
   String? _goalId;
+  TimeOfDay? _time;
+  int _minutes = 30;
+  int? _reminder = 10;
+  _Repeat _repeat = _Repeat.none;
 
   int get _xp => MissionsFormat.estimatedXp(
     title: _title.text,
@@ -72,8 +78,25 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
     };
   }
 
+  /// Día del bloque y de la repetición: el de la fecha límite o hoy.
+  DateTime get _day => _dueDate() ?? DateTime.now();
+
+  DateTime? _scheduledAt() => _time == null
+      ? null
+      : DateTime(_day.year, _day.month, _day.day, _time!.hour, _time!.minute);
+
+  /// Formato cerrado de `tasks.repeat_rule` (032); domingo = 0 como en SQL.
+  String? _repeatRule() => switch (_repeat) {
+    _Repeat.none => null,
+    _Repeat.daily => 'daily',
+    _Repeat.weekdays => 'weekdays',
+    _Repeat.weekly => 'weekly:${_day.weekday % 7}',
+    _Repeat.monthly => 'monthly:${_day.day}',
+  };
+
   void _save({required bool start}) {
     if (!_formKey.currentState!.validate()) return;
+    final hasTime = _time != null;
     final CreateMissionResult result = (
       mission: NewMission(
         title: _title.text.trim(),
@@ -87,6 +110,10 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
           for (final item in _checklist)
             if (item.text.trim().isNotEmpty) item.text.trim(),
         ],
+        scheduledAt: _scheduledAt(),
+        estimatedMinutes: hasTime ? _minutes : null,
+        reminderMinutes: hasTime ? _reminder : null,
+        repeatRule: _repeatRule(),
       ),
       startFocus: start,
     );
@@ -225,6 +252,65 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                 ),
               ),
             const SizedBox(height: 14),
+            _section('AGENDA'),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickTime,
+                    icon: const Icon(Icons.schedule),
+                    label: Text(
+                      _time == null
+                          ? 'Sin hora'
+                          : 'A las ${_time!.format(context)}',
+                    ),
+                  ),
+                ),
+                if (_time != null)
+                  IconButton(
+                    tooltip: 'Quitar la hora',
+                    onPressed: () => setState(() => _time = null),
+                    icon: const Icon(Icons.close),
+                  ),
+              ],
+            ),
+            if (_time != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _dropdown<int>('Duración', _minutes, const {
+                      15: '15 min',
+                      30: '30 min',
+                      45: '45 min',
+                      60: '1 h',
+                      90: '1 h 30',
+                      120: '2 h',
+                    }, (v) => setState(() => _minutes = v!)),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _dropdown<int?>('Aviso', _reminder, const {
+                      null: 'Sin aviso',
+                      0: 'A la hora',
+                      5: '5 min antes',
+                      10: '10 min antes',
+                      30: '30 min antes',
+                      60: '1 h antes',
+                    }, (v) => setState(() => _reminder = v)),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 8),
+            _dropdown<_Repeat>('Repetir', _repeat, {
+              _Repeat.none: 'No se repite',
+              _Repeat.daily: 'Cada día',
+              _Repeat.weekdays: 'De lunes a viernes',
+              _Repeat.weekly: 'Cada ${MissionsFormat.weekday(_day)}',
+              _Repeat.monthly: 'Cada mes, el día ${_day.day}',
+            }, (v) => setState(() => _repeat = v!)),
+            const SizedBox(height: 14),
             _section('SUBTAREAS (OPCIONAL)'),
             for (var i = 0; i < _checklist.length; i++)
               Padding(
@@ -359,6 +445,18 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
     ],
     onChanged: onChanged,
   );
+
+  Future<void> _pickTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime:
+          _time ??
+          TimeOfDay.fromDateTime(
+            DateTime.now().add(const Duration(hours: 1)),
+          ).replacing(minute: 0),
+    );
+    if (time != null && mounted) setState(() => _time = time);
+  }
 
   Future<void> _pickDate() async {
     final now = DateTime.now();

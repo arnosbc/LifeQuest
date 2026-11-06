@@ -16,4 +16,7 @@ abstract class MissionsRepository {
   Future<Either<Failure, Unit>> renameMission(String missionId, String title);
 
   Future<Either<Failure, Unit>> deleteMission(String missionId);
+
+  /// Mueve el bloque de la tarea [minutes] minutos más tarde.
+  Future<Either<Failure, Unit>> snoozeMission(String missionId, int minutes);
 }

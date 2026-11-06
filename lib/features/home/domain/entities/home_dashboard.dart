@@ -44,6 +44,45 @@ class TodayHabit extends Equatable {
   List<Object?> get props => [id, name, done];
 }
 
+/// Bloque de la agenda de hoy (tarea con hora, `day_agenda` de 032).
+class AgendaBlock extends Equatable {
+  const AgendaBlock({
+    required this.id,
+    required this.title,
+    required this.start,
+    this.minutes,
+    this.done = false,
+    this.repeats = false,
+  });
+
+  final String id;
+  final String title;
+
+  /// Hora local de inicio.
+  final DateTime start;
+  final int? minutes;
+  final bool done;
+  final bool repeats;
+
+  /// Fin del bloque; sin duración cuenta como 30 min.
+  DateTime get end => start.add(Duration(minutes: minutes ?? 30));
+
+  @override
+  List<Object?> get props => [id, title, start, minutes, done, repeats];
+}
+
+/// Tarea abierta sin hora, lista para ponerla en la agenda.
+class UnscheduledTask extends Equatable {
+  const UnscheduledTask({required this.id, required this.title, this.minutes});
+
+  final String id;
+  final String title;
+  final int? minutes;
+
+  @override
+  List<Object?> get props => [id, title, minutes];
+}
+
 /// Todo lo que muestra el Home, leído en una sola consulta.
 class HomeDashboard extends Equatable {
   const HomeDashboard({
@@ -64,6 +103,8 @@ class HomeDashboard extends Equatable {
     this.displayName,
     this.characterClass,
     this.priorityMission,
+    this.agenda = const [],
+    this.unscheduled = const [],
   });
 
   final String? displayName;
@@ -90,6 +131,10 @@ class HomeDashboard extends Equatable {
   final int missionsTotal;
   final int focusMinutes;
 
+  /// Bloques de hoy por hora de inicio.
+  final List<AgendaBlock> agenda;
+  final List<UnscheduledTask> unscheduled;
+
   @override
   List<Object?> get props => [
     displayName,
@@ -109,5 +154,7 @@ class HomeDashboard extends Equatable {
     missionsDone,
     missionsTotal,
     focusMinutes,
+    agenda,
+    unscheduled,
   ];
 }

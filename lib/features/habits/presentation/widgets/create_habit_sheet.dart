@@ -24,6 +24,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
   final Set<int> _days = {};
   int _severity = 5;
   String? _skillId;
+  TimeOfDay? _reminder;
 
   // Orden de lunes a domingo; el valor es 0 = domingo … 6 = sábado.
   static const _week = [
@@ -52,8 +53,20 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
         specificDays: _type == HabitType.good ? (_days.toList()..sort()) : [],
         hpPenalty: _type == HabitType.bad ? _severity : 0,
         skillId: _skillId,
+        reminderMinuteOfDay: _type == HabitType.good && _reminder != null
+            ? _reminder!.hour * 60 + _reminder!.minute
+            : null,
       ),
     );
+  }
+
+  Future<void> _pickReminder() async {
+    final time = await showTimePicker(
+      context: context,
+      helpText: 'Hora del aviso',
+      initialTime: _reminder ?? const TimeOfDay(hour: 8, minute: 0),
+    );
+    if (time != null && mounted) setState(() => _reminder = time);
   }
 
   @override
@@ -130,6 +143,28 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                           () => on ? _days.add(value) : _days.remove(value),
                         ),
                       ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _pickReminder,
+                      icon: const Icon(Icons.notifications_none),
+                      label: Text(
+                        _reminder == null
+                            ? 'Sin aviso'
+                            : 'Avisarme a las ${_reminder!.format(context)}',
+                      ),
+                    ),
+                  ),
+                  if (_reminder != null)
+                    IconButton(
+                      tooltip: 'Quitar el aviso',
+                      onPressed: () => setState(() => _reminder = null),
+                      icon: const Icon(Icons.close),
                     ),
                 ],
               ),

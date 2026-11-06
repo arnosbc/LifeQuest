@@ -1,5 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mocktail/mocktail.dart';
+
+import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
+import 'package:proyecto_movil/features/reminders/domain/usecases/sync_reminders.dart';
 
 import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
@@ -142,6 +146,13 @@ class MockHomeRemoteDataSource extends Mock implements HomeRemoteDataSource {}
 class MockGetHomeDashboard extends Mock implements GetHomeDashboard {}
 
 class MockCompleteHabit extends Mock implements CompleteHabit {}
+
+class MockScheduleTask extends Mock implements ScheduleTask {}
+
+class MockSyncReminders extends Mock implements SyncReminders {}
+
+class MockNotificationsPlugin extends Mock
+    implements FlutterLocalNotificationsPlugin {}
 
 class MockMissionsBloc extends MockBloc<MissionsEvent, MissionsState>
     implements MissionsBloc {}

@@ -18,6 +18,8 @@ abstract class MissionsRemoteDataSource {
   Future<void> renameMission(String missionId, String title);
 
   Future<void> deleteMission(String missionId);
+
+  Future<void> snoozeMission(String missionId, int minutes);
 }
 
 class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
@@ -44,6 +46,10 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
         'p_project_id': mission.projectId,
         'p_goal_id': mission.goalId,
         'p_subtasks': mission.subtasks,
+        'p_scheduled_at': mission.scheduledAt?.toUtc().toIso8601String(),
+        'p_estimated_minutes': mission.estimatedMinutes,
+        'p_reminder_minutes': mission.reminderMinutes,
+        'p_repeat_rule': mission.repeatRule,
       },
     ),
   );
@@ -66,6 +72,14 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
   @override
   Future<void> deleteMission(String missionId) => _guard(
     () => _client.rpc<void>('delete_task', params: {'p_task_id': missionId}),
+  );
+
+  @override
+  Future<void> snoozeMission(String missionId, int minutes) => _guard(
+    () => _client.rpc<void>(
+      'snooze_task',
+      params: {'p_task_id': missionId, 'p_minutes': minutes},
+    ),
   );
 
   Future<T> _guard<T>(Future<T> Function() action) async {

@@ -13,4 +13,10 @@ abstract class HomeRepository {
     required String habitId,
     required DateTime now,
   });
+
+  /// Pone la tarea en la agenda a [at] (hora local) o la quita si es null.
+  Future<Either<Failure, Unit>> scheduleTask({
+    required String taskId,
+    required DateTime? at,
+  });
 }

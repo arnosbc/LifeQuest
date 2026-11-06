@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/app/config/constants.dart';
 import 'package:proyecto_movil/app/observers/app_bloc_observer.dart';
+import 'package:proyecto_movil/app/reminder_actions.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
@@ -18,6 +19,7 @@ Future<void> main() async {
     publishableKey: AppConstants.supabaseKey,
   );
   await initDependencies();
+  await ReminderActions.init();
   Bloc.observer = const AppBlocObserver();
 
   // Se resuelve la sesión guardada antes de pintar, para que el router no

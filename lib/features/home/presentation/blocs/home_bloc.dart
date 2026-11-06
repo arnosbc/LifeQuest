@@ -6,6 +6,7 @@ import 'package:fpdart/fpdart.dart' show Left;
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -14,16 +15,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({
     required this._getHomeDashboard,
     required this._completeHabit,
+    required this._scheduleTask,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HomeInitial()) {
     // droppable: toques repetidos mientras carga se ignoran.
     on<HomeRequested>(_onRequested, transformer: droppable());
     on<HomeHabitCompleted>(_onHabitCompleted, transformer: droppable());
+    on<HomeTaskScheduled>(_onTaskScheduled, transformer: droppable());
   }
 
   final GetHomeDashboard _getHomeDashboard;
   final CompleteHabit _completeHabit;
+  final ScheduleTask _scheduleTask;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(
@@ -42,6 +46,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         (failure) => current is HomeSuccess
             ? HomeSuccess(current.dashboard, message: failure.message)
             : HomeFailure(failure.message),
+        HomeSuccess.new,
+      ),
+    );
+  }
+
+  Future<void> _onTaskScheduled(
+    HomeTaskScheduled event,
+    Emitter<HomeState> emit,
+  ) async {
+    final current = state;
+    if (current is! HomeSuccess) return;
+    final scheduled = await _scheduleTask((taskId: event.taskId, at: event.at));
+    if (scheduled case Left(value: final failure)) {
+      emit(HomeSuccess(current.dashboard, message: failure.message));
+      return;
+    }
+    final reloaded = await _getHomeDashboard(_clock());
+    emit(
+      reloaded.match(
+        (failure) => HomeSuccess(current.dashboard, message: failure.message),
         HomeSuccess.new,
       ),
     );

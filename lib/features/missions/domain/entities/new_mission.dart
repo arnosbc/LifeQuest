@@ -14,6 +14,10 @@ class NewMission extends Equatable {
     this.projectId,
     this.goalId,
     this.subtasks = const [],
+    this.scheduledAt,
+    this.estimatedMinutes,
+    this.reminderMinutes,
+    this.repeatRule,
   });
 
   final String title;
@@ -24,6 +28,10 @@ class NewMission extends Equatable {
   final String? projectId;
   final String? goalId;
   final List<String> subtasks;
+  final DateTime? scheduledAt;
+  final int? estimatedMinutes;
+  final int? reminderMinutes;
+  final String? repeatRule;
 
   @override
   List<Object?> get props => [
@@ -35,5 +43,9 @@ class NewMission extends Equatable {
     projectId,
     goalId,
     subtasks,
+    scheduledAt,
+    estimatedMinutes,
+    reminderMinutes,
+    repeatRule,
   ];
 }

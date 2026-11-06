@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/app/reminder_actions.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
@@ -115,10 +116,19 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.home,
                     onShown: (c) =>
                         c.read<HomeBloc>().add(const HomeRequested()),
-                    child: HomeScreen(
-                      userName: _userName(context),
-                      onNavigate: (tab) =>
-                          StatefulNavigationShell.of(context).goBranch(tab),
+                    // La agenda cambió: reprograma los avisos.
+                    child: BlocListener<HomeBloc, HomeState>(
+                      listenWhen: (a, b) =>
+                          a is HomeSuccess &&
+                          b is HomeSuccess &&
+                          a.dashboard.agenda != b.dashboard.agenda,
+                      listener: (_, _) => ReminderActions.sync(),
+                      child: HomeScreen(
+                        userName: _userName(context),
+                        onNavigate: (tab) =>
+                            StatefulNavigationShell.of(context).goBranch(tab),
+                        onStartFocus: (id) => context.go(_focusPath(id)),
+                      ),
                     ),
                   ),
                 ),
@@ -137,9 +147,16 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.missions,
                     onShown: (c) =>
                         c.read<MissionsBloc>().add(const MissionsRequested()),
-                    child: MissionsScreen(
-                      onStartFocus: () => context.go(RoutePaths.dungeon),
-                      onOpenProjects: () => context.go(RoutePaths.stage),
+                    // Tareas nuevas, completadas o borradas: reprograma los avisos.
+                    child: BlocListener<MissionsBloc, MissionsState>(
+                      listenWhen: (a, b) =>
+                          b is MissionsSuccess &&
+                          (a is! MissionsSuccess || a.board != b.board),
+                      listener: (_, _) => ReminderActions.sync(),
+                      child: MissionsScreen(
+                        onStartFocus: ([id]) => context.go(_focusPath(id)),
+                        onOpenProjects: () => context.go(RoutePaths.stage),
+                      ),
                     ),
                   ),
                 ),
@@ -173,7 +190,14 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.habits,
                     onShown: (c) =>
                         c.read<HabitsBloc>().add(const HabitsRequested()),
-                    child: const HabitsScreen(),
+                    // Hábito nuevo o borrado: reprograma los avisos.
+                    child: BlocListener<HabitsBloc, HabitsState>(
+                      listenWhen: (a, b) =>
+                          b is HabitsSuccess &&
+                          (a is! HabitsSuccess || a.board != b.board),
+                      listener: (_, _) => ReminderActions.sync(),
+                      child: const HabitsScreen(),
+                    ),
                   ),
                 ),
               ),
@@ -197,7 +221,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       child: Builder(
                         builder: (context) => ColoredBox(
                           color: context.lq.background,
-                          child: const DungeonScreen(),
+                          child: DungeonScreen(
+                            preselectedTaskId:
+                                state.uri.queryParameters['task'],
+                          ),
                         ),
                       ),
                     ),
@@ -324,6 +351,14 @@ String _userName(BuildContext context) =>
 /// Las pestañas viven todo el tiempo (indexedStack): sin esto, lo que cambia en
 /// otra (XP, vida, Monedas, misiones) no se vería hasta reiniciar la app.
 /// Al volver a [path] pide los datos otra vez, sin cargador.
+/// Foco con la tarea en la mochila (`?task=<id>`).
+String _focusPath(String? taskId) => taskId == null
+    ? RoutePaths.dungeon
+    : Uri(
+        path: RoutePaths.dungeon,
+        queryParameters: {'task': taskId},
+      ).toString();
+
 class _ReloadOnShow extends StatefulWidget {
   const _ReloadOnShow({
     required this.location,

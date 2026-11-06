@@ -69,4 +69,11 @@ class MissionsRepositoryImpl implements MissionsRepository {
         await _remote.deleteMission(missionId);
         return unit;
       });
+
+  @override
+  Future<Either<Failure, Unit>> snoozeMission(String missionId, int minutes) =>
+      _run(() async {
+        await _remote.snoozeMission(missionId, minutes);
+        return unit;
+      });
 }

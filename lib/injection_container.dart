@@ -1,7 +1,15 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/snooze_mission.dart';
+import 'package:proyecto_movil/features/reminders/data/datasources/reminders_local_datasource.dart';
+import 'package:proyecto_movil/features/reminders/data/datasources/reminders_remote_datasource.dart';
+import 'package:proyecto_movil/features/reminders/data/repositories/reminders_repository_impl.dart';
+import 'package:proyecto_movil/features/reminders/domain/repositories/reminders_repository.dart';
+import 'package:proyecto_movil/features/reminders/domain/usecases/sync_reminders.dart';
 import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:proyecto_movil/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:proyecto_movil/features/auth/domain/repositories/auth_repository.dart';
@@ -144,8 +152,13 @@ Future<void> initDependencies() async {
   // ---------- Home ----------
   // Bloc: factory, uno nuevo cada vez que se construye la pantalla.
   sl.registerFactory(
-    () => HomeBloc(getHomeDashboard: sl(), completeHabit: sl()),
+    () => HomeBloc(
+      getHomeDashboard: sl(),
+      completeHabit: sl(),
+      scheduleTask: sl(),
+    ),
   );
+  sl.registerLazySingleton(() => ScheduleTask(sl()));
   sl.registerLazySingleton(() => GetHomeDashboard(sl()));
   sl.registerLazySingleton(() => CompleteHabit(sl()));
   sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
@@ -168,11 +181,25 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => DeleteMission(sl()));
   sl.registerLazySingleton(() => CreateMission(sl()));
   sl.registerLazySingleton(() => CompleteMission(sl()));
+  sl.registerLazySingleton(() => SnoozeMission(sl()));
   sl.registerLazySingleton<MissionsRepository>(
     () => MissionsRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<MissionsRemoteDataSource>(
     () => MissionsRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Recordatorios ----------
+  sl.registerLazySingleton(FlutterLocalNotificationsPlugin.new);
+  sl.registerLazySingleton(() => SyncReminders(sl()));
+  sl.registerLazySingleton<RemindersRepository>(
+    () => RemindersRepositoryImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<RemindersRemoteDataSource>(
+    () => RemindersRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<RemindersLocalDataSource>(
+    () => RemindersLocalDataSourceImpl(sl()),
   );
 
   // ---------- Mazmorra ----------

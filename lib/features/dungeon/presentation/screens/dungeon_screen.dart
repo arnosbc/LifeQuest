@@ -11,7 +11,10 @@ import 'package:proyecto_movil/features/dungeon/presentation/widgets/session_rew
 
 /// Mazmorra. Necesita un [DungeonBloc] por encima (lo provee el router).
 class DungeonScreen extends StatelessWidget {
-  const DungeonScreen({super.key});
+  const DungeonScreen({super.key, this.preselectedTaskId});
+
+  /// Tarea elegida en Hoy o en Tareas con «Empezar foco».
+  final String? preselectedTaskId;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<DungeonBloc, DungeonState>(
@@ -67,6 +70,7 @@ class DungeonScreen extends StatelessWidget {
           ],
           DungeonSetupView(
             board: state.board,
+            preselected: preselectedTaskId,
             busy: state.busy,
             onStart: (total, cycle, tasks) => bloc.add(
               DungeonStarted(

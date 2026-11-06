@@ -22,6 +22,11 @@ class Mission extends Equatable {
     this.goalTitle,
     this.subtasksTotal = 0,
     this.subtasksDone = 0,
+    this.scheduledAt,
+    this.estimatedMinutes,
+    this.reminderMinutes,
+    this.repeatRule,
+    this.focusMinutes = 0,
   });
 
   final String id;
@@ -38,6 +43,19 @@ class Mission extends Equatable {
   final int subtasksTotal;
   final int subtasksDone;
 
+  /// Bloque en la agenda (hora local).
+  final DateTime? scheduledAt;
+  final int? estimatedMinutes;
+
+  /// Aviso N minutos antes de [scheduledAt].
+  final int? reminderMinutes;
+
+  /// `daily`, `weekdays`, `weekly:1,3` o `monthly:15` (032_scheduling.sql).
+  final String? repeatRule;
+
+  /// Minutos medidos en Foco.
+  final int focusMinutes;
+
   @override
   List<Object?> get props => [
     id,
@@ -53,5 +71,10 @@ class Mission extends Equatable {
     goalTitle,
     subtasksTotal,
     subtasksDone,
+    scheduledAt,
+    estimatedMinutes,
+    reminderMinutes,
+    repeatRule,
+    focusMinutes,
   ];
 }

@@ -41,8 +41,8 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   });
 
   @override
-  Future<void> createHabit(NewHabit habit) => _guard(
-    () => _client.rpc<void>(
+  Future<void> createHabit(NewHabit habit) => _guard(() async {
+    final id = await _client.rpc<String>(
       'create_habit',
       params: {
         'p_name': habit.name,
@@ -52,8 +52,20 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
         'p_hp_penalty': habit.hpPenalty,
         'p_skill_id': habit.skillId,
       },
-    ),
-  );
+    );
+    final minute = habit.reminderMinuteOfDay;
+    if (minute == null) return;
+    // reminder_time tiene grant de columna (032); si falla, el hábito queda
+    // creado sin aviso y el error se muestra.
+    await _client
+        .from('habits')
+        .update({
+          'reminder_time':
+              '${(minute ~/ 60).toString().padLeft(2, '0')}:'
+              '${(minute % 60).toString().padLeft(2, '0')}',
+        })
+        .eq('id', id);
+  });
 
   @override
   Future<void> completeGoodHabit({

@@ -12,9 +12,13 @@ class DungeonSetupView extends StatefulWidget {
     required this.board,
     required this.busy,
     required this.onStart,
+    this.preselected,
   });
 
   final DungeonBoard board;
+
+  /// Tarea que llega desde «Empezar foco»: entra ya en la mochila.
+  final String? preselected;
   final bool busy;
   final void Function(int totalMinutes, int cycleMinutes, List<String> taskIds)
   onStart;
@@ -27,6 +31,28 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
   int _cycle = 25;
   int _total = 60;
   final List<String> _picked = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pick(widget.preselected);
+  }
+
+  @override
+  void didUpdateWidget(DungeonSetupView old) {
+    super.didUpdateWidget(old);
+    if (widget.preselected != old.preselected) _pick(widget.preselected);
+  }
+
+  void _pick(String? id) {
+    if (id == null ||
+        _picked.contains(id) ||
+        _picked.length >= widget.board.maxTasks ||
+        !widget.board.candidates.any((t) => t.id == id)) {
+      return;
+    }
+    _picked.add(id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +162,8 @@ class SessionRoute extends StatelessWidget {
     final breaks = [
       for (var i = 1; i < cycles; i++) board.breakAfter(i).inMinutes,
     ];
-    final minutes = cycles * cycleMinutes + breaks.fold<int>(0, (a, b) => a + b);
+    final minutes =
+        cycles * cycleMinutes + breaks.fold<int>(0, (a, b) => a + b);
     final end = now.add(Duration(minutes: minutes));
     final hhmm =
         '${end.hour.toString().padLeft(2, '0')}:'

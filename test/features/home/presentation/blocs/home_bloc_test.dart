@@ -14,6 +14,7 @@ import '../../home_fixtures.dart';
 void main() {
   late MockGetHomeDashboard getHomeDashboard;
   late MockCompleteHabit completeHabit;
+  late MockScheduleTask scheduleTask;
   final now = DateTime(2026, 10, 17, 9);
   const failure = ServerFailure('Algo salió mal.');
 
@@ -25,11 +26,13 @@ void main() {
   setUp(() {
     getHomeDashboard = MockGetHomeDashboard();
     completeHabit = MockCompleteHabit();
+    scheduleTask = MockScheduleTask();
   });
 
   HomeBloc build() => HomeBloc(
     getHomeDashboard: getHomeDashboard,
     completeHabit: completeHabit,
+    scheduleTask: scheduleTask,
     clock: () => now,
   );
 
@@ -108,6 +111,39 @@ void main() {
       build: build,
       act: (bloc) => bloc.add(const HomeHabitCompleted('h2')),
       expect: () => <HomeState>[],
+    );
+  });
+
+  group('HomeTaskScheduled', () {
+    final at = DateTime(2026, 10, 17, 15);
+
+    blocTest<HomeBloc, HomeState>(
+      'pone la tarea en la agenda y vuelve a leer el día',
+      setUp: () {
+        givenDashboard(Right(dashboard));
+        when(
+          () => scheduleTask((taskId: 't1', at: at)),
+        ).thenAnswer((_) async => const Right(unit));
+      },
+      build: build,
+      seed: () => HomeSuccess(dashboard),
+      act: (bloc) => bloc.add(HomeTaskScheduled('t1', at)),
+      expect: () => const <HomeState>[],
+      verify: (_) {
+        verify(() => scheduleTask((taskId: 't1', at: at))).called(1);
+        verify(() => getHomeDashboard(now)).called(1);
+      },
+    );
+
+    blocTest<HomeBloc, HomeState>(
+      'si falla, avisa sin quitar los datos',
+      setUp: () => when(
+        () => scheduleTask((taskId: 't1', at: at)),
+      ).thenAnswer((_) async => const Left(failure)),
+      build: build,
+      seed: () => HomeSuccess(dashboard),
+      act: (bloc) => bloc.add(HomeTaskScheduled('t1', at)),
+      expect: () => [HomeSuccess(dashboard, message: failure.message)],
     );
   });
 }

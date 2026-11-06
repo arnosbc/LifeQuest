@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart' show Right, unit;
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/app/app.dart';
@@ -15,6 +17,8 @@ import 'package:proyecto_movil/features/settings/presentation/blocs/settings_blo
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/reminders/domain/usecases/sync_reminders.dart';
+import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 import 'features/home/home_fixtures.dart';
@@ -44,6 +48,15 @@ void main() {
       const Stream<AppearanceState>.empty(),
       initialState: const AppearanceSuccess(ThemePreference.system),
     );
+    // Los avisos del teléfono, simulados: sin plugin nativo en los tests.
+    final syncReminders = MockSyncReminders();
+    when(
+      () => syncReminders(const NoParams()),
+    ).thenAnswer((_) async => const Right(unit));
+    sl.registerLazySingleton<SyncReminders>(() => syncReminders);
+    final plugin = MockNotificationsPlugin();
+    when(plugin.cancelAll).thenAnswer((_) async {});
+    sl.registerLazySingleton<FlutterLocalNotificationsPlugin>(() => plugin);
     // El Home pide su bloc a get_it; aquí, uno simulado con datos fijos.
     sl.registerFactory<HomeBloc>(() {
       final homeBloc = MockHomeBloc();

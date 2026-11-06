@@ -13,8 +13,12 @@ import '../../missions_fixtures.dart';
 
 void main() {
   late MockMissionsBloc bloc;
+  String? focusTask;
 
-  setUp(() => bloc = MockMissionsBloc());
+  setUp(() {
+    bloc = MockMissionsBloc();
+    focusTask = null;
+  });
 
   Future<void> pump(WidgetTester tester, MissionsBoard board) async {
     whenListen(
@@ -30,7 +34,10 @@ void main() {
         home: Scaffold(
           body: BlocProvider<MissionsBloc>.value(
             value: bloc,
-            child: MissionsScreen(onStartFocus: () {}, onOpenProjects: () {}),
+            child: MissionsScreen(
+              onStartFocus: ([id]) => focusTask = id,
+              onOpenProjects: () {},
+            ),
           ),
         ),
       ),
@@ -67,6 +74,8 @@ void main() {
     expect(find.text('Sin fecha · 1'), findsOneWidget);
     expect(find.text('40'), findsOneWidget); // XP en juego
     expect(find.text('Empezar foco'), findsOneWidget);
+    await tester.tap(find.text('Empezar foco'));
+    expect(focusTask, 'vencida'); // la primera abre Foco con su id
   });
 
   testWidgets('sin tareas muestra la ilustración y la invitación', (

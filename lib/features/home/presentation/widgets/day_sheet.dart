@@ -16,6 +16,7 @@ class DaySheet extends StatelessWidget {
     required this.onCreateTask,
     required this.onCompleteHabit,
     required this.onOpenHabits,
+    required this.onScheduleTask,
     this.busyHabitId,
     this.minHeight = 0,
   });
@@ -24,10 +25,15 @@ class DaySheet extends StatelessWidget {
 
   final HomeDashboard dashboard;
   final DateTime now;
-  final VoidCallback onStartFocus;
+
+  /// Abre Foco con esa tarea en la mochila.
+  final ValueChanged<String> onStartFocus;
   final VoidCallback onCreateTask;
   final ValueChanged<String> onCompleteHabit;
   final VoidCallback onOpenHabits;
+
+  /// Pone o mueve una tarea en la agenda de hoy.
+  final void Function(String taskId, DateTime at) onScheduleTask;
   final String? busyHabitId;
 
   static const weekdays = [
@@ -69,6 +75,10 @@ class DaySheet extends StatelessWidget {
         d.streakDays == 1 ? 'racha 1 día' : 'racha ${d.streakDays} días',
     ].join(' · ');
     final mission = d.priorityMission;
+    // El bloque en curso manda sobre la tarea sugerida: es la única fila en rojo.
+    final nowBlock = d.agenda
+        .where((b) => !b.done && !now.isBefore(b.start) && now.isBefore(b.end))
+        .firstOrNull;
 
     return PaperSheet(
       bound: true,
@@ -129,7 +139,19 @@ class DaySheet extends StatelessWidget {
           const PaperRule(),
           const SizedBox(height: 16),
           const LifeQuestSectionHeading('Ahora'),
-          if (mission == null)
+          if (nowBlock != null)
+            SheetRow(
+              current: true,
+              leading: const SheetCheck(done: false),
+              time: _time(nowBlock.start),
+              title: nowBlock.title,
+              subtitle: 'Hasta las ${_time(nowBlock.end)}',
+              action: SheetPill(
+                label: 'Empezar foco',
+                onTap: () => onStartFocus(nowBlock.id),
+              ),
+            )
+          else if (mission == null)
             LifeQuestEmptyState(
               compact: true,
               illustration: d.missionsTotal > 0
@@ -151,8 +173,55 @@ class DaySheet extends StatelessWidget {
               time: _time(mission.dueDate),
               title: mission.title,
               subtitle: '+${mission.xpReward} XP',
-              action: SheetPill(label: 'Empezar foco', onTap: onStartFocus),
+              action: SheetPill(
+                label: 'Empezar foco',
+                onTap: () => onStartFocus(mission.id),
+              ),
             ),
+          const SizedBox(height: 20),
+          LifeQuestSectionHeading(
+            d.agenda.isEmpty ? 'Agenda' : 'Agenda · ${d.agenda.length}',
+          ),
+          if (d.agenda.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                'Nada con hora hoy. Ponle hora a una tarea y te avisamos.',
+                style: QText.body(q.text2),
+              ),
+            ),
+          for (final block in d.agenda)
+            SheetRow(
+              leading: SheetCheck(done: block.done),
+              time: _time(block.start),
+              title: block.title,
+              subtitle: [
+                'Hasta las ${_time(block.end)}',
+                if (block.repeats) 'se repite',
+              ].join(' · '),
+              done: block.done,
+              muted: !block.done && block.end.isBefore(now),
+              action: block.done
+                  ? null
+                  : SheetPill(
+                      label: 'Mover',
+                      onTap: () => _pickTime(context, block.id, block.start),
+                    ),
+            ),
+          if (d.unscheduled.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            LifeQuestSectionHeading('Sin hora · ${d.unscheduled.length}'),
+            // shortcut: solo las 5 primeras; la lista completa vive en Tareas.
+            for (final task in d.unscheduled.take(5))
+              SheetRow(
+                leading: const SheetCheck(done: false),
+                title: task.title,
+                action: SheetPill(
+                  label: 'Poner hora',
+                  onTap: () => _pickTime(context, task.id, null),
+                ),
+              ),
+          ],
           const SizedBox(height: 20),
           LifeQuestSectionHeading(
             d.habitsTotal == 0
@@ -189,6 +258,28 @@ class DaySheet extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+
+  /// Elige la hora de hoy para la tarea; por defecto, la próxima hora en punto.
+  Future<void> _pickTime(
+    BuildContext context,
+    String taskId,
+    DateTime? current,
+  ) async {
+    final next = now.add(const Duration(hours: 1));
+    final time = await showTimePicker(
+      context: context,
+      helpText: 'Hora para hoy',
+      initialTime: TimeOfDay(
+        hour: (current ?? next).hour,
+        minute: current?.minute ?? 0,
+      ),
+    );
+    if (time == null) return;
+    onScheduleTask(
+      taskId,
+      DateTime(now.year, now.month, now.day, time.hour, time.minute),
     );
   }
 

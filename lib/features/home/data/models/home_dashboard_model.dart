@@ -1,6 +1,7 @@
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 
-/// Respuesta JSON de la RPC `home_dashboard` (supabase/migrations/001_home.sql).
+/// Respuesta JSON de la RPC `home_dashboard` (supabase/migrations/001_home.sql)
+/// con la de `day_agenda` (032) en la clave `agenda`.
 class HomeDashboardModel {
   const HomeDashboardModel(this.json);
 
@@ -13,6 +14,10 @@ class HomeDashboardModel {
     final mission = json['priority_mission'] as Map<String, dynamic>?;
     final habits = (json['habits'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
+    final agenda = json['agenda'] as Map<String, dynamic>? ?? const {};
+    List<Map<String, dynamic>> list(String key) =>
+        (agenda[key] as List<dynamic>? ?? const [])
+            .cast<Map<String, dynamic>>();
     return HomeDashboard(
       displayName: _text(json['display_name']),
       characterClass: _text(json['character_class']),
@@ -52,6 +57,25 @@ class HomeDashboardModel {
       missionsDone: _int(json['missions_done']),
       missionsTotal: _int(json['missions_total']),
       focusMinutes: _int(json['focus_minutes']),
+      agenda: [
+        for (final b in list('scheduled'))
+          AgendaBlock(
+            id: b['id'] as String,
+            title: b['title'] as String,
+            start: DateTime.parse(b['scheduled_at'] as String).toLocal(),
+            minutes: (b['estimated_minutes'] as num?)?.toInt(),
+            done: b['done'] as bool? ?? false,
+            repeats: b['repeat_rule'] != null,
+          ),
+      ],
+      unscheduled: [
+        for (final t in list('unscheduled'))
+          UnscheduledTask(
+            id: t['id'] as String,
+            title: t['title'] as String,
+            minutes: (t['estimated_minutes'] as num?)?.toInt(),
+          ),
+      ],
     );
   }
 

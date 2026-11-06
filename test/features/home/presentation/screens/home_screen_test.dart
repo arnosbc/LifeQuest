@@ -35,7 +35,11 @@ void main() {
           child: Scaffold(
             body: BlocProvider<HomeBloc>.value(
               value: bloc,
-              child: HomeScreen(userName: 'Alex', onNavigate: (_) {}),
+              child: HomeScreen(
+                userName: 'Alex',
+                onNavigate: (_) {},
+                onStartFocus: (_) {},
+              ),
             ),
           ),
         ),

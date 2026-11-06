@@ -30,6 +30,15 @@ class HomeRepositoryImpl implements HomeRepository {
     return unit;
   });
 
+  @override
+  Future<Either<Failure, Unit>> scheduleTask({
+    required String taskId,
+    required DateTime? at,
+  }) => _run(() async {
+    await _remote.scheduleTask(taskId: taskId, at: at);
+    return unit;
+  });
+
   static String _day(DateTime now) =>
       '${now.year.toString().padLeft(4, '0')}-'
       '${now.month.toString().padLeft(2, '0')}-'
@@ -54,6 +63,8 @@ class HomeRepositoryImpl implements HomeRepository {
     'already_completed' => 'Ese hábito ya quedó registrado hoy. ¡Bien hecho!',
     'not_scheduled' => 'Este hábito no toca hoy. Te espera su próximo día.',
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',
+    'task_not_found' =>
+      'Esa tarea ya no está abierta. Desliza para actualizar.',
     'invalid_day' =>
       'La fecha de tu teléfono no coincide con la de hoy. Revísala y reintenta.',
     'profile_not_found' =>

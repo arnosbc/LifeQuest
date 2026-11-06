@@ -15,8 +15,8 @@ class MissionsScreen extends StatelessWidget {
     required this.onOpenProjects,
   });
 
-  /// Abre Foco tras «Crear y empezar foco».
-  final VoidCallback onStartFocus;
+  /// Abre Foco, con la tarea ya en la mochila si se indica.
+  final void Function([String? taskId]) onStartFocus;
 
   /// Abre Proyectos y metas.
   final VoidCallback onOpenProjects;
@@ -99,16 +99,21 @@ class MissionsScreen extends StatelessWidget {
         label: 'Completar ${mission.title}',
         onTap: idle ? () => complete(mission.id) : null,
       ),
-      time: MissionsFormat.time(mission.dueDate),
+      time: MissionsFormat.time(mission.scheduledAt ?? mission.dueDate),
       title: mission.title,
       subtitle: [
         MissionsFormat.due(mission.dueDate, now),
         MissionsFormat.origin(mission),
+        ?MissionsFormat.repeat(mission.repeatRule),
+        ?MissionsFormat.focus(mission),
         '${mission.xpReward} XP',
       ].join(' · '),
       trailing: menu(mission),
       action: mission.id == current
-          ? SheetPill(label: 'Empezar foco', onTap: onStartFocus)
+          ? SheetPill(
+              label: 'Empezar foco',
+              onTap: () => onStartFocus(mission.id),
+            )
           : null,
     );
     final groups = _group(missions, now);

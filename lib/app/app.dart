@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_router.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
+import 'package:proyecto_movil/app/reminder_actions.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
@@ -35,6 +36,7 @@ class _AppState extends State<App> {
     widget.onboardingBloc,
   );
   late final StreamSubscription<AuthState> _auth;
+  late final AppLifecycleListener _lifecycle;
   bool _signedIn = false;
 
   @override
@@ -42,6 +44,12 @@ class _AppState extends State<App> {
     super.initState();
     _onAuth(widget.authBloc.state);
     _auth = widget.authBloc.stream.listen(_onAuth);
+    // Al volver a la app: la hora o las tareas pudieron cambiar en otro lado.
+    _lifecycle = AppLifecycleListener(
+      onResume: () {
+        if (_signedIn) ReminderActions.sync();
+      },
+    );
   }
 
   /// Al iniciar sesión se consulta si toca el Onboarding; al cerrarla se
@@ -53,11 +61,13 @@ class _AppState extends State<App> {
     widget.onboardingBloc.add(
       signedIn ? const OnboardingRequested() : const OnboardingReset(),
     );
+    signedIn ? ReminderActions.sync() : ReminderActions.clear();
   }
 
   @override
   void dispose() {
     _auth.cancel();
+    _lifecycle.dispose();
     _router.dispose();
     super.dispose();
   }

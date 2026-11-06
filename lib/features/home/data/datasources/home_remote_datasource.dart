@@ -15,6 +15,9 @@ abstract class HomeRemoteDataSource {
   });
 
   Future<void> completeHabit({required String habitId, required String day});
+
+  /// Pone la tarea en la agenda a [at] o la quita si es null.
+  Future<void> scheduleTask({required String taskId, required DateTime? at});
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
@@ -27,13 +30,18 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     required String day,
     required int utcOffsetMinutes,
   }) => _guard(() async {
+    final params = {'p_day': day, 'p_utc_offset_minutes': utcOffsetMinutes};
     final json = await _client.rpc<Map<String, dynamic>?>(
       'home_dashboard',
-      params: {'p_day': day, 'p_utc_offset_minutes': utcOffsetMinutes},
+      params: params,
     );
     // Null: aún no existe la fila de profiles de este usuario.
     if (json == null) throw const ServerException(code: 'profile_not_found');
-    return HomeDashboardModel.fromJson(json);
+    final agenda = await _client.rpc<Map<String, dynamic>>(
+      'day_agenda',
+      params: params,
+    );
+    return HomeDashboardModel.fromJson({...json, 'agenda': agenda});
   });
 
   @override
@@ -42,6 +50,15 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
         () => _client.rpc<void>(
           'complete_habit',
           params: {'p_habit_id': habitId, 'p_day': day},
+        ),
+      );
+
+  @override
+  Future<void> scheduleTask({required String taskId, required DateTime? at}) =>
+      _guard(
+        () => _client.rpc<void>(
+          'schedule_task',
+          params: {'p_task_id': taskId, 'p_at': at?.toUtc().toIso8601String()},
         ),
       );
 

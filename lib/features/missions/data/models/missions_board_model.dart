@@ -2,7 +2,7 @@ import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/missions_board.dart';
 
 /// Respuesta JSON de la RPC `missions_overview`
-/// (supabase/migrations/010_missions.sql).
+/// (supabase/migrations/010_missions.sql, campos de agenda en 032).
 class MissionsBoardModel {
   const MissionsBoardModel(this.json);
 
@@ -20,9 +20,7 @@ class MissionsBoardModel {
           description: _text(m['description']),
           priority: MissionPriority.values.byName(m['priority'] as String),
           bucket: MissionBucket.values.byName(m['bucket'] as String),
-          dueDate: m['due_date'] == null
-              ? null
-              : DateTime.parse(m['due_date'] as String).toLocal(),
+          dueDate: _date(m['due_date']),
           xpReward: _int(m['xp_reward']),
           coinReward: _int(m['coin_reward']),
           skillName: _text(m['skill_name']),
@@ -30,6 +28,11 @@ class MissionsBoardModel {
           goalTitle: _text(m['goal_title']),
           subtasksTotal: _int(m['subtasks_total']),
           subtasksDone: _int(m['subtasks_done']),
+          scheduledAt: _date(m['scheduled_at']),
+          estimatedMinutes: (m['estimated_minutes'] as num?)?.toInt(),
+          reminderMinutes: (m['reminder_minutes'] as num?)?.toInt(),
+          repeatRule: _text(m['repeat_rule']),
+          focusMinutes: _int(m['focus_minutes']),
         ),
     ],
     skills: [
@@ -52,6 +55,9 @@ class MissionsBoardModel {
 
   List<Map<String, dynamic>> _list(String key) =>
       (json[key] as List<dynamic>? ?? const []).cast<Map<String, dynamic>>();
+
+  static DateTime? _date(Object? value) =>
+      value is String ? DateTime.parse(value).toLocal() : null;
 
   static int _int(Object? value) => (value as num?)?.toInt() ?? 0;
 

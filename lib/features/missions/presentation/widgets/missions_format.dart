@@ -17,6 +17,41 @@ abstract final class MissionsFormat {
     'dic',
   ];
 
+  static const _weekdays = [
+    'lunes',
+    'martes',
+    'miércoles',
+    'jueves',
+    'viernes',
+    'sábado',
+    'domingo',
+  ];
+
+  static String weekday(DateTime day) => _weekdays[day.weekday - 1];
+
+  /// Texto de `repeat_rule` (032): "cada día", "cada lunes y miércoles"…
+  static String? repeat(String? rule) {
+    if (rule == null) return null;
+    final [kind, ...rest] = rule.split(':');
+    return switch (kind) {
+      'daily' => 'Cada día',
+      'weekdays' => 'De lunes a viernes',
+      'weekly' =>
+        'Cada ${rest.first.split(',').map((d) => _weekdays[(int.parse(d) + 6) % 7]).join(' y ')}',
+      'monthly' => 'Cada mes, el día ${rest.first}',
+      _ => null,
+    };
+  }
+
+  /// "25 min de foco" o "25 de 60 min de foco" si hay duración estimada.
+  static String? focus(Mission mission) {
+    if (mission.focusMinutes == 0) return null;
+    final estimate = mission.estimatedMinutes;
+    return estimate == null
+        ? '${mission.focusMinutes} min de foco'
+        : '${mission.focusMinutes} de $estimate min de foco';
+  }
+
   static String priority(MissionPriority priority) => switch (priority) {
     MissionPriority.high => 'Alta',
     MissionPriority.medium => 'Media',
