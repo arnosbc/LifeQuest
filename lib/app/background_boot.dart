@@ -16,6 +16,7 @@ Future<bool> bootInBackground() async {
     await Supabase.initialize(
       url: AppConstants.supabaseUrl,
       publishableKey: AppConstants.supabaseKey,
+      authOptions: AppConstants.authOptions,
     );
     await initDependencies();
     _booted = true;

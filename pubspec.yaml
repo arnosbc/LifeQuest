@@ -52,6 +52,7 @@ dependencies:
   receive_sharing_intent: ^1.9.0
   home_widget: ^0.10.0
   device_calendar_plus: ^0.12.0
+  flutter_secure_storage: ^11.2.0
 
 # shortcut: path_provider_foundation >= 2.5 compila un hook nativo (objective_c)
 # que falla con espacios en la ruta del usuario en Windows; quitar cuando

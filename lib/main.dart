@@ -20,6 +20,7 @@ Future<void> main() async {
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,
     publishableKey: AppConstants.supabaseKey,
+    authOptions: AppConstants.authOptions,
   );
   await initDependencies();
   // Avisos y widget de inicio solo existen en el teléfono.

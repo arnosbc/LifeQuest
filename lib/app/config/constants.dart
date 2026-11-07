@@ -1,3 +1,7 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:proyecto_movil/core/storage/secure_session_storage.dart';
+
 /// Configuración que llega al compilar:
 /// `flutter run --dart-define-from-file=supabase.json`
 abstract final class AppConstants {
@@ -6,6 +10,13 @@ abstract final class AppConstants {
   /// Clave publicable (sb_publishable_…) o la anon key heredada; ambas son
   /// públicas por diseño: los datos los protege el RLS.
   static const supabaseKey = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
+
+  /// Sesión cifrada con Keystore/Keychain, nunca en texto plano (H-01).
+  static FlutterAuthClientOptions get authOptions => FlutterAuthClientOptions(
+    localStorage: SecureSessionStorage(
+      SecureSessionStorage.keyFor(supabaseUrl),
+    ),
+  );
 
   static void ensureSupabaseConfigured() {
     if (supabaseUrl.isEmpty || supabaseKey.isEmpty) {
