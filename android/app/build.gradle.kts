@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -28,11 +30,31 @@ android {
         versionName = flutter.versionName
     }
 
+    // H-08: firma de release con la llave propia (android/key.properties, fuera de
+    // git). Sin ese archivo se firma con la de debug y Gradle lo avisa.
+    val keyProperties = Properties().apply {
+        val file = rootProject.file("key.properties")
+        if (file.exists()) file.inputStream().use { load(it) }
+    }
+    signingConfigs {
+        if (keyProperties.isNotEmpty()) {
+            create("release") {
+                storeFile = file(keyProperties.getProperty("storeFile"))
+                storePassword = keyProperties.getProperty("storePassword")
+                keyAlias = keyProperties.getProperty("keyAlias")
+                keyPassword = keyProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keyProperties.isNotEmpty()) {
+                signingConfigs.getByName("release")
+            } else {
+                logger.warn("Sin android/key.properties: release firmado con la llave de debug.")
+                signingConfigs.getByName("debug")
+            }
             // H-07: R8 reduce y ofusca el código Java/Kotlin; el Dart se ofusca con
             // flutter build apk --obfuscate --split-debug-info=build/symbols
             isMinifyEnabled = true

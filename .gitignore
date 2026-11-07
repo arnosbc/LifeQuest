@@ -52,3 +52,8 @@ graphify-out/
 
 # Estado local del CLI de Supabase
 supabase/.temp/
+
+# H-08: llave y contraseñas de firma de release
+android/key.properties
+*.jks
+*.keystore
