@@ -61,7 +61,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/questly_widget_info" />
         </receiver>
-        <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver" android:exported="true">
+        <!-- H-03: solo lo llama el widget de esta app (PendingIntent explícito). -->
+        <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="es.antonborri.home_widget.action.BACKGROUND" />
             </intent-filter>
