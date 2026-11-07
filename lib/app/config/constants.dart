@@ -19,6 +19,10 @@ abstract final class AppConstants {
   );
 
   static void ensureSupabaseConfigured() {
+    // H-06: solo HTTPS, también si alguien compila con un supabase.json mal hecho.
+    if (supabaseUrl.isNotEmpty && !supabaseUrl.startsWith('https://')) {
+      throw StateError('SUPABASE_URL debe empezar por https://');
+    }
     if (supabaseUrl.isEmpty || supabaseKey.isEmpty) {
       throw StateError(
         'Faltan SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY. Copia '
