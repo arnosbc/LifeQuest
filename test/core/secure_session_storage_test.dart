@@ -2,9 +2,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:proyecto_movil/app/home_widget_sync.dart';
 import 'package:proyecto_movil/core/storage/secure_session_storage.dart';
 
-// Seguridad (tarea OWASP): H-01 sesión cifrada.
+// Seguridad (tarea OWASP): H-01 sesión cifrada y H-04 validar el id del widget.
 void main() {
   const key = 'sb-demo-auth-token';
 
@@ -44,5 +45,12 @@ void main() {
       SecureSessionStorage.keyFor('https://admy123.supabase.co'),
       'sb-admy123-auth-token',
     );
+  });
+
+  test('H-04: el widget solo acepta ids con forma de UUID', () {
+    expect(isTaskId('0f8fad5b-d9cb-469f-a165-70867728950e'), isTrue);
+    expect(isTaskId(null), isFalse);
+    expect(isTaskId("1' or '1'='1"), isFalse);
+    expect(isTaskId('../../etc'), isFalse);
   });
 }

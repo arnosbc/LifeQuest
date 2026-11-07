@@ -55,12 +55,22 @@ abstract final class HomeWidgetSync {
       '${t.minute.toString().padLeft(2, '0')}';
 }
 
+final _uuid = RegExp(
+  r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+);
+
+/// Id de tarea con forma de UUID (lo que genera la BD).
+bool isTaskId(String? id) => id != null && _uuid.hasMatch(id);
+
 /// «✓» del widget (`questly://done?id=…`), con la app abierta o cerrada.
 @pragma('vm:entry-point')
 Future<void> onWidgetAction(Uri? uri) async {
   final id = uri?.queryParameters['id'];
-  if (uri?.host != 'done' || id == null || !await bootInBackground()) return;
-  final done = await sl<CompleteTask>()(id);
+  // H-04: validar lo que llega por el intent antes de usarlo.
+  if (uri?.host != 'done' || !isTaskId(id) || !await bootInBackground()) {
+    return;
+  }
+  final done = await sl<CompleteTask>()(id!);
   // Se quita la fila sin esperar a abrir la app; si falló, se queda.
   if (done.isRight()) {
     final rest = (await HomeWidgetSync._read()).where((t) => t.$1 != id);
