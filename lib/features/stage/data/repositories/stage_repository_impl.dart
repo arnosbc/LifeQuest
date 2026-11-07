@@ -1,12 +1,12 @@
 import 'package:fpdart/fpdart.dart';
 
-import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/stage/data/datasources/stage_remote_datasource.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 import 'package:proyecto_movil/features/stage/domain/repositories/stage_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class StageRepositoryImpl implements StageRepository {
   const StageRepositoryImpl(this._remote);
@@ -55,6 +55,15 @@ class StageRepositoryImpl implements StageRepository {
   });
 
   @override
+  Future<Either<Failure, Unit>> delete({
+    required StageItemKind kind,
+    required String id,
+  }) => _run(() async {
+    await _remote.delete(kind: kind, id: id);
+    return unit;
+  });
+
+  @override
   Future<Either<Failure, Unit>> completeProject(String projectId) =>
       _run(() async {
         await _remote.completeProject(projectId);
@@ -66,19 +75,8 @@ class StageRepositoryImpl implements StageRepository {
       '${now.month.toString().padLeft(2, '0')}-'
       '${now.day.toString().padLeft(2, '0')}';
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'No hay conexión con el servidor. Revisa tu internet y reintenta.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error.code)));
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) =>
+      runGuarded(action, (error) => _messageFor(error.code));
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
@@ -101,6 +99,8 @@ class StageRepositoryImpl implements StageRepository {
     'project_no_real_work' =>
       'Las tareas de este proyecto se cerraron muy rápido. Avanza en una más y vuelve a intentarlo.',
     'project_not_open' => 'Ese proyecto ya estaba cerrado.',
+    'item_completed' =>
+      'Lo completado no se borra: es parte de tu historial. Archívalo.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

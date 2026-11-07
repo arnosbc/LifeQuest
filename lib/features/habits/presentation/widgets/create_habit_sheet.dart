@@ -20,6 +20,7 @@ class CreateHabitSheet extends StatefulWidget {
 class _CreateHabitSheetState extends State<CreateHabitSheet> {
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
+  final _min = TextEditingController();
   late HabitType _type = widget.type;
   final Set<int> _days = {};
   int _severity = 5;
@@ -40,6 +41,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
   @override
   void dispose() {
     _name.dispose();
+    _min.dispose();
     super.dispose();
   }
 
@@ -55,6 +57,9 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
         skillId: _skillId,
         reminderMinuteOfDay: _type == HabitType.good && _reminder != null
             ? _reminder!.hour * 60 + _reminder!.minute
+            : null,
+        minVersion: _type == HabitType.good && _min.text.trim().isNotEmpty
+            ? _min.text.trim()
             : null,
       ),
     );
@@ -122,6 +127,17 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             ),
             const SizedBox(height: 8),
             if (_type == HabitType.good) ...[
+              TextFormField(
+                controller: _min,
+                maxLength: 100,
+                decoration: const InputDecoration(
+                  labelText: 'Versión mínima (opcional)',
+                  hintText: 'Leer 1 página',
+                  helperText:
+                      'Para los días difíciles: hacerla también cuenta.',
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 '¿Qué días? (ninguno = todos los días)',
                 style: TextStyle(color: context.lq.muted, fontSize: 12),

@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { sanitizeParse, sanitizeSteps } from './sanitize.ts';
+import { sanitizeGoal, sanitizeParse, sanitizeSteps } from './sanitize.ts';
 
 const now = new Date('2026-11-05T14:00:00Z');
 
@@ -64,4 +64,20 @@ test('steps: 2–7 pasos únicos de una línea, sin viñetas', () => {
   assert.equal(sanitizeSteps({ steps: ['Solo uno'] }), null);
   assert.equal(sanitizeSteps('texto'), null);
   assert.equal(sanitizeSteps({ steps: Array.from({ length: 10 }, (_, i) => `Paso ${i}`) })!.length, 7);
+});
+
+test('goal: exige los 4 campos S.M.A.R.T. y al menos 2 pasos', () => {
+  const ok = sanitizeGoal({
+    title: 'Correr 10 km',
+    specific: 'Correr 10 km sin parar',
+    measurable: 'Tiempo y distancia en la app',
+    achievable: 'Entreno 3 días por semana',
+    relevant: 'Mejorar mi salud',
+    steps: ['Correr 3 km', 'Correr 5 km', 'Correr 8 km'],
+  }, 'correr 10k');
+  assert.equal(ok?.title, 'Correr 10 km');
+  assert.equal(ok?.steps.length, 3);
+  assert.equal(sanitizeGoal({ title: 'x', steps: ['a', 'b'] }, 'x'), null);
+  assert.equal(sanitizeGoal({ specific: 'a', measurable: 'b', achievable: 'c',
+    relevant: 'd', steps: ['a', 'b'] }, 'aprender piano')?.title, 'aprender piano');
 });

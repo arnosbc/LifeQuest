@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
 
-import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/brain_dump/data/datasources/brain_dump_remote_datasource.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/entities/brain_dump_board.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/repositories/brain_dump_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class BrainDumpRepositoryImpl implements BrainDumpRepository {
   const BrainDumpRepositoryImpl(this._remote);
@@ -37,19 +37,8 @@ class BrainDumpRepositoryImpl implements BrainDumpRepository {
         return unit;
       });
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'No hay conexión con el servidor. Revisa tu internet y reintenta.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error.code)));
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) =>
+      runGuarded(action, (error) => _messageFor(error.code));
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {

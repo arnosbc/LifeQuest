@@ -30,7 +30,7 @@ class StageGoalCreated extends StageEvent {
   List<Object?> get props => [goal];
 }
 
-/// El usuario completó una misión desde su proyecto.
+/// El usuario completó una tarea desde su proyecto.
 class StageTaskCompleted extends StageEvent {
   const StageTaskCompleted(this.taskId);
 
@@ -52,6 +52,16 @@ class StageResourceCreated extends StageEvent {
 
 class StageItemArchived extends StageEvent {
   const StageItemArchived({required this.kind, required this.id});
+
+  final StageItemKind kind;
+  final String id;
+
+  @override
+  List<Object?> get props => [kind, id];
+}
+
+class StageItemDeleted extends StageEvent {
+  const StageItemDeleted({required this.kind, required this.id});
 
   final StageItemKind kind;
   final String id;

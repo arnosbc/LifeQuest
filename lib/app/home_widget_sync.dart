@@ -2,7 +2,7 @@ import 'package:home_widget/home_widget.dart';
 
 import 'package:proyecto_movil/app/background_boot.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/complete_mission.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/complete_task.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 /// Datos del widget de inicio (android/…/QuestlyWidgetProvider.kt): las
@@ -35,7 +35,7 @@ abstract final class HomeWidgetSync {
         await HomeWidget.saveWidgetData<String>('task_${i}_time', item?.$3);
       }
       await HomeWidget.updateWidget(qualifiedAndroidName: _provider);
-    } on Exception {
+    } catch (_) {
       // Sin widget (o en tests): nada que actualizar.
     }
   }
@@ -60,7 +60,7 @@ abstract final class HomeWidgetSync {
 Future<void> onWidgetAction(Uri? uri) async {
   final id = uri?.queryParameters['id'];
   if (uri?.host != 'done' || id == null || !await bootInBackground()) return;
-  final done = await sl<CompleteMission>()(id);
+  final done = await sl<CompleteTask>()(id);
   // Se quita la fila sin esperar a abrir la app; si falló, se queda.
   if (done.isRight()) {
     final rest = (await HomeWidgetSync._read()).where((t) => t.$1 != id);

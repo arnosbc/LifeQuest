@@ -1,0 +1,102 @@
+{
+  "title": "Elige el mundo visual de Questly",
+  "question": "Nueva mano. El sorteo asignó «Ticket del día». Quédatela, toma una alternativa o pide otra.",
+  "options": [
+    {
+      "id": "assigned", "kind": "assigned", "label": "Ticket del día", "kicker": "THE ROLL",
+      "lineage": "Tickets de caja térmicos: líneas, puntos guía y un total",
+      "thesis": "Tu día impreso como un ticket: cada tarea una línea con su tiempo, y el total te dice si cabe.",
+      "palette": ["#FFFFFF", "#26262B", "#E8E6E1", "#2B59C3", "#C2410C"],
+      "materials": ["papel térmico", "puntos guía", "borde perforado", "cifras tabulares"],
+      "viewport": "Hoy: cabecera tipo ticket con fecha y hora; tareas como líneas con hora a la izquierda y duración a la derecha unidas por puntos; la tarea en curso resaltada en azul; TOTAL del día contra tiempo libre; captura abajo.",
+      "risk": "Puede recordar dinero o caja registradora si los totales no se leen como tiempo.",
+      "raised": [
+        {"from": "challenger-airport", "raise": "La siguiente tarea se anuncia sola y monumental, con los minutos que faltan, como un letrero de puerta."},
+        {"from": "challenger-labanotation", "raise": "El alto de cada línea es su duración: una hora mide el doble que media."},
+        {"from": "challenger-emission", "raise": "El estado se dice con la forma del trazo (lleno, punteado, tachado), no solo con color."},
+        {"from": "challenger-wallet", "raise": "Nada desaparece: lo hecho queda sellado y tachado en el ticket."}
+      ],
+      "html": ".impeccable/mocks/decision/assigned.html", "htmlFrame": "390x844"
+    },
+    {
+      "id": "model-pick", "kind": "pick", "label": "Calendario de taco", "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Calendarios de taco de pared, una hoja por día",
+      "thesis": "Cada día es una hoja con su número gigante; al terminar, la arrancas.",
+      "palette": ["#FFFFFF", "#111111", "#D7262E", "#F1EFEA"],
+      "materials": ["número enorme", "domingos en rojo", "borde de hoja arrancada"],
+      "viewport": "Hoy: número 31 gigante con «viernes · octubre», debajo las tareas del día en la hoja; las hojas de días pasados asoman arriba.",
+      "risk": "Familiar y algo nostálgico; el número grande puede robar espacio a las tareas.",
+      "html": ".impeccable/mocks/decision/model-pick.html", "htmlFrame": "390x844"
+    },
+    {
+      "id": "challenger-airport", "kind": "challenger", "catalogId": "wayfinding-cartography-signage-terminal-yellow-wayfinding",
+      "label": "Señalética de aeropuerto", "verdict": "wins",
+      "lineage": "Letreros amarillos de aeropuerto: una decisión a la vez, con minutos",
+      "thesis": "Hoy te dice solo lo siguiente: qué, a qué hora y en cuántos minutos.",
+      "palette": ["#FFD100", "#111111", "#FFFFFF", "#F4F4F2"],
+      "materials": ["banda amarilla", "humanista en minúsculas", "flechas al borde", "número monumental"],
+      "viewport": "Hoy: banda amarilla arriba con la siguiente tarea («Llamar a mamá → en 12 min») y el número monumental; debajo la cadena de próximas decisiones con minutos; captura abajo.",
+      "case": "Gana en identificación (todos leen un aeropuerto) y en claridad (una sola acción siguiente).",
+      "risk": "El amarillo es muy fuerte: si se usa fuera de lo «siguiente», grita.",
+      "html": ".impeccable/mocks/decision/challenger-airport.html", "htmlFrame": "390x844",
+      "hero": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding-hero.webp"
+    },
+    {
+      "id": "challenger-wallet", "kind": "challenger", "catalogId": "vernacular-ephemera-jet-age-ticket-wallet",
+      "label": "Billetera de pasajes", "verdict": "competitive",
+      "lineage": "Billeteras de pasajes de los años 60, un cupón por tramo",
+      "thesis": "Cada tarea es un cupón que se valida o se anula; la billetera muestra lo que queda.",
+      "palette": ["#FFFFFF", "#14213D", "#C8102E", "#6B4FA0"],
+      "materials": ["cupones con talón", "sellos", "cifras en carbón"],
+      "viewport": "Hoy: cupones apilados por hora; el del frente es la tarea actual con su talón y botón Empezar.",
+      "case": "Funde bien con el «nada desaparece»; pierde algo de claridad por la metáfora de viaje.",
+      "risk": "Puede leerse como app de vuelos.",
+      "html": ".impeccable/mocks/decision/challenger-wallet.html", "htmlFrame": "390x844",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-jet-age-ticket-wallet-hero.webp"
+    },
+    {
+      "id": "challenger-metro", "kind": "challenger", "catalogId": "digital-design-canon-metro-typographic-tiles",
+      "label": "Mosaicos Metro", "verdict": "declined",
+      "lineage": "Interfaz Metro de mosaicos planos", "thesis": "Mosaicos planos y tipografía gigante como interfaz.",
+      "palette": ["#000000", "#00ABEC", "#FFFFFF"], "materials": ["mosaicos", "minúsculas gigantes"],
+      "viewport": "Panorama de mosaicos.", "case": "Funde mal: se lee como un sistema operativo viejo.",
+      "kept": "La tipografía misma hace de interfaz, sin cromo.", "risk": "Fechado."
+    },
+    {
+      "id": "challenger-labanotation", "kind": "challenger", "catalogId": "notation-diagram-systems-labanotation",
+      "label": "Partitura de danza", "verdict": "declined",
+      "lineage": "Labanotación", "thesis": "Bloques cuyo largo es su duración exacta.",
+      "palette": ["#FFFFFF", "#111111", "#D9D9D9"], "materials": ["pentagrama vertical", "rayado"],
+      "viewport": "Columnas simétricas.", "case": "Funde mal: notación que nadie sabe leer.",
+      "kept": "El largo de cada bloque es su duración.", "risk": "Ilegible."
+    },
+    {
+      "id": "challenger-emission", "kind": "challenger", "catalogId": "operate-c-emission-line-rail",
+      "label": "Riel de emisión", "verdict": "declined",
+      "lineage": "Espectrogramas", "thesis": "Todo cuelga de un riel; el estado es la forma de la línea.",
+      "palette": ["#2A2A2A", "#E9E4D8", "#F2C14E"], "materials": ["líneas finas", "continuo gris"],
+      "viewport": "Un riel con marcas.", "case": "Funde mal: frío y abstracto.",
+      "kept": "Estado por forma de trazo, no por color.", "risk": "Críptico."
+    },
+    {
+      "id": "challenger-rail", "kind": "challenger", "catalogId": "rw-centre-rail-reference-setting",
+      "label": "Edición con riel central", "verdict": "declined",
+      "lineage": "Ediciones de referencia", "thesis": "Dos columnas alrededor de un riel de claves.",
+      "palette": ["#F2EDE3", "#1A1A1A", "#C0392B"], "materials": ["serif de texto", "filetes"],
+      "viewport": "Página impresa.", "case": "Funde mal: libro antiguo, no un día.",
+      "kept": "Una sola parte móvil.", "risk": "Libresco."
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code", "toggle": false},
+  "canon": true,
+  "canonCard": {
+    "kind": "canon", "label": "El estándar de la categoría",
+    "thesis": "Lo que hacen Todoist o TickTick, ejecutado impecable.",
+    "palette": ["#FFFFFF", "#111827", "#2563EB"], "materials": ["lista limpia", "chips de fecha"],
+    "viewport": "Lista de Hoy con checks, fecha y prioridad; FAB azul.",
+    "risk": "Indistinguible de la competencia por diseño.",
+    "html": ".impeccable/mocks/decision/canon.html", "htmlFrame": "390x844"
+  },
+  "steer": true
+}

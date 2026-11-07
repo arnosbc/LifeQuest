@@ -24,6 +24,23 @@ abstract final class LocalParser {
 
   static RegExp _re(String p) => RegExp(p, caseSensitive: false);
 
+  /// Verbos de cosas puntuales: se hacen en un momento, no en Foco.
+  static final _quick = _re(
+    r'^(llamar|telefonear|marcar|escribirle|escribir a|mandar|enviar|pagar|'
+    r'comprar|recoger|sacar|regar|felicitar|avisar|confirmar|reservar|'
+    r'renovar|cancelar|devolver|recordar|tomar(?:me)? (?:la|las|el|los) '
+    r'(?:pastilla|pastillas|medicina|medicinas|medicamento|medicamentos))\b',
+  );
+
+  /// Marca como recordatorio lo que tiene hora y es puntual: empieza con un
+  /// verbo de [_quick] o dura 5 min o menos. El usuario puede cambiarlo.
+  static TaskDraft classify(TaskDraft d) => d.copyWith(
+    isReminder:
+        !d.isNote &&
+        d.scheduledAt != null &&
+        (_quick.hasMatch(d.title.trim()) || (d.estimatedMinutes ?? 99) <= 5),
+  );
+
   static TaskDraft parse(String text, DateTime now) {
     var rest = ' ${text.trim()} ';
     String? take(RegExp re, void Function(RegExpMatch m) on) {

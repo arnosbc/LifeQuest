@@ -30,6 +30,23 @@ abstract class AssistantRepository {
     List<DraftStep> steps,
   );
 
+  /// La IA convierte la idea en meta S.M.A.R.T. con 3–7 pasos.
+  Future<Either<Failure, ({String title, SmartGoal smart, List<String> steps})>>
+  planGoal(String text);
+
+  /// Crea el proyecto y sus pasos como tareas del proyecto.
+  Future<Either<Failure, Unit>> createProject(
+    TaskDraft draft,
+    List<DraftStep> steps,
+  );
+
+  /// Crea la meta (vence en `draft.dueDate`) y sus pasos como tareas.
+  Future<Either<Failure, Unit>> createGoal(
+    TaskDraft draft,
+    SmartGoal smart,
+    List<DraftStep> steps,
+  );
+
   /// Guarda el texto en la Bandeja.
   Future<Either<Failure, Unit>> saveToInbox(String text);
 }

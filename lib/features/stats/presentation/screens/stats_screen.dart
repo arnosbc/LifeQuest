@@ -49,7 +49,7 @@ class StatsScreen extends StatelessWidget {
           children: [
             Expanded(child: _compare('XP', b.xp, b.xpPrev)),
             const SizedBox(width: 6),
-            Expanded(child: _compare('Tareas', b.missions, b.missionsPrev)),
+            Expanded(child: _compare('Tareas', b.tasks, b.tasksPrev)),
             const SizedBox(width: 6),
             Expanded(
               child: _compare('Min. foco', b.focusMinutes, b.focusMinutesPrev),

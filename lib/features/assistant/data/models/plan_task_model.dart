@@ -1,6 +1,6 @@
 import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
 
-/// Una misión de `missions_overview` vista por el planificador.
+/// Una tarea de `missions_overview` vista por el planificador.
 class PlanTaskModel {
   const PlanTaskModel(this.json);
 

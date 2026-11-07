@@ -5,6 +5,7 @@ import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 import 'package:proyecto_movil/features/profile/domain/repositories/profile_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   const ProfileRepositoryImpl(this._remote);
@@ -48,19 +49,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
     return unit;
   });
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'No hay conexión con el servidor. Revisa tu internet y reintenta.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error)));
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) =>
+      runGuarded(action, (error) => _messageFor(error));
 
   /// Mensajes que dicen qué hacer, con tono de invitación.
   static String _messageFor(ServerException error) =>

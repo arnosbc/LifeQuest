@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
 
-import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/habits/data/datasources/habits_remote_datasource.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/repositories/habits_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class HabitsRepositoryImpl implements HabitsRepository {
   const HabitsRepositoryImpl(this._remote);
@@ -39,6 +39,13 @@ class HabitsRepositoryImpl implements HabitsRepository {
       });
 
   @override
+  Future<Either<Failure, Unit>> setReminder(String habitId, int? minuteOfDay) =>
+      _run(() async {
+        await _remote.setReminder(habitId, minuteOfDay);
+        return unit;
+      });
+
+  @override
   Future<Either<Failure, Unit>> renameHabit(String habitId, String name) =>
       _run(() async {
         await _remote.renameHabit(habitId, name);
@@ -56,19 +63,8 @@ class HabitsRepositoryImpl implements HabitsRepository {
       '${now.month.toString().padLeft(2, '0')}-'
       '${now.day.toString().padLeft(2, '0')}';
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'No hay conexión con el servidor. Revisa tu internet y reintenta.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error.code)));
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) =>
+      runGuarded(action, (error) => _messageFor(error.code));
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {

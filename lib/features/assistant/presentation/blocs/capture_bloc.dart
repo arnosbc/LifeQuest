@@ -3,10 +3,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart' show Left;
 
+import 'package:proyecto_movil/features/assistant/domain/entities/local_parser.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capture.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/listen_voice.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/plan_goal.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
 
 part 'capture_event.dart';
@@ -17,9 +19,13 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
   CaptureBloc({
     required this._interpret,
     required this._breakDown,
+    required this._planGoal,
     required this._save,
     required this._listen,
-  }) : super(const CaptureWriting()) {
+    DateTime Function()? clock,
+  }) : _clock = clock ?? DateTime.now,
+       super(const CaptureWriting()) {
+    on<CaptureKindChanged>((event, _) => _kind = event.kind);
     on<CaptureListenRequested>(_onListen, transformer: droppable());
     on<CaptureListenStopped>((_, _) => _listen.stop());
     on<CaptureSubmitted>(_onSubmitted, transformer: droppable());
@@ -31,6 +37,9 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
 
   final InterpretCapture _interpret;
   final BreakDownTask _breakDown;
+  final PlanGoal _planGoal;
+  final DateTime Function() _clock;
+  CaptureKind _kind = CaptureKind.task;
   final SaveCapture _save;
   final ListenVoice _listen;
 
@@ -73,6 +82,14 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
     final text = event.text.trim();
     if (text.isEmpty) return;
     emit(const CaptureWriting(busy: true));
+    switch (_kind) {
+      case CaptureKind.project:
+        return _proposeProject(text, emit);
+      case CaptureKind.goal:
+        return _proposeGoal(text, emit);
+      case CaptureKind.task:
+        break;
+    }
     final result = await _interpret(text);
     emit(
       result.match(
@@ -82,6 +99,50 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
           usedAi: i.usedAi,
           aiAvailable: i.aiAvailable,
           message: i.notice,
+        ),
+      ),
+    );
+  }
+
+  /// Proyecto: título y fecha por reglas; la IA (si está) propone las tareas.
+  Future<void> _proposeProject(String text, Emitter<CaptureState> emit) async {
+    final parsed = LocalParser.parse(text, _clock());
+    final draft = TaskDraft(
+      title: parsed.title,
+      dueDate: parsed.dueDate,
+      priority: parsed.priority,
+    );
+    final steps = await _breakDown(draft);
+    emit(
+      CapturePreview(
+        kind: CaptureKind.project,
+        draft: draft,
+        usedAi: steps.isRight(),
+        aiAvailable: false,
+        steps: steps.getOrElse((_) => const []),
+        message: steps.match(
+          (f) => '${f.message} Lo creo sin tareas; añádelas después.',
+          (_) => null,
+        ),
+      ),
+    );
+  }
+
+  /// Meta: necesita la IA para escribir el S.M.A.R.T.
+  Future<void> _proposeGoal(String text, Emitter<CaptureState> emit) async {
+    final result = await _planGoal(LocalParser.parse(text, _clock()));
+    emit(
+      result.match(
+        (f) => CaptureWriting(
+          message: '${f.message} También puedes usar el formulario.',
+        ),
+        (plan) => CapturePreview(
+          kind: CaptureKind.goal,
+          draft: plan.draft,
+          smart: plan.smart,
+          steps: plan.steps,
+          usedAi: true,
+          aiAvailable: false,
         ),
       ),
     );
@@ -114,11 +175,15 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
     final current = state;
     if (current is! CapturePreview || current.busy) return;
     emit(current.copy(busy: true));
-    final toInbox = event.toInbox || current.draft.isNote;
+    final toInbox =
+        current.kind == CaptureKind.task &&
+        (event.toInbox || current.draft.isNote);
     final saved = await _save((
       draft: current.draft,
       steps: current.steps,
       toInbox: toInbox,
+      kind: current.kind,
+      smart: current.smart,
     ));
     if (saved case Left(value: final failure)) {
       emit(current.copy(message: failure.message));

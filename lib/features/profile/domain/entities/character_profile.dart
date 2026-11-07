@@ -90,7 +90,7 @@ class CharacterProfile extends Equatable {
   double get xpProgress =>
       xpToNextLevel <= 0 ? 0 : (currentXp / xpToNextLevel).clamp(0, 1);
 
-  /// Misiones cumplidas sobre las cerradas; null si aún no hay ninguna.
+  /// Tareas cumplidas sobre las cerradas; null si aún no hay ninguna.
   double? get completionRate {
     final total = questsCompleted + questsFailed;
     return total == 0 ? null : questsCompleted / total;

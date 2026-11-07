@@ -36,7 +36,7 @@ class GameSettings extends Equatable {
   /// Los avisos críticos saltan la ventana de silencio.
   final bool criticalBypassSilence;
 
-  /// RF-067: descansos de la Mazmorra.
+  /// RF-067: descansos de Foco.
   final int shortBreakMinutes;
   final int longBreakMinutes;
   final int longBreakEveryNCycles;

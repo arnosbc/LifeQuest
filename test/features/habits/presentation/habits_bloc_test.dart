@@ -39,6 +39,7 @@ void main() {
     registerBadHabit: registerBad,
     renameHabit: MockRenameHabit(),
     deleteHabit: MockDeleteHabit(),
+    setHabitReminder: MockSetHabitReminder(),
     clock: () => now,
   );
 

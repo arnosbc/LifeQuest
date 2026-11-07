@@ -8,6 +8,7 @@ class OnboardingChoices extends Equatable {
     this.identity = '',
     this.skill = '',
     this.difficulty = GameDifficulty.normal,
+    this.aiEnabled = false,
   });
 
   static const identityMaxLength = 280;
@@ -17,11 +18,14 @@ class OnboardingChoices extends Equatable {
   final String skill;
   final GameDifficulty difficulty;
 
+  /// Encender el asistente con IA (Gemini) desde el principio.
+  final bool aiEnabled;
+
   /// Mismos límites que el Perfil y la BD (002).
   bool get isValid =>
       identity.trim().length <= identityMaxLength &&
       skill.trim().length <= skillMaxLength;
 
   @override
-  List<Object?> get props => [identity, skill, difficulty];
+  List<Object?> get props => [identity, skill, difficulty, aiEnabled];
 }

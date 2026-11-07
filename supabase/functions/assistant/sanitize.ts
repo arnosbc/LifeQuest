@@ -67,3 +67,27 @@ export function sanitizeSteps(raw: unknown): string[] | null {
   const steps = [...new Set(clean)].slice(0, 7);
   return steps.length >= 2 ? steps : null;
 }
+
+export type GoalPlan = {
+  title: string;
+  specific: string;
+  measurable: string;
+  achievable: string;
+  relevant: string;
+  steps: string[];
+};
+
+/// Meta S.M.A.R.T.: los 4 campos obligatorios de create_goal (014) y sus
+/// pasos; null si falta alguno. [input]: título de respaldo.
+export function sanitizeGoal(raw: unknown, input: string): GoalPlan | null {
+  const o = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const steps = sanitizeSteps(raw);
+  const [specific, measurable, achievable, relevant] = [
+    o.specific, o.measurable, o.achievable, o.relevant,
+  ].map(text);
+  if (!steps || !specific || !measurable || !achievable || !relevant) return null;
+  return {
+    title: text(o.title) ?? input.slice(0, 200),
+    specific, measurable, achievable, relevant, steps,
+  };
+}

@@ -6,6 +6,7 @@ class TaskDraft extends Equatable {
   const TaskDraft({
     required this.title,
     this.isNote = false,
+    this.isReminder = false,
     this.scheduledAt,
     this.dueDate,
     this.estimatedMinutes,
@@ -18,6 +19,10 @@ class TaskDraft extends Equatable {
 
   /// No es algo por hacer: va a la Bandeja.
   final bool isNote;
+
+  /// Algo puntual (llamar, pagar…): suena a su hora, sin Foco ni XP (038).
+  /// Solo con hora.
+  final bool isReminder;
   final DateTime? scheduledAt;
   final DateTime? dueDate;
   final int? estimatedMinutes;
@@ -37,11 +42,14 @@ class TaskDraft extends Equatable {
     int? Function()? reminderMinutes,
     String? Function()? repeatRule,
     int? priority,
+    bool? isReminder,
   }) {
     final at = scheduledAt == null ? this.scheduledAt : scheduledAt();
     return TaskDraft(
       title: title ?? this.title,
       isNote: isNote,
+      // Sin hora no hay recordatorio.
+      isReminder: at != null && (isReminder ?? this.isReminder),
       scheduledAt: at,
       dueDate: dueDate == null ? this.dueDate : dueDate(),
       estimatedMinutes: estimatedMinutes == null
@@ -62,6 +70,7 @@ class TaskDraft extends Equatable {
   List<Object?> get props => [
     title,
     isNote,
+    isReminder,
     scheduledAt,
     dueDate,
     estimatedMinutes,
@@ -80,4 +89,25 @@ class DraftStep extends Equatable {
 
   @override
   List<Object?> get props => [title, due];
+}
+
+/// Qué se crea desde la hoja «Crear».
+enum CaptureKind { task, project, goal }
+
+/// Campos S.M.A.R.T. obligatorios de una meta (`create_goal`, 014).
+class SmartGoal extends Equatable {
+  const SmartGoal({
+    required this.specific,
+    required this.measurable,
+    required this.achievable,
+    required this.relevant,
+  });
+
+  final String specific;
+  final String measurable;
+  final String achievable;
+  final String relevant;
+
+  @override
+  List<Object?> get props => [specific, measurable, achievable, relevant];
 }

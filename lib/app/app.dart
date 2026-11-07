@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_router.dart';
+import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/app/capture_sheet.dart';
 import 'package:proyecto_movil/app/home_widget_sync.dart';
@@ -52,6 +53,7 @@ class _AppState extends State<App> {
     _onAuth(widget.authBloc.state);
     _auth = widget.authBloc.stream.listen(_onAuth);
     _share.start();
+    ReminderActions.opened.addListener(_onOpened);
     // Al volver a la app: la hora o las tareas pudieron cambiar en otro lado.
     _lifecycle = AppLifecycleListener(
       onResume: () {
@@ -72,6 +74,7 @@ class _AppState extends State<App> {
     if (signedIn) {
       ReminderActions.sync();
       if (_pendingShare case final text?) _onShared(text);
+      _onOpened();
     } else {
       ReminderActions.clear();
       HomeWidgetSync.clear();
@@ -92,8 +95,21 @@ class _AppState extends State<App> {
     });
   }
 
+  /// Toque en un aviso del teléfono: ir a su pantalla (espera a la sesión).
+  void _onOpened() {
+    final route = ReminderActions.opened.value;
+    if (route == null || !_signedIn) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ReminderActions.opened.value == null) return;
+      ReminderActions.opened.value = null;
+      // La revisión es una sección encima de la pestaña; el resto, pestañas.
+      route == RoutePaths.review ? _router.push(route) : _router.go(route);
+    });
+  }
+
   @override
   void dispose() {
+    ReminderActions.opened.removeListener(_onOpened);
     _auth.cancel();
     _lifecycle.dispose();
     _share.dispose();

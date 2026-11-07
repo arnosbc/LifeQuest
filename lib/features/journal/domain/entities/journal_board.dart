@@ -20,8 +20,8 @@ class JournalSummary extends Equatable {
   const JournalSummary({
     this.xp = 0,
     this.xpPrev = 0,
-    this.missions = 0,
-    this.missionsPrev = 0,
+    this.tasks = 0,
+    this.tasksPrev = 0,
     this.cycles = 0,
     this.cyclesPrev = 0,
     this.bestStreak = 0,
@@ -29,10 +29,10 @@ class JournalSummary extends Equatable {
 
   final int xp;
   final int xpPrev;
-  final int missions;
-  final int missionsPrev;
+  final int tasks;
+  final int tasksPrev;
 
-  /// Ciclos de Mazmorra.
+  /// Ciclos de Foco.
   final int cycles;
   final int cyclesPrev;
 
@@ -43,8 +43,8 @@ class JournalSummary extends Equatable {
   List<Object?> get props => [
     xp,
     xpPrev,
-    missions,
-    missionsPrev,
+    tasks,
+    tasksPrev,
     cycles,
     cyclesPrev,
     bestStreak,
@@ -57,7 +57,7 @@ enum JournalSource {
   project,
   goal,
   habit,
-  dungeon,
+  focus,
   dailyChest,
   achievement,
 }

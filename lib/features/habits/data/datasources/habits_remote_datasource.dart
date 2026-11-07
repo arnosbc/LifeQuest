@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/habits/data/models/habits_board_model.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 /// RPCs de Hábitos en Supabase. Lanza [ServerException] o [NetworkException].
 abstract class HabitsRemoteDataSource {
@@ -23,6 +23,8 @@ abstract class HabitsRemoteDataSource {
 
   Future<void> renameHabit(String habitId, String name);
 
+  Future<void> setReminder(String habitId, int? minuteOfDay);
+
   Future<void> deleteHabit(String habitId);
 }
 
@@ -32,7 +34,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   final SupabaseClient _client;
 
   @override
-  Future<HabitsBoardModel> getBoard(String day) => _guard(() async {
+  Future<HabitsBoardModel> getBoard(String day) => guardSupabase(() async {
     final json = await _client.rpc<Map<String, dynamic>>(
       'habits_overview',
       params: {'p_day': day},
@@ -41,7 +43,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   });
 
   @override
-  Future<void> createHabit(NewHabit habit) => _guard(() async {
+  Future<void> createHabit(NewHabit habit) => guardSupabase(() async {
     final id = await _client.rpc<String>(
       'create_habit',
       params: {
@@ -51,6 +53,8 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
         'p_specific_days': habit.specificDays,
         'p_hp_penalty': habit.hpPenalty,
         'p_skill_id': habit.skillId,
+        // p_min_version llega con 039; sin texto no se envía.
+        'p_min_version': ?habit.minVersion,
       },
     );
     final minute = habit.reminderMinuteOfDay;
@@ -71,7 +75,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   Future<void> completeGoodHabit({
     required String habitId,
     required String day,
-  }) => _guard(
+  }) => guardSupabase(
     () => _client.rpc<void>(
       'complete_habit',
       params: {'p_habit_id': habitId, 'p_day': day},
@@ -79,7 +83,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   );
 
   @override
-  Future<void> registerBadHabit(String habitId) => _guard(
+  Future<void> registerBadHabit(String habitId) => guardSupabase(
     () => _client.rpc<void>(
       'register_bad_habit',
       params: {'p_habit_id': habitId},
@@ -87,7 +91,21 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   );
 
   @override
-  Future<void> renameHabit(String habitId, String name) => _guard(
+  Future<void> setReminder(String habitId, int? minuteOfDay) => guardSupabase(
+    () => _client.rpc<void>(
+      'set_habit_reminder',
+      params: {
+        'p_habit_id': habitId,
+        'p_time': minuteOfDay == null
+            ? null
+            : '${(minuteOfDay ~/ 60).toString().padLeft(2, '0')}:'
+                  '${(minuteOfDay % 60).toString().padLeft(2, '0')}',
+      },
+    ),
+  );
+
+  @override
+  Future<void> renameHabit(String habitId, String name) => guardSupabase(
     () => _client.rpc<void>(
       'rename_habit',
       params: {'p_habit_id': habitId, 'p_name': name},
@@ -95,25 +113,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   );
 
   @override
-  Future<void> deleteHabit(String habitId) => _guard(
+  Future<void> deleteHabit(String habitId) => guardSupabase(
     () => _client.rpc<void>('delete_habit', params: {'p_habit_id': habitId}),
   );
-
-  /// Las funciones SQL lanzan su motivo como mensaje (p. ej.
-  /// `already_completed`); se pasa como [ServerException.code].
-  Future<T> _guard<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } on PostgrestException catch (error) {
-      throw ServerException(
-        code: error.message,
-        message: error.details?.toString(),
-        statusCode: error.code,
-      );
-    } on ClientException catch (error) {
-      throw NetworkException(error.message);
-    } on TimeoutException catch (error) {
-      throw NetworkException(error.message);
-    }
-  }
 }

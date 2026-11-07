@@ -12,6 +12,7 @@ import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart
 import 'package:proyecto_movil/features/habits/domain/usecases/get_habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/register_bad_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_reminder.dart';
 
 part 'habits_event.dart';
 part 'habits_state.dart';
@@ -24,6 +25,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     required this._registerBadHabit,
     required this._renameHabit,
     required this._deleteHabit,
+    required this._setHabitReminder,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HabitsInitial()) {
@@ -67,6 +69,18 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       ),
       transformer: droppable(),
     );
+    on<HabitReminderChanged>(
+      (event, emit) => _act(
+        emit,
+        (s) => HabitsSuccess(s.board, busyHabitId: event.habitId),
+        () => _setHabitReminder((
+          id: event.habitId,
+          minuteOfDay: event.minuteOfDay,
+        )),
+        event.minuteOfDay == null ? 'Aviso quitado.' : 'Aviso guardado.',
+      ),
+      transformer: droppable(),
+    );
     on<HabitDeleted>(
       (event, emit) => _act(
         emit,
@@ -84,6 +98,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
   final RegisterBadHabit _registerBadHabit;
   final RenameHabit _renameHabit;
   final DeleteHabit _deleteHabit;
+  final SetHabitReminder _setHabitReminder;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(

@@ -11,6 +11,7 @@ class NewHabit extends Equatable {
     this.hpPenalty = 0,
     this.skillId,
     this.reminderMinuteOfDay,
+    this.minVersion,
   });
 
   final String name;
@@ -26,6 +27,9 @@ class NewHabit extends Equatable {
   /// Solo hábitos buenos: hora del aviso en minutos desde medianoche.
   final int? reminderMinuteOfDay;
 
+  /// Solo hábitos buenos: la versión de 2 minutos (039).
+  final String? minVersion;
+
   @override
   List<Object?> get props => [
     name,
@@ -34,5 +38,6 @@ class NewHabit extends Equatable {
     hpPenalty,
     skillId,
     reminderMinuteOfDay,
+    minVersion,
   ];
 }

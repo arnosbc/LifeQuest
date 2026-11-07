@@ -14,7 +14,11 @@ class CaptureView extends StatefulWidget {
     this.initialText,
     this.startListening = false,
     this.preferInbox = false,
+    this.onOpenForm,
   });
+
+  /// «Usar el formulario» del tipo elegido; lo compone app/.
+  final ValueChanged<CaptureKind>? onOpenForm;
 
   /// Texto compartido desde otra app: se interpreta al abrir.
   final String? initialText;
@@ -31,6 +35,19 @@ class CaptureView extends StatefulWidget {
 
 class _CaptureViewState extends State<CaptureView> {
   late final _text = TextEditingController(text: widget.initialText);
+  CaptureKind _kind = CaptureKind.task;
+
+  static const _labels = {
+    CaptureKind.task: 'Tarea',
+    CaptureKind.project: 'Proyecto',
+    CaptureKind.goal: 'Meta',
+  };
+
+  static const _hints = {
+    CaptureKind.task: 'gym mañana 6pm cada lunes',
+    CaptureKind.project: 'Mudanza de apartamento para el 30 de diciembre',
+    CaptureKind.goal: 'Correr 10 km en marzo',
+  };
 
   @override
   void initState() {
@@ -87,6 +104,28 @@ class _CaptureViewState extends State<CaptureView> {
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      if (!widget.preferInbox) ...[
+        QuestlySegmented<CaptureKind>(
+          segments: [for (final k in CaptureKind.values) (k, _labels[k]!)],
+          selected: _kind,
+          onChanged: busy || listening
+              ? (_) {}
+              : (kind) {
+                  setState(() => _kind = kind);
+                  context.read<CaptureBloc>().add(CaptureKindChanged(kind));
+                },
+        ),
+        const SizedBox(height: 8),
+        Text(switch (_kind) {
+          CaptureKind.task =>
+            'Escribe o dicta como hablas. Yo pongo fecha, hora y aviso.',
+          CaptureKind.project =>
+            'Describe el proyecto. Con la IA activa te propongo sus tareas.',
+          CaptureKind.goal =>
+            'Describe tu meta. La IA la vuelve S.M.A.R.T. y la divide en pasos.',
+        }, style: QText.body(context.q.text2).copyWith(fontSize: 13)),
+        const SizedBox(height: 12),
+      ],
       TextField(
         controller: _text,
         autofocus: true,
@@ -97,8 +136,14 @@ class _CaptureViewState extends State<CaptureView> {
         textInputAction: TextInputAction.done,
         onSubmitted: (_) => _submit(),
         decoration: InputDecoration(
-          labelText: listening ? 'Te escucho…' : '¿Qué tienes en mente?',
-          hintText: 'gym mañana 6pm cada lunes',
+          labelText: listening
+              ? 'Te escucho…'
+              : switch (_kind) {
+                  CaptureKind.task => '¿Qué hay que hacer?',
+                  CaptureKind.project => '¿Qué proyecto?',
+                  CaptureKind.goal => '¿Qué quieres lograr?',
+                },
+          hintText: _hints[_kind],
           suffixIcon: IconButton(
             tooltip: listening ? 'Dejar de dictar' : 'Dictar',
             onPressed: busy
@@ -116,9 +161,17 @@ class _CaptureViewState extends State<CaptureView> {
       ),
       const SizedBox(height: 12),
       QuestlyButton(
-        label: busy ? 'Entendiendo…' : 'Continuar',
+        label: busy
+            ? (_kind == CaptureKind.task ? 'Entendiendo…' : 'Pensando…')
+            : 'Continuar',
         onPressed: busy || listening ? null : _submit,
       ),
+      if (widget.onOpenForm case final open?)
+        QuestlyButton(
+          label: 'Usar el formulario',
+          variant: QuestlyButtonVariant.text,
+          onPressed: busy || listening ? null : () => open(_kind),
+        ),
     ],
   );
 
@@ -171,13 +224,36 @@ class _CaptureViewState extends State<CaptureView> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          d.isNote ? 'Parece una nota, no una tarea' : 'Lo que entendí',
-          style: QText.meta(q.text2),
-        ),
+        Text(switch (state.kind) {
+          CaptureKind.project => 'Proyecto',
+          CaptureKind.goal => 'Meta',
+          CaptureKind.task =>
+            d.isNote ? 'Parece una nota, no una tarea' : 'Lo que entendí',
+        }, style: QText.meta(q.text2)),
         const SizedBox(height: 4),
         Text(d.title, style: QText.title3(q.text)),
         const SizedBox(height: 10),
+        // Con hora, se elige si es trabajo o algo puntual que solo debe sonar.
+        if (state.kind == CaptureKind.task &&
+            !d.isNote &&
+            d.scheduledAt != null) ...[
+          QuestlySegmented<bool>(
+            segments: const [(false, 'Tarea'), (true, 'Recordatorio')],
+            selected: d.isReminder,
+            onChanged: state.busy
+                ? (_) {}
+                : (reminder) => edit(d.copyWith(isReminder: reminder)),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            d.isReminder
+                ? 'Suena a su hora y lo marcas con Hecho. No entra en Foco '
+                      'ni da XP.'
+                : 'Trabajo para hacer con calma: entra en Foco y da XP.',
+            style: QText.meta(q.text2),
+          ),
+          const SizedBox(height: 10),
+        ],
         if (chips.isEmpty)
           Text(
             'Sin fecha ni hora. Puedes ponérsela después.',
@@ -192,14 +268,44 @@ class _CaptureViewState extends State<CaptureView> {
                 InputChip(
                   avatar: Icon(icon, size: 18),
                   label: Text(label),
-                  onDeleted: state.busy ? null : remove,
+                  // La meta necesita su fecha (create_goal, 014).
+                  onDeleted: state.busy || state.kind == CaptureKind.goal
+                      ? null
+                      : remove,
                   deleteButtonTooltipMessage: 'Quitar $label',
                 ),
             ],
           ),
+        if (state.smart case final smart?) ...[
+          const SizedBox(height: 14),
+          for (final (label, value) in [
+            ('Específica', smart.specific),
+            ('Medible', smart.measurable),
+            ('Alcanzable', smart.achievable),
+            ('Relevante', smart.relevant),
+          ])
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$label: ',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    TextSpan(text: value),
+                  ],
+                ),
+                style: QText.body(q.text),
+              ),
+            ),
+        ],
         if (state.steps.isNotEmpty) ...[
           const SizedBox(height: 14),
-          Text('Pasos', style: QText.meta(q.text2)),
+          Text(
+            state.kind == CaptureKind.task ? 'Pasos' : 'Tareas',
+            style: QText.meta(q.text2),
+          ),
           for (final step in state.steps)
             SheetRow(
               leading: const SheetCheck(done: false),
@@ -213,7 +319,7 @@ class _CaptureViewState extends State<CaptureView> {
           style: QText.meta(q.text2),
         ),
         const SizedBox(height: 14),
-        if (!d.isNote && state.aiAvailable && state.steps.isEmpty) ...[
+        if (!d.isNote && !d.isReminder && state.steps.isEmpty) ...[
           QuestlyButton(
             label: 'Dividir en pasos',
             variant: QuestlyButtonVariant.secondary,
@@ -226,9 +332,16 @@ class _CaptureViewState extends State<CaptureView> {
         QuestlyButton(
           label: state.busy
               ? 'Guardando…'
-              : d.isNote || widget.preferInbox
-              ? 'Guardar en la Bandeja'
-              : 'Crear tarea',
+              : switch (state.kind) {
+                  CaptureKind.project => 'Crear proyecto',
+                  CaptureKind.goal => 'Crear meta',
+                  CaptureKind.task =>
+                    d.isNote || widget.preferInbox
+                        ? 'Guardar en la Bandeja'
+                        : d.isReminder
+                        ? 'Crear recordatorio'
+                        : 'Crear tarea',
+                },
           onPressed: state.busy
               ? null
               : () => bloc.add(CaptureConfirmed(toInbox: widget.preferInbox)),
@@ -245,7 +358,7 @@ class _CaptureViewState extends State<CaptureView> {
                     : () => bloc.add(const CaptureRestarted()),
               ),
             ),
-            if (!d.isNote)
+            if (!d.isNote && state.kind == CaptureKind.task)
               Expanded(
                 child: QuestlyButton(
                   label: widget.preferInbox ? 'Crear tarea' : 'A la Bandeja',

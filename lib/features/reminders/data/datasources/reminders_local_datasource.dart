@@ -24,6 +24,17 @@ class RemindersLocalDataSourceImpl implements RemindersLocalDataSource {
   /// Ids de los botones; los atiende `app/reminder_actions.dart`.
   static const actionDone = 'done';
   static const actionSnooze = 'snooze';
+  static const actionHabitDone = 'habit_done';
+
+  /// `<tipo>:<id>` (task, habit, project) o `close` (cierre del día): lo lee
+  /// `app/reminder_actions.dart` para el botón o para abrir la pantalla.
+  static String? payloadOf(LocalReminder r) => switch (r) {
+    LocalReminder(:final taskId?) => 'task:$taskId',
+    LocalReminder(:final habitId?) => 'habit:$habitId',
+    LocalReminder(:final projectId?) => 'project:$projectId',
+    LocalReminder(daily: true) => 'close',
+    _ => null,
+  };
 
   static const _channelId = 'reminders';
   static const _channelName = 'Recordatorios';
@@ -61,10 +72,12 @@ class RemindersLocalDataSourceImpl implements RemindersLocalDataSource {
           title: r.title,
           body: r.body,
           scheduledDate: tz.TZDateTime.from(r.at, tz.local),
-          payload: r.taskId,
+          payload: payloadOf(r),
           // Inexacta: no necesita el permiso de alarma exacta.
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          matchDateTimeComponents: r.weekly
+          matchDateTimeComponents: r.daily
+              ? DateTimeComponents.time
+              : r.weekly
               ? DateTimeComponents.dayOfWeekAndTime
               : null,
           notificationDetails: NotificationDetails(
@@ -74,12 +87,14 @@ class RemindersLocalDataSourceImpl implements RemindersLocalDataSource {
               channelDescription: _channelDescription,
               importance: Importance.high,
               priority: Priority.high,
-              actions: r.taskId == null
-                  ? null
-                  : const [
+              actions: r.taskId != null
+                  ? const [
                       AndroidNotificationAction(actionDone, 'Hecha'),
                       AndroidNotificationAction(actionSnooze, 'Posponer 1 h'),
-                    ],
+                    ]
+                  : r.habitId != null
+                  ? const [AndroidNotificationAction(actionHabitDone, 'Hecho')]
+                  : null,
             ),
           ),
         );

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 /// Texto o enlaces compartidos desde otra app («Compartir → Questly»).
@@ -11,6 +12,7 @@ class ShareIntake {
   StreamSubscription<List<SharedMediaFile>>? _sub;
 
   void start() {
+    if (kIsWeb) return; // «Compartir → Questly» solo existe en el teléfono.
     try {
       // Con la app abierta.
       _sub = ReceiveSharingIntent.instance.getMediaStream().listen(

@@ -20,6 +20,9 @@ abstract class HomeRepository {
     required DateTime? at,
   });
 
+  /// Marca un recordatorio como hecho (sin XP, 038).
+  Future<Either<Failure, Unit>> completeReminder(String taskId);
+
   /// Pide el permiso del calendario del teléfono (tras explicar para qué).
   Future<Either<Failure, Unit>> connectCalendar();
 }

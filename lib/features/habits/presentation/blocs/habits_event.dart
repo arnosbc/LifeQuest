@@ -52,6 +52,17 @@ class HabitRenamed extends HabitsEvent {
   List<Object?> get props => [habitId, name];
 }
 
+/// Cambió (o quitó, con null) la hora del aviso.
+class HabitReminderChanged extends HabitsEvent {
+  const HabitReminderChanged(this.habitId, this.minuteOfDay);
+
+  final String habitId;
+  final int? minuteOfDay;
+
+  @override
+  List<Object?> get props => [habitId, minuteOfDay];
+}
+
 class HabitDeleted extends HabitsEvent {
   const HabitDeleted(this.habitId);
 

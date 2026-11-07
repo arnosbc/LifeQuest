@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/core/widgets/confirm_dialog.dart';
 
-/// Menú «⋯» de un elemento: renombrar (pide el nombre nuevo) y borrar (pide
-/// confirmación). Solo llama a los callbacks si el usuario acepta.
+/// Menú «⋯» de un elemento: [onEdit] opcional (abre su propia hoja),
+/// renombrar (pide el nombre nuevo) y borrar (pide confirmación). Solo llama
+/// a los callbacks si el usuario acepta.
 class LifeQuestItemMenu extends StatelessWidget {
   const LifeQuestItemMenu({
     super.key,
@@ -14,7 +15,13 @@ class LifeQuestItemMenu extends StatelessWidget {
     this.enabled = true,
     this.maxLength = 200,
     this.deleteMessage,
+    this.onEdit,
+    this.editLabel = 'Editar',
+    this.onDone,
   });
+
+  /// «Ya la hice»: marcar como hecho sin pasar por Foco.
+  final VoidCallback? onDone;
 
   final String name;
   final ValueChanged<String> onRename;
@@ -24,9 +31,13 @@ class LifeQuestItemMenu extends StatelessWidget {
 
   /// Qué pasa al borrar, si no es obvio.
   final String? deleteMessage;
+  final VoidCallback? onEdit;
+  final String editLabel;
 
-  Future<void> _onSelected(BuildContext context, bool delete) async {
-    if (delete) {
+  Future<void> _onSelected(BuildContext context, _Action action) async {
+    if (action == _Action.edit) return onEdit?.call();
+    if (action == _Action.done) return onDone?.call();
+    if (action == _Action.delete) {
       if (await confirmLifeQuest(
         context,
         title: 'Borrar «$name»',
@@ -49,14 +60,20 @@ class LifeQuestItemMenu extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => PopupMenuButton<bool>(
+  Widget build(BuildContext context) => PopupMenuButton<_Action>(
     enabled: enabled,
     tooltip: 'Opciones de «$name»',
     icon: Icon(Icons.more_vert, color: context.lq.muted, size: 20),
-    onSelected: (delete) => _onSelected(context, delete),
-    itemBuilder: (_) => const [
-      PopupMenuItem(value: false, child: Text('Renombrar')),
-      PopupMenuItem(value: true, child: Text('Borrar')),
+    onSelected: (action) => _onSelected(context, action),
+    itemBuilder: (_) => [
+      if (onDone != null)
+        const PopupMenuItem(value: _Action.done, child: Text('Ya la hice')),
+      if (onEdit != null)
+        PopupMenuItem(value: _Action.edit, child: Text(editLabel)),
+      const PopupMenuItem(value: _Action.rename, child: Text('Renombrar')),
+      const PopupMenuItem(value: _Action.delete, child: Text('Borrar')),
     ],
   );
 }
+
+enum _Action { done, edit, rename, delete }

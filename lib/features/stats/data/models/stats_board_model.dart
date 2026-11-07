@@ -13,8 +13,8 @@ class StatsBoardModel {
   StatsBoard toEntity() => StatsBoard(
     xp: _int(json['xp']),
     xpPrev: _int(json['xp_prev']),
-    missions: _int(json['missions']),
-    missionsPrev: _int(json['missions_prev']),
+    tasks: _int(json['missions']),
+    tasksPrev: _int(json['missions_prev']),
     focusMinutes: _int(json['focus_minutes']),
     focusMinutesPrev: _int(json['focus_minutes_prev']),
     bestStreak: _int(json['best_streak']),

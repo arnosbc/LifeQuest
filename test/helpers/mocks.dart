@@ -5,14 +5,17 @@ import 'package:mocktail/mocktail.dart';
 import 'package:proyecto_movil/core/calendar/phone_event.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/listen_voice.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_reminder.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_reminder.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/update_task.dart';
 import 'package:proyecto_movil/features/reminders/domain/usecases/sync_reminders.dart';
 
 import 'package:proyecto_movil/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/mark_notifications_read.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart'
+import 'package:proyecto_movil/features/tasks/domain/usecases/rename_task.dart'
     as rm;
-import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart'
+import 'package:proyecto_movil/features/tasks/domain/usecases/delete_task.dart'
     as dm;
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart'
     as rh;
@@ -32,14 +35,16 @@ import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:proyecto_movil/features/dungeon/data/datasources/dungeon_remote_datasource.dart';
-import 'package:proyecto_movil/features/dungeon/domain/repositories/dungeon_repository.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_dungeon_cycle.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_task.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/get_dungeon_board.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/start_dungeon.dart';
-import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
+import 'package:proyecto_movil/features/focus/data/datasources/focus_remote_datasource.dart';
+import 'package:proyecto_movil/features/focus/domain/repositories/focus_repository.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/add_focus_step.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/complete_focus_cycle.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/complete_session_task.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/end_focus.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/get_focus_board.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/schedule_focus_task.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/start_focus.dart';
+import 'package:proyecto_movil/features/focus/presentation/blocs/focus_bloc.dart';
 import 'package:proyecto_movil/features/habits/data/datasources/habits_remote_datasource.dart';
 import 'package:proyecto_movil/features/habits/domain/repositories/habits_repository.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/complete_good_habit.dart';
@@ -52,12 +57,12 @@ import 'package:proyecto_movil/features/home/domain/repositories/home_repository
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
-import 'package:proyecto_movil/features/missions/data/datasources/missions_remote_datasource.dart';
-import 'package:proyecto_movil/features/missions/domain/repositories/missions_repository.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/complete_mission.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/create_mission.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/get_missions_board.dart';
-import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/tasks/data/datasources/tasks_remote_datasource.dart';
+import 'package:proyecto_movil/features/tasks/domain/repositories/tasks_repository.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/complete_task.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/create_task.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/get_tasks_board.dart';
+import 'package:proyecto_movil/features/tasks/presentation/blocs/tasks_bloc.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/appearance_local_datasource.dart';
 import 'package:proyecto_movil/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:proyecto_movil/features/profile/domain/repositories/appearance_repository.dart';
@@ -74,6 +79,7 @@ import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.
 import 'package:proyecto_movil/features/stage/data/datasources/stage_remote_datasource.dart';
 import 'package:proyecto_movil/features/stage/domain/repositories/stage_repository.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/archive_stage_item.dart';
+import 'package:proyecto_movil/features/stage/domain/usecases/delete_stage_item.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_stage_task.dart';
 import 'package:proyecto_movil/features/onboarding/data/datasources/onboarding_remote_datasource.dart';
@@ -106,23 +112,26 @@ class MockRegisterUser extends Mock implements RegisterUser {}
 
 class MockLogoutUser extends Mock implements LogoutUser {}
 
-class MockDungeonRemoteDataSource extends Mock
-    implements DungeonRemoteDataSource {}
+class MockFocusRemoteDataSource extends Mock implements FocusRemoteDataSource {}
 
-class MockDungeonRepository extends Mock implements DungeonRepository {}
+class MockFocusRepository extends Mock implements FocusRepository {}
 
-class MockGetDungeonBoard extends Mock implements GetDungeonBoard {}
+class MockGetFocusBoard extends Mock implements GetFocusBoard {}
 
-class MockStartDungeon extends Mock implements StartDungeon {}
+class MockStartFocus extends Mock implements StartFocus {}
 
-class MockCompleteDungeonCycle extends Mock implements CompleteDungeonCycle {}
+class MockCompleteFocusCycle extends Mock implements CompleteFocusCycle {}
 
 class MockCompleteSessionTask extends Mock implements CompleteSessionTask {}
 
-class MockEndDungeon extends Mock implements EndDungeon {}
+class MockEndFocus extends Mock implements EndFocus {}
 
-class MockDungeonBloc extends MockBloc<DungeonEvent, DungeonState>
-    implements DungeonBloc {}
+class MockAddFocusStep extends Mock implements AddFocusStep {}
+
+class MockScheduleFocusTask extends Mock implements ScheduleFocusTask {}
+
+class MockFocusBloc extends MockBloc<FocusEvent, FocusState>
+    implements FocusBloc {}
 
 class MockHabitsBloc extends MockBloc<HabitsEvent, HabitsState>
     implements HabitsBloc {}
@@ -152,7 +161,13 @@ class MockCompleteHabit extends Mock implements CompleteHabit {}
 
 class MockScheduleTask extends Mock implements ScheduleTask {}
 
+class MockUpdateTask extends Mock implements UpdateTask {}
+
+class MockSetHabitReminder extends Mock implements SetHabitReminder {}
+
 class MockConnectCalendar extends Mock implements ConnectCalendar {}
+
+class MockCompleteReminder extends Mock implements CompleteReminder {}
 
 class MockListenVoice extends Mock implements ListenVoice {}
 
@@ -188,19 +203,18 @@ class MockSyncReminders extends Mock implements SyncReminders {}
 class MockNotificationsPlugin extends Mock
     implements FlutterLocalNotificationsPlugin {}
 
-class MockMissionsBloc extends MockBloc<MissionsEvent, MissionsState>
-    implements MissionsBloc {}
+class MockTasksBloc extends MockBloc<TasksEvent, TasksState>
+    implements TasksBloc {}
 
-class MockMissionsRepository extends Mock implements MissionsRepository {}
+class MockTasksRepository extends Mock implements TasksRepository {}
 
-class MockMissionsRemoteDataSource extends Mock
-    implements MissionsRemoteDataSource {}
+class MockTasksRemoteDataSource extends Mock implements TasksRemoteDataSource {}
 
-class MockGetMissionsBoard extends Mock implements GetMissionsBoard {}
+class MockGetTasksBoard extends Mock implements GetTasksBoard {}
 
-class MockCreateMission extends Mock implements CreateMission {}
+class MockCreateTask extends Mock implements CreateTask {}
 
-class MockCompleteMission extends Mock implements CompleteMission {}
+class MockCompleteTask extends Mock implements CompleteTask {}
 
 class MockProfileBloc extends MockBloc<ProfileEvent, ProfileState>
     implements ProfileBloc {}
@@ -246,6 +260,8 @@ class MockCreateProject extends Mock implements CreateProject {}
 class MockCreateResource extends Mock implements CreateResource {}
 
 class MockArchiveStageItem extends Mock implements ArchiveStageItem {}
+
+class MockDeleteStageItem extends Mock implements DeleteStageItem {}
 
 class MockCompleteProject extends Mock implements CompleteProject {}
 
@@ -294,9 +310,9 @@ class MockDeleteThought extends Mock implements DeleteThought {}
 class MockGetStats extends Mock implements GetStats {}
 
 // Renombrar y borrar (028).
-class MockRenameMission extends Mock implements rm.RenameMission {}
+class MockRenameTask extends Mock implements rm.RenameTask {}
 
-class MockDeleteMission extends Mock implements dm.DeleteMission {}
+class MockDeleteTask extends Mock implements dm.DeleteTask {}
 
 class MockRenameHabit extends Mock implements rh.RenameHabit {}
 

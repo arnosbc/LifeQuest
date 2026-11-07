@@ -33,7 +33,7 @@ void main() {
     );
   });
 
-  group('observaciones de RPGenie', () {
+  group('observaciones del asistente', () {
     test('comparan con la semana anterior, el mejor día y el Área', () {
       final b = StatsBoard(
         xp: 120,

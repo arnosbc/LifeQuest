@@ -28,7 +28,14 @@ class HabitsBoardModel {
           bestStreak: _int(h['best_streak']),
           scheduledToday: h['scheduled_today'] as bool? ?? true,
           doneToday: h['done_today'] as bool? ?? false,
+          reminderMinuteOfDay: switch ((h['reminder_time'] as String?)?.split(
+            ':',
+          )) {
+            [final hh, final mm, ...] => int.parse(hh) * 60 + int.parse(mm),
+            _ => null,
+          },
           todayCount: _int(h['today_count']),
+          minVersion: h['min_version'] as String?,
           week: (h['week'] as List<dynamic>? ?? const []).cast<bool>(),
         ),
     ],

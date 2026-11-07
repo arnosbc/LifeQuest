@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Ticket del día</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#E8E6E1;--p:#FFFFFF;--i:#26262B;--m:#6B6B72;--a:#2B59C3;--w:#C2410C;--u:52px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--g);color:var(--i);font:400 15px/1.35 "Hanken Grotesk",sans-serif}
+.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+.bar{height:24px}
+.r{position:relative;margin:12px 16px 0;background:var(--p);padding:22px 18px 16px;height:604px}
+.r:before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px;background:linear-gradient(135deg,transparent 50%,var(--p) 50%) 0 0/12px 8px,linear-gradient(225deg,transparent 50%,var(--p) 50%) 0 0/12px 8px;background-repeat:repeat-x}
+.hd{text-align:center;font-weight:800;letter-spacing:.18em;font-size:13px}
+.dt{text-align:center;font-size:12px;color:var(--m);margin-top:4px}
+.sep{border-top:1px dashed var(--i);margin:12px 0}
+.nx small{display:block;font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--a)}
+.nx b{display:block;font-size:34px;font-weight:800;line-height:1.05;letter-spacing:-.02em;margin:2px 0}
+.nx span{font-size:20px;font-weight:600}
+.nx span .n{color:var(--a)}
+.it{display:flex;gap:10px;padding:8px 0 8px 10px;border-left:3px solid transparent;align-items:flex-start;position:relative}
+.it .t{font-size:13px;width:44px;flex:none;padding-top:2px}
+.it .l{flex:1;display:flex;align-items:baseline;gap:6px;min-width:0}
+.it .l i{flex:1;border-bottom:1px dotted var(--m);font-style:normal}
+.it.p .l i{border-bottom-style:dashed}
+.it .d{font-size:13px;flex:none}
+.done{color:var(--m)}.done .nm{text-decoration:line-through}
+.stamp{position:absolute;right:56px;top:14px;transform:rotate(-8deg);border:1px solid var(--m);color:var(--m);font:600 10px "JetBrains Mono",monospace;letter-spacing:.15em;padding:1px 5px}
+.cur{border-left-color:var(--a);background:#F3F6FC;flex-wrap:wrap}
+.cur .nm{font-weight:600}
+.btn{margin-left:54px;height:48px;padding:0 18px;border:1px solid var(--a);background:var(--a);color:#fff;font:600 15px "Hanken Grotesk";border-radius:4px}
+.tot{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.ok{text-align:center;font-size:11px;letter-spacing:.2em;color:var(--m);margin-top:6px}
+.cap{position:absolute;left:16px;right:16px;bottom:92px;height:52px;background:var(--p);border:1px solid var(--i);display:flex;align-items:center;padding-left:16px;color:var(--m)}
+.cap span{flex:1}
+.mic{width:48px;height:48px;display:grid;place-items:center}
+nav{position:absolute;left:0;right:0;bottom:0;height:80px;background:var(--p);border-top:1px solid #CFCCC5;display:flex}
+nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:500;color:var(--m);text-decoration:none}
+nav a svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.6}
+nav a.on{color:var(--i);font-weight:800}
+nav a.on svg{background:#DCE4F5;border-radius:16px;width:56px;padding:2px 16px;height:28px;stroke:var(--a)}
+</style></head><body>
+<div class="bar"></div>
+<main class="r">
+<div class="hd">QUESTLY · HOY</div>
+<div class="dt n">VIE 31 OCT 2026 · 16:20</div>
+<div class="sep"></div>
+<div class="nx"><small>SIGUIENTE</small><b>Llamar a mamá</b><span>en <span class="n">12 min</span></span></div>
+<div class="sep"></div>
+<div class="it done" style="min-height:calc(var(--u)*1.5)"><span class="t n">14:00</span><span class="l"><span class="nm">Revisar informe de ventas</span><i></i></span><span class="d n">45 min</span><span class="stamp">HECHO</span></div>
+<div class="it cur" style="min-height:calc(var(--u)*1)"><span class="t n">16:30</span><span class="l"><span class="nm">Llamar a mamá</span><i></i></span><span class="d n">30 min</span><button class="btn">Empezar foco</button></div>
+<div class="it p" style="min-height:calc(var(--u)*2)"><span class="t n">18:30</span><span class="l"><span class="nm">Gimnasio</span><i></i></span><span class="d n">60 min</span></div>
+<div class="it p" style="min-height:calc(var(--u)*.67)"><span class="t n">20:00</span><span class="l"><span class="nm">Leer</span><i></i></span><span class="d n">20 min</span></div>
+<div class="sep"></div>
+<div class="tot"><span>PLANEADO</span><span class="n">2 h 35 min</span></div>
+<div class="tot"><span>LIBRE HOY</span><span class="n">5 h 10 min</span></div>
+<div class="ok">TOTAL OK</div>
+</main>
+<div class="cap"><span>Escribe o dicta…</span><button class="mic" aria-label="Dictar" style="border:0;background:none;color:var(--i)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
+<nav>
+<a class="on" href="#"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8H4z"/></svg>Hoy</a>
+<a href="#"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9"/></svg>Tareas</a>
+<a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M9 12l2 2 4-4"/></svg>Hábitos</a>
+<a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l3 2M10 3h4"/></svg>Foco</a>
+<a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1-4 4-6 8-6s7 2 8 6"/></svg>Tú</a>
+</nav>
+</body></html>

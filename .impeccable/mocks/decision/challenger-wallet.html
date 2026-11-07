@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Billetera de pasajes</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#14213D;--red:#C8102E;--purple:#6B4FA0;--paper:#fff;--bg:#E9ECF2;--rule:#C9CFDB;--muted:#5A6478}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden}
+body{background:var(--bg);font-family:Archivo,sans-serif;color:var(--navy);position:relative}
+.mono{font-family:"IBM Plex Mono",monospace}
+header{padding:28px 16px 14px;background:var(--navy);color:#fff}
+header small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+header h1{font-size:22px;font-weight:800;margin-top:4px}
+header p{font-size:14px;margin-top:4px;opacity:.9}
+.wallet{padding:16px}
+.coupon{background:var(--paper);border:1px solid var(--rule);border-radius:6px;position:relative}
+.front{box-shadow:0 6px 18px rgba(20,33,61,.18);z-index:3}
+.band{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--rule)}
+.band b{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.band span{font-size:11px;color:var(--muted)}
+.title{padding:12px 14px 4px;font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:.01em}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;margin:8px 14px 14px;border:1px solid var(--navy)}
+.grid div{padding:8px;border-right:1px solid var(--navy)}
+.grid div:last-child{border-right:0}
+.grid label{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.grid strong{display:block;margin-top:4px;font-size:18px;color:var(--purple)}
+.grid .txt{font-family:Archivo,sans-serif;font-weight:800;font-size:16px;color:var(--navy)}
+.stub{border-top:2px dashed var(--rule);padding:12px 14px 14px;display:flex;align-items:center;justify-content:space-between;position:relative}
+.stub::before,.stub::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg)}
+.stub::before{left:-11px;border-right:1px solid var(--rule)}
+.stub::after{right:-11px;border-left:1px solid var(--rule)}
+.stub span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{min-height:48px;padding:0 22px;border:0;border-radius:4px;background:var(--navy);color:#fff;font:800 14px Archivo,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.mini{display:flex;align-items:center;min-height:56px;margin-top:-4px;padding:12px 14px 8px;border-top:0;border-radius:0 0 6px 6px}
+.mini+.mini{margin-top:8px;border-radius:6px}
+.mini .t{width:64px;font-size:16px;color:var(--purple)}
+.mini .n{flex:1;font-weight:800;text-transform:uppercase;font-size:15px}
+.mini .d{font-size:12px;color:var(--muted)}
+.mini.l1{margin:0 6px;z-index:2}
+.mini.l2{margin:0 12px;z-index:1}
+.used{margin-top:14px;opacity:.85;overflow:hidden}
+.used .n{text-decoration:line-through;text-decoration-color:var(--muted)}
+.stamp{position:absolute;right:18px;top:8px;transform:rotate(-12deg);border:3px solid var(--red);color:var(--red);font:800 18px Archivo,sans-serif;letter-spacing:.2em;padding:2px 10px;border-radius:4px}
+.sect{margin:18px 0 6px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.capture{position:absolute;left:16px;right:16px;bottom:92px}
+.capture input{width:100%;min-height:52px;border:1px solid var(--navy);border-radius:6px;background:var(--paper);padding:0 16px;font:400 15px Archivo,sans-serif;color:var(--navy)}
+.capture input::placeholder{color:var(--muted)}
+nav{position:absolute;left:0;right:0;bottom:0;height:76px;background:var(--paper);border-top:1px solid var(--rule);display:flex}
+nav a{flex:1;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);text-decoration:none;text-transform:uppercase;letter-spacing:.08em}
+nav a i{width:22px;height:3px;background:currentColor;border-radius:2px;opacity:.4}
+nav a.on{color:var(--navy)}
+nav a.on i{opacity:1;background:var(--red);width:28px}
+</style>
+</head>
+<body>
+<header>
+<small class="mono">Vie 31 oct · 16:20</small>
+<h1>Tu día</h1>
+<p><span class="mono">4</span> cupones · <span class="mono">1</span> usado</p>
+</header>
+<main class="wallet">
+<article class="coupon front" aria-label="Tarea actual: Llamar a mamá">
+<div class="band"><b>Pase de abordar · Ahora</b><span class="mono">Cupón 2 de 4</span></div>
+<h2 class="title">Llamar a mamá</h2>
+<div class="grid">
+<div><label>Hora</label><strong class="mono">16:30</strong></div>
+<div><label>Duración</label><strong class="mono">30 MIN</strong></div>
+<div><label>Área</label><strong class="txt">Familia</strong></div>
+</div>
+<div class="stub"><span>Talón · Conservar</span><button class="btn">Empezar foco</button></div>
+</article>
+<div class="coupon mini l1"><span class="t mono">18:30</span><span class="n">Gimnasio</span><span class="d mono">60 MIN</span></div>
+<div class="coupon mini l2"><span class="t mono">20:00</span><span class="n">Leer</span><span class="d mono">20 MIN</span></div>
+<p class="sect">Cupones usados</p>
+<div class="coupon mini used"><span class="t mono">14:00</span><span class="n">Revisar informe de ventas</span><span class="stamp">HECHO</span></div>
+</main>
+<label class="capture"><span style="position:absolute;left:-9999px">Capturar una idea</span><input type="text" placeholder="Escribe o dicta…"></label>
+<nav aria-label="Navegación principal">
+<a class="on" href="#" aria-current="page"><i></i>Hoy</a>
+<a href="#"><i></i>Tareas</a>
+<a href="#"><i></i>Hábitos</a>
+<a href="#"><i></i>Foco</a>
+<a href="#"><i></i>Tú</a>
+</nav>
+</body>
+</html>

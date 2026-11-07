@@ -22,7 +22,7 @@ class DevicePhoneCalendar implements PhoneCalendar {
       if (status == CalendarPermissionStatus.granted) {
         return CalendarAccess.granted;
       }
-    } on Exception {
+    } catch (_) {
       // Sin calendario o sin plugin (p. ej. en tests): como negado.
     }
     return await _prefs.getBool(_askedKey) ?? false
@@ -38,7 +38,7 @@ class DevicePhoneCalendar implements PhoneCalendar {
       return status == CalendarPermissionStatus.granted
           ? CalendarAccess.granted
           : CalendarAccess.denied;
-    } on Exception {
+    } catch (_) {
       return CalendarAccess.denied;
     }
   }
@@ -60,7 +60,7 @@ class DevicePhoneCalendar implements PhoneCalendar {
               end: e.endDate.toLocal(),
             ),
       ]..sort((a, b) => a.start.compareTo(b.start));
-    } on Exception {
+    } catch (_) {
       return const [];
     }
   }

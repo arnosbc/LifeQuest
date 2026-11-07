@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Questly Hoy</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden}
+body{background:#F4F4F2;color:#111;font-family:"Fira Sans",sans-serif;display:flex;flex-direction:column}
+.status{height:32px;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:13px;font-weight:500}
+.head{padding:8px 20px 12px;font-size:15px;font-weight:500}
+.next{background:#FFD100;padding:16px 20px 20px;position:relative}
+.lbl{font-size:13px;font-weight:700;letter-spacing:.04em}
+.title{display:flex;align-items:center;justify-content:space-between;font-size:30px;font-weight:700;margin-top:4px}
+.big{font-size:96px;font-weight:800;line-height:.95;letter-spacing:-.03em;margin-top:6px}
+.sub{font-size:17px;font-weight:500;margin-top:6px}
+.btn{display:flex;align-items:center;justify-content:center;height:52px;margin-top:16px;background:#111;color:#fff;font-size:17px;font-weight:700;border:0;width:100%;font-family:inherit}
+.list{padding:12px 20px 0;display:flex;flex-direction:column;gap:8px}
+.row{background:#fff;min-height:64px;display:flex;align-items:center;gap:14px;padding-left:8px}
+.pic{width:48px;height:48px;background:#111;display:flex;align-items:center;justify-content:center;flex:none}
+.txt{flex:1}
+.t1{font-size:17px;font-weight:700}
+.t2{font-size:14px;color:#444;margin-top:2px}
+.arr{width:48px;height:64px;display:flex;align-items:center;justify-content:center;border-left:2px solid #F4F4F2}
+.done{background:transparent;color:#666}
+.done .pic{background:#bbb}
+.done .t1{text-decoration:line-through;font-weight:500}
+.plan{padding:12px 20px;font-size:14px;color:#444}
+.cap{margin:auto 20px 12px;height:52px;background:#fff;border:2px solid #111;display:flex;align-items:center;padding-left:16px;font-size:16px;color:#555}
+.cap span{flex:1}
+.mic{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#111}
+nav{height:72px;background:#111;display:flex}
+nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#aaa;font-size:12px;text-decoration:none;font-weight:500}
+nav a.on{color:#fff;font-weight:700;box-shadow:inset 0 3px 0 #fff}
+nav i{width:22px;height:22px;border:2px solid currentColor;display:block}
+</style>
+</head>
+<body>
+<div class="status"><span>16:20</span><span>5G 82 %</span></div>
+<div class="head">Hoy · viernes 31 oct</div>
+
+<section class="next" aria-label="Siguiente tarea">
+  <div class="lbl">Siguiente</div>
+  <div class="title">Llamar a mamá
+    <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h16M13 5l7 7-7 7" stroke="#111" stroke-width="3" fill="none"/></svg>
+  </div>
+  <div class="big">12 min</div>
+  <div class="sub">16:30 · Familia</div>
+  <button class="btn">Empezar foco</button>
+</section>
+
+<div class="list">
+  <div class="row">
+    <div class="pic"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8" stroke="#fff" stroke-width="2.4" fill="none"/></svg></div>
+    <div class="txt"><div class="t1">18:30 Gimnasio</div><div class="t2">en 2 h 10 min</div></div>
+    <div class="arr"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M12 5l7 7-7 7" stroke="#111" stroke-width="2.6" fill="none"/></svg></div>
+  </div>
+  <div class="row">
+    <div class="pic"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1zM12 6v14" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+    <div class="txt"><div class="t1">20:00 Leer 20 min</div><div class="t2">en 3 h 40 min</div></div>
+    <div class="arr"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M12 5l7 7-7 7" stroke="#111" stroke-width="2.6" fill="none"/></svg></div>
+  </div>
+  <div class="row done">
+    <div class="pic"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3" fill="none"/></svg></div>
+    <div class="txt"><div class="t2">Hecho · 14:00</div><div class="t1">Revisar informe de ventas</div></div>
+  </div>
+</div>
+
+<div class="plan">Planeado 2 h 35 min de 5 h 10 min libres</div>
+
+<div class="cap"><span>Escribe o dicta…</span>
+  <div class="mic" role="button" aria-label="Dictar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="#fff"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+</div>
+
+<nav>
+  <a class="on" href="#"><i></i>Hoy</a>
+  <a href="#"><i></i>Tareas</a>
+  <a href="#"><i></i>Hábitos</a>
+  <a href="#"><i></i>Foco</a>
+  <a href="#"><i></i>Tú</a>
+</nav>
+</body>
+</html>

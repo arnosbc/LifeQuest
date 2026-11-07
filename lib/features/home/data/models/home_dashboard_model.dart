@@ -11,7 +11,7 @@ class HomeDashboardModel {
   final Map<String, dynamic> json;
 
   HomeDashboard toEntity() {
-    final mission = json['priority_mission'] as Map<String, dynamic>?;
+    final task = json['priority_mission'] as Map<String, dynamic>?;
     final habits = (json['habits'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
     final agenda = json['agenda'] as Map<String, dynamic>? ?? const {};
@@ -29,19 +29,17 @@ class HomeDashboardModel {
       hpCurrent: _int(json['hp_current'], 100),
       hpMax: _int(json['hp_max'], 100),
       isWeakened: json['is_weakened'] as bool? ?? false,
-      priorityMission: mission == null
+      priorityTask: task == null
           ? null
-          : PriorityMission(
-              id: mission['id'] as String,
-              title: mission['title'] as String,
-              priority: UrgencyLevel.values.byName(
-                mission['priority'] as String,
-              ),
-              xpReward: _int(mission['xp_reward']),
-              coinReward: _int(mission['coin_reward']),
-              dueDate: mission['due_date'] == null
+          : PriorityTask(
+              id: task['id'] as String,
+              title: task['title'] as String,
+              priority: UrgencyLevel.values.byName(task['priority'] as String),
+              xpReward: _int(task['xp_reward']),
+              coinReward: _int(task['coin_reward']),
+              dueDate: task['due_date'] == null
                   ? null
-                  : DateTime.parse(mission['due_date'] as String).toLocal(),
+                  : DateTime.parse(task['due_date'] as String).toLocal(),
             ),
       habits: [
         for (final habit in habits)
@@ -54,8 +52,8 @@ class HomeDashboardModel {
       habitsDone: _int(json['habits_done']),
       habitsTotal: _int(json['habits_total']),
       streakDays: _int(json['streak_days']),
-      missionsDone: _int(json['missions_done']),
-      missionsTotal: _int(json['missions_total']),
+      tasksDone: _int(json['missions_done']),
+      tasksTotal: _int(json['missions_total']),
       focusMinutes: _int(json['focus_minutes']),
       agenda: [
         for (final b in list('scheduled'))
@@ -66,6 +64,7 @@ class HomeDashboardModel {
             minutes: (b['estimated_minutes'] as num?)?.toInt(),
             done: b['done'] as bool? ?? false,
             repeats: b['repeat_rule'] != null,
+            isReminder: b['is_reminder'] as bool? ?? false,
           ),
       ],
       unscheduled: [
@@ -74,6 +73,7 @@ class HomeDashboardModel {
             id: t['id'] as String,
             title: t['title'] as String,
             minutes: (t['estimated_minutes'] as num?)?.toInt(),
+            isReminder: t['is_reminder'] as bool? ?? false,
           ),
       ],
     );

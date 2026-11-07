@@ -17,6 +17,16 @@ class CaptureSubmitted extends CaptureEvent {
   List<Object?> get props => [text];
 }
 
+/// Cambió qué se crea (tarea, proyecto o meta).
+class CaptureKindChanged extends CaptureEvent {
+  const CaptureKindChanged(this.kind);
+
+  final CaptureKind kind;
+
+  @override
+  List<Object?> get props => [kind];
+}
+
 /// Empezar a dictar.
 class CaptureListenRequested extends CaptureEvent {
   const CaptureListenRequested();

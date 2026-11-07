@@ -22,7 +22,7 @@ class InterpretCapture implements UseCase<Interpretation, String> {
       (_) => AiStatus.off,
     );
     Interpretation local([String? notice]) => Interpretation(
-      draft: LocalParser.parse(text, now),
+      draft: LocalParser.classify(LocalParser.parse(text, now)),
       usedAi: false,
       aiAvailable: status.available,
       notice: notice,
@@ -33,7 +33,7 @@ class InterpretCapture implements UseCase<Interpretation, String> {
       ai.match(
         (failure) => local(failure.message),
         (draft) => Interpretation(
-          draft: draft,
+          draft: LocalParser.classify(draft),
           usedAi: true,
           aiAvailable: status.callsLeft > 1,
         ),

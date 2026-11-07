@@ -6,10 +6,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/assistant/data/models/task_draft_model.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
+import 'package:proyecto_movil/features/assistant/domain/entities/step_templates.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
 import 'package:proyecto_movil/features/assistant/domain/repositories/assistant_repository.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capture.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/plan_goal.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
 
@@ -28,6 +30,14 @@ void main() {
     registerFallbackValue(DateTime(2026));
     registerFallbackValue(const TaskDraft(title: ''));
     registerFallbackValue(<DraftStep>[]);
+    registerFallbackValue(
+      const SmartGoal(
+        specific: '',
+        measurable: '',
+        achievable: '',
+        relevant: '',
+      ),
+    );
   });
   setUp(() {
     repo = _Repo();
@@ -92,12 +102,39 @@ void main() {
     ]);
   });
 
+  test('sin IA, BreakDownTask propone pasos por reglas', () async {
+    when(
+      () => repo.breakdown(any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('La IA está apagada.')));
+    final titles = await BreakDownTask(
+      repo,
+    ).titles('Realizar pruebas finales y desplegar la aplicación');
+    expect(
+      titles.getOrElse((_) => const []).first,
+      'Definir qué debe funcionar',
+    );
+  });
+
+  test('StepTemplates: inicio de palabra y plantilla genérica', () {
+    expect(
+      StepTemplates.forTitle('Estudiar para el parcial').first,
+      'Reunir apuntes y temas',
+    );
+    // «apagar» no debe tomarse como «pagar».
+    expect(
+      StepTemplates.forTitle('Apagar el router').first,
+      'Definir cómo se ve terminado',
+    );
+  });
+
   group('CaptureBloc', () {
     CaptureBloc build() => CaptureBloc(
       interpret: InterpretCapture(repo, clock: () => now),
       breakDown: BreakDownTask(repo, clock: () => now),
+      planGoal: PlanGoal(repo, clock: () => now),
       save: SaveCapture(repo),
       listen: voice,
+      clock: () => now,
     );
 
     blocTest<CaptureBloc, CaptureState>(
@@ -132,6 +169,49 @@ void main() {
       verify: (_) => verify(
         () => repo.createTask(const TaskDraft(title: 'Comprar pan'), const []),
       ).called(1),
+    );
+
+    blocTest<CaptureBloc, CaptureState>(
+      'meta: la IA escribe el S.M.A.R.T. y los pasos; se crea la meta con ellos',
+      setUp: () {
+        when(() => repo.planGoal(any())).thenAnswer(
+          (_) async => const Right((
+            title: 'Correr 10 km',
+            smart: SmartGoal(
+              specific: 'a',
+              measurable: 'b',
+              achievable: 'c',
+              relevant: 'd',
+            ),
+            steps: ['Correr 3 km', 'Correr 5 km'],
+          )),
+        );
+        when(
+          () => repo.createGoal(any(), any(), any()),
+        ).thenAnswer((_) async => const Right(unit));
+      },
+      build: build,
+      act: (bloc) async {
+        bloc.add(const CaptureKindChanged(CaptureKind.goal));
+        bloc.add(const CaptureSubmitted('correr 10k'));
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const CaptureConfirmed());
+      },
+      skip: 1,
+      verify: (bloc) {
+        final saved = verify(
+          () => repo.createGoal(captureAny(), any(), captureAny()),
+        ).captured;
+        final draft = saved[0] as TaskDraft;
+        expect(draft.title, 'Correr 10 km');
+        // Sin fecha dicha: vence en 90 días; los pasos se reparten hasta ahí.
+        expect(
+          draft.dueDate,
+          now.add(const Duration(days: PlanGoal.defaultDays)),
+        );
+        expect((saved[1] as List<DraftStep>).length, 2);
+        expect(bloc.state, const CaptureSaved(toInbox: false));
+      },
     );
 
     blocTest<CaptureBloc, CaptureState>(

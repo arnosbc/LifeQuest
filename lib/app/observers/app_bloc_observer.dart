@@ -9,7 +9,11 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
     super.onChange(bloc, change);
-    if (kDebugMode) {
+    // El cronómetro de Foco cambia de estado cada segundo y tapa el resto.
+    final tick =
+        change.currentState.runtimeType == change.nextState.runtimeType &&
+        bloc.runtimeType.toString() == 'FocusBloc';
+    if (kDebugMode && !tick) {
       debugPrint(
         '${bloc.runtimeType}: ${change.currentState} → ${change.nextState}',
       );

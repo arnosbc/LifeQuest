@@ -11,6 +11,9 @@ enum NotificationKind {
   final String label;
 }
 
+/// De qué trata el aviso, para abrir dónde se resuelve (043).
+enum NotificationTopic { habit, project, task, level, other }
+
 class AppNotification extends Equatable {
   const AppNotification({
     required this.id,
@@ -19,6 +22,7 @@ class AppNotification extends Equatable {
     required this.description,
     required this.createdAt,
     this.read = false,
+    this.topic = NotificationTopic.other,
   });
 
   final String id;
@@ -27,7 +31,16 @@ class AppNotification extends Equatable {
   final String description;
   final DateTime createdAt;
   final bool read;
+  final NotificationTopic topic;
 
   @override
-  List<Object?> get props => [id, kind, title, description, createdAt, read];
+  List<Object?> get props => [
+    id,
+    kind,
+    title,
+    description,
+    createdAt,
+    read,
+    topic,
+  ];
 }

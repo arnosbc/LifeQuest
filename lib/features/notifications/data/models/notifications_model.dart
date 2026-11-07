@@ -1,7 +1,7 @@
 import 'package:proyecto_movil/features/notifications/domain/entities/app_notification.dart';
 
 /// Respuesta JSON de la RPC `notifications_overview`
-/// (supabase/migrations/029_notifications.sql).
+/// (supabase/migrations/029_notifications.sql; `category` llega con 043).
 class NotificationsModel {
   const NotificationsModel(this.json);
 
@@ -16,6 +16,13 @@ class NotificationsModel {
     'informational': NotificationKind.informative,
   };
 
+  static const _topics = {
+    'streak': NotificationTopic.habit,
+    'project': NotificationTopic.project,
+    'due': NotificationTopic.task,
+    'level': NotificationTopic.level,
+  };
+
   List<AppNotification> toEntity() => [
     for (final n
         in (json['items'] as List<dynamic>? ?? const [])
@@ -27,6 +34,7 @@ class NotificationsModel {
         description: n['message'] as String,
         createdAt: DateTime.parse(n['created_at'] as String).toLocal(),
         read: n['read'] as bool? ?? false,
+        topic: _topics[n['category']] ?? NotificationTopic.other,
       ),
   ];
 }

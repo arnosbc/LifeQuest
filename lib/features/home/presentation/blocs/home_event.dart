@@ -37,3 +37,13 @@ class HomeHabitCompleted extends HomeEvent {
   @override
   List<Object?> get props => [habitId];
 }
+
+/// «Hecho» de un recordatorio de la agenda.
+class HomeReminderCompleted extends HomeEvent {
+  const HomeReminderCompleted(this.taskId);
+
+  final String taskId;
+
+  @override
+  List<Object?> get props => [taskId];
+}

@@ -64,6 +64,34 @@ class _HabitsScreenState extends State<HabitsScreen> {
     if (habit != null) bloc.add(HabitCreated(habit));
   }
 
+  /// Elegir la hora del aviso; si ya tiene, también se puede quitar.
+  Future<void> _editReminder(BuildContext context, Habit habit) async {
+    final bloc = context.read<HabitsBloc>();
+    final current = habit.reminderMinuteOfDay;
+    if (current != null &&
+        await confirmLifeQuest(
+          context,
+          title: 'Aviso de «${habit.name}»',
+          message: '¿Quieres quitar el aviso o elegir otra hora?',
+          confirmLabel: 'Quitar aviso',
+          cancelLabel: 'Otra hora',
+        )) {
+      bloc.add(HabitReminderChanged(habit.id, null));
+      return;
+    }
+    if (!context.mounted) return;
+    final time = await showTimePicker(
+      context: context,
+      helpText: 'Hora del aviso',
+      initialTime: current == null
+          ? const TimeOfDay(hour: 8, minute: 0)
+          : TimeOfDay(hour: current ~/ 60, minute: current % 60),
+    );
+    if (time != null) {
+      bloc.add(HabitReminderChanged(habit.id, time.hour * 60 + time.minute));
+    }
+  }
+
   Widget _content(BuildContext context, HabitsSuccess state) {
     final bloc = context.read<HabitsBloc>();
     final idle = state.busyHabitId == null && !state.saving;
@@ -72,6 +100,13 @@ class _HabitsScreenState extends State<HabitsScreen> {
       enabled: idle,
       maxLength: 100,
       onRename: (name) => bloc.add(HabitRenamed(habit.id, name)),
+      // Solo los buenos tienen aviso: invita a cumplirlos.
+      onEdit: habit.type == HabitType.good
+          ? () => _editReminder(context, habit)
+          : null,
+      editLabel: habit.reminderMinuteOfDay == null
+          ? 'Poner aviso'
+          : 'Cambiar aviso',
       onDelete: () => bloc.add(HabitDeleted(habit.id)),
       deleteMessage: 'Se borra también su historial y su racha.',
     );

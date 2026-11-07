@@ -67,13 +67,56 @@ class SyncReminders implements UseCase<Unit, NoParams> {
             title: habit.name,
             body: 'Tu hábito de hoy te está esperando.',
             at: at,
+            habitId: habit.id,
             weekly: true,
           ),
         );
       }
     }
+    for (final project in plan.projects) {
+      final at = _afterSilence(
+        DateTime(
+          project.day.year,
+          project.day.month,
+          project.day.day,
+          _projectHour,
+        ),
+        plan,
+      );
+      if (!at.isAfter(now)) continue;
+      out.add(
+        LocalReminder(
+          id: out.length + 1,
+          title: '«${project.title}» necesita un empujón',
+          body: 'A este ritmo no llega a su fecha. Dale un bloque hoy en Hoy.',
+          at: at,
+          projectId: project.id,
+        ),
+      );
+    }
+    if (plan.dayClose) {
+      var at = _afterSilence(
+        DateTime(now.year, now.month, now.day, _closeHour),
+        plan,
+      );
+      if (!at.isAfter(now)) {
+        at = DateTime(at.year, at.month, at.day + 1, at.hour, at.minute);
+      }
+      out.add(
+        LocalReminder(
+          id: out.length + 1,
+          title: 'Cierra el día',
+          body: 'Un minuto: decide qué pasa con lo pendiente.',
+          at: at,
+          daily: true,
+        ),
+      );
+    }
     return out;
   }
+
+  static const _closeHour = 21;
+  static const _projectHour = 9;
 
   static DateTime _afterSilence(DateTime at, ReminderPlan plan) {
     final start = plan.silenceStart;

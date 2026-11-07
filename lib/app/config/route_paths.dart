@@ -10,9 +10,9 @@ abstract final class RoutePaths {
 
   // Pestañas de la barra inferior: Hoy · Tareas · Hábitos · Foco · Tú.
   static const home = '/home';
-  static const missions = '/tasks';
+  static const tasks = '/tasks';
   static const habits = '/habits';
-  static const dungeon = '/dungeon';
+  static const focus = '/focus';
   static const profile = '/profile';
 
   // Dentro de la pestaña Tareas: proyectos, metas y recursos (P.A.R.A.).
@@ -28,6 +28,7 @@ abstract final class RoutePaths {
   // Subpáginas de Configuración.
   static const appearance = '/settings/appearance';
   static const journal = '/journal';
+  static const review = '/review';
   static const brainDump = '/brain-dump';
 
   // Desde Perfil (§13).

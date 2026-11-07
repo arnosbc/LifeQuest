@@ -1,6 +1,7 @@
 // Edge Function assistant · la IA solo interpreta lenguaje (fase 3 del rework).
 //   { mode: 'parse', text, now }      → tarea { title, scheduled_at, … } (sanitize.ts)
 //   { mode: 'breakdown', title }      → { steps: [3–7 pasos] }
+//   { mode: 'goal', text }            → meta S.M.A.R.T. { title, specific, …, steps }
 // Fechas, huecos y repartos los deciden las reglas de la app, no la IA.
 // Secrets: GEMINI_API_KEY y GEMINI_MODEL (capa gratis, sin facturación).
 // Antes de llamar a Gemini se cuenta la llamada con consume_ai_call() (033):
@@ -9,7 +10,7 @@
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-import { sanitizeParse, sanitizeSteps } from './sanitize.ts';
+import { sanitizeGoal, sanitizeParse, sanitizeSteps } from './sanitize.ts';
 
 const PARSE = [
   'Convierte una nota corta en español en una tarea de agenda.',
@@ -26,6 +27,14 @@ const BREAKDOWN = [
   'Divide la tarea en 3 a 7 pasos concretos, en orden, que se puedan hacer en',
   'menos de una hora cada uno. Responde solo JSON: {"steps": ["..."]}.',
   'Pasos cortos en español, en infinitivo, sin numerar y sin emojis.',
+].join(' ');
+
+const GOAL = [
+  'Convierte la idea del usuario en una meta S.M.A.R.T. de semanas o meses.',
+  'Responde solo JSON con: title (corto), specific (qué se logra exactamente),',
+  'measurable (cómo se mide), achievable (por qué es realista), relevant (para',
+  'qué le importa) y steps (3 a 7 tareas concretas, en orden, en infinitivo).',
+  'Todo en español, una línea por campo, sin emojis. No inventes datos personales.',
 ].join(' ');
 
 async function gemini(system: string, prompt: string): Promise<unknown> {
@@ -78,7 +87,7 @@ if (import.meta.main) {
     const input = typeof body?.text === 'string' ? body.text.trim().slice(0, 500)
       : typeof body?.title === 'string' ? body.title.trim().slice(0, 200)
       : '';
-    if ((mode !== 'parse' && mode !== 'breakdown') || !input) {
+    if (!['parse', 'breakdown', 'goal'].includes(mode) || !input) {
       return json({ error: 'invalid_request' }, 400);
     }
     const now = new Date(typeof body.now === 'string' ? body.now : Date.now());
@@ -99,6 +108,10 @@ if (import.meta.main) {
       if (mode === 'parse') {
         const raw = await gemini(PARSE, JSON.stringify({ now: body.now, text: input }));
         return json(sanitizeParse(raw, input, now));
+      }
+      if (mode === 'goal') {
+        const goal = sanitizeGoal(await gemini(GOAL, input), input);
+        return goal ? json(goal) : json({ error: 'sin_pasos' }, 502);
       }
       const steps = sanitizeSteps(await gemini(BREAKDOWN, input));
       return steps ? json({ steps }) : json({ error: 'sin_pasos' }, 502);

@@ -9,8 +9,8 @@ export 'package:proyecto_movil/core/calendar/phone_event.dart'
 enum UrgencyLevel { low, medium, high }
 
 /// La tarea que conviene hacer ahora, elegida por reglas (RF-097).
-class PriorityMission extends Equatable {
-  const PriorityMission({
+class PriorityTask extends Equatable {
+  const PriorityTask({
     required this.id,
     required this.title,
     required this.priority,
@@ -58,10 +58,14 @@ class AgendaBlock extends Equatable {
     this.minutes,
     this.done = false,
     this.repeats = false,
+    this.isReminder = false,
   });
 
   final String id;
   final String title;
+
+  /// Recordatorio (038): un instante con aviso, no un bloque de trabajo.
+  final bool isReminder;
 
   /// Hora local de inicio.
   final DateTime start;
@@ -73,19 +77,33 @@ class AgendaBlock extends Equatable {
   DateTime get end => start.add(Duration(minutes: minutes ?? 30));
 
   @override
-  List<Object?> get props => [id, title, start, minutes, done, repeats];
+  List<Object?> get props => [
+    id,
+    title,
+    start,
+    minutes,
+    done,
+    repeats,
+    isReminder,
+  ];
 }
 
 /// Tarea abierta sin hora, lista para ponerla en la agenda.
 class UnscheduledTask extends Equatable {
-  const UnscheduledTask({required this.id, required this.title, this.minutes});
+  const UnscheduledTask({
+    required this.id,
+    required this.title,
+    this.minutes,
+    this.isReminder = false,
+  });
 
   final String id;
   final String title;
   final int? minutes;
+  final bool isReminder;
 
   @override
-  List<Object?> get props => [id, title, minutes];
+  List<Object?> get props => [id, title, minutes, isReminder];
 }
 
 /// Todo lo que muestra el Home, leído en una sola consulta.
@@ -102,12 +120,12 @@ class HomeDashboard extends Equatable {
     required this.habitsDone,
     required this.habitsTotal,
     required this.streakDays,
-    required this.missionsDone,
-    required this.missionsTotal,
+    required this.tasksDone,
+    required this.tasksTotal,
     required this.focusMinutes,
     this.displayName,
     this.characterClass,
-    this.priorityMission,
+    this.priorityTask,
     this.agenda = const [],
     this.unscheduled = const [],
     this.events = const [],
@@ -126,16 +144,16 @@ class HomeDashboard extends Equatable {
   /// HP ≤ 20 %: −10 % de XP y Monedas, sin bloquear nada (RF-034).
   final bool isWeakened;
 
-  /// Null cuando no hay misiones abiertas.
-  final PriorityMission? priorityMission;
+  /// Null cuando no hay tareas abiertas.
+  final PriorityTask? priorityTask;
   final List<TodayHabit> habits;
   final int habitsDone;
   final int habitsTotal;
 
   /// Racha más larga en curso entre los hábitos de hoy.
   final int streakDays;
-  final int missionsDone;
-  final int missionsTotal;
+  final int tasksDone;
+  final int tasksTotal;
   final int focusMinutes;
 
   /// Bloques de hoy por hora de inicio.
@@ -158,13 +176,13 @@ class HomeDashboard extends Equatable {
         hpCurrent: hpCurrent,
         hpMax: hpMax,
         isWeakened: isWeakened,
-        priorityMission: priorityMission,
+        priorityTask: priorityTask,
         habits: habits,
         habitsDone: habitsDone,
         habitsTotal: habitsTotal,
         streakDays: streakDays,
-        missionsDone: missionsDone,
-        missionsTotal: missionsTotal,
+        tasksDone: tasksDone,
+        tasksTotal: tasksTotal,
         focusMinutes: focusMinutes,
         agenda: agenda,
         unscheduled: unscheduled,
@@ -183,13 +201,13 @@ class HomeDashboard extends Equatable {
     hpCurrent,
     hpMax,
     isWeakened,
-    priorityMission,
+    priorityTask,
     habits,
     habitsDone,
     habitsTotal,
     streakDays,
-    missionsDone,
-    missionsTotal,
+    tasksDone,
+    tasksTotal,
     focusMinutes,
     agenda,
     unscheduled,

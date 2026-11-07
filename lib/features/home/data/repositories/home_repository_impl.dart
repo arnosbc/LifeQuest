@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/calendar/phone_event.dart';
-import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class HomeRepositoryImpl implements HomeRepository {
   const HomeRepositoryImpl(this._remote, this._calendar);
@@ -21,10 +21,15 @@ class HomeRepositoryImpl implements HomeRepository {
           utcOffsetMinutes: now.timeZoneOffset.inMinutes,
         );
         final start = DateTime(now.year, now.month, now.day);
-        final (access, events) = await (
-          _calendar.access(),
-          _calendar.events(start, start.add(const Duration(days: 1))),
-        ).wait;
+        final (access, events) =
+            await (
+              _calendar.access(),
+              _calendar.events(start, start.add(const Duration(days: 1))),
+            ).wait.timeout(
+              const Duration(seconds: 5),
+              // El calendario nunca bloquea Hoy: sin respuesta, sin eventos.
+              onTimeout: () => (CalendarAccess.denied, const <PhoneEvent>[]),
+            );
         return model.toEntity().withCalendar(access, events);
       });
 
@@ -33,6 +38,13 @@ class HomeRepositoryImpl implements HomeRepository {
     await _calendar.requestAccess();
     return const Right(unit);
   }
+
+  @override
+  Future<Either<Failure, Unit>> completeReminder(String taskId) =>
+      _run(() async {
+        await _remote.completeTask(taskId);
+        return unit;
+      });
 
   @override
   Future<Either<Failure, Unit>> completeHabit({
@@ -57,25 +69,15 @@ class HomeRepositoryImpl implements HomeRepository {
       '${now.month.toString().padLeft(2, '0')}-'
       '${now.day.toString().padLeft(2, '0')}';
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'No hay conexión con el servidor. Revisa tu internet y reintenta.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error.code)));
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) =>
+      runGuarded(action, (error) => _messageFor(error.code));
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
     'already_completed' => 'Ese hábito ya quedó registrado hoy. ¡Bien hecho!',
     'not_scheduled' => 'Este hábito no toca hoy. Te espera su próximo día.',
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',
+    'task_not_open' => 'Ese recordatorio ya estaba hecho.',
     'task_not_found' =>
       'Esa tarea ya no está abierta. Desliza para actualizar.',
     'invalid_day' =>

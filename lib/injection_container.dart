@@ -13,14 +13,24 @@ import 'package:proyecto_movil/features/assistant/domain/repositories/voice_inpu
 import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/listen_voice.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/interpret_capture.dart';
+import 'package:proyecto_movil/features/assistant/domain/usecases/plan_goal.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/save_capture.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/assistant_bloc.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
 import 'package:proyecto_movil/core/calendar/device_phone_calendar.dart';
 import 'package:proyecto_movil/core/calendar/phone_event.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_reminder.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/snooze_mission.dart';
+import 'package:proyecto_movil/features/review/data/datasources/review_remote_datasource.dart';
+import 'package:proyecto_movil/features/review/data/repositories/review_repository_impl.dart';
+import 'package:proyecto_movil/features/review/domain/repositories/review_repository.dart';
+import 'package:proyecto_movil/features/review/domain/usecases/drop_task.dart';
+import 'package:proyecto_movil/features/review/domain/usecases/get_weekly_review.dart';
+import 'package:proyecto_movil/features/review/domain/usecases/postpone_task.dart';
+import 'package:proyecto_movil/features/review/presentation/blocs/review_bloc.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/snooze_task.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/update_task.dart';
 import 'package:proyecto_movil/features/reminders/data/datasources/reminders_local_datasource.dart';
 import 'package:proyecto_movil/features/reminders/data/datasources/reminders_remote_datasource.dart';
 import 'package:proyecto_movil/features/reminders/data/repositories/reminders_repository_impl.dart';
@@ -34,15 +44,17 @@ import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:proyecto_movil/features/dungeon/data/datasources/dungeon_remote_datasource.dart';
-import 'package:proyecto_movil/features/dungeon/data/repositories/dungeon_repository_impl.dart';
-import 'package:proyecto_movil/features/dungeon/domain/repositories/dungeon_repository.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_dungeon_cycle.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_task.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/get_dungeon_board.dart';
-import 'package:proyecto_movil/features/dungeon/domain/usecases/start_dungeon.dart';
-import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
+import 'package:proyecto_movil/features/focus/data/datasources/focus_remote_datasource.dart';
+import 'package:proyecto_movil/features/focus/data/repositories/focus_repository_impl.dart';
+import 'package:proyecto_movil/features/focus/domain/repositories/focus_repository.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/complete_focus_cycle.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/complete_session_task.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/add_focus_step.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/end_focus.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/schedule_focus_task.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/get_focus_board.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/start_focus.dart';
+import 'package:proyecto_movil/features/focus/presentation/blocs/focus_bloc.dart';
 import 'package:proyecto_movil/features/habits/data/datasources/habits_remote_datasource.dart';
 import 'package:proyecto_movil/features/habits/data/repositories/habits_repository_impl.dart';
 import 'package:proyecto_movil/features/habits/domain/repositories/habits_repository.dart';
@@ -55,6 +67,7 @@ import 'package:proyecto_movil/features/home/data/datasources/home_remote_dataso
 import 'package:proyecto_movil/features/home/data/repositories/home_repository_impl.dart';
 import 'package:proyecto_movil/features/home/domain/repositories/home_repository.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_reminder.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/journal/data/datasources/journal_remote_datasource.dart';
@@ -62,13 +75,13 @@ import 'package:proyecto_movil/features/journal/data/repositories/journal_reposi
 import 'package:proyecto_movil/features/journal/domain/repositories/journal_repository.dart';
 import 'package:proyecto_movil/features/journal/domain/usecases/get_journal.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
-import 'package:proyecto_movil/features/missions/data/datasources/missions_remote_datasource.dart';
-import 'package:proyecto_movil/features/missions/data/repositories/missions_repository_impl.dart';
-import 'package:proyecto_movil/features/missions/domain/repositories/missions_repository.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/complete_mission.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/create_mission.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/get_missions_board.dart';
-import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/tasks/data/datasources/tasks_remote_datasource.dart';
+import 'package:proyecto_movil/features/tasks/data/repositories/tasks_repository_impl.dart';
+import 'package:proyecto_movil/features/tasks/domain/repositories/tasks_repository.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/complete_task.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/create_task.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/get_tasks_board.dart';
+import 'package:proyecto_movil/features/tasks/presentation/blocs/tasks_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/data/datasources/onboarding_remote_datasource.dart';
 import 'package:proyecto_movil/features/onboarding/data/repositories/onboarding_repository_impl.dart';
 import 'package:proyecto_movil/features/onboarding/domain/repositories/onboarding_repository.dart';
@@ -100,6 +113,7 @@ import 'package:proyecto_movil/features/settings/presentation/blocs/settings_blo
 import 'package:proyecto_movil/features/stage/data/repositories/stage_repository_impl.dart';
 import 'package:proyecto_movil/features/stage/domain/repositories/stage_repository.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/archive_stage_item.dart';
+import 'package:proyecto_movil/features/stage/domain/usecases/delete_stage_item.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_stage_task.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
@@ -121,8 +135,8 @@ import 'package:proyecto_movil/features/stats/data/repositories/stats_repository
 import 'package:proyecto_movil/features/stats/domain/repositories/stats_repository.dart';
 import 'package:proyecto_movil/features/stats/domain/usecases/get_stats.dart';
 import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart';
-import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/rename_task.dart';
+import 'package:proyecto_movil/features/tasks/domain/usecases/delete_task.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart';
 import 'package:proyecto_movil/features/notifications/data/datasources/notifications_remote_datasource.dart';
@@ -173,8 +187,10 @@ Future<void> initDependencies() async {
       completeHabit: sl(),
       scheduleTask: sl(),
       connectCalendar: sl(),
+      completeReminder: sl(),
     ),
   );
+  sl.registerLazySingleton(() => CompleteReminder(sl()));
   sl.registerLazySingleton(() => ScheduleTask(sl()));
   sl.registerLazySingleton(() => GetHomeDashboard(sl()));
   sl.registerLazySingleton(() => CompleteHabit(sl()));
@@ -186,27 +202,26 @@ Future<void> initDependencies() async {
     () => HomeRemoteDataSourceImpl(sl()),
   );
 
-  // ---------- Misiones ----------
+  // ---------- Tareas ----------
   sl.registerFactory(
-    () => MissionsBloc(
-      getMissionsBoard: sl(),
-      createMission: sl(),
-      completeMission: sl(),
-      renameMission: sl(),
-      deleteMission: sl(),
+    () => TasksBloc(
+      getTasksBoard: sl(),
+      completeTask: sl(),
+      renameTask: sl(),
+      deleteTask: sl(),
+      updateTask: sl(),
     ),
   );
-  sl.registerLazySingleton(() => GetMissionsBoard(sl()));
-  sl.registerLazySingleton(() => RenameMission(sl()));
-  sl.registerLazySingleton(() => DeleteMission(sl()));
-  sl.registerLazySingleton(() => CreateMission(sl()));
-  sl.registerLazySingleton(() => CompleteMission(sl()));
-  sl.registerLazySingleton(() => SnoozeMission(sl()));
-  sl.registerLazySingleton<MissionsRepository>(
-    () => MissionsRepositoryImpl(sl()),
-  );
-  sl.registerLazySingleton<MissionsRemoteDataSource>(
-    () => MissionsRemoteDataSourceImpl(sl()),
+  sl.registerLazySingleton(() => UpdateTask(sl()));
+  sl.registerLazySingleton(() => GetTasksBoard(sl()));
+  sl.registerLazySingleton(() => RenameTask(sl()));
+  sl.registerLazySingleton(() => DeleteTask(sl()));
+  sl.registerLazySingleton(() => CreateTask(sl()));
+  sl.registerLazySingleton(() => CompleteTask(sl()));
+  sl.registerLazySingleton(() => SnoozeTask(sl()));
+  sl.registerLazySingleton<TasksRepository>(() => TasksRepositoryImpl(sl()));
+  sl.registerLazySingleton<TasksRemoteDataSource>(
+    () => TasksRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Calendario del teléfono (core: lo leen Hoy y el Asistente) ----------
@@ -218,13 +233,19 @@ Future<void> initDependencies() async {
   sl.registerFactory(() => AssistantBloc(getDayPlan: sl(), applyDayPlan: sl()));
   sl.registerLazySingleton(() => GetDayPlan(sl()));
   sl.registerFactory(
-    () =>
-        CaptureBloc(interpret: sl(), breakDown: sl(), save: sl(), listen: sl()),
+    () => CaptureBloc(
+      interpret: sl(),
+      breakDown: sl(),
+      planGoal: sl(),
+      save: sl(),
+      listen: sl(),
+    ),
   );
   sl.registerLazySingleton(() => ListenVoice(sl()));
   sl.registerLazySingleton<VoiceInput>(SpeechVoiceInput.new);
   sl.registerLazySingleton(() => InterpretCapture(sl()));
   sl.registerLazySingleton(() => BreakDownTask(sl()));
+  sl.registerLazySingleton(() => PlanGoal(sl()));
   sl.registerLazySingleton(() => SaveCapture(sl()));
   sl.registerLazySingleton(() => ApplyDayPlan(sl()));
   sl.registerLazySingleton<AssistantRepository>(
@@ -232,6 +253,18 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<AssistantRemoteDataSource>(
     () => AssistantRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Revisión semanal ----------
+  sl.registerFactory(
+    () => ReviewBloc(getReview: sl(), postpone: sl(), drop: sl()),
+  );
+  sl.registerLazySingleton(() => GetWeeklyReview(sl()));
+  sl.registerLazySingleton(() => PostponeTask(sl()));
+  sl.registerLazySingleton(() => DropTask(sl()));
+  sl.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl(sl()));
+  sl.registerLazySingleton<ReviewRemoteDataSource>(
+    () => ReviewRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Recordatorios ----------
@@ -247,26 +280,28 @@ Future<void> initDependencies() async {
     () => RemindersLocalDataSourceImpl(sl()),
   );
 
-  // ---------- Mazmorra ----------
+  // ---------- Foco ----------
   sl.registerFactory(
-    () => DungeonBloc(
+    () => FocusBloc(
       getBoard: sl(),
       start: sl(),
       completeCycle: sl(),
       completeTask: sl(),
+      addStep: sl(),
+      schedule: sl(),
       end: sl(),
     ),
   );
-  sl.registerLazySingleton(() => GetDungeonBoard(sl()));
-  sl.registerLazySingleton(() => StartDungeon(sl()));
-  sl.registerLazySingleton(() => CompleteDungeonCycle(sl()));
+  sl.registerLazySingleton(() => AddFocusStep(sl()));
+  sl.registerLazySingleton(() => ScheduleFocusTask(sl()));
+  sl.registerLazySingleton(() => GetFocusBoard(sl()));
+  sl.registerLazySingleton(() => StartFocus(sl()));
+  sl.registerLazySingleton(() => CompleteFocusCycle(sl()));
   sl.registerLazySingleton(() => CompleteSessionTask(sl()));
-  sl.registerLazySingleton(() => EndDungeon(sl()));
-  sl.registerLazySingleton<DungeonRepository>(
-    () => DungeonRepositoryImpl(sl()),
-  );
-  sl.registerLazySingleton<DungeonRemoteDataSource>(
-    () => DungeonRemoteDataSourceImpl(sl()),
+  sl.registerLazySingleton(() => EndFocus(sl()));
+  sl.registerLazySingleton<FocusRepository>(() => FocusRepositoryImpl(sl()));
+  sl.registerLazySingleton<FocusRemoteDataSource>(
+    () => FocusRemoteDataSourceImpl(sl()),
   );
 
   // ---------- Hábitos ----------
@@ -278,8 +313,10 @@ Future<void> initDependencies() async {
       registerBadHabit: sl(),
       renameHabit: sl(),
       deleteHabit: sl(),
+      setHabitReminder: sl(),
     ),
   );
+  sl.registerLazySingleton(() => SetHabitReminder(sl()));
   sl.registerLazySingleton(() => RenameHabit(sl()));
   sl.registerLazySingleton(() => DeleteHabit(sl()));
   sl.registerLazySingleton(() => GetHabitsBoard(sl()));
@@ -300,6 +337,7 @@ Future<void> initDependencies() async {
       completeTask: sl(),
       createResource: sl(),
       archive: sl(),
+      delete: sl(),
       completeProject: sl(),
     ),
   );
@@ -309,6 +347,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => CompleteStageTask(sl()));
   sl.registerLazySingleton(() => CreateResource(sl()));
   sl.registerLazySingleton(() => ArchiveStageItem(sl()));
+  sl.registerLazySingleton(() => DeleteStageItem(sl()));
   sl.registerLazySingleton(() => CompleteProject(sl()));
   sl.registerLazySingleton<StageRepository>(() => StageRepositoryImpl(sl()));
   sl.registerLazySingleton<StageRemoteDataSource>(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
@@ -21,9 +22,12 @@ Future<void> main() async {
     publishableKey: AppConstants.supabaseKey,
   );
   await initDependencies();
-  await ReminderActions.init();
-  // «✓» del widget de inicio, también con la app cerrada.
-  await HomeWidget.registerInteractivityCallback(onWidgetAction);
+  // Avisos y widget de inicio solo existen en el teléfono.
+  if (!kIsWeb) {
+    await ReminderActions.init();
+    // «✓» del widget de inicio, también con la app cerrada.
+    await HomeWidget.registerInteractivityCallback(onWidgetAction);
+  }
   Bloc.observer = const AppBlocObserver();
 
   // Se resuelve la sesión guardada antes de pintar, para que el router no

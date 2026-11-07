@@ -4,7 +4,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 
 /// Proyecto desplegable: progreso y urgencia arriba; al abrirlo, sus
-/// misiones (con ✓ para completarlas) y las acciones del proyecto.
+/// tareas (con ✓ para completarlas) y las acciones del proyecto.
 class StageProjectCard extends StatelessWidget {
   const StageProjectCard({
     super.key,
@@ -13,7 +13,8 @@ class StageProjectCard extends StatelessWidget {
     required this.onCompleteTask,
     required this.onComplete,
     required this.onArchive,
-    required this.onAddMission,
+    required this.onAddTask,
+    this.onDelete,
   });
 
   final StageProject project;
@@ -25,7 +26,8 @@ class StageProjectCard extends StatelessWidget {
   final ValueChanged<String>? onCompleteTask;
   final VoidCallback? onComplete;
   final VoidCallback? onArchive;
-  final VoidCallback onAddMission;
+  final VoidCallback onAddTask;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +55,8 @@ class StageProjectCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: context.lq.ink,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Column(
@@ -62,7 +64,7 @@ class StageProjectCard extends StatelessWidget {
                 children: [
                   Text(
                     '$details\n${project.tasksDone} de ${project.tasksTotal} tareas · $urgencyLabel',
-                    style: TextStyle(color: context.lq.muted, fontSize: 10),
+                    style: TextStyle(color: context.lq.muted, fontSize: 13),
                   ),
                   const SizedBox(height: 5),
                   LinearProgressIndicator(
@@ -81,7 +83,7 @@ class StageProjectCard extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Aún no tiene tareas.',
-                      style: TextStyle(color: context.lq.muted, fontSize: 11),
+                      style: TextStyle(color: context.lq.muted, fontSize: 14),
                     ),
                   ),
                 for (final task in project.tasks)
@@ -94,7 +96,7 @@ class StageProjectCard extends StatelessWidget {
                             color: task.done
                                 ? context.lq.muted
                                 : context.lq.ink,
-                            fontSize: 11,
+                            fontSize: 15,
                             decoration: task.done
                                 ? TextDecoration.lineThrough
                                 : null,
@@ -128,7 +130,7 @@ class StageProjectCard extends StatelessWidget {
                   spacing: 6,
                   children: [
                     TextButton.icon(
-                      onPressed: onAddMission,
+                      onPressed: onAddTask,
                       icon: const Icon(Icons.add),
                       label: const Text('Tarea'),
                     ),
@@ -140,6 +142,10 @@ class StageProjectCard extends StatelessWidget {
                     TextButton(
                       onPressed: onArchive,
                       child: const Text('Archivar'),
+                    ),
+                    TextButton(
+                      onPressed: onDelete,
+                      child: const Text('Borrar'),
                     ),
                   ],
                 ),

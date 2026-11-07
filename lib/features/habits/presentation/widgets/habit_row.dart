@@ -47,6 +47,7 @@ class HabitRow extends StatelessWidget {
       muted: !habit.scheduledToday,
       subtitle: [
         if (!habit.scheduledToday) 'No toca hoy',
+        if (habit.minVersion case final min?) 'Mínimo: $min',
         '$doneDays de 7 días',
         _frequency,
         if (habit.currentStreak > 0) 'racha ${habit.currentStreak}',

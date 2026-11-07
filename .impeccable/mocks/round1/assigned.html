@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Questly Hoy</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:#FBFAF7;color:#18181B;font-family:"Hanken Grotesk",sans-serif}
+.num{font-variant-numeric:tabular-nums}
+header{padding:20px 20px 0}
+.date{font-size:14px;font-weight:500;color:#52525B}
+.clock{font-size:64px;font-weight:600;letter-spacing:-2px;line-height:1;margin-top:4px}
+.greet{font-size:16px;margin-top:6px}
+.cap{padding:14px 20px 12px}
+.cap p{font-size:13px;color:#52525B;margin-bottom:6px}
+.cap b{color:#18181B;font-weight:600}
+.bar{height:4px;background:#E4E4E7;border-radius:2px}
+.bar i{display:block;height:4px;width:63%;background:#18181B;border-radius:2px}
+.band{position:relative;height:440px;margin:0 16px;border:1px solid #E4E4E7;border-radius:12px;overflow:hidden;
+ background:linear-gradient(#FBEDE4 0%,#FBFAF7 14%,#FBFAF7 52%,#F4A27C 64%,#6E5BD6 78%,#15123A 88%,#15123A 100%)}
+.h{position:absolute;left:0;width:100%;height:1px;background:rgba(24,24,27,.08)}
+.h span{position:absolute;left:10px;top:-8px;font-size:12px;color:#71717A}
+.h.n{background:rgba(255,255,255,.12)}.h.n span{color:#C9C3F0}
+.now{position:absolute;left:0;right:0;top:183px;height:1px;background:#D97706;z-index:3}
+.now span{position:absolute;right:8px;top:-18px;font-size:12px;font-weight:600;color:#B45309}
+.now:before{content:"";position:absolute;left:52px;top:-4px;width:9px;height:9px;border-radius:50%;background:#D97706}
+.t{position:absolute;left:62px;right:10px;border-radius:8px;padding:8px 12px;font-size:15px;font-weight:500;min-height:48px;display:flex;align-items:center;gap:8px}
+.t small{font-size:12px;font-weight:400}
+.done{top:55px;color:#A1A1AA;border:1px solid #E4E4E7;text-decoration:line-through}
+.cur{top:165px;height:55px;background:#6E5BD6;color:#fff;z-index:2;justify-content:space-between}
+.cur small{display:block;opacity:.85}
+.go{height:36px;padding:0 14px;border-radius:18px;background:#fff;color:#4C3DB0;font:600 13px "Hanken Grotesk";border:0;position:relative}
+.go:after{content:"";position:absolute;inset:-6px 0}
+.gym{top:302px;border:1px solid #18181B;color:#18181B;background:rgba(251,250,247,.6)}
+.read{top:388px;color:#EDEAFB;border:1px solid rgba(237,234,251,.35)}
+.capture{display:flex;align-items:center;gap:10px;margin:12px 16px 0;height:52px;border:1px solid #D4D4D8;border-radius:26px;padding:0 6px 0 18px;background:#fff}
+.capture span{flex:1;font-size:15px;color:#71717A}
+.mic{width:44px;height:44px;border-radius:50%;background:#18181B;display:grid;place-items:center}
+.mic i{width:10px;height:16px;border:2px solid #fff;border-radius:6px}
+nav{position:absolute;bottom:0;left:0;width:390px;height:80px;border-top:1px solid #E4E4E7;background:#FBFAF7;display:flex}
+nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:500;color:#52525B;text-decoration:none;min-height:48px}
+nav a i{width:56px;height:30px;border-radius:15px;display:grid;place-items:center;font-style:normal;font-size:16px}
+nav a.on{color:#18181B;font-weight:700}nav a.on i{background:#E9E5FB}
+</style></head>
+<body>
+<header>
+ <p class="date">Viernes 31 oct</p>
+ <p class="clock num">16:20</p>
+ <p class="greet">Buenas tardes, Jhon · 3 pendientes</p>
+</header>
+<section class="cap">
+ <p>Planeado <b class="num">3 h 10 min</b> de <span class="num">5 h</span> libres</p>
+ <div class="bar" role="img" aria-label="63 % del tiempo libre planeado"><i></i></div>
+</section>
+<section class="band" aria-label="Tu día, de 13:00 a 21:00">
+ <div class="h num" style="top:0"><span>13:00</span></div>
+ <div class="h num" style="top:55px"><span>14:00</span></div>
+ <div class="h num" style="top:110px"><span>15:00</span></div>
+ <div class="h num" style="top:165px"><span>16:00</span></div>
+ <div class="h num" style="top:220px"><span>17:00</span></div>
+ <div class="h num" style="top:275px"><span>18:00</span></div>
+ <div class="h num n" style="top:330px"><span>19:00</span></div>
+ <div class="h num n" style="top:385px"><span>20:00</span></div>
+ <div class="t done">Revisar informe de ventas <small class="num">14:00</small></div>
+ <div class="t cur"><div>Llamar a mamá<small class="num">16:00 – 17:00 · ahora</small></div><button class="go">Empezar foco</button></div>
+ <div class="now num"><span>ahora 16:20</span></div>
+ <div class="t gym">Gimnasio <small class="num">18:30</small></div>
+ <div class="t read">Leer 20 min <small class="num">20:00</small></div>
+</section>
+<div class="capture"><span>Escribe o dicta…</span><a class="mic" aria-label="Dictar"><i></i></a></div>
+<nav aria-label="Navegación principal">
+ <a class="on" href="#"><i>◐</i>Hoy</a>
+ <a href="#"><i>☰</i>Tareas</a>
+ <a href="#"><i>↻</i>Hábitos</a>
+ <a href="#"><i>◎</i>Foco</a>
+ <a href="#"><i>○</i>Tú</a>
+</nav>
+</body></html>

@@ -5,8 +5,8 @@ class StatsBoard extends Equatable {
   const StatsBoard({
     this.xp = 0,
     this.xpPrev = 0,
-    this.missions = 0,
-    this.missionsPrev = 0,
+    this.tasks = 0,
+    this.tasksPrev = 0,
     this.focusMinutes = 0,
     this.focusMinutesPrev = 0,
     this.bestStreak = 0,
@@ -18,10 +18,10 @@ class StatsBoard extends Equatable {
 
   final int xp;
   final int xpPrev;
-  final int missions;
-  final int missionsPrev;
+  final int tasks;
+  final int tasksPrev;
 
-  /// Minutos de ciclos de Mazmorra terminados.
+  /// Minutos de ciclos de Foco terminados.
   final int focusMinutes;
   final int focusMinutesPrev;
 
@@ -32,7 +32,7 @@ class StatsBoard extends Equatable {
   final List<SkillXp> xpBySkill;
   final List<HabitConsistency> topHabits;
 
-  /// Las 3 observaciones de RPGenie (v1, por reglas). Siempre en tono de
+  /// Las 3 observaciones del asistente (v1, por reglas). Siempre en tono de
   /// invitación: comparan con uno mismo, nunca culpan.
   List<String> get observations {
     final notes = <String>[];
@@ -89,8 +89,8 @@ class StatsBoard extends Equatable {
   List<Object?> get props => [
     xp,
     xpPrev,
-    missions,
-    missionsPrev,
+    tasks,
+    tasksPrev,
     focusMinutes,
     focusMinutesPrev,
     bestStreak,

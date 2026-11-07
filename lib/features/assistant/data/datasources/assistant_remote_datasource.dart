@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
@@ -9,6 +8,7 @@ import 'package:proyecto_movil/features/assistant/data/models/task_draft_model.d
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 /// RPCs que usa el Asistente. Lanza [ServerException] o [NetworkException].
 abstract class AssistantRemoteDataSource {
@@ -24,6 +24,18 @@ abstract class AssistantRemoteDataSource {
 
   Future<void> createTask(TaskDraft draft, List<DraftStep> steps);
 
+  Future<({String title, SmartGoal smart, List<String> steps})> planGoal(
+    String text,
+  );
+
+  Future<void> createProject(TaskDraft draft, List<DraftStep> steps);
+
+  Future<void> createGoal(
+    TaskDraft draft,
+    SmartGoal smart,
+    List<DraftStep> steps,
+  );
+
   Future<void> saveToInbox(String text);
 }
 
@@ -34,7 +46,7 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
 
   /// `missions_overview` (010, agenda en 032) ya trae las tareas abiertas.
   @override
-  Future<List<PlanTaskModel>> getOpenTasks() => _guard(() async {
+  Future<List<PlanTaskModel>> getOpenTasks() => guardSupabase(() async {
     final json = await _client.rpc<Map<String, dynamic>>('missions_overview');
     return [
       for (final m in json['missions'] as List<dynamic>? ?? const [])
@@ -43,7 +55,7 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
   });
 
   @override
-  Future<void> schedule(ProposedBlock block) => _guard(
+  Future<void> schedule(ProposedBlock block) => guardSupabase(
     () => _client.rpc<void>(
       'schedule_task',
       params: {
@@ -55,7 +67,7 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
   );
 
   @override
-  Future<AiStatus> aiStatus() => _guard(() async {
+  Future<AiStatus> aiStatus() => guardSupabase(() async {
     final json = await _client.rpc<Map<String, dynamic>>('assistant_status');
     return AiStatus(
       enabled: json['ai_enabled'] as bool? ?? false,
@@ -64,20 +76,21 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
   });
 
   @override
-  Future<TaskDraftModel> parse(String text, DateTime now) => _guard(() async {
-    final res = await _client.functions.invoke(
-      'assistant',
-      body: {
-        'mode': 'parse',
-        'text': text,
-        'now': TaskDraftModel.localIso(now),
-      },
-    );
-    return TaskDraftModel(res.data as Map<String, dynamic>, text.trim());
-  });
+  Future<TaskDraftModel> parse(String text, DateTime now) =>
+      guardSupabase(() async {
+        final res = await _client.functions.invoke(
+          'assistant',
+          body: {
+            'mode': 'parse',
+            'text': text,
+            'now': TaskDraftModel.localIso(now),
+          },
+        );
+        return TaskDraftModel(res.data as Map<String, dynamic>, text.trim());
+      });
 
   @override
-  Future<List<String>> breakdown(String title) => _guard(() async {
+  Future<List<String>> breakdown(String title) => guardSupabase(() async {
     final res = await _client.functions.invoke(
       'assistant',
       body: {'mode': 'breakdown', 'title': title},
@@ -92,7 +105,7 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
   /// directo: RLS y grants de columna de 003; la recompensa la pone el trigger).
   @override
   Future<void> createTask(TaskDraft draft, List<DraftStep> steps) =>
-      _guard(() async {
+      guardSupabase(() async {
         final res = await _client.rpc<Map<String, dynamic>>(
           'create_task',
           params: TaskDraftModel.toParams(draft),
@@ -111,25 +124,84 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
       });
 
   @override
-  Future<void> saveToInbox(String text) => _guard(
+  Future<({String title, SmartGoal smart, List<String> steps})> planGoal(
+    String text,
+  ) => guardSupabase(() async {
+    final res = await _client.functions.invoke(
+      'assistant',
+      body: {'mode': 'goal', 'text': text},
+    );
+    final json = res.data as Map<String, dynamic>;
+    return (
+      title: json['title'] as String,
+      smart: SmartGoal(
+        specific: json['specific'] as String,
+        measurable: json['measurable'] as String,
+        achievable: json['achievable'] as String,
+        relevant: json['relevant'] as String,
+      ),
+      steps: [
+        for (final s in json['steps'] as List)
+          if (s is String && s.trim().isNotEmpty) s.trim(),
+      ],
+    );
+  });
+
+  @override
+  Future<void> createProject(TaskDraft draft, List<DraftStep> steps) =>
+      guardSupabase(() async {
+        final id = await _client.rpc<String>(
+          'create_project',
+          params: {'p_title': draft.title, 'p_end_date': _date(draft.dueDate)},
+        );
+        await _insertSteps(steps, {'project_id': id});
+      });
+
+  @override
+  Future<void> createGoal(
+    TaskDraft draft,
+    SmartGoal smart,
+    List<DraftStep> steps,
+  ) => guardSupabase(() async {
+    final id = await _client.rpc<String>(
+      'create_goal',
+      params: {
+        'p_title': draft.title,
+        'p_specific': smart.specific,
+        'p_measurable': smart.measurable,
+        'p_achievable': smart.achievable,
+        'p_relevant': smart.relevant,
+        'p_due_date': _date(draft.dueDate),
+      },
+    );
+    await _insertSteps(steps, {'goal_id': id});
+  });
+
+  /// Pasos como tareas raíz vinculadas (insert directo como en [createTask]).
+  Future<void> _insertSteps(
+    List<DraftStep> steps,
+    Map<String, String> link,
+  ) async {
+    if (steps.isEmpty) return;
+    final uid = _client.auth.currentUser?.id;
+    await _client.from('tasks').insert([
+      for (final s in steps)
+        {
+          'user_id': uid,
+          ...link,
+          'title': s.title,
+          'due_date': s.due.toUtc().toIso8601String(),
+        },
+    ]);
+  }
+
+  static String? _date(DateTime? d) => d == null
+      ? null
+      : '${d.year}-${d.month.toString().padLeft(2, '0')}-'
+            '${d.day.toString().padLeft(2, '0')}';
+
+  @override
+  Future<void> saveToInbox(String text) => guardSupabase(
     () => _client.rpc<void>('capture_thought', params: {'p_content': text}),
   );
-
-  Future<T> _guard<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } on FunctionException catch (error) {
-      final details = error.details;
-      throw ServerException(
-        code: details is Map ? details['error']?.toString() : null,
-        statusCode: '${error.status}',
-      );
-    } on PostgrestException catch (error) {
-      throw ServerException(code: error.message, statusCode: error.code);
-    } on ClientException catch (error) {
-      throw NetworkException(error.message);
-    } on TimeoutException catch (error) {
-      throw NetworkException(error.message);
-    }
-  }
 }

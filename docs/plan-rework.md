@@ -94,12 +94,34 @@ Principios:
 - **Compartir:** `receive_sharing_intent`; texto o enlaces desde otra app abren la vista previa de captura (por defecto a la Bandeja).
 - **Widget de inicio:** `home_widget` + `AppWidgetProvider` en Kotlin; próximas 3 tareas de hoy y marcar hecha con un callback Dart en segundo plano (`complete_task`).
 
-## Verificación (cada fase)
+## Mejoras tras el rework (v2.6.0)
+- **Editar tareas:** «Editar» en el menú «⋯» de Tareas reutiliza la hoja de crear (sin vínculos ni subtareas); `update_task` (034) no recalcula la XP (RF-112).
+- **Aviso de hábitos:** «Poner/Cambiar aviso» en el menú de un hábito bueno (`set_habit_reminder`, 034); `habits_overview` devuelve `reminder_time`.
+- **Revisión semanal:** feature `review` (`/review`, desde «Revisar semana» en Historial): lo hecho en la semana y, por cada pendiente, «A la otra semana» (`postpone_task`) o «Soltar» (`delete_task`). Aviso local los domingos a las 18:00.
+- **Deuda:** `035_cleanup.sql` borra las RPC y tablas del juego retirado que nada usa y quita el aviso del Cofre de `notifications_overview` (`shortcut:` quedan `user_consumables`, `refuge_upgrades`, `daily_runs`, `achievements`, `titles` y la economía de Monedas/HP porque aún las leen funciones vivas). Manejo de errores de Supabase en `core/errors/supabase_guard.dart` (`guardSupabase`, `runGuarded`). Features renombradas: `dungeon` → `focus`, `missions` → `tasks` (las RPC conservan su nombre). `docs/rf-uc-rework.md`: cambios para los RF y UC del Project.
+- **Foco que guía (037):** `dungeon_overview` trae los pasos (subtareas) de cada tarea, el nivel y XP (`progress`) y los minutos de foco de esta semana y la anterior (`week`). En Foco: meta del ciclo («¿Qué vas a terminar?», en memoria), pasos que se marcan con `complete_task` y «Añadir paso», barra de nivel con «+N XP» al ganar, descanso guiado (`FocusGuide`, reglas) con lo que sigue, y un resumen con lo terminado, la semana comparada y «Agendar para mañana» (`schedule_task`). **Falta:** aplicar 037 en Supabase.
+- **Recordatorios (038):** `tasks.is_reminder`. «Anotar» lo detecta por reglas (`LocalParser.classify`: verbo puntual como llamar o pagar, o 5 min o menos, y siempre con hora) y deja corregirlo con Tarea / Recordatorio. Un recordatorio suena a su hora, se marca con «Hecho» en la agenda de Hoy, no da XP ni deja fila en el Historial y no aparece en Tareas, Foco ni como sugerencia de Hoy. **Falta:** aplicar 038 en Supabase. `shortcut:` uno de otro día solo se ve ese día en Hoy.
+
+
 - `flutter analyze` sin errores y `flutter test` en verde; tests nuevos de `PlanDay`, `Replan`, `SpreadDates`, el parser local y la repetición.
 - SQL: `cd supabase/tests && npm test` sobre Postgres real (siguiente ocurrencia, `schedule_task`/`snooze_task`, `focus_minutes`, tope de IA, RLS entre dos usuarios).
 - Edge Function: test Deno que valide la salida de `parse` sin confiar en el JSON de la IA.
 - En un teléfono Android: dictar «llamar a mamá mañana 7pm» y verla en la agenda con aviso; Hecha y Posponer desde la notificación; repetir; Empezar → Foco → minutos guardados; armar el día evitando un evento; replanificar; dividir un proyecto; compartir desde Chrome; marcar desde el widget; modo claro y oscuro.
 - Diseño: capturas con un test golden temporal (fuente Archivo cargada con `FontLoader`) para mirar cada pantalla; seguir `docs/diseño/DESIGN.md` y las skills impeccable, design-taste-frontend y emil-design-eng.
+
+## Rediseño por descubrimiento (2026-11-07, `docs/descubrimiento-funcionalidades.md`)
+- **UX:** Tareas sin check (deslizar o «Ya la hice», 5 s para deshacer en `TasksBloc`); Hoy con hábitos en chips y agenda plegada; skill `ux-interaction`.
+- **Foco en un toque:** «Empezar foco» en una tarea arranca 30 min con un ciclo de 25 (`FocusQuickStarted`, una vez por tarea); sin campo de meta: la meta es el siguiente paso.
+- **Pasos siempre:** `BreakDownTask` usa la IA y, si está apagada o falla, `StepTemplates` (reglas); «Dividir en pasos» en Crear, en el formulario y en Foco. El Onboarding ofrece encender la IA.
+- **Un solo camino para crear:** «Nueva tarea» abre la hoja Crear; el formulario queda como «Usar el formulario».
+- **Cierre del día:** aviso diario a las 21:00 (reemplaza el del domingo), fila «Cierra el día» en Hoy desde las 19:00 y «Mañana» / «A la otra semana» / «Soltar» en la revisión.
+- **Hábitos:** versión mínima al crear (se muestra en la fila). El aviso con hora ya existía.
+- **Proyectos y metas:** letra al tamaño del resto (16 / 13) y «Borrar» en proyectos, metas y recursos (`delete_item`, 040: lo vinculado queda suelto; lo completado no se borra).
+- **Foco ordenado:** `041_task_order.sql` (`tasks.created_at` con `clock_timestamp()` y empates viejos por fecha límite): los pasos y tareas creados juntos salen en su orden. Marcar el último paso abierto completa la tarea (`FocusBloc`).
+- **Aviso de proyecto atrasado:** `042_project_alerts.sql`: `sync_reminders` devuelve el día (próximos 7) en que cada proyecto pasaría a 🔴 sin avanzar; el teléfono avisa ese día a las 9:00. Un aviso por cambio; si se avanza, se recalcula.
+- **Avisos que abren su acción:** `043_notification_targets.sql` suma `category` a cada aviso; en el centro de avisos, «Abrir» lleva a Hábitos, Proyectos, Tareas o Tú. Tocar un aviso del teléfono abre su pantalla (payload `tipo:id`, `ReminderActions.opened`, también con la app cerrada).
+- **Bandeja en el cierre:** `044_review_inbox.sql` suma `inbox` (notas pendientes) a `weekly_review`; la revisión muestra «N notas sin decidir» con «Decidir» (abre la Bandeja y relee al volver).
+- **Falta:** aplicar `044_review_inbox.sql`, `043_notification_targets.sql`, `042_project_alerts.sql`, `041_task_order.sql`, `040_delete_items.sql` y `039_day_close_habits.sql` en Supabase (sin ella fallan «Mañana» y crear un hábito con versión mínima); probar en un teléfono. El aviso de un hábito trae «Hecho» (`ReminderActions`, `complete_habit`). `shortcut:` los hábitos con hora no salen en la agenda de Hoy (requiere cambiar `home_dashboard`).
 
 ## Fuera de alcance
 Borrar las tablas económicas, push remoto (FCM), widget y acciones de notificación en iOS, sincronización con Google Calendar en la nube, traducción al inglés.

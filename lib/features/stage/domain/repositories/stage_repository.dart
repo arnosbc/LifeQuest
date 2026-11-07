@@ -14,7 +14,7 @@ abstract class StageRepository {
 
   Future<Either<Failure, Unit>> createGoal(NewGoal goal);
 
-  /// Completa una misión; el servidor da la recompensa y golpea al jefe.
+  /// Completa una tarea; el servidor da la recompensa y golpea al jefe.
   Future<Either<Failure, Unit>> completeTask(String taskId);
 
   Future<Either<Failure, Unit>> createResource({
@@ -23,6 +23,12 @@ abstract class StageRepository {
   });
 
   Future<Either<Failure, Unit>> archive({
+    required StageItemKind kind,
+    required String id,
+  });
+
+  /// Borra un proyecto, meta o recurso; lo vinculado queda suelto (040).
+  Future<Either<Failure, Unit>> delete({
     required StageItemKind kind,
     required String id,
   });

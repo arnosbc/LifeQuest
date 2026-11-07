@@ -43,7 +43,7 @@ HomeDashboard dashboardWith({bool isWeakened = false}) => HomeDashboard(
   hpCurrent: 80,
   hpMax: 100,
   isWeakened: isWeakened,
-  priorityMission: PriorityMission(
+  priorityTask: PriorityTask(
     id: 't1',
     title: 'Preparar presentación del proyecto',
     dueDate: DateTime.parse('2026-10-17T23:00:00+00:00').toLocal(),
@@ -58,12 +58,12 @@ HomeDashboard dashboardWith({bool isWeakened = false}) => HomeDashboard(
   habitsDone: 1,
   habitsTotal: 2,
   streakDays: 12,
-  missionsDone: 3,
-  missionsTotal: 5,
+  tasksDone: 3,
+  tasksTotal: 5,
   focusMinutes: 45,
 );
 
-/// Usuario recién registrado: sin misiones ni hábitos.
+/// Usuario recién registrado: sin tareas ni hábitos.
 const emptyDashboard = HomeDashboard(
   level: 1,
   currentXp: 0,
@@ -76,7 +76,7 @@ const emptyDashboard = HomeDashboard(
   habitsDone: 0,
   habitsTotal: 0,
   streakDays: 0,
-  missionsDone: 0,
-  missionsTotal: 0,
+  tasksDone: 0,
+  tasksTotal: 0,
   focusMinutes: 0,
 );

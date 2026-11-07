@@ -17,6 +17,8 @@ class Habit extends Equatable {
     this.doneToday = false,
     this.todayCount = 0,
     this.week = const [],
+    this.reminderMinuteOfDay,
+    this.minVersion,
   });
 
   final String id;
@@ -40,6 +42,12 @@ class Habit extends Equatable {
   /// Últimos 7 días, del más antiguo a hoy: hubo registro ese día.
   final List<bool> week;
 
+  /// Hora del aviso en minutos desde medianoche (solo hábitos buenos).
+  final int? reminderMinuteOfDay;
+
+  /// Versión de 2 minutos («leer 1 página»); cuenta igual al marcarlo.
+  final String? minVersion;
+
   @override
   List<Object?> get props => [
     id,
@@ -54,5 +62,7 @@ class Habit extends Equatable {
     doneToday,
     todayCount,
     week,
+    reminderMinuteOfDay,
+    minVersion,
   ];
 }

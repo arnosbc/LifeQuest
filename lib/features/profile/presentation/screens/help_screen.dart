@@ -108,7 +108,7 @@ class _HelpScreenState extends State<HelpScreen> {
               child: HelpQuickAccessCard(
                 icon: Icons.chat_bubble_outline,
                 title: 'Contactar soporte',
-                subtitle: 'Respondemos en menos de 2 h',
+                subtitle: 'Escríbenos tu duda',
                 onTap: _contactSupport,
               ),
             ),
@@ -179,8 +179,6 @@ class _HelpScreenState extends State<HelpScreen> {
     ),
   );
 
-  void _contactSupport() => showLifeQuestMessage(
-    context,
-    'Escríbenos a soporte@lifequest.app. Respondemos en menos de 2 horas.',
-  );
+  void _contactSupport() =>
+      showLifeQuestMessage(context, 'Escríbenos a soporte@lifequest.app.');
 }

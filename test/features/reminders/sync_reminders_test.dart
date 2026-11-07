@@ -88,12 +88,29 @@ void main() {
         ),
         now,
       );
-      expect(out.every((r) => r.weekly && r.taskId == null), isTrue);
+      expect(
+        out.every((r) => r.weekly && r.taskId == null && r.habitId == 'h'),
+        isTrue,
+      );
       expect(out.map((r) => r.at), [
         DateTime(2026, 11, 8, 7, 30),
         DateTime(2026, 11, 12, 7, 30),
       ]);
       expect(out.map((r) => r.id).toSet().length, 2);
+    });
+
+    test('un proyecto que pasaría a 🔴 avisa ese día a las 9:00, una vez', () {
+      final out = SyncReminders.build(
+        ReminderPlan(
+          projects: [
+            ProjectAlert(id: 'p', title: 'Tesis', day: DateTime(2026, 11, 9)),
+          ],
+        ),
+        now,
+      );
+      expect(out.single.at, DateTime(2026, 11, 9, 9));
+      expect(out.single.title, '«Tesis» necesita un empujón');
+      expect(out.single.weekly || out.single.daily, isFalse);
     });
   });
 

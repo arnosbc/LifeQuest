@@ -20,7 +20,7 @@ Future<GameSettings?> showNotificationSheet(
   builder: (_) => _NotificationSheet(settings),
 );
 
-/// Hoja de descansos de la Mazmorra (RF-067).
+/// Hoja de descansos de Foco (RF-067).
 Future<GameSettings?> showBreaksSheet(
   BuildContext context,
   GameSettings settings,

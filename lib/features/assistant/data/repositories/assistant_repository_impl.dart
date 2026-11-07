@@ -1,13 +1,13 @@
 import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/calendar/phone_event.dart';
-import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/assistant/data/datasources/assistant_remote_datasource.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
 import 'package:proyecto_movil/features/assistant/domain/repositories/assistant_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class AssistantRepositoryImpl implements AssistantRepository {
   const AssistantRepositoryImpl(this._remote, this._calendar);
@@ -57,37 +57,49 @@ class AssistantRepositoryImpl implements AssistantRepository {
   });
 
   @override
+  Future<Either<Failure, ({String title, SmartGoal smart, List<String> steps})>>
+  planGoal(String text) => _run(() => _remote.planGoal(text));
+
+  @override
+  Future<Either<Failure, Unit>> createProject(
+    TaskDraft draft,
+    List<DraftStep> steps,
+  ) => _run(() async {
+    await _remote.createProject(draft, steps);
+    return unit;
+  });
+
+  @override
+  Future<Either<Failure, Unit>> createGoal(
+    TaskDraft draft,
+    SmartGoal smart,
+    List<DraftStep> steps,
+  ) => _run(() async {
+    await _remote.createGoal(draft, smart, steps);
+    return unit;
+  });
+
+  @override
   Future<Either<Failure, Unit>> saveToInbox(String text) => _run(() async {
     await _remote.saveToInbox(text);
     return unit;
   });
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'No hay conexión con el servidor. Revisa tu internet y reintenta.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(
-        ServerFailure(switch (error.code) {
-          'task_not_found' =>
-            'Una tarea cambió mientras planeabas. Vuelve a abrir la propuesta.',
-          'ai_limit' =>
-            'Usaste las llamadas de IA de hoy. Lo entendí con las reglas.',
-          'ai_disabled' =>
-            'La IA está apagada en Ajustes. Lo entendí con las reglas.',
-          'invalid_title' =>
-            'Dale a tu tarea un nombre de hasta 200 caracteres.',
-          'invalid_content' => 'Escribe algo para guardarlo en la Bandeja.',
-          final code? when code.startsWith('gemini') || code == 'sin_pasos' =>
-            'La IA no respondió. Inténtalo de nuevo en un momento.',
-          _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
-        }),
-      );
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) => runGuarded(
+    action,
+    (error) => switch (error.code) {
+      'task_not_found' =>
+        'Una tarea cambió mientras planeabas. Vuelve a abrir la propuesta.',
+      'ai_limit' => 'Usaste las llamadas de IA de hoy.',
+      'ai_disabled' => 'La IA está apagada en Ajustes.',
+      'invalid_title' => 'Dale a tu tarea un nombre de hasta 200 caracteres.',
+      'invalid_content' => 'Escribe algo para guardarlo en la Bandeja.',
+      'invalid_due_date' => 'La fecha de la meta ya pasó. Elige una futura.',
+      'invalid_request' =>
+        'Actualiza la función «assistant» en Supabase para crear metas con IA.',
+      final code? when code.startsWith('gemini') || code == 'sin_pasos' =>
+        'La IA no respondió. Inténtalo de nuevo en un momento.',
+      _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
+    },
+  );
 }

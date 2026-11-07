@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/brain_dump/data/models/brain_dump_board_model.dart';
 import 'package:proyecto_movil/features/brain_dump/domain/entities/brain_dump_board.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 /// RPCs del Brain Dump (023). Lanza [ServerException] o [NetworkException].
 abstract class BrainDumpRemoteDataSource {
@@ -26,7 +26,7 @@ class BrainDumpRemoteDataSourceImpl implements BrainDumpRemoteDataSource {
   final SupabaseClient _client;
 
   @override
-  Future<BrainDumpBoardModel> getBoard() => _guard(
+  Future<BrainDumpBoardModel> getBoard() => guardSupabase(
     () async => BrainDumpBoardModel.fromJson(
       await _client.rpc<Map<String, dynamic>>('brain_dump_overview'),
     ),
@@ -55,23 +55,5 @@ class BrainDumpRemoteDataSourceImpl implements BrainDumpRemoteDataSource {
       _rpc('delete_thought', {'p_id': thoughtId});
 
   Future<void> _rpc(String name, Map<String, dynamic> params) =>
-      _guard(() => _client.rpc<void>(name, params: params));
-
-  /// Las funciones SQL lanzan su motivo como mensaje; se pasa como
-  /// [ServerException.code].
-  Future<T> _guard<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } on PostgrestException catch (error) {
-      throw ServerException(
-        code: error.message,
-        message: error.details?.toString(),
-        statusCode: error.code,
-      );
-    } on ClientException catch (error) {
-      throw NetworkException(error.message);
-    } on TimeoutException catch (error) {
-      throw NetworkException(error.message);
-    }
-  }
+      guardSupabase(() => _client.rpc<void>(name, params: params));
 }

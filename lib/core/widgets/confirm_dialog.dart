@@ -7,6 +7,7 @@ Future<bool> confirmLifeQuest(
   required String title,
   required String message,
   required String confirmLabel,
+  String cancelLabel = 'Ahora no',
 }) async =>
     await showDialog<bool>(
       context: context,
@@ -16,7 +17,7 @@ Future<bool> confirmLifeQuest(
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Ahora no'),
+            child: Text(cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
@@ -27,7 +28,7 @@ Future<bool> confirmLifeQuest(
     ) ??
     false;
 
-/// Pide un texto corto (p. ej. la misión de un NPC). Devuelve null si se
+/// Pide un texto corto (p. ej. la tarea de un NPC). Devuelve null si se
 /// cancela o queda vacío.
 Future<String?> askLifeQuestText(
   BuildContext context, {

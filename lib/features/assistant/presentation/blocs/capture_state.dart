@@ -31,11 +31,17 @@ class CapturePreview extends CaptureState {
     required this.draft,
     required this.usedAi,
     required this.aiAvailable,
+    this.kind = CaptureKind.task,
+    this.smart,
     this.steps = const [],
     this.busy = false,
     this.message,
   });
 
+  final CaptureKind kind;
+
+  /// Solo en metas: lo que propuso la IA.
+  final SmartGoal? smart;
   final TaskDraft draft;
   final bool usedAi;
   final bool aiAvailable;
@@ -54,13 +60,24 @@ class CapturePreview extends CaptureState {
     draft: draft ?? this.draft,
     usedAi: usedAi,
     aiAvailable: aiAvailable,
+    kind: kind,
+    smart: smart,
     steps: steps ?? this.steps,
     busy: busy,
     message: message,
   );
 
   @override
-  List<Object?> get props => [draft, usedAi, aiAvailable, steps, busy, message];
+  List<Object?> get props => [
+    kind,
+    smart,
+    draft,
+    usedAi,
+    aiAvailable,
+    steps,
+    busy,
+    message,
+  ];
 }
 
 /// Guardado; la hoja se cierra.

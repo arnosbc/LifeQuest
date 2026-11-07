@@ -36,7 +36,7 @@ class TaskDraftModel {
   static DateTime? _date(Object? v) =>
       v is String ? DateTime.tryParse(v)?.toLocal() : null;
 
-  /// Fila de `create_task` (010 + 032).
+  /// Fila de `create_task` (010 + 032; p_is_reminder desde 038).
   static Map<String, Object?> toParams(TaskDraft d) => {
     'p_title': d.title,
     'p_priority': const ['low', 'medium', 'high'][d.priority.clamp(0, 2)],
@@ -45,6 +45,8 @@ class TaskDraftModel {
     'p_estimated_minutes': d.estimatedMinutes,
     'p_reminder_minutes': d.scheduledAt == null ? null : d.reminderMinutes,
     'p_repeat_rule': d.repeatRule,
+    // Solo si lo es: así crear tareas no depende de tener 038 aplicada.
+    if (d.isReminder) 'p_is_reminder': true,
   };
 
   /// Hora local con su desfase (`2026-11-05T14:00:00-05:00`) para que la IA

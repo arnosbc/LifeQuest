@@ -4,7 +4,7 @@ import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/core/widgets/lifequest_surface.dart';
 
 /// Fila con icono, título, detalle y un botón de acción (comprar, atacar,
-/// pedir misión…). Sin [onAction] el botón queda deshabilitado.
+/// pedir tarea…). Sin [onAction] el botón queda deshabilitado.
 class LifeQuestActionRow extends StatelessWidget {
   const LifeQuestActionRow({
     super.key,

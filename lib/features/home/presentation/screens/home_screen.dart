@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
     required this.onReplan,
     required this.onCapture,
     required this.onVoice,
+    this.onCloseDay,
   });
 
   /// Nombre de la sesión; se usa mientras el perfil no tenga uno propio.
@@ -31,6 +32,7 @@ class HomeScreen extends StatelessWidget {
   final VoidCallback onReplan;
   final VoidCallback onCapture;
   final VoidCallback onVoice;
+  final VoidCallback? onCloseDay;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<HomeBloc, HomeState>(
@@ -71,18 +73,22 @@ class HomeScreen extends StatelessWidget {
           now: DateTime.now(),
           busyHabitId: state.busyHabitId,
           // Encuadernación (≈35) y margen de arriba: la hoja llega a la barra.
-          minHeight: box.maxHeight - 47,
+          // Nunca negativo: en la primera medida el alto puede ser casi 0.
+          minHeight: (box.maxHeight - 47).clamp(0, double.infinity),
           onStartFocus: onStartFocus,
           onPlanDay: onPlanDay,
           onReplan: onReplan,
           onCapture: onCapture,
           onVoice: onVoice,
+          onCloseDay: onCloseDay,
           onConnectCalendar: () =>
               context.read<HomeBloc>().add(const HomeCalendarConnected()),
-          onCreateTask: () => context.go(RoutePaths.missions),
+          onCreateTask: () => context.go(RoutePaths.tasks),
           onOpenHabits: () => onNavigate(2),
           onCompleteHabit: (id) =>
               context.read<HomeBloc>().add(HomeHabitCompleted(id)),
+          onCompleteReminder: (id) =>
+              context.read<HomeBloc>().add(HomeReminderCompleted(id)),
           onScheduleTask: (id, at) =>
               context.read<HomeBloc>().add(HomeTaskScheduled(id, at)),
         ),

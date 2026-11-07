@@ -23,4 +23,7 @@ abstract class HabitsRepository {
   Future<Either<Failure, Unit>> renameHabit(String habitId, String name);
 
   Future<Either<Failure, Unit>> deleteHabit(String habitId);
+
+  /// Pone ([minuteOfDay]) o quita (null) la hora del aviso de un hábito bueno.
+  Future<Either<Failure, Unit>> setReminder(String habitId, int? minuteOfDay);
 }

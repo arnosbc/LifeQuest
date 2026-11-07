@@ -22,9 +22,17 @@ class DaySheet extends StatelessWidget {
     required this.onCapture,
     required this.onVoice,
     required this.onConnectCalendar,
+    this.onCloseDay,
     this.busyHabitId,
+    this.onCompleteReminder,
     this.minHeight = 0,
   });
+
+  /// Abre «Cierra el día» (revisión de lo pendiente).
+  final VoidCallback? onCloseDay;
+
+  /// «Hecho» de un recordatorio; null lo deja solo de lectura.
+  final ValueChanged<String>? onCompleteReminder;
 
   final double minHeight;
 
@@ -54,6 +62,9 @@ class DaySheet extends StatelessWidget {
   final VoidCallback onConnectCalendar;
   final String? busyHabitId;
 
+  /// Desde esta hora Hoy invita a cerrar el día.
+  static const closeHour = 19;
+
   static const weekdays = [
     'lunes',
     'martes',
@@ -82,7 +93,7 @@ class DaySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final q = context.q;
     final d = dashboard;
-    final left = (d.missionsTotal - d.missionsDone).clamp(0, d.missionsTotal);
+    final left = (d.tasksTotal - d.tasksDone).clamp(0, d.tasksTotal);
     final meta = [
       switch (left) {
         0 => 'Nada pendiente',
@@ -92,10 +103,17 @@ class DaySheet extends StatelessWidget {
       if (d.streakDays > 0)
         d.streakDays == 1 ? 'racha 1 día' : 'racha ${d.streakDays} días',
     ].join(' · ');
-    final mission = d.priorityMission;
+    final task = d.priorityTask;
     // El bloque en curso manda sobre la tarea sugerida: es la única fila en rojo.
     final nowBlock = d.agenda
-        .where((b) => !b.done && !now.isBefore(b.start) && now.isBefore(b.end))
+        // Un recordatorio no es un bloque de trabajo: no se ofrece en Foco.
+        .where(
+          (b) =>
+              !b.isReminder &&
+              !b.done &&
+              !now.isBefore(b.start) &&
+              now.isBefore(b.end),
+        )
         .firstOrNull;
 
     return PaperSheet(
@@ -152,6 +170,17 @@ class DaySheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
+          if (now.hour >= closeHour && left > 0 && onCloseDay != null) ...[
+            SheetRow(
+              current: true,
+              title: 'Cierra el día',
+              subtitle: left == 1
+                  ? 'Queda 1 pendiente: decide si va mañana.'
+                  : 'Quedan $left pendientes: decide qué va mañana.',
+              action: SheetPill(label: 'Cerrar el día', onTap: onCloseDay),
+            ),
+            const SizedBox(height: 12),
+          ],
           _CaptureBar(onTap: onCapture, onVoice: onVoice),
           const SizedBox(height: 16),
           _DayProgress(dashboard: d),
@@ -162,7 +191,6 @@ class DaySheet extends StatelessWidget {
           if (nowBlock != null)
             SheetRow(
               current: true,
-              leading: const SheetCheck(done: false),
               time: _time(nowBlock.start),
               title: nowBlock.title,
               subtitle: 'Hasta las ${_time(nowBlock.end)}',
@@ -171,16 +199,16 @@ class DaySheet extends StatelessWidget {
                 onTap: () => onStartFocus(nowBlock.id),
               ),
             )
-          else if (mission == null)
+          else if (task == null)
             LifeQuestEmptyState(
               compact: true,
-              illustration: d.missionsTotal > 0
+              illustration: d.tasksTotal > 0
                   ? LifeQuestIllustration.done
                   : LifeQuestIllustration.blank,
-              title: d.missionsTotal > 0
+              title: d.tasksTotal > 0
                   ? 'Todo listo por hoy'
                   : 'No tienes tareas pendientes',
-              message: d.missionsTotal > 0
+              message: d.tasksTotal > 0
                   ? 'Cerraste lo que tocaba. Descansa o adelanta algo.'
                   : 'Anota lo siguiente que quieres hacer.',
               actionLabel: 'Crear tarea',
@@ -189,84 +217,16 @@ class DaySheet extends StatelessWidget {
           else
             SheetRow(
               current: true,
-              leading: const SheetCheck(done: false),
-              time: _time(mission.dueDate),
-              title: mission.title,
-              subtitle: '+${mission.xpReward} XP',
+              time: _time(task.dueDate),
+              title: task.title,
+              subtitle: '+${task.xpReward} XP',
               action: SheetPill(
                 label: 'Empezar foco',
-                onTap: () => onStartFocus(mission.id),
+                onTap: () => onStartFocus(task.id),
               ),
             ),
-          const SizedBox(height: 20),
-          LifeQuestSectionHeading(
-            d.agenda.isEmpty ? 'Agenda' : 'Agenda · ${d.agenda.length}',
-            action: d.unscheduled.isEmpty ? null : 'Armar mi día',
-            onTap: d.unscheduled.isEmpty ? null : onPlanDay,
-          ),
-          if (d.agenda.any((b) => !b.done && b.end.isBefore(now)))
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: onReplan,
-                icon: const Icon(Icons.update_rounded, size: 20),
-                label: const Text('Replanificar lo atrasado'),
-                style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
-              ),
-            ),
-          if (d.calendarAccess == CalendarAccess.notAsked)
-            _ConnectCalendar(onConnect: onConnectCalendar),
-          for (final event in d.events)
-            SheetRow(
-              leading: const SizedBox(
-                width: 24,
-                child: Icon(Icons.event_outlined, size: 20),
-              ),
-              time: _time(event.start),
-              title: event.title,
-              subtitle: 'Calendario · hasta las ${_time(event.end)}',
-              muted: event.end.isBefore(now),
-            ),
-          if (d.agenda.isEmpty && d.events.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                'Nada con hora hoy. Ponle hora a una tarea y te avisamos.',
-                style: QText.body(q.text2),
-              ),
-            ),
-          for (final block in d.agenda)
-            SheetRow(
-              leading: SheetCheck(done: block.done),
-              time: _time(block.start),
-              title: block.title,
-              subtitle: [
-                'Hasta las ${_time(block.end)}',
-                if (block.repeats) 'se repite',
-              ].join(' · '),
-              done: block.done,
-              muted: !block.done && block.end.isBefore(now),
-              action: block.done
-                  ? null
-                  : SheetPill(
-                      label: 'Mover',
-                      onTap: () => _pickTime(context, block.id, block.start),
-                    ),
-            ),
-          if (d.unscheduled.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            LifeQuestSectionHeading('Sin hora · ${d.unscheduled.length}'),
-            // shortcut: solo las 5 primeras; la lista completa vive en Tareas.
-            for (final task in d.unscheduled.take(5))
-              SheetRow(
-                leading: const SheetCheck(done: false),
-                title: task.title,
-                action: SheetPill(
-                  label: 'Poner hora',
-                  onTap: () => _pickTime(context, task.id, null),
-                ),
-              ),
-          ],
+          // Hábitos antes que la agenda: son de un toque y no deben quedar
+          // enterrados bajo una agenda llena.
           const SizedBox(height: 20),
           LifeQuestSectionHeading(
             d.habitsTotal == 0
@@ -283,24 +243,32 @@ class DaySheet extends StatelessWidget {
               message: 'Empieza por uno pequeño que puedas repetir.',
               actionLabel: 'Crear hábito',
               onAction: onOpenHabits,
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final habit in d.habits)
+                  _HabitChip(
+                    habit: habit,
+                    busy: habit.id == busyHabitId,
+                    onTap: habit.done || habit.id == busyHabitId
+                        ? null
+                        : () => onCompleteHabit(habit.id),
+                  ),
+              ],
             ),
-          for (final habit in d.habits)
-            SheetRow(
-              leading: SheetCheck(
-                done: habit.done,
-                busy: habit.id == busyHabitId,
-                label: habit.done
-                    ? '${habit.name}, hecho hoy'
-                    : 'Marcar ${habit.name} como hecho',
-                onTap: habit.done || habit.id == busyHabitId
-                    ? null
-                    : () => onCompleteHabit(habit.id),
-              ),
-              time: '',
-              timeIcon: Icons.repeat_rounded,
-              title: habit.name,
-              done: habit.done,
-            ),
+          const SizedBox(height: 20),
+          _Agenda(
+            dashboard: d,
+            now: now,
+            onPlanDay: onPlanDay,
+            onReplan: onReplan,
+            onConnectCalendar: onConnectCalendar,
+            onCompleteReminder: onCompleteReminder,
+            onPickTime: (id, current) => _pickTime(context, id, current),
+          ),
         ],
       ),
     );
@@ -458,7 +426,7 @@ class _DayProgress extends StatelessWidget {
             children: [
               Expanded(
                 child: LifeQuestStat(
-                  value: '${d.missionsDone}/${d.missionsTotal}',
+                  value: '${d.tasksDone}/${d.tasksTotal}',
                   label: 'Tareas',
                 ),
               ),
@@ -612,6 +580,251 @@ class _WeekStrip extends StatelessWidget {
                   ],
                 );
               },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Hábito de hoy como chip: un toque lo marca. Hecho = relleno con check.
+class _HabitChip extends StatelessWidget {
+  const _HabitChip({required this.habit, required this.busy, this.onTap});
+
+  final TodayHabit habit;
+  final bool busy;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    final ink = habit.done ? q.onStrong : q.text;
+    return Semantics(
+      button: onTap != null,
+      checked: habit.done,
+      label: habit.done
+          ? '${habit.name}, hecho hoy'
+          : 'Marcar ${habit.name} como hecho',
+      excludeSemantics: true,
+      child: Material(
+        color: habit.done ? q.strong : q.card,
+        shape: StadiumBorder(
+          side: habit.done
+              ? BorderSide.none
+              : BorderSide(color: q.inputBorder, width: 1.5),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const StadiumBorder(),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: QSize.minTap),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 14, 0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox.square(
+                    dimension: 20,
+                    child: busy
+                        ? CircularProgressIndicator(strokeWidth: 2, color: ink)
+                        : Icon(
+                            habit.done
+                                ? Icons.check_circle_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                            size: 20,
+                            color: ink,
+                          ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      habit.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: QText.label(ink).copyWith(fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Agenda de hoy en una sola línea de tiempo (eventos del teléfono y
+/// bloques). Plegada muestra solo lo que viene; lo pasado, lo hecho y las
+/// tareas sin hora una por una se abren con «Ver toda la agenda».
+class _Agenda extends StatefulWidget {
+  const _Agenda({
+    required this.dashboard,
+    required this.now,
+    required this.onPlanDay,
+    required this.onReplan,
+    required this.onConnectCalendar,
+    required this.onPickTime,
+    this.onCompleteReminder,
+  });
+
+  final HomeDashboard dashboard;
+  final DateTime now;
+  final VoidCallback onPlanDay;
+  final VoidCallback onReplan;
+  final VoidCallback onConnectCalendar;
+  final ValueChanged<String>? onCompleteReminder;
+  final void Function(String taskId, DateTime? current) onPickTime;
+
+  /// Cuántas entradas próximas se ven plegada.
+  static const preview = 3;
+
+  @override
+  State<_Agenda> createState() => _AgendaState();
+}
+
+class _AgendaState extends State<_Agenda> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    final d = widget.dashboard;
+    final now = widget.now;
+    String time(DateTime t) => DaySheet._time(t);
+
+    final entries = <({DateTime start, bool upcoming, Widget row})>[
+      for (final event in d.events)
+        (
+          start: event.start,
+          upcoming: event.end.isAfter(now),
+          row: SheetRow(
+            leading: const SizedBox(
+              width: 24,
+              child: Icon(Icons.event_outlined, size: 20),
+            ),
+            time: time(event.start),
+            title: event.title,
+            subtitle: 'Calendario · hasta las ${time(event.end)}',
+            muted: event.end.isBefore(now),
+          ),
+        ),
+      for (final block in d.agenda)
+        (
+          start: block.start,
+          upcoming:
+              !block.done &&
+              (block.isReminder ? block.start : block.end).isAfter(now),
+          row: SheetRow(
+            // Solo un recordatorio se marca aquí; una tarea se termina en
+            // Tareas o en Foco, no con un check que parece de selección.
+            leading: block.isReminder
+                ? SheetCheck(
+                    done: block.done,
+                    label: block.done
+                        ? '${block.title}, hecho'
+                        : 'Marcar «${block.title}» como hecho',
+                    onTap: !block.done && widget.onCompleteReminder != null
+                        ? () => widget.onCompleteReminder!(block.id)
+                        : null,
+                  )
+                : null,
+            time: time(block.start),
+            timeIcon: block.isReminder
+                ? Icons.notifications_none_rounded
+                : null,
+            title: block.title,
+            subtitle: [
+              if (block.isReminder)
+                'Recordatorio'
+              else
+                'Hasta las ${time(block.end)}',
+              if (block.repeats) 'se repite',
+            ].join(' · '),
+            done: block.done,
+            muted:
+                !block.done &&
+                (block.isReminder ? block.start : block.end).isBefore(now),
+            trailing: block.done
+                ? null
+                : IconButton(
+                    tooltip: 'Mover «${block.title}»',
+                    onPressed: () => widget.onPickTime(block.id, block.start),
+                    icon: Icon(Icons.schedule_rounded, color: q.text2),
+                  ),
+          ),
+        ),
+    ]..sort((a, b) => a.start.compareTo(b.start));
+
+    final upcoming = entries.where((e) => e.upcoming).toList();
+    final shown = _open ? entries : upcoming.take(_Agenda.preview).toList();
+    final folded = entries.length - shown.length;
+    final late = d.agenda.any(
+      (b) => !b.isReminder && !b.done && b.end.isBefore(now),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LifeQuestSectionHeading(
+          upcoming.isEmpty ? 'Agenda' : 'Agenda · ${upcoming.length} por venir',
+          action: late ? 'Replanificar' : null,
+          onTap: late ? widget.onReplan : null,
+        ),
+        if (d.calendarAccess == CalendarAccess.notAsked)
+          _ConnectCalendar(onConnect: widget.onConnectCalendar),
+        if (entries.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              'Nada con hora hoy. Ponle hora a una tarea y te avisamos.',
+              style: QText.body(q.text2),
+            ),
+          )
+        else if (shown.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              'No queda nada con hora por hoy.',
+              style: QText.body(q.text2),
+            ),
+          ),
+        for (final e in shown) e.row,
+        if (d.unscheduled.isNotEmpty)
+          SheetRow(
+            title: d.unscheduled.length == 1
+                ? '1 tarea sin hora'
+                : '${d.unscheduled.length} tareas sin hora',
+            subtitle: d.unscheduled.map((t) => t.title).take(3).join(' · '),
+            action: SheetPill(label: 'Armar mi día', onTap: widget.onPlanDay),
+          ),
+        if (_open)
+          // shortcut: solo las 5 primeras; la lista completa vive en Tareas.
+          for (final task in d.unscheduled.take(5))
+            SheetRow(
+              title: task.title,
+              subtitle: task.isReminder ? 'Recordatorio sin hora' : 'Sin hora',
+              trailing: IconButton(
+                tooltip: 'Poner hora a «${task.title}»',
+                onPressed: () => widget.onPickTime(task.id, null),
+                icon: Icon(Icons.schedule_rounded, color: q.text2),
+              ),
+            ),
+        if (folded > 0 || _open || d.unscheduled.isNotEmpty)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => setState(() => _open = !_open),
+              icon: Icon(
+                _open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+              ),
+              label: Text(
+                _open
+                    ? 'Ver menos'
+                    : folded > 0
+                    ? 'Ver toda la agenda · $folded más'
+                    : 'Poner hora una por una',
+              ),
+              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
             ),
           ),
       ],

@@ -19,6 +19,7 @@ void main() {
   late MockCompleteStageTask completeTask;
   late MockCreateResource createResource;
   late MockArchiveStageItem archive;
+  late MockDeleteStageItem delete;
   late MockCompleteProject completeProject;
   final now = DateTime(2026, 10, 25, 9);
   const failure = ServerFailure('Algo salió mal.');
@@ -40,6 +41,7 @@ void main() {
     completeTask = MockCompleteStageTask();
     createResource = MockCreateResource();
     archive = MockArchiveStageItem();
+    delete = MockDeleteStageItem();
     completeProject = MockCompleteProject();
   });
 
@@ -50,6 +52,7 @@ void main() {
     completeTask: completeTask,
     createResource: createResource,
     archive: archive,
+    delete: delete,
     completeProject: completeProject,
     clock: () => now,
   );
@@ -164,5 +167,24 @@ void main() {
     expect: () => [
       const StageSuccess(emptyStageBoard, message: '¡Tarea completada!'),
     ],
+  );
+
+  blocTest<StageBloc, StageState>(
+    'borrar un proyecto llama a DeleteStageItem y vuelve a leer',
+    setUp: () {
+      when(() => delete(any())).thenAnswer((_) async => const Right(unit));
+      givenBoard(const Right(emptyStageBoard));
+    },
+    build: build,
+    seed: () => const StageSuccess(stageBoard),
+    act: (bloc) =>
+        bloc.add(const StageItemDeleted(kind: StageItemKind.project, id: 'p1')),
+    skip: 1,
+    expect: () => [const StageSuccess(emptyStageBoard, message: 'Borrado.')],
+    verify: (_) => verify(
+      () => delete(
+        const ArchiveStageItemParams(kind: StageItemKind.project, id: 'p1'),
+      ),
+    ).called(1),
   );
 }

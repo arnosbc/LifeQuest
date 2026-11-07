@@ -151,11 +151,15 @@ class SummaryStep extends StatelessWidget {
     required this.identity,
     required this.skill,
     required this.difficulty,
+    required this.aiEnabled,
+    required this.onAiChanged,
   });
 
   final String identity;
   final String skill;
   final GameDifficulty difficulty;
+  final bool aiEnabled;
+  final ValueChanged<bool> onAiChanged;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -173,6 +177,20 @@ class SummaryStep extends StatelessWidget {
             _Row('Área', _or(skill, 'Sin área por ahora')),
             _Row('Dificultad', difficultyName(difficulty)),
           ],
+        ),
+      ),
+      const SizedBox(height: 16),
+      LifeQuestSurface(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: SwitchListTile(
+          value: aiEnabled,
+          onChanged: onAiChanged,
+          title: const Text('Asistente con IA'),
+          subtitle: const Text(
+            'Divide tus tareas en pasos y entiende frases como «gym '
+            'mañana 6pm». Lo que escribes se envía a Gemini (Google); no '
+            'pongas datos sensibles. Puedes apagarlo en Ajustes.',
+          ),
         ),
       ),
     ],

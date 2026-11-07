@@ -6,6 +6,7 @@ import 'package:fpdart/fpdart.dart' show Left;
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/complete_habit.dart';
+import 'package:proyecto_movil/features/home/domain/usecases/complete_reminder.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/get_home_dashboard.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
@@ -19,6 +20,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this._completeHabit,
     required this._scheduleTask,
     required this._connectCalendar,
+    required this._completeReminder,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HomeInitial()) {
@@ -27,12 +29,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeHabitCompleted>(_onHabitCompleted, transformer: droppable());
     on<HomeTaskScheduled>(_onTaskScheduled, transformer: droppable());
     on<HomeCalendarConnected>(_onCalendarConnected, transformer: droppable());
+    on<HomeReminderCompleted>(_onReminderCompleted, transformer: droppable());
   }
 
   final GetHomeDashboard _getHomeDashboard;
   final CompleteHabit _completeHabit;
   final ScheduleTask _scheduleTask;
   final ConnectCalendar _connectCalendar;
+  final CompleteReminder _completeReminder;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(
@@ -78,6 +82,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (current is! HomeSuccess) return;
     final scheduled = await _scheduleTask((taskId: event.taskId, at: event.at));
     if (scheduled case Left(value: final failure)) {
+      emit(HomeSuccess(current.dashboard, message: failure.message));
+      return;
+    }
+    final reloaded = await _getHomeDashboard(_clock());
+    emit(
+      reloaded.match(
+        (failure) => HomeSuccess(current.dashboard, message: failure.message),
+        HomeSuccess.new,
+      ),
+    );
+  }
+
+  Future<void> _onReminderCompleted(
+    HomeReminderCompleted event,
+    Emitter<HomeState> emit,
+  ) async {
+    final current = state;
+    if (current is! HomeSuccess) return;
+    final done = await _completeReminder(event.taskId);
+    if (done case Left(value: final failure)) {
       emit(HomeSuccess(current.dashboard, message: failure.message));
       return;
     }

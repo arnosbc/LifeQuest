@@ -1,7 +1,7 @@
 import 'package:proyecto_movil/features/reminders/domain/entities/reminder_plan.dart';
 
 /// Respuesta JSON de la RPC `sync_reminders`
-/// (supabase/migrations/032_scheduling.sql).
+/// (supabase/migrations/032_scheduling.sql; `projects` llega con 042).
 class ReminderPlanModel {
   const ReminderPlanModel(this.json);
 
@@ -28,8 +28,18 @@ class ReminderPlanModel {
           ],
         ),
     ],
+    projects: [
+      for (final p in _list('projects'))
+        ProjectAlert(
+          id: p['id'] as String,
+          title: p['title'] as String,
+          day: DateTime.parse(p['day'] as String),
+        ),
+    ],
     silenceStart: _minutes(json['silence_start']),
     silenceEnd: _minutes(json['silence_end']),
+    // shortcut: siempre activo; pasarlo a Ajustes si alguien lo pide.
+    dayClose: true,
   );
 
   List<Map<String, dynamic>> _list(String key) =>

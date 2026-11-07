@@ -9,17 +9,27 @@ typedef SaveCaptureParams = ({
   TaskDraft draft,
   List<DraftStep> steps,
   bool toInbox,
+  CaptureKind kind,
+  SmartGoal? smart,
 });
 
-/// Crea la tarea (con sus pasos) o manda el texto a la Bandeja.
+/// Crea la tarea, el proyecto o la meta (con sus pasos) o manda el texto a
+/// la Bandeja.
 class SaveCapture implements UseCase<Unit, SaveCaptureParams> {
   const SaveCapture(this._repository);
 
   final AssistantRepository _repository;
 
   @override
-  Future<Either<Failure, Unit>> call(SaveCaptureParams params) =>
-      params.toInbox || params.draft.isNote
-      ? _repository.saveToInbox(params.draft.title)
-      : _repository.createTask(params.draft, params.steps);
+  Future<Either<Failure, Unit>> call(SaveCaptureParams p) {
+    if (p.toInbox || (p.kind == CaptureKind.task && p.draft.isNote)) {
+      return _repository.saveToInbox(p.draft.title);
+    }
+    return switch (p.kind) {
+      CaptureKind.task => _repository.createTask(p.draft, p.steps),
+      CaptureKind.project => _repository.createProject(p.draft, p.steps),
+      // Sin S.M.A.R.T. no hay meta: la crea solo la IA (o el formulario).
+      CaptureKind.goal => _repository.createGoal(p.draft, p.smart!, p.steps),
+    };
+  }
 }

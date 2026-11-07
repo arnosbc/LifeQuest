@@ -17,6 +17,7 @@ void main() {
   late MockCompleteHabit completeHabit;
   late MockScheduleTask scheduleTask;
   late MockConnectCalendar connectCalendar;
+  late MockCompleteReminder completeReminder;
   final now = DateTime(2026, 10, 17, 9);
   const failure = ServerFailure('Algo salió mal.');
 
@@ -30,6 +31,7 @@ void main() {
     completeHabit = MockCompleteHabit();
     scheduleTask = MockScheduleTask();
     connectCalendar = MockConnectCalendar();
+    completeReminder = MockCompleteReminder();
   });
 
   HomeBloc build() => HomeBloc(
@@ -37,6 +39,7 @@ void main() {
     completeHabit: completeHabit,
     scheduleTask: scheduleTask,
     connectCalendar: connectCalendar,
+    completeReminder: completeReminder,
     clock: () => now,
   );
 
@@ -167,5 +170,34 @@ void main() {
       verify(() => connectCalendar(const NoParams())).called(1);
       verify(() => getHomeDashboard(now)).called(1);
     },
+  );
+
+  blocTest<HomeBloc, HomeState>(
+    'marcar un recordatorio lo cierra y vuelve a leer la agenda',
+    setUp: () {
+      when(
+        () => completeReminder('r1'),
+      ).thenAnswer((_) async => const Right(unit));
+      givenDashboard(Right(dashboard));
+    },
+    build: build,
+    seed: () => HomeSuccess(dashboard),
+    act: (bloc) => bloc.add(const HomeReminderCompleted('r1')),
+    expect: () => <HomeState>[],
+    verify: (_) {
+      verify(() => completeReminder('r1')).called(1);
+      verify(() => getHomeDashboard(now)).called(1);
+    },
+  );
+
+  blocTest<HomeBloc, HomeState>(
+    'si el recordatorio no se puede marcar, avisa sin perder Hoy',
+    setUp: () => when(
+      () => completeReminder('r1'),
+    ).thenAnswer((_) async => const Left(failure)),
+    build: build,
+    seed: () => HomeSuccess(dashboard),
+    act: (bloc) => bloc.add(const HomeReminderCompleted('r1')),
+    expect: () => [HomeSuccess(dashboard, message: failure.message)],
   );
 }

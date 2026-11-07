@@ -8,11 +8,12 @@ import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 class SheetRow extends StatelessWidget {
   const SheetRow({
     super.key,
-    required this.leading,
+    this.leading,
     required this.title,
     this.time = '',
     this.timeIcon,
     this.subtitle,
+    this.subtitleLines = 1,
     this.action,
     this.trailing,
     this.current = false,
@@ -20,11 +21,13 @@ class SheetRow extends StatelessWidget {
     this.muted = false,
   });
 
-  final Widget leading;
+  /// Check u otro marcador; null deja el título pegado al margen.
+  final Widget? leading;
   final String title;
   final String time;
   final IconData? timeIcon;
   final String? subtitle;
+  final int subtitleLines;
   final Widget? action;
   final Widget? trailing;
   final bool current;
@@ -47,7 +50,11 @@ class SheetRow extends StatelessWidget {
         children: [
           Row(
             children: [
-              Transform.translate(offset: const Offset(-8, 0), child: leading),
+              if (leading case final leading?)
+                Transform.translate(
+                  offset: const Offset(-8, 0),
+                  child: leading,
+                ),
               if (time.isNotEmpty || timeIcon != null)
                 SizedBox(
                   width: 48,
@@ -81,7 +88,7 @@ class SheetRow extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           subtitle,
-                          maxLines: 1,
+                          maxLines: subtitleLines,
                           overflow: TextOverflow.ellipsis,
                           style: QText.body(q.text2).copyWith(fontSize: 13),
                         ),
@@ -95,7 +102,9 @@ class SheetRow extends StatelessWidget {
           if (action != null)
             Padding(
               padding: EdgeInsets.only(
-                left: time.isNotEmpty || timeIcon != null ? 88 : 40,
+                left:
+                    (leading == null ? 0 : 40) +
+                    (time.isNotEmpty || timeIcon != null ? 48 : 0),
                 top: 8,
               ),
               child: action,

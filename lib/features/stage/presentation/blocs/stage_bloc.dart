@@ -8,6 +8,7 @@ import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/archive_stage_item.dart';
+import 'package:proyecto_movil/features/stage/domain/usecases/delete_stage_item.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/complete_stage_task.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
@@ -26,6 +27,7 @@ class StageBloc extends Bloc<StageEvent, StageState> {
     required this._completeTask,
     required this._createResource,
     required this._archive,
+    required this._delete,
     required this._completeProject,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
@@ -71,6 +73,14 @@ class StageBloc extends Bloc<StageEvent, StageState> {
       ),
       transformer: droppable(),
     );
+    on<StageItemDeleted>(
+      (event, emit) => _act(
+        emit,
+        () => _delete(ArchiveStageItemParams(kind: event.kind, id: event.id)),
+        'Borrado.',
+      ),
+      transformer: droppable(),
+    );
     on<StageProjectCompleted>(
       (event, emit) => _act(
         emit,
@@ -87,6 +97,7 @@ class StageBloc extends Bloc<StageEvent, StageState> {
   final CompleteStageTask _completeTask;
   final CreateResource _createResource;
   final ArchiveStageItem _archive;
+  final DeleteStageItem _delete;
   final CompleteProject _completeProject;
   final DateTime Function() _clock;
 

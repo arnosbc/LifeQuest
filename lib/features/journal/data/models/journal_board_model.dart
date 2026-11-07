@@ -16,7 +16,7 @@ class JournalBoardModel {
     'project': JournalSource.project,
     'goal': JournalSource.goal,
     'habit': JournalSource.habit,
-    'dungeon': JournalSource.dungeon,
+    'dungeon': JournalSource.focus,
     'daily_chest': JournalSource.dailyChest,
     'achievement': JournalSource.achievement,
   };
@@ -27,8 +27,8 @@ class JournalBoardModel {
       summary: JournalSummary(
         xp: _int(s['xp']),
         xpPrev: _int(s['xp_prev']),
-        missions: _int(s['missions']),
-        missionsPrev: _int(s['missions_prev']),
+        tasks: _int(s['missions']),
+        tasksPrev: _int(s['missions_prev']),
         cycles: _int(s['cycles']),
         cyclesPrev: _int(s['cycles_prev']),
         bestStreak: _int(s['best_streak']),

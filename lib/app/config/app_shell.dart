@@ -25,18 +25,17 @@ class AppShell extends StatelessWidget {
       child: Scaffold(
         backgroundColor: q.bg,
         body: SafeArea(bottom: false, child: navigationShell),
-        // Anotar a un toque desde cualquier pestaña (Modelo de Fogg), salvo en
-        // Foco: dentro de la sesión, sin ruido (CLAUDE.md §8). Lo que no es
-        // tarea va a la Bandeja desde la misma hoja.
-        floatingActionButton: navigationShell.currentIndex == 3
+        // Crear a un toque desde Hoy, Tareas y Hábitos (Modelo de Fogg). No en
+        // Foco (sesión sin ruido, CLAUDE.md §8) ni en Tú y sus páginas.
+        floatingActionButton: navigationShell.currentIndex >= 3
             ? null
             : FloatingActionButton(
                 heroTag: 'capture',
-                tooltip: 'Anotar una tarea o una idea',
+                tooltip: 'Crear tarea, proyecto o meta',
                 onPressed: () => openCaptureSheet(context),
                 child: const Icon(Icons.add_rounded, size: 28),
               ),
-        // Tocar una pestaña siempre abre su pantalla principal: Misiones,
+        // Tocar una pestaña siempre abre su pantalla principal: Tareas,
         // abierta desde Inicio, no debe quedarse en lugar de Stage.
         bottomNavigationBar: QuestlyNavBar(
           currentIndex: navigationShell.currentIndex,

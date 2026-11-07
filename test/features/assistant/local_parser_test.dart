@@ -97,4 +97,29 @@ void main() {
     expect(r.repeatRule, isNull);
     expect(LocalParser.parse('mañana', now).title, 'mañana');
   });
+
+  group('classify', () {
+    bool reminder(String text) =>
+        LocalParser.classify(LocalParser.parse(text, now)).isReminder;
+
+    test('lo puntual con hora es recordatorio', () {
+      expect(reminder('llamar a mamá mañana 7pm'), isTrue);
+      expect(reminder('pagar la luz el viernes a las 9'), isTrue);
+      expect(reminder('tomarme la pastilla a las 8pm'), isTrue);
+      expect(reminder('revisar correo a las 5pm por 5 min'), isTrue);
+    });
+
+    test('el trabajo, o lo que no tiene hora, sigue siendo tarea', () {
+      expect(reminder('escribir el informe mañana a las 9'), isFalse);
+      expect(reminder('estudiar cálculo a las 4pm por 2 horas'), isFalse);
+      expect(reminder('llamar a mamá'), isFalse); // sin hora no sonaría
+    });
+
+    test('quitar la hora deja de ser recordatorio', () {
+      final r = LocalParser.classify(
+        LocalParser.parse('llamar a mamá mañana 7pm', now),
+      );
+      expect(r.copyWith(scheduledAt: () => null).isReminder, isFalse);
+    });
+  });
 }

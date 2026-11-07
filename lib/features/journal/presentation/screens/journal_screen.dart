@@ -8,7 +8,10 @@ import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.
 /// Diario: resumen semanal + Bitácora filtrable (CLAUDE.md §13). Pantalla de
 /// lectura; necesita un [JournalBloc] por encima.
 class JournalScreen extends StatefulWidget {
-  const JournalScreen({super.key});
+  const JournalScreen({super.key, required this.onOpenReview});
+
+  /// Acción principal del Historial: cerrar la semana.
+  final VoidCallback onOpenReview;
 
   @override
   State<JournalScreen> createState() => _JournalScreenState();
@@ -19,7 +22,7 @@ class _JournalScreenState extends State<JournalScreen> {
     'Todo': <JournalSource>{},
     'Tareas': {JournalSource.task, JournalSource.npc, JournalSource.project},
     'Hábitos': {JournalSource.habit},
-    'Foco': {JournalSource.dungeon},
+    'Foco': {JournalSource.focus},
     'Metas': {JournalSource.goal},
   };
 
@@ -63,6 +66,12 @@ class _JournalScreenState extends State<JournalScreen> {
     return LifeQuestPage(
       title: 'Diario',
       subtitle: 'Todo lo que cumpliste.',
+      trailing: TextButton.icon(
+        onPressed: widget.onOpenReview,
+        icon: const Icon(Icons.fact_check_outlined, size: 20),
+        label: const Text('Revisar semana'),
+        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+      ),
       children: [
         const LifeQuestSectionHeading('ESTA SEMANA'),
         const SizedBox(height: 7),
@@ -70,7 +79,7 @@ class _JournalScreenState extends State<JournalScreen> {
           children: [
             Expanded(child: _stat('XP', s.xp, s.xpPrev)),
             const SizedBox(width: 6),
-            Expanded(child: _stat('Tareas', s.missions, s.missionsPrev)),
+            Expanded(child: _stat('Tareas', s.tasks, s.tasksPrev)),
             const SizedBox(width: 6),
             Expanded(child: _stat('Foco', s.cycles, s.cyclesPrev)),
             const SizedBox(width: 6),
@@ -124,12 +133,8 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   static String? _change(JournalEntry e) {
-    final parts = [
-      if (e.xp > 0) '+${e.xp} XP',
-      if (e.coins > 0) '+${e.coins} 🪙',
-      if (e.hp != 0) '${e.hp > 0 ? '+' : '−'}${e.hp.abs()} vida',
-    ];
-    return parts.isEmpty ? null : parts.join(' ');
+    // Monedas y vida ya no se muestran (rework): solo la XP.
+    return e.xp > 0 ? '+${e.xp} XP' : null;
   }
 
   static String _sourceLabel(JournalSource source) => switch (source) {
@@ -138,7 +143,7 @@ class _JournalScreenState extends State<JournalScreen> {
     JournalSource.project => 'Proyecto',
     JournalSource.goal => 'Meta',
     JournalSource.habit => 'Hábito',
-    JournalSource.dungeon => 'Foco',
+    JournalSource.focus => 'Foco',
     JournalSource.dailyChest => 'Recompensa diaria',
     JournalSource.achievement => 'Logro',
   };

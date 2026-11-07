@@ -9,7 +9,7 @@ enum StageBucket { urgent, high, medium, low, pending }
 /// Lo que se puede mandar al Archivo desde Stage.
 enum StageItemKind { project, resource, goal }
 
-/// Misión (sin subtareas) dentro de un proyecto.
+/// Tarea (sin subtareas) dentro de un proyecto.
 class StageTask extends Equatable {
   const StageTask({required this.id, required this.title, this.done = false});
 
@@ -21,7 +21,7 @@ class StageTask extends Equatable {
   List<Object?> get props => [id, title, done];
 }
 
-/// Meta = Boss: cada misión o proyecto vinculado le resta vida.
+/// Meta = Boss: cada tarea o proyecto vinculado le resta vida.
 class StageGoal extends Equatable {
   const StageGoal({
     required this.id,
@@ -89,7 +89,7 @@ class StageProject extends Equatable {
   final String id;
   final String title;
 
-  /// Misiones del proyecto, abiertas primero.
+  /// Tareas del proyecto, abiertas primero.
   final List<StageTask> tasks;
 
   /// Calculada por el servidor según el ritmo (RF-019); no se guarda.
@@ -192,7 +192,7 @@ class StageBoard extends Equatable {
     this.goals = const [],
   });
 
-  /// Las primeras 5 misiones del Daily Highlight.
+  /// Las primeras 5 tareas del Daily Highlight.
   final List<HighlightItem> highlight;
   final int highlightTotal;
   final List<StageProject> projects;

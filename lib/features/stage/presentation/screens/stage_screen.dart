@@ -11,14 +11,14 @@ import 'package:proyecto_movil/features/stage/presentation/widgets/quick_add_she
 import 'package:proyecto_movil/features/stage/presentation/widgets/stage_action_row.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/stage_project_card.dart';
 
-/// Stage · P.A.R.A.: centro de mando de lectura sobre misiones, proyectos,
+/// Stage · P.A.R.A.: centro de mando de lectura sobre tareas, proyectos,
 /// áreas (skills), recursos y archivo. No guarda datos propios.
 /// Necesita un [StageBloc] por encima (lo provee el router).
 class StageScreen extends StatelessWidget {
-  const StageScreen({super.key, required this.onOpenMissions});
+  const StageScreen({super.key, required this.onOpenTasks});
 
-  /// Abre la lista completa de Misiones (y su alta).
-  final VoidCallback onOpenMissions;
+  /// Abre la lista completa de Tareas (y su alta).
+  final VoidCallback onOpenTasks;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<StageBloc, StageState>(
@@ -71,8 +71,8 @@ class StageScreen extends StatelessWidget {
       builder: (_) => child,
     );
     switch (await sheet<QuickAddKind>(const QuickAddSheet())) {
-      case QuickAddKind.mission:
-        onOpenMissions();
+      case QuickAddKind.task:
+        onOpenTasks();
       case QuickAddKind.project:
         final project = await sheet<NewProject>(
           CreateProjectSheet(skills: board.skills, goals: board.goalLinks),
@@ -120,7 +120,7 @@ class StageScreen extends StatelessWidget {
         LifeQuestSectionHeading(
           'LO URGENTE',
           action: 'Ver tareas (${board.highlightTotal})',
-          onTap: onOpenMissions,
+          onTap: onOpenTasks,
         ),
         const SizedBox(height: 7),
         if (board.highlight.isEmpty)
@@ -134,7 +134,7 @@ class StageScreen extends StatelessWidget {
             subtitle: _bucketLabel(item.bucket),
           ),
         const SizedBox(height: 14),
-        // Meta (Boss) → Proyecto → Misión: las metas van primero.
+        // Meta (Boss) → Proyecto → Tarea: las metas van primero.
         LifeQuestSectionHeading(
           'METAS',
           action: '${board.goals.length} activas',
@@ -166,6 +166,16 @@ class StageScreen extends StatelessWidget {
                   StageItemArchived(kind: StageItemKind.goal, id: goal.id),
                 ),
               ),
+              (
+                label: 'Borrar',
+                onSelected: () => _delete(
+                  context,
+                  StageItemKind.goal,
+                  goal.id,
+                  goal.title,
+                  'Sus proyectos y tareas se quedan, sin meta.',
+                ),
+              ),
             ],
           ),
         const SizedBox(height: 14),
@@ -184,7 +194,7 @@ class StageScreen extends StatelessWidget {
             project: project,
             // Símbolo + texto: el color nunca va solo.
             urgencyLabel: _urgencyLabel(project.urgency),
-            onAddMission: onOpenMissions,
+            onAddTask: onOpenTasks,
             onCompleteTask: idle
                 ? (id) => bloc.add(StageTaskCompleted(id))
                 : null,
@@ -197,6 +207,15 @@ class StageScreen extends StatelessWidget {
                       kind: StageItemKind.project,
                       id: project.id,
                     ),
+                  )
+                : null,
+            onDelete: idle
+                ? () => _delete(
+                    context,
+                    StageItemKind.project,
+                    project.id,
+                    project.title,
+                    'Sus tareas se quedan en Tareas, sin proyecto.',
                   )
                 : null,
           ),
@@ -245,6 +264,16 @@ class StageScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              (
+                label: 'Borrar',
+                onSelected: () => _delete(
+                  context,
+                  StageItemKind.resource,
+                  resource.id,
+                  resource.title,
+                  'Se borra el enlace guardado.',
+                ),
+              ),
             ],
           ),
         const SizedBox(height: 14),
@@ -262,12 +291,30 @@ class StageScreen extends StatelessWidget {
     );
   }
 
+  static Future<void> _delete(
+    BuildContext context,
+    StageItemKind kind,
+    String id,
+    String title,
+    String consequence,
+  ) async {
+    final bloc = context.read<StageBloc>();
+    if (await confirmLifeQuest(
+      context,
+      title: 'Borrar «$title»',
+      message: '$consequence No se puede deshacer.',
+      confirmLabel: 'Borrar',
+    )) {
+      bloc.add(StageItemDeleted(kind: kind, id: id));
+    }
+  }
+
   static Widget _empty(BuildContext context, String text) => Padding(
     padding: const EdgeInsets.only(bottom: 7),
     child: LifeQuestSurface(
       child: Text(
         text,
-        style: TextStyle(color: context.lq.muted, fontSize: 11),
+        style: TextStyle(color: context.lq.muted, fontSize: 14),
       ),
     ),
   );

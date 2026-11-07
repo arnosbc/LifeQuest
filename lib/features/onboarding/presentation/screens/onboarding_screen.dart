@@ -25,6 +25,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   // Solo cambia en el paso 4: quien salta antes se queda en Normal (FR-005).
   GameDifficulty _difficulty = GameDifficulty.normal;
+  bool _ai = false;
 
   @override
   void dispose() {
@@ -39,6 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         identity: _identity.text,
         skill: _skill.text,
         difficulty: _difficulty,
+        aiEnabled: _ai,
       ),
     ),
   );
@@ -155,6 +157,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   identity: _identity.text,
                   skill: _skill.text,
                   difficulty: _difficulty,
+                  aiEnabled: _ai,
+                  onAiChanged: (v) => setState(() => _ai = v),
                 ),
               },
             ),

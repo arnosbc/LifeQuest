@@ -45,8 +45,8 @@ class StageActionRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: context.lq.ink,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -54,7 +54,7 @@ class StageActionRow extends StatelessWidget {
                   subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: context.lq.muted, fontSize: 10),
+                  style: TextStyle(color: context.lq.muted, fontSize: 13),
                 ),
                 if (progress case final value?) ...[
                   const SizedBox(height: 5),
@@ -75,7 +75,7 @@ class StageActionRow extends StatelessWidget {
                 trailing!,
                 style: TextStyle(
                   color: context.lq.deepGreen,
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
               ),

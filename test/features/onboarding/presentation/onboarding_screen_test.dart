@@ -84,9 +84,7 @@ void main() {
           of: find.text('Normal'),
           matching: find.byType(InkWell),
         ),
-        matching: find.byWidgetPredicate(
-          (w) => w is SheetCheck && w.done,
-        ),
+        matching: find.byWidgetPredicate((w) => w is SheetCheck && w.done),
       ),
       findsOneWidget,
     );

@@ -15,6 +15,7 @@ El tutor rechazó la versión RPG: crear una tarea (manual o con IA) solo guarda
 - **Cada función debe actuar en el día real** (agenda, recordatorios, tiempo medido, acciones del sistema), no solo guardar filas. Lo determinista va por reglas en `domain`; la IA (Gemini capa gratis) solo interpreta lenguaje.
 - **Diseño minimal sobrio:** `docs/diseño/DESIGN.md` (zinc + índigo, Inter). Reemplaza «Bosque vivo».
 - Donde este documento hable de la ambientación o de módulos quitados, vale solo como historia del diseño.
+- Código renombrado: las features `dungeon` y `missions` ahora son `focus` y `tasks` (clases `Focus*`, `Task*`); las RPC de la base conservan su nombre (`dungeon_overview`, `missions_overview`…). Errores de Supabase con `core/errors/supabase_guard.dart`. RF/UC por actualizar: `docs/rf-uc-rework.md`.
 
 ---
 
@@ -403,3 +404,4 @@ Sistema **minimal sobrio** en `docs/diseño/DESIGN.md` (tokens en `lib/core/them
 - **Accesibilidad WCAG 2.1 AA** obligatoria: contraste 4,5:1 (3:1 texto grande), zonas táctiles ≥ 44 px, `Semantics` en botones de icono y el color nunca va solo.
 - Foco (Deep Working) es siempre oscuro y respeta la reducción de movimiento del sistema.
 - Nada de pantallas que solo informan: cada pantalla tiene una acción principal.
+- **Antes de crear o cambiar una pantalla, usa la skill `ux-interaction`** (`.claude/skills/ux-interaction`): significado de cada control, deshacer en lugar de confirmar, la app propone y el usuario edita, y presupuesto de scroll en móvil. Complementa a `design-taste-frontend`, `impeccable` y `emil-design-eng`.

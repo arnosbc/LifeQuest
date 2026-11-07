@@ -49,3 +49,6 @@ supabase.json
 
 # Grafo generado por graphify
 graphify-out/
+
+# Estado local del CLI de Supabase
+supabase/.temp/

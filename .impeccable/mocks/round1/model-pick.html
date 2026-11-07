@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Questly Hoy</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1C1C1E;--mute:#6B6B70;--line:#E9E9EC;--red:#E5484D;--h:56px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:#FFF;color:var(--ink);font-family:Figtree,sans-serif}
+.status{height:28px;display:flex;justify-content:space-between;padding:6px 20px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px 14px;border-bottom:1px solid var(--line)}
+.tab{background:var(--red);color:#FFF;font-weight:700;font-size:26px;width:52px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:0 0 6px 6px}
+.d b{display:block;font-size:17px;font-weight:700;letter-spacing:.04em}
+.d span{font-size:14px;color:var(--mute)}
+.pend{margin-left:auto;font-size:13px;color:var(--mute)}
+.grid{position:relative;height:504px;margin-top:6px;background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% var(--h)}
+.hr{position:absolute;left:16px;width:36px;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums;transform:translateY(-1px)}
+.col{position:absolute;left:60px;top:0;bottom:0;border-left:1px solid var(--line)}
+.t{position:absolute;left:68px;right:16px;min-height:48px;display:flex;align-items:center;gap:12px;padding:0 10px;font-size:15px}
+.t i{font-style:normal;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums;width:34px}
+.done{color:var(--mute);text-decoration:line-through}
+.cur{border-left:3px solid var(--red);font-weight:600;background:#FFF}
+.box{width:20px;height:20px;border:1px solid var(--ink);border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center}
+.done .box{border-color:var(--mute)}
+.now{position:absolute;left:52px;right:0;height:0;border-top:1px solid var(--red)}
+.now::before{content:"";position:absolute;left:4px;top:-4px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.now span{position:absolute;right:16px;top:-16px;font-size:11px;font-weight:600;color:var(--red);background:#FFF;padding:0 4px}
+.sin{border-top:1px solid var(--ink);padding:10px 16px 0}
+.sin h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:2px}
+.row{height:48px;display:flex;align-items:center;gap:14px;font-size:15px;border-bottom:1px solid var(--line)}
+.rc{width:22px;height:22px;border:1px solid var(--ink);border-radius:50%}
+.fab{position:absolute;right:16px;bottom:96px;width:56px;height:56px;border-radius:16px;background:var(--red);color:#FFF;font-size:30px;font-weight:400;display:flex;align-items:center;justify-content:center;border:0}
+nav{position:absolute;left:0;right:0;bottom:0;height:80px;border-top:1px solid var(--line);display:flex;background:#FFF}
+nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--mute);text-decoration:none;min-height:48px}
+nav a s{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;text-decoration:none}
+nav a s::after{content:"";width:18px;height:18px;border:1.5px solid currentColor;border-radius:4px}
+nav a.on{color:var(--ink);font-weight:600}
+nav a.on s{background:#FCE8E9}
+nav a.on s::after{border-color:var(--red);background:var(--red)}
+</style></head><body>
+<div class="status"><span>16:20</span><span>5G 82%</span></div>
+<header>
+  <div class="tab">31</div>
+  <div class="d"><b>VIE</b><span>octubre</span></div>
+  <div class="pend">3 pendientes</div>
+</header>
+<div class="grid">
+  <div class="col"></div>
+  <div class="hr" style="top:0">13:00</div>
+  <div class="hr" style="top:56px">14:00</div>
+  <div class="hr" style="top:112px">15:00</div>
+  <div class="hr" style="top:168px">16:00</div>
+  <div class="hr" style="top:224px">17:00</div>
+  <div class="hr" style="top:280px">18:00</div>
+  <div class="hr" style="top:336px">19:00</div>
+  <div class="hr" style="top:392px">20:00</div>
+  <div class="hr" style="top:448px">21:00</div>
+  <div class="t done" style="top:60px"><span class="box">&#10003;</span>Revisar informe de ventas</div>
+  <div class="t cur" style="top:172px"><span class="box"></span>Llamar a mamá</div>
+  <div class="now" style="top:225px"><span>ahora 16:20</span></div>
+  <div class="t" style="top:312px"><span class="box"></span><i>18:30</i>Gimnasio</div>
+  <div class="t" style="top:396px"><span class="box"></span>Leer 20 min</div>
+</div>
+<section class="sin">
+  <h2>Sin hora</h2>
+  <div class="row"><span class="rc"></span>Pagar internet</div>
+  <div class="row"><span class="rc"></span>Comprar regalo de Ana</div>
+</section>
+<button class="fab" aria-label="Añadir tarea">+</button>
+<nav>
+  <a class="on" href="#"><s></s>Hoy</a>
+  <a href="#"><s></s>Tareas</a>
+  <a href="#"><s></s>Hábitos</a>
+  <a href="#"><s></s>Foco</a>
+  <a href="#"><s></s>Tú</a>
+</nav>
+</body></html>

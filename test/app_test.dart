@@ -10,7 +10,7 @@ import 'package:proyecto_movil/core/widgets/questly/questly_nav_bar.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
-import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
+import 'package:proyecto_movil/features/tasks/presentation/blocs/tasks_bloc.dart';
 import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
@@ -22,7 +22,7 @@ import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 import 'features/home/home_fixtures.dart';
-import 'features/missions/missions_fixtures.dart';
+import 'features/tasks/tasks_fixtures.dart';
 import 'features/onboarding/onboarding_fixtures.dart';
 import 'features/profile/profile_fixtures.dart';
 import 'features/settings/settings_fixtures.dart';
@@ -67,14 +67,14 @@ void main() {
       );
       return homeBloc;
     });
-    sl.registerFactory<MissionsBloc>(() {
-      final missionsBloc = MockMissionsBloc();
+    sl.registerFactory<TasksBloc>(() {
+      final tasksBloc = MockTasksBloc();
       whenListen(
-        missionsBloc,
-        const Stream<MissionsState>.empty(),
-        initialState: const MissionsSuccess(board),
+        tasksBloc,
+        const Stream<TasksState>.empty(),
+        initialState: const TasksSuccess(board),
       );
-      return missionsBloc;
+      return tasksBloc;
     });
     sl.registerFactory<StageBloc>(() {
       final stageBloc = MockStageBloc();

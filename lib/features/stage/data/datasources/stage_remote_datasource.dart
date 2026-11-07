@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
@@ -8,6 +7,7 @@ import 'package:proyecto_movil/features/stage/data/models/stage_board_model.dart
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 /// RPCs de Stage · P.A.R.A. en Supabase. Lanza [ServerException] o
 /// [NetworkException].
@@ -24,6 +24,7 @@ abstract class StageRemoteDataSource {
   Future<void> createResource({required String title, required String url});
 
   Future<void> archive({required StageItemKind kind, required String id});
+  Future<void> delete({required StageItemKind kind, required String id});
 
   Future<void> completeProject(String projectId);
 }
@@ -34,7 +35,7 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
   final SupabaseClient _client;
 
   @override
-  Future<StageBoardModel> getBoard(String day) => _guard(
+  Future<StageBoardModel> getBoard(String day) => guardSupabase(
     () async => StageBoardModel.fromJson(
       await _client.rpc<Map<String, dynamic>>(
         'stage_overview',
@@ -44,7 +45,7 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
   );
 
   @override
-  Future<void> createProject(NewProject project) => _guard(
+  Future<void> createProject(NewProject project) => guardSupabase(
     () => _client.rpc<void>(
       'create_project',
       params: {
@@ -61,7 +62,7 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
   );
 
   @override
-  Future<void> createGoal(NewGoal goal) => _guard(
+  Future<void> createGoal(NewGoal goal) => guardSupabase(
     () => _client.rpc<void>(
       'create_goal',
       params: {
@@ -78,7 +79,7 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
   );
 
   @override
-  Future<void> completeTask(String taskId) => _guard(
+  Future<void> completeTask(String taskId) => guardSupabase(
     () => _client.rpc<void>('complete_task', params: {'p_task_id': taskId}),
   );
 
@@ -90,7 +91,7 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
 
   @override
   Future<void> createResource({required String title, required String url}) =>
-      _guard(
+      guardSupabase(
         () => _client.rpc<void>(
           'create_resource',
           params: {'p_title': title, 'p_url': url},
@@ -99,7 +100,7 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
 
   @override
   Future<void> archive({required StageItemKind kind, required String id}) =>
-      _guard(
+      guardSupabase(
         () => _client.rpc<void>(
           'archive_item',
           params: {'p_kind': kind.name, 'p_id': id},
@@ -107,28 +108,19 @@ class StageRemoteDataSourceImpl implements StageRemoteDataSource {
       );
 
   @override
-  Future<void> completeProject(String projectId) => _guard(
+  Future<void> delete({required StageItemKind kind, required String id}) =>
+      guardSupabase(
+        () => _client.rpc<void>(
+          'delete_item',
+          params: {'p_kind': kind.name, 'p_id': id},
+        ),
+      );
+
+  @override
+  Future<void> completeProject(String projectId) => guardSupabase(
     () => _client.rpc<void>(
       'complete_project',
       params: {'p_project_id': projectId},
     ),
   );
-
-  /// Las funciones SQL lanzan su motivo como mensaje (p. ej. `invalid_url`);
-  /// se pasa como [ServerException.code].
-  Future<T> _guard<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } on PostgrestException catch (error) {
-      throw ServerException(
-        code: error.message,
-        message: error.details?.toString(),
-        statusCode: error.code,
-      );
-    } on ClientException catch (error) {
-      throw NetworkException(error.message);
-    } on TimeoutException catch (error) {
-      throw NetworkException(error.message);
-    }
-  }
 }

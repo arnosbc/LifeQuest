@@ -6,6 +6,7 @@ import 'package:proyecto_movil/features/onboarding/data/datasources/onboarding_r
 import 'package:proyecto_movil/features/onboarding/domain/entities/onboarding_choices.dart';
 import 'package:proyecto_movil/features/onboarding/domain/entities/onboarding_status.dart';
 import 'package:proyecto_movil/features/onboarding/domain/repositories/onboarding_repository.dart';
+import 'package:proyecto_movil/core/errors/supabase_guard.dart';
 
 class OnboardingRepositoryImpl implements OnboardingRepository {
   const OnboardingRepositoryImpl(this._remote);
@@ -28,19 +29,11 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         return unit;
       });
 
-  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Right(await action());
-    } on NetworkException {
-      return const Left(
-        NetworkFailure(
-          'Sin conexión. Revisa tu internet y vuelve a intentarlo.',
-        ),
-      );
-    } on ServerException catch (error) {
-      return Left(ServerFailure(_messageFor(error)));
-    }
-  }
+  Future<Either<Failure, T>> _run<T>(Future<T> Function() action) => runGuarded(
+    action,
+    (error) => _messageFor(error),
+    network: 'Sin conexión. Revisa tu internet y vuelve a intentarlo.',
+  );
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(ServerException error) => switch (error.code) {

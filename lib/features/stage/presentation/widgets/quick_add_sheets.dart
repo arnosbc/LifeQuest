@@ -6,7 +6,7 @@ import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 
 /// Qué eligió el usuario en Quick Add.
-enum QuickAddKind { mission, project, goal, resource }
+enum QuickAddKind { task, project, goal, resource }
 
 /// Hoja de Quick Add (RF-014): elige qué capturar.
 class QuickAddSheet extends StatelessWidget {
@@ -18,7 +18,7 @@ class QuickAddSheet extends StatelessWidget {
     children: [
       _option(
         context,
-        QuickAddKind.mission,
+        QuickAddKind.task,
         Icons.flag_outlined,
         'Tarea',
         'Un paso concreto que puedes completar',
