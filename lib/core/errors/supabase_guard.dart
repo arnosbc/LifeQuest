@@ -57,7 +57,8 @@ Future<Either<Failure, T>> runGuarded<T>(
     return Left(ServerFailure(serverMessage(error)));
   } catch (error, stack) {
     // JSON inesperado o plugin que falla: sin esto el bloc se queda cargando.
-    debugPrint('Error inesperado: $error\n$stack');
+    // H-05: el log de release lo lee cualquiera con adb; solo en debug.
+    if (kDebugMode) debugPrint('Error inesperado: $error\n$stack');
     return Left(ServerFailure(serverMessage(const ServerException())));
   }
 }
