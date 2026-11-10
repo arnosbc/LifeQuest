@@ -18,7 +18,11 @@ class LifeQuestItemMenu extends StatelessWidget {
     this.onEdit,
     this.editLabel = 'Editar',
     this.onDone,
+    this.onResources,
   });
+
+  /// Abre la hoja de recursos (enlaces, fotos, PDF, notas).
+  final VoidCallback? onResources;
 
   /// «Ya la hice»: marcar como hecho sin pasar por Foco.
   final VoidCallback? onDone;
@@ -37,6 +41,7 @@ class LifeQuestItemMenu extends StatelessWidget {
   Future<void> _onSelected(BuildContext context, _Action action) async {
     if (action == _Action.edit) return onEdit?.call();
     if (action == _Action.done) return onDone?.call();
+    if (action == _Action.resources) return onResources?.call();
     if (action == _Action.delete) {
       if (await confirmLifeQuest(
         context,
@@ -70,10 +75,12 @@ class LifeQuestItemMenu extends StatelessWidget {
         const PopupMenuItem(value: _Action.done, child: Text('Ya la hice')),
       if (onEdit != null)
         PopupMenuItem(value: _Action.edit, child: Text(editLabel)),
+      if (onResources != null)
+        const PopupMenuItem(value: _Action.resources, child: Text('Recursos')),
       const PopupMenuItem(value: _Action.rename, child: Text('Renombrar')),
       const PopupMenuItem(value: _Action.delete, child: Text('Borrar')),
     ],
   );
 }
 
-enum _Action { done, edit, rename, delete }
+enum _Action { done, edit, resources, rename, delete }

@@ -70,6 +70,17 @@ enum QIcons {
   edit('<path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/>'),
   bell('<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/>'),
   back('<path d="M15 6l-6 6 6 6"/>'),
+  link(
+    '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  ),
+  image(
+    '<rect x="3" y="4" width="18" height="16" rx="2"/>'
+    '<circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+  ),
+  file(
+    '<path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h6M9 17h6"/>',
+  ),
+  note('<path d="M5 4h14v12l-4 4H5zM15 20v-4h4M8 9h8M8 13h5"/>'),
   close('<path d="M6 6l12 12M18 6L6 18"/>');
 
   const QIcons(this.svg);

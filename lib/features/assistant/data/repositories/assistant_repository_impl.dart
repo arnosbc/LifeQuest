@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/calendar/phone_event.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/features/assistant/data/datasources/assistant_remote_datasource.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
@@ -44,40 +45,33 @@ class AssistantRepositoryImpl implements AssistantRepository {
       _run(() async => (await _remote.parse(text, now)).toEntity());
 
   @override
-  Future<Either<Failure, List<String>>> breakdown(String title) =>
-      _run(() => _remote.breakdown(title));
+  Future<Either<Failure, List<String>>> breakdown(
+    String title, {
+    AiContext ai = const AiContext(),
+  }) => _run(() => _remote.breakdown(title, ai));
 
   @override
-  Future<Either<Failure, Unit>> createTask(
+  Future<Either<Failure, String>> createTask(
     TaskDraft draft,
     List<DraftStep> steps,
-  ) => _run(() async {
-    await _remote.createTask(draft, steps);
-    return unit;
-  });
+  ) => _run(() => _remote.createTask(draft, steps));
 
   @override
   Future<Either<Failure, ({String title, SmartGoal smart, List<String> steps})>>
   planGoal(String text) => _run(() => _remote.planGoal(text));
 
   @override
-  Future<Either<Failure, Unit>> createProject(
+  Future<Either<Failure, String>> createProject(
     TaskDraft draft,
     List<DraftStep> steps,
-  ) => _run(() async {
-    await _remote.createProject(draft, steps);
-    return unit;
-  });
+  ) => _run(() => _remote.createProject(draft, steps));
 
   @override
-  Future<Either<Failure, Unit>> createGoal(
+  Future<Either<Failure, String>> createGoal(
     TaskDraft draft,
     SmartGoal smart,
     List<DraftStep> steps,
-  ) => _run(() async {
-    await _remote.createGoal(draft, smart, steps);
-    return unit;
-  });
+  ) => _run(() => _remote.createGoal(draft, smart, steps));
 
   @override
   Future<Either<Failure, Unit>> saveToInbox(String text) => _run(() async {

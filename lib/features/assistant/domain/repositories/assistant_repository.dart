@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/plan_entities.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
@@ -21,11 +22,14 @@ abstract class AssistantRepository {
   /// La IA convierte el texto en tarea (Edge Function `assistant`).
   Future<Either<Failure, TaskDraft>> parseWithAi(String text, DateTime now);
 
-  /// La IA propone 2–7 pasos para la tarea.
-  Future<Either<Failure, List<String>>> breakdown(String title);
+  /// La IA propone 2–7 pasos para la tarea; [ai]: recursos como contexto.
+  Future<Either<Failure, List<String>>> breakdown(
+    String title, {
+    AiContext ai = const AiContext(),
+  });
 
-  /// Crea la tarea y sus pasos (subtareas con fecha).
-  Future<Either<Failure, Unit>> createTask(
+  /// Crea la tarea y sus pasos (subtareas con fecha); devuelve su id.
+  Future<Either<Failure, String>> createTask(
     TaskDraft draft,
     List<DraftStep> steps,
   );
@@ -34,14 +38,14 @@ abstract class AssistantRepository {
   Future<Either<Failure, ({String title, SmartGoal smart, List<String> steps})>>
   planGoal(String text);
 
-  /// Crea el proyecto y sus pasos como tareas del proyecto.
-  Future<Either<Failure, Unit>> createProject(
+  /// Crea el proyecto y sus pasos como tareas del proyecto; devuelve su id.
+  Future<Either<Failure, String>> createProject(
     TaskDraft draft,
     List<DraftStep> steps,
   );
 
-  /// Crea la meta (vence en `draft.dueDate`) y sus pasos como tareas.
-  Future<Either<Failure, Unit>> createGoal(
+  /// Crea la meta (vence en `draft.dueDate`) y sus pasos como tareas; devuelve su id.
+  Future<Either<Failure, String>> createGoal(
     TaskDraft draft,
     SmartGoal smart,
     List<DraftStep> steps,

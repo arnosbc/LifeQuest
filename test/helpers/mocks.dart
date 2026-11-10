@@ -38,6 +38,10 @@ import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/focus/data/datasources/focus_remote_datasource.dart';
 import 'package:proyecto_movil/features/focus/domain/repositories/focus_repository.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/add_focus_step.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/capture_distraction.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/get_recall_questions.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/save_resume_note.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/save_step_proof.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/complete_focus_cycle.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/complete_session_task.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/end_focus.dart';
@@ -127,6 +131,14 @@ class MockCompleteSessionTask extends Mock implements CompleteSessionTask {}
 class MockEndFocus extends Mock implements EndFocus {}
 
 class MockAddFocusStep extends Mock implements AddFocusStep {}
+
+class MockSaveStepProof extends Mock implements SaveStepProof {}
+
+class MockSaveResumeNote extends Mock implements SaveResumeNote {}
+
+class MockCaptureDistraction extends Mock implements CaptureDistraction {}
+
+class MockGetRecallQuestions extends Mock implements GetRecallQuestions {}
 
 class MockScheduleFocusTask extends Mock implements ScheduleFocusTask {}
 

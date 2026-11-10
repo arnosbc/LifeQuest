@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/focus/domain/entities/focus_board.dart';
 import 'package:proyecto_movil/features/focus/domain/entities/focus_guide.dart';
@@ -46,6 +47,10 @@ void main() {
   late MockEndFocus end;
   late MockAddFocusStep addStep;
   late MockScheduleFocusTask schedule;
+  late MockSaveStepProof saveProof;
+  late MockSaveResumeNote saveResume;
+  late MockCaptureDistraction captureDistraction;
+  late MockGetRecallQuestions recallQuestions;
   late DateTime now;
   const failure = ServerFailure('Sin conexión.');
 
@@ -59,6 +64,9 @@ void main() {
     );
     registerFallbackValue((taskId: 't', at: DateTime(2026)));
     registerFallbackValue((taskId: 't', title: ''));
+    registerFallbackValue((taskId: 't', note: ''));
+    registerFallbackValue((stepId: 's', proof: ResourceDraft.note('x')));
+    registerFallbackValue(_t1);
   });
 
   setUp(() {
@@ -69,6 +77,10 @@ void main() {
     end = MockEndFocus();
     addStep = MockAddFocusStep();
     schedule = MockScheduleFocusTask();
+    saveProof = MockSaveStepProof();
+    saveResume = MockSaveResumeNote();
+    captureDistraction = MockCaptureDistraction();
+    recallQuestions = MockGetRecallQuestions();
     now = DateTime(2026, 10, 25, 9);
   });
 
@@ -80,6 +92,10 @@ void main() {
     addStep: addStep,
     schedule: schedule,
     end: end,
+    saveProof: saveProof,
+    saveResume: saveResume,
+    captureDistraction: captureDistraction,
+    recallQuestions: recallQuestions,
     clock: () => now,
     ticker: () => const Stream.empty(),
   );
@@ -358,6 +374,7 @@ void main() {
       focus(withProgress(after)).copyWith(
         message: '¡Paso hecho!',
         gain: const FocusGain(xp: 15, levelUp: false, seq: 1),
+        proofStepId: () => 'p1',
       ),
     ],
   );
@@ -507,5 +524,123 @@ void main() {
       isNot(FocusGuide.breakTip(2, long: false)),
     );
     expect(FocusGuide.breakTip(4, long: true), isNotEmpty);
+  });
+
+  group('Foco que deja algo', () {
+    const step = FocusStep(id: 'p1', title: 'Leer el tema 3');
+    const withStep = FocusTask(id: 't1', title: 'Estudiar', steps: [step]);
+    final board = FocusBoard(
+      session: const FocusSession(
+        id: 's1',
+        totalMinutes: 60,
+        cycleMinutes: 25,
+        tasks: [withStep, _t2],
+      ),
+    );
+
+    test('recallNotes junta Dónde lo dejé y las pruebas de los pasos hechos', () {
+      const t = FocusTask(
+        id: 't',
+        title: 'Estudiar',
+        resumeNote: 'Sigo en el 6',
+        steps: [
+          FocusStep(id: 'a', title: 'Ej. 1-5', done: true, proof: 'Me trabé en el 4'),
+          FocusStep(id: 'b', title: 'Ej. 6-10'),
+        ],
+      );
+      expect(t.recallNotes, ['Sigo en el 6', 'Ej. 1-5: Me trabé en el 4']);
+      expect(t.resumeSuggestion, 'Sigue: Ej. 6-10');
+      expect(_t1.recallNotes, isEmpty);
+      expect(_t1.resumeSuggestion, '');
+    });
+
+    blocTest<FocusBloc, FocusState>(
+      'al marcar un paso ofrece dejar prueba; «Ahora no» la quita',
+      setUp: () {
+        givenBoard(board);
+        when(() => completeTask(any())).thenAnswer((_) async => const Right(unit));
+      },
+      build: build,
+      seed: () => focus(board),
+      act: (bloc) async {
+        bloc.add(const FocusStepCompleted('p1'));
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const FocusStepProofSkipped());
+      },
+      skip: 1,
+      expect: () => [
+        isA<FocusReady>().having((s) => s.proofStepId, 'proof', 'p1'),
+        isA<FocusReady>().having((s) => s.proofStepId, 'proof', null),
+      ],
+    );
+
+    blocTest<FocusBloc, FocusState>(
+      'la prueba se guarda como recurso del paso',
+      setUp: () {
+        givenBoard(board);
+        when(() => saveProof(any())).thenAnswer((_) async => const Right(unit));
+      },
+      build: build,
+      seed: () => focus(board).copyWith(proofStepId: () => 'p1'),
+      act: (bloc) => bloc.add(
+        FocusStepProofSaved(stepId: 'p1', proof: ResourceDraft.note('Hecho')),
+      ),
+      verify: (bloc) {
+        verify(() => saveProof((stepId: 'p1', proof: ResourceDraft.note('Hecho')))).called(1);
+        expect((bloc.state as FocusReady).proofStepId, isNull);
+      },
+    );
+
+    blocTest<FocusBloc, FocusState>(
+      'una distracción va a la Bandeja y se cuenta',
+      setUp: () => when(
+        () => captureDistraction(any()),
+      ).thenAnswer((_) async => const Right(unit)),
+      build: build,
+      seed: () => focus(board),
+      act: (bloc) => bloc.add(const FocusDistractionCaptured('Pagar la luz')),
+      expect: () => [
+        isA<FocusReady>()
+            .having((s) => s.distractions, 'distractions', 1)
+            .having((s) => s.message, 'message', 'A la Bandeja. Sigue con lo tuyo.'),
+      ],
+    );
+
+    blocTest<FocusBloc, FocusState>(
+      'Dónde lo dejé se guarda sin perder el resumen',
+      setUp: () => when(
+        () => saveResume(any()),
+      ).thenAnswer((_) async => const Right(unit)),
+      build: build,
+      seed: () => FocusReady(
+        board: _setupBoard,
+        phase: FocusPhase.setup,
+        now: now,
+        summary: const FocusSummary(cycles: 1, xp: 10, coins: 0, minutes: 25),
+      ),
+      act: (bloc) =>
+          bloc.add(const FocusResumeNoteSaved(taskId: 't1', note: 'Sigo en el 6')),
+      expect: () => [
+        isA<FocusReady>()
+            .having((s) => s.resumeSaved, 'saved', {'t1'})
+            .having((s) => s.summary, 'summary', isNotNull),
+      ],
+    );
+
+    blocTest<FocusBloc, FocusState>(
+      'el repaso trae preguntas de la IA para la tarea',
+      setUp: () => when(() => recallQuestions(any())).thenAnswer(
+        (_) async => const Right(['¿Qué falló en el 4?']),
+      ),
+      build: build,
+      seed: () => focus(board),
+      act: (bloc) => bloc.add(const FocusRecallRequested('t1')),
+      expect: () => [
+        isA<FocusReady>().having((s) => s.recallAsking, 'asking', 't1'),
+        isA<FocusReady>()
+            .having((s) => s.recallAsking, 'asking', null)
+            .having((s) => s.recall['t1'], 'questions', ['¿Qué falló en el 4?']),
+      ],
+    );
   });
 }

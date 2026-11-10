@@ -123,5 +123,11 @@ Principios:
 - **Bandeja en el cierre:** `044_review_inbox.sql` suma `inbox` (notas pendientes) a `weekly_review`; la revisión muestra «N notas sin decidir» con «Decidir» (abre la Bandeja y relee al volver).
 - **Falta:** aplicar `044_review_inbox.sql`, `043_notification_targets.sql`, `042_project_alerts.sql`, `041_task_order.sql`, `040_delete_items.sql` y `039_day_close_habits.sql` en Supabase (sin ella fallan «Mañana» y crear un hábito con versión mínima); probar en un teléfono. El aviso de un hábito trae «Hecho» (`ReminderActions`, `complete_habit`). `shortcut:` los hábitos con hora no salen en la agenda de Hoy (requiere cambiar `home_dashboard`).
 
+## Recursos y Foco que deja algo (v2.8.0)
+- **Recursos (045):** una tarea, proyecto o meta guarda enlaces, fotos, PDF (≤ 10 MB, bucket privado `resources`, carpeta por usuario) y notas. Se adjuntan en «Anotar» (chips, se guardan al crear) o desde «Recursos» en el menú «⋯» de Tareas, en cada proyecto y en cada meta; se abren con URL firmada y se quitan con deshacer de 5 s. Contrato y hoja en `core/resources` y `core/widgets/resources_sheet.dart` porque los usan varias features.
+- **IA con contexto:** con la IA encendida, «Dividir en pasos» manda a Gemini las fotos y PDF (`paths`, descargados con el JWT del usuario) y las notas y enlaces (`context`). Al crear, los archivos se suben al pedir los pasos y se reutilizan al guardar.
+- **Foco:** prueba del paso (nota o foto opcional al marcarlo), «Dónde lo dejé» al cerrar (propone «Sigue: <siguiente paso>»), repaso al empezar con las notas y, con la IA, 1–3 preguntas (`recall`), y «Anotar distracción» a la Bandeja.
+- **Falta:** aplicar `045_resources.sql` en Supabase (crea el bucket y sus políticas), desplegar de nuevo la Edge Function `assistant` y probar en un teléfono. `shortcut:` al borrar una tarea, proyecto o meta, sus archivos quedan en Storage (las filas se borran por cascada).
+
 ## Fuera de alcance
 Borrar las tablas económicas, push remoto (FCM), widget y acciones de notificación en iOS, sincronización con Google Calendar en la nube, traducción al inglés.

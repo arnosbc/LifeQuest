@@ -256,7 +256,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                           child: FocusScreen(
                             preselectedTaskId:
                                 state.uri.queryParameters['task'],
-                            suggestSteps: sl<BreakDownTask>().titles,
+                            suggestSteps: (title, taskId) => sl<BreakDownTask>()
+                                .titles(title, taskId: taskId),
                           ),
                         ),
                       ),

@@ -59,6 +59,10 @@ android {
             // flutter build apk --obfuscate --split-debug-info=build/symbols
             isMinifyEnabled = true
             isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

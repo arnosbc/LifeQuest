@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { sanitizeGoal, sanitizeParse, sanitizeSteps } from './sanitize.ts';
+import { sanitizeGoal, sanitizeParse, sanitizeQuestions, sanitizeSteps } from './sanitize.ts';
 
 const now = new Date('2026-11-05T14:00:00Z');
 
@@ -80,4 +80,14 @@ test('goal: exige los 4 campos S.M.A.R.T. y al menos 2 pasos', () => {
   assert.equal(sanitizeGoal({ title: 'x', steps: ['a', 'b'] }, 'x'), null);
   assert.equal(sanitizeGoal({ specific: 'a', measurable: 'b', achievable: 'c',
     relevant: 'd', steps: ['a', 'b'] }, 'aprender piano')?.title, 'aprender piano');
+});
+
+test('questions: 1–3 preguntas únicas de una línea', () => {
+  assert.deepEqual(
+    sanitizeQuestions({ questions: ['1. ¿Qué es un límite?', '¿Qué es un límite?', 3, '- ¿Por qué falló el 4?\nextra'] }),
+    ['¿Qué es un límite?', '¿Por qué falló el 4?'],
+  );
+  assert.equal(sanitizeQuestions({ questions: [] }), null);
+  assert.equal(sanitizeQuestions(null), null);
+  assert.equal(sanitizeQuestions({ questions: ['a', 'b', 'c', 'd'] })!.length, 3);
 });

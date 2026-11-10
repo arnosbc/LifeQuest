@@ -51,12 +51,16 @@ class FocusBoardModel {
     title: t['title'] as String,
     done: t['done'] as bool? ?? false,
     cycles: _int(t['cycles']),
+    resumeNote: t['resume_note'] as String?,
+    resources: _int(t['resources']),
     steps: [
       for (final st in _list(t['steps']))
         FocusStep(
           id: st['id'] as String,
           title: st['title'] as String,
           done: st['done'] as bool? ?? false,
+          proof: st['proof'] as String?,
+          proofPhoto: st['proof_photo'] as bool? ?? false,
         ),
     ],
   );

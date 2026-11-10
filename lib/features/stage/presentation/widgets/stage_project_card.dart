@@ -15,6 +15,7 @@ class StageProjectCard extends StatelessWidget {
     required this.onArchive,
     required this.onAddTask,
     this.onDelete,
+    this.onResources,
   });
 
   final StageProject project;
@@ -28,6 +29,7 @@ class StageProjectCard extends StatelessWidget {
   final VoidCallback? onArchive;
   final VoidCallback onAddTask;
   final VoidCallback? onDelete;
+  final VoidCallback? onResources;
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +141,10 @@ class StageProjectCard extends StatelessWidget {
                         onPressed: onComplete,
                         child: const Text('Completar proyecto'),
                       ),
+                    TextButton(
+                      onPressed: onResources,
+                      child: const Text('Recursos'),
+                    ),
                     TextButton(
                       onPressed: onArchive,
                       child: const Text('Archivar'),

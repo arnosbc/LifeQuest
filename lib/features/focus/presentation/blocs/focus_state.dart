@@ -56,7 +56,31 @@ class FocusReady extends FocusState {
     this.intention,
     this.gain,
     this.nextScheduledAt,
+    this.proofStepId,
+    this.distractions = 0,
+    this.recall = const {},
+    this.recallDismissed = const {},
+    this.resumeSaved = const {},
+    this.recallAsking,
   });
+
+  /// Tarea cuyas preguntas de repaso se están pidiendo.
+  final String? recallAsking;
+
+  /// Paso recién marcado que puede llevar prueba (nota o foto).
+  final String? proofStepId;
+
+  /// Ideas mandadas a la Bandeja en esta sesión.
+  final int distractions;
+
+  /// Preguntas de repaso por tarea.
+  final Map<String, List<String>> recall;
+
+  /// Tareas cuyo repaso el usuario ya cerró en esta sesión.
+  final Set<String> recallDismissed;
+
+  /// Tareas con «Dónde lo dejé» ya guardado desde el resumen.
+  final Set<String> resumeSaved;
 
   final FocusBoard board;
   final FocusPhase phase;
@@ -112,7 +136,19 @@ class FocusReady extends FocusState {
     String? Function()? intention,
     FocusGain? gain,
     DateTime? nextScheduledAt,
+    String? Function()? proofStepId,
+    int? distractions,
+    Map<String, List<String>>? recall,
+    Set<String>? recallDismissed,
+    Set<String>? resumeSaved,
+    String? Function()? recallAsking,
   }) => FocusReady(
+    recallAsking: recallAsking == null ? this.recallAsking : recallAsking(),
+    proofStepId: proofStepId == null ? this.proofStepId : proofStepId(),
+    distractions: distractions ?? this.distractions,
+    recall: recall ?? this.recall,
+    recallDismissed: recallDismissed ?? this.recallDismissed,
+    resumeSaved: resumeSaved ?? this.resumeSaved,
     board: board ?? this.board,
     phase: phase ?? this.phase,
     now: now ?? this.now,
@@ -141,5 +177,11 @@ class FocusReady extends FocusState {
     intention,
     gain,
     nextScheduledAt,
+    proofStepId,
+    distractions,
+    recall,
+    recallDismissed,
+    resumeSaved,
+    recallAsking,
   ];
 }

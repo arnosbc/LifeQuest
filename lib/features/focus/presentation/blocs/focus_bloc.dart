@@ -5,7 +5,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart' show Left;
 
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/capture_distraction.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/get_recall_questions.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/save_resume_note.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/save_step_proof.dart';
 import 'package:proyecto_movil/features/focus/domain/entities/focus_board.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/add_focus_step.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/complete_focus_cycle.dart';
@@ -29,6 +34,10 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     required this._addStep,
     required this._schedule,
     required this._end,
+    required this._saveProof,
+    required this._saveResume,
+    required this._captureDistraction,
+    required this._recallQuestions,
     DateTime Function()? clock,
     Stream<void> Function()? ticker,
   }) : _clock = clock ?? DateTime.now,
@@ -51,6 +60,19 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
     on<FocusNextScheduled>(_onNextScheduled, transformer: droppable());
     on<FocusEnded>(_onEnded, transformer: droppable());
     on<FocusSummaryDismissed>(_onSummaryDismissed);
+    on<FocusStepProofSaved>(_onProofSaved, transformer: droppable());
+    on<FocusStepProofSkipped>(
+      (_, emit) => _update(emit, (s) => s.copyWith(proofStepId: () => null)),
+    );
+    on<FocusResumeNoteSaved>(_onResumeSaved, transformer: sequential());
+    on<FocusDistractionCaptured>(_onDistraction, transformer: sequential());
+    on<FocusRecallRequested>(_onRecall, transformer: droppable());
+    on<FocusRecallDismissed>(
+      (e, emit) => _update(
+        emit,
+        (s) => s.copyWith(recallDismissed: {...s.recallDismissed, e.taskId}),
+      ),
+    );
     _ticks = (ticker ?? _everySecond)().listen((_) => add(const FocusTicked()));
   }
 
@@ -61,6 +83,10 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
   final AddFocusStep _addStep;
   final ScheduleFocusTask _schedule;
   final EndFocus _end;
+  final SaveStepProof _saveProof;
+  final SaveResumeNote _saveResume;
+  final CaptureDistraction _captureDistraction;
+  final GetRecallQuestions _recallQuestions;
   final DateTime Function() _clock;
   late final StreamSubscription<void> _ticks;
 
@@ -357,10 +383,97 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
         return;
       }
     }
+    // Se ofrece dejar prueba de lo hecho; es opcional y no frena.
     await _reload(
       current,
       parent == null ? '¡Paso hecho!' : '¡Último paso! Tarea completada.',
       emit,
+      proofStepId: () => event.stepId,
+    );
+  }
+
+  void _update(Emitter<FocusState> emit, FocusReady Function(FocusReady) f) {
+    if (state case final FocusReady s) emit(f(s));
+  }
+
+  Future<void> _onProofSaved(
+    FocusStepProofSaved event,
+    Emitter<FocusState> emit,
+  ) async {
+    final current = state;
+    if (current is! FocusReady) return;
+    emit(current.copyWith(busy: true));
+    final saved = await _saveProof((stepId: event.stepId, proof: event.proof));
+    if (saved case Left(value: final failure)) {
+      emit(_latest(current).copyWith(busy: false, message: failure.message));
+      return;
+    }
+    await _reload(
+      current,
+      'Guardado en el paso. Te servirá al repasar.',
+      emit,
+      proofStepId: () => null,
+    );
+  }
+
+  Future<void> _onResumeSaved(
+    FocusResumeNoteSaved event,
+    Emitter<FocusState> emit,
+  ) async {
+    final current = state;
+    if (current is! FocusReady) return;
+    final saved = await _saveResume((taskId: event.taskId, note: event.note));
+    final latest = _latest(current);
+    emit(
+      saved.match(
+        (f) => latest.copyWith(summary: latest.summary, message: f.message),
+        (_) => latest.copyWith(
+          summary: latest.summary,
+          nextScheduledAt: latest.nextScheduledAt,
+          resumeSaved: {...latest.resumeSaved, event.taskId},
+          message: 'Listo. La próxima vez empiezas por ahí.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onDistraction(
+    FocusDistractionCaptured event,
+    Emitter<FocusState> emit,
+  ) async {
+    final current = state;
+    if (current is! FocusReady) return;
+    final saved = await _captureDistraction(event.text);
+    final latest = _latest(current);
+    emit(
+      saved.match(
+        (f) => latest.copyWith(message: f.message),
+        (_) => latest.copyWith(
+          distractions: latest.distractions + 1,
+          message: 'A la Bandeja. Sigue con lo tuyo.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onRecall(
+    FocusRecallRequested event,
+    Emitter<FocusState> emit,
+  ) async {
+    final current = state;
+    if (current is! FocusReady) return;
+    final task = current.board.session?.tasks
+        .where((t) => t.id == event.taskId)
+        .firstOrNull;
+    if (task == null) return;
+    emit(current.copyWith(recallAsking: () => task.id));
+    final result = await _recallQuestions(task);
+    final latest = _latest(current).copyWith(recallAsking: () => null);
+    emit(
+      result.match(
+        (f) => latest.copyWith(message: f.message),
+        (qs) => latest.copyWith(recall: {...latest.recall, task.id: qs}),
+      ),
     );
   }
 
@@ -401,8 +514,9 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
   Future<void> _reload(
     FocusReady before,
     String message,
-    Emitter<FocusState> emit,
-  ) async {
+    Emitter<FocusState> emit, {
+    String? Function()? proofStepId,
+  }) async {
     final reloaded = await _getBoard(const NoParams());
     final latest = _latest(before);
     final board = reloaded.getOrElse((_) => latest.board);
@@ -415,6 +529,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
             : _nextTask(board.session!, latest.currentTaskId),
         gain: _gain(latest, board),
         message: message,
+        proofStepId: proofStepId,
       ),
     );
   }
@@ -496,6 +611,7 @@ class FocusBloc extends Bloc<FocusEvent, FocusState> {
       tasks: _latest(current).board.session?.tasks ?? session.tasks,
       weekMinutes: board.weekMinutes,
       prevWeekMinutes: board.prevWeekMinutes,
+      distractions: _latest(current).distractions,
     );
     emit(_fresh(board, summary: summary));
   }

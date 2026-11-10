@@ -34,11 +34,15 @@ class CapturePreview extends CaptureState {
     this.kind = CaptureKind.task,
     this.smart,
     this.steps = const [],
+    this.attachments = const [],
     this.busy = false,
     this.message,
   });
 
   final CaptureKind kind;
+
+  /// Recursos elegidos; se guardan al confirmar (no van a la Bandeja).
+  final List<ResourceDraft> attachments;
 
   /// Solo en metas: lo que propuso la IA.
   final SmartGoal? smart;
@@ -54,6 +58,7 @@ class CapturePreview extends CaptureState {
   CapturePreview copy({
     TaskDraft? draft,
     List<DraftStep>? steps,
+    List<ResourceDraft>? attachments,
     bool busy = false,
     String? message,
   }) => CapturePreview(
@@ -63,6 +68,7 @@ class CapturePreview extends CaptureState {
     kind: kind,
     smart: smart,
     steps: steps ?? this.steps,
+    attachments: attachments ?? this.attachments,
     busy: busy,
     message: message,
   );
@@ -75,6 +81,7 @@ class CapturePreview extends CaptureState {
     usedAi,
     aiAvailable,
     steps,
+    attachments,
     busy,
     message,
   ];
@@ -82,10 +89,13 @@ class CapturePreview extends CaptureState {
 
 /// Guardado; la hoja se cierra.
 class CaptureSaved extends CaptureState {
-  const CaptureSaved({required this.toInbox});
+  const CaptureSaved({required this.toInbox, this.notice});
 
   final bool toInbox;
 
+  /// Algo no entró (p. ej. un recurso), aunque lo creado sí.
+  final String? notice;
+
   @override
-  List<Object?> get props => [toInbox];
+  List<Object?> get props => [toInbox, notice];
 }

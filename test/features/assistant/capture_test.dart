@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/features/assistant/data/models/task_draft_model.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/step_templates.dart';
@@ -19,8 +20,11 @@ import '../../helpers/mocks.dart';
 
 class _Repo extends Mock implements AssistantRepository {}
 
+class _Resources extends Mock implements ResourceRepository {}
+
 void main() {
   late _Repo repo;
+  late _Resources resources;
   late MockListenVoice voice;
   // Jueves 5 nov 2026, 14:00.
   final now = DateTime(2026, 11, 5, 14);
@@ -30,6 +34,8 @@ void main() {
     registerFallbackValue(DateTime(2026));
     registerFallbackValue(const TaskDraft(title: ''));
     registerFallbackValue(<DraftStep>[]);
+    registerFallbackValue(const ResourceTarget.task(''));
+    registerFallbackValue(ResourceDraft.note('x'));
     registerFallbackValue(
       const SmartGoal(
         specific: '',
@@ -41,6 +47,7 @@ void main() {
   });
   setUp(() {
     repo = _Repo();
+    resources = _Resources();
     voice = MockListenVoice();
   });
 
@@ -93,7 +100,7 @@ void main() {
     when(
       () => repo.breakdown('Informe'),
     ).thenAnswer((_) async => const Right(['Investigar', 'Escribir']));
-    final steps = await BreakDownTask(repo, clock: () => now)(
+    final steps = await BreakDownTask(repo, resources, clock: () => now)(
       TaskDraft(title: 'Informe', dueDate: DateTime(2026, 11, 10, 23, 59)),
     );
     expect(steps.getOrElse((_) => const []), [
@@ -108,6 +115,7 @@ void main() {
     ).thenAnswer((_) async => const Left(ServerFailure('La IA está apagada.')));
     final titles = await BreakDownTask(
       repo,
+      resources,
     ).titles('Realizar pruebas finales y desplegar la aplicación');
     expect(
       titles.getOrElse((_) => const []).first,
@@ -130,9 +138,9 @@ void main() {
   group('CaptureBloc', () {
     CaptureBloc build() => CaptureBloc(
       interpret: InterpretCapture(repo, clock: () => now),
-      breakDown: BreakDownTask(repo, clock: () => now),
+      breakDown: BreakDownTask(repo, resources, clock: () => now),
       planGoal: PlanGoal(repo, clock: () => now),
-      save: SaveCapture(repo),
+      save: SaveCapture(repo, resources),
       listen: voice,
       clock: () => now,
     );
@@ -143,7 +151,7 @@ void main() {
         givenStatus(AiStatus.off);
         when(
           () => repo.createTask(any(), any()),
-        ).thenAnswer((_) async => const Right(unit));
+        ).thenAnswer((_) async => const Right('t1'));
       },
       build: build,
       act: (bloc) async {
@@ -188,7 +196,7 @@ void main() {
         );
         when(
           () => repo.createGoal(any(), any(), any()),
-        ).thenAnswer((_) async => const Right(unit));
+        ).thenAnswer((_) async => const Right('g1'));
       },
       build: build,
       act: (bloc) async {
@@ -316,5 +324,77 @@ void main() {
       expect(iso, startsWith('2026-11-05T14:00:00'));
       expect(iso, matches(RegExp(r'[+-]\d\d:\d\d$')));
     });
+  });
+
+  group('Recursos al crear', () {
+    test('SaveCapture adjunta cada recurso a la tarea creada', () async {
+      when(() => repo.createTask(any(), any()))
+          .thenAnswer((_) async => const Right('t1'));
+      when(() => resources.attach(any(), any()))
+          .thenAnswer((_) async => const Right(unit));
+      final link = ResourceDraft.link('https://ejemplo.com/guia');
+      final note = ResourceDraft.note('Usar el capítulo 3');
+      final r = await SaveCapture(repo, resources)((
+        draft: const TaskDraft(title: 'Estudiar'),
+        steps: const [],
+        toInbox: false,
+        kind: CaptureKind.task,
+        smart: null,
+        attachments: [link, note],
+      ));
+      expect(r, const Right<Failure, String?>(null));
+      verify(() => resources.attach(const ResourceTarget.task('t1'), link)).called(1);
+      verify(() => resources.attach(const ResourceTarget.task('t1'), note)).called(1);
+    });
+
+    test('si un recurso falla, lo creado queda y se avisa', () async {
+      when(() => repo.createTask(any(), any()))
+          .thenAnswer((_) async => const Right('t1'));
+      when(() => resources.attach(any(), any()))
+          .thenAnswer((_) async => const Left(ServerFailure('x')));
+      final r = await SaveCapture(repo, resources)((
+        draft: const TaskDraft(title: 'Estudiar'),
+        steps: const [],
+        toInbox: false,
+        kind: CaptureKind.task,
+        smart: null,
+        attachments: [ResourceDraft.note('a')],
+      ));
+      expect(r.getOrElse((_) => null), contains('1 recurso'));
+    });
+
+    test('la Bandeja no recibe recursos', () async {
+      when(() => repo.saveToInbox(any()))
+          .thenAnswer((_) async => const Right(unit));
+      await SaveCapture(repo, resources)((
+        draft: const TaskDraft(title: 'Idea'),
+        steps: const [],
+        toInbox: true,
+        kind: CaptureKind.task,
+        smart: null,
+        attachments: [ResourceDraft.note('a')],
+      ));
+      verifyNever(() => resources.attach(any(), any()));
+    });
+
+    test('Dividir en pasos manda el material subido a la IA', () async {
+      const ai = AiContext(paths: ['u/x.pdf'], context: ['nota']);
+      when(() => resources.prepareForAi(any()))
+          .thenAnswer((_) async => const Right(ai));
+      when(() => repo.breakdown('Informe', ai: ai))
+          .thenAnswer((_) async => const Right(['Leer guía', 'Escribir']));
+      final steps = await BreakDownTask(repo, resources, clock: () => now)
+          .withAttachments(const TaskDraft(title: 'Informe'), [ResourceDraft.note('nota')]);
+      expect(steps.getOrElse((_) => const []).map((s) => s.title), ['Leer guía', 'Escribir']);
+    });
+  });
+
+  test('ResourceDraft valida enlace, tipo y tamaño', () {
+    expect(ResourceDraft.link('ftp://x').problem, isNotNull);
+    expect(ResourceDraft.link('https://ejemplo.com/a').title, 'ejemplo.com');
+    expect(ResourceDraft.file(localPath: '/a', name: 'a.docx', size: 1).problem, isNotNull);
+    expect(ResourceDraft.file(localPath: '/a', name: 'g.pdf', size: 20 << 20).problem, isNotNull);
+    expect(ResourceDraft.file(localPath: '/a', name: 'f.JPG', size: 100).kind, ResourceKind.image);
+    expect(ResourceDraft.file(localPath: '/a', name: 'f.JPG', size: 100).problem, isNull);
   });
 }

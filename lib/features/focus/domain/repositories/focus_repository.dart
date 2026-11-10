@@ -37,4 +37,19 @@ abstract class FocusRepository {
 
   /// Cierra la sesión sin perder lo ganado.
   Future<Either<Failure, FocusSummary>> end(String sessionId);
+
+  /// «Dónde lo dejé»; vacío la borra (`set_resume_note`, 045).
+  Future<Either<Failure, Unit>> setResumeNote({
+    required String taskId,
+    required String note,
+  });
+
+  /// Una idea que distrae va a la Bandeja sin salir del ciclo.
+  Future<Either<Failure, Unit>> captureDistraction(String text);
+
+  /// La IA hace 1–3 preguntas de repaso con las notas del usuario.
+  Future<Either<Failure, List<String>>> recallQuestions({
+    required String title,
+    required List<String> notes,
+  });
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/features/assistant/data/models/plan_task_model.dart';
 import 'package:proyecto_movil/features/assistant/data/models/task_draft_model.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/interpretation.dart';
@@ -20,17 +21,18 @@ abstract class AssistantRemoteDataSource {
 
   Future<TaskDraftModel> parse(String text, DateTime now);
 
-  Future<List<String>> breakdown(String title);
+  Future<List<String>> breakdown(String title, AiContext ai);
 
-  Future<void> createTask(TaskDraft draft, List<DraftStep> steps);
+  /// Devuelve el id de lo creado (para adjuntarle recursos).
+  Future<String> createTask(TaskDraft draft, List<DraftStep> steps);
 
   Future<({String title, SmartGoal smart, List<String> steps})> planGoal(
     String text,
   );
 
-  Future<void> createProject(TaskDraft draft, List<DraftStep> steps);
+  Future<String> createProject(TaskDraft draft, List<DraftStep> steps);
 
-  Future<void> createGoal(
+  Future<String> createGoal(
     TaskDraft draft,
     SmartGoal smart,
     List<DraftStep> steps,
@@ -90,10 +92,16 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
       });
 
   @override
-  Future<List<String>> breakdown(String title) => guardSupabase(() async {
+  Future<List<String>> breakdown(String title, AiContext ai) =>
+      guardSupabase(() async {
     final res = await _client.functions.invoke(
       'assistant',
-      body: {'mode': 'breakdown', 'title': title},
+      body: {
+        'mode': 'breakdown',
+        'title': title,
+        if (ai.paths.isNotEmpty) 'paths': ai.paths,
+        if (ai.context.isNotEmpty) 'context': ai.context,
+      },
     );
     return [
       for (final s in (res.data as Map<String, dynamic>)['steps'] as List)
@@ -104,13 +112,14 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
   /// La tarea con `create_task`; los pasos, como subtareas con fecha (insert
   /// directo: RLS y grants de columna de 003; la recompensa la pone el trigger).
   @override
-  Future<void> createTask(TaskDraft draft, List<DraftStep> steps) =>
+  Future<String> createTask(TaskDraft draft, List<DraftStep> steps) =>
       guardSupabase(() async {
         final res = await _client.rpc<Map<String, dynamic>>(
           'create_task',
           params: TaskDraftModel.toParams(draft),
         );
-        if (steps.isEmpty) return;
+        final id = res['id'] as String;
+        if (steps.isEmpty) return id;
         final uid = _client.auth.currentUser?.id;
         await _client.from('tasks').insert([
           for (final s in steps)
@@ -121,6 +130,7 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
               'due_date': s.due.toUtc().toIso8601String(),
             },
         ]);
+        return id;
       });
 
   @override
@@ -148,17 +158,18 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
   });
 
   @override
-  Future<void> createProject(TaskDraft draft, List<DraftStep> steps) =>
+  Future<String> createProject(TaskDraft draft, List<DraftStep> steps) =>
       guardSupabase(() async {
         final id = await _client.rpc<String>(
           'create_project',
           params: {'p_title': draft.title, 'p_end_date': _date(draft.dueDate)},
         );
         await _insertSteps(steps, {'project_id': id});
+        return id;
       });
 
   @override
-  Future<void> createGoal(
+  Future<String> createGoal(
     TaskDraft draft,
     SmartGoal smart,
     List<DraftStep> steps,
@@ -175,6 +186,7 @@ class AssistantRemoteDataSourceImpl implements AssistantRemoteDataSource {
       },
     );
     await _insertSteps(steps, {'goal_id': id});
+    return id;
   });
 
   /// Pasos como tareas raíz vinculadas (insert directo como en [createTask]).

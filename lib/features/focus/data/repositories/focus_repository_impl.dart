@@ -65,6 +65,28 @@ class FocusRepositoryImpl implements FocusRepository {
   Future<Either<Failure, FocusSummary>> end(String sessionId) =>
       _run(() async => (await _remote.end(sessionId)).toEntity());
 
+  @override
+  Future<Either<Failure, Unit>> setResumeNote({
+    required String taskId,
+    required String note,
+  }) => _run(() async {
+    await _remote.setResumeNote(taskId: taskId, note: note);
+    return unit;
+  });
+
+  @override
+  Future<Either<Failure, Unit>> captureDistraction(String text) =>
+      _run(() async {
+        await _remote.captureDistraction(text);
+        return unit;
+      });
+
+  @override
+  Future<Either<Failure, List<String>>> recallQuestions({
+    required String title,
+    required List<String> notes,
+  }) => _run(() => _remote.recallQuestions(title: title, notes: notes));
+
   Future<Either<Failure, T>> _run<T>(Future<T> Function() action) =>
       runGuarded(action, (error) => _messageFor(error.code));
 
@@ -84,6 +106,9 @@ class FocusRepositoryImpl implements FocusRepository {
     'session_not_found' || 'session_not_active' =>
       'Esta sesión ya terminó. Puedes empezar otra cuando quieras.',
     'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
+    'ai_disabled' => 'Las preguntas usan la IA: actívala en Ajustes. Tus notas siguen aquí.',
+    'ai_limit' => 'Usaste las llamadas de IA de hoy. Repasa con tus notas.',
+    'invalid_note' => 'La nota puede tener hasta 500 caracteres.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

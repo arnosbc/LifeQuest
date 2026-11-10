@@ -48,6 +48,12 @@ Terminología en todos los RF y UC: Mazmorra → **Foco**; Misión → **Tarea**
 | RF-129 | **Editar** una tarea abierta (título, prioridad, fecha, agenda, aviso y repetición) | 034 (`update_task`) |
 | RF-130 | Poner, cambiar o quitar la **hora del aviso** de un hábito bueno | 034 (`set_habit_reminder`) |
 | RF-131 | **Revisión semanal**: lo hecho en la semana y, por cada pendiente, «A la otra semana» o «Soltar»; aviso los domingos a las 18:00 | 034 (`weekly_review`, `postpone_task`) |
+| RF-132 | **Recursos** de una tarea, proyecto o meta: enlace, foto (cámara o galería), PDF (≤ 10 MB) o nota; se adjuntan al crear o después, se abren y se quitan con deshacer | 045 (`attach_resource`, bucket `resources`), `core/resources` |
+| RF-133 | Con la IA encendida, **«Dividir en pasos» lee los recursos** de la tarea (fotos y PDF como archivo; notas y enlaces como texto) | 045, Edge Function `assistant` (`paths`, `context`) |
+| RF-134 | **Prueba del paso** en Foco: al marcar un paso, nota o foto opcional que queda como recurso del paso | 045 (`dungeon_overview.steps[].proof`) |
+| RF-135 | **Dónde lo dejé**: al cerrar Foco, una línea por tarea sin terminar (la app propone el siguiente paso); se muestra al volver a esa tarea | 045 (`set_resume_note`) |
+| RF-136 | **Repaso activo** al empezar Foco con una tarea que tiene notas: «La última vez…» y, con la IA, 1–3 preguntas para comprobarse antes de ver las notas | Edge Function `assistant` (`recall`) |
+| RF-137 | **Anotar distracción** en Foco: la idea va a la Bandeja sin salir del ciclo; el resumen dice cuántas | `capture_thought` (023) |
 
 ## 4. Casos de uso
 
@@ -65,8 +71,10 @@ Terminología en todos los RF y UC: Mazmorra → **Foco**; Misión → **Tarea**
   - UC-40 Completar una tarea desde el widget (RF-128)
   - UC-41 Editar una tarea (RF-129)
   - UC-42 Hacer la revisión semanal (RF-131)
+  - UC-43 Adjuntar y abrir recursos de una tarea, proyecto o meta (RF-132, RF-133)
+  - UC-44 Trabajar en Foco dejando prueba, repaso y Dónde lo dejé (RF-134, RF-135, RF-136, RF-137)
 - Corregir de paso las referencias rotas conocidas: UC-08 → UC-10 y UC-15; UC-09 → UC-11.
 
 ## 5. Esquema
 
-`Esquema_Base_de_Datos.md` y `schema.sql` deben sumar: columnas de agenda en `tasks` (`scheduled_at`, `estimated_minutes`, `reminder_minutes`, `focus_minutes`, `repeat_rule` con check), `habits.reminder_time`, `game_master_settings.time_zone` y `ai_enabled`, la tabla `ai_usage`, y quitar las tablas borradas en 035 (`market_items`, `user_market_selection`, `purchases`, `black_market_items`, `black_market_redemptions`, `recovery_passes`, `vision_boards`, `inventory_items`, `user_inventory`, `npcs`).
+`Esquema_Base_de_Datos.md` y `schema.sql` deben sumar: columnas de agenda en `tasks` (`scheduled_at`, `estimated_minutes`, `reminder_minutes`, `focus_minutes`, `repeat_rule` con check), `habits.reminder_time`, `game_master_settings.time_zone` y `ai_enabled`, la tabla `ai_usage`, en `resources` (045) `task_id`/`project_id`/`goal_id` (máx. uno, cascada), `kind resource_kind`, `storage_path`, `size_bytes` y `note`, `tasks.resume_note`/`resume_at`, y quitar las tablas borradas en 035 (`market_items`, `user_market_selection`, `purchases`, `black_market_items`, `black_market_redemptions`, `recovery_passes`, `vision_boards`, `inventory_items`, `user_inventory`, `npcs`).

@@ -1,7 +1,8 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fpdart/fpdart.dart' show Left;
+
+import 'package:proyecto_movil/core/resources/resource.dart';
 
 import 'package:proyecto_movil/features/assistant/domain/entities/local_parser.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
@@ -31,6 +32,8 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
     on<CaptureSubmitted>(_onSubmitted, transformer: droppable());
     on<CaptureDraftEdited>(_onEdited);
     on<CaptureBreakdownRequested>(_onBreakdown, transformer: droppable());
+    on<CaptureAttachmentAdded>(_onAttachmentAdded);
+    on<CaptureAttachmentRemoved>(_onAttachmentRemoved);
     on<CaptureConfirmed>(_onConfirmed, transformer: droppable());
     on<CaptureRestarted>((_, emit) => emit(const CaptureWriting()));
   }
@@ -159,13 +162,36 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
     final current = state;
     if (current is! CapturePreview || current.busy) return;
     emit(current.copy(busy: true));
-    final result = await _breakDown(current.draft);
+    final result = await _breakDown.withAttachments(
+      current.draft,
+      current.attachments,
+    );
     emit(
       result.match(
         (failure) => current.copy(message: failure.message),
         (steps) => current.copy(steps: steps),
       ),
     );
+  }
+
+  void _onAttachmentAdded(
+    CaptureAttachmentAdded event,
+    Emitter<CaptureState> emit,
+  ) {
+    final s = state;
+    if (s is! CapturePreview) return;
+    if (event.draft.problem case final p?) return emit(s.copy(message: p));
+    if (s.attachments.contains(event.draft)) return;
+    emit(s.copy(attachments: [...s.attachments, event.draft]));
+  }
+
+  void _onAttachmentRemoved(
+    CaptureAttachmentRemoved event,
+    Emitter<CaptureState> emit,
+  ) {
+    if (state case final CapturePreview s) {
+      emit(s.copy(attachments: [...s.attachments]..remove(event.draft)));
+    }
   }
 
   Future<void> _onConfirmed(
@@ -184,11 +210,13 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
       toInbox: toInbox,
       kind: current.kind,
       smart: current.smart,
+      attachments: current.attachments,
     ));
-    if (saved case Left(value: final failure)) {
-      emit(current.copy(message: failure.message));
-      return;
-    }
-    emit(CaptureSaved(toInbox: toInbox));
+    emit(
+      saved.match(
+        (failure) => current.copy(message: failure.message),
+        (notice) => CaptureSaved(toInbox: toInbox, notice: notice),
+      ),
+    );
   }
 }

@@ -29,6 +29,15 @@ abstract class FocusRemoteDataSource {
   Future<void> schedule({required String taskId, required DateTime at});
 
   Future<FocusSummaryModel> end(String sessionId);
+
+  Future<void> setResumeNote({required String taskId, required String note});
+
+  Future<void> captureDistraction(String text);
+
+  Future<List<String>> recallQuestions({
+    required String title,
+    required List<String> notes,
+  });
 }
 
 class FocusRemoteDataSourceImpl implements FocusRemoteDataSource {
@@ -105,4 +114,35 @@ class FocusRemoteDataSourceImpl implements FocusRemoteDataSource {
       ),
     ),
   );
+
+  @override
+  Future<void> setResumeNote({required String taskId, required String note}) =>
+      guardSupabase(
+        () => _client.rpc<void>(
+          'set_resume_note',
+          params: {'p_task_id': taskId, 'p_note': note},
+        ),
+      );
+
+  /// La misma RPC que la Bandeja (023).
+  @override
+  Future<void> captureDistraction(String text) => guardSupabase(
+    () => _client.rpc<void>('capture_thought', params: {'p_content': text}),
+  );
+
+  /// Edge Function `assistant`, modo `recall` (045).
+  @override
+  Future<List<String>> recallQuestions({
+    required String title,
+    required List<String> notes,
+  }) => guardSupabase(() async {
+    final res = await _client.functions.invoke(
+      'assistant',
+      body: {'mode': 'recall', 'title': title, 'notes': notes},
+    );
+    return [
+      for (final q in (res.data as Map<String, dynamic>)['questions'] as List)
+        if (q is String && q.trim().isNotEmpty) q.trim(),
+    ];
+  });
 }

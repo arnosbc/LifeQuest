@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart' show Either;
 
 import 'package:proyecto_movil/core/errors/failures.dart';
-
+import 'package:proyecto_movil/core/resources/resource.dart';
+import 'package:proyecto_movil/core/widgets/resources_sheet.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/focus/domain/entities/focus_guide.dart';
 import 'package:proyecto_movil/features/focus/presentation/blocs/focus_bloc.dart';
 import 'package:proyecto_movil/features/focus/presentation/widgets/deep_work_session_card.dart';
+import 'package:proyecto_movil/features/focus/presentation/widgets/focus_memory_widgets.dart';
 import 'package:proyecto_movil/features/focus/presentation/widgets/focus_progress_widgets.dart';
 import 'package:proyecto_movil/features/focus/presentation/widgets/focus_setup_view.dart';
 import 'package:proyecto_movil/features/focus/presentation/widgets/focus_timer_ring.dart';
@@ -17,8 +19,12 @@ import 'package:proyecto_movil/features/focus/presentation/widgets/session_rewar
 class FocusScreen extends StatelessWidget {
   const FocusScreen({super.key, this.preselectedTaskId, this.suggestSteps});
 
-  /// El asistente propone los pasos de una tarea; null oculta el botón.
-  final Future<Either<Failure, List<String>>> Function(String title)?
+  /// El asistente propone los pasos de una tarea (con sus recursos como
+  /// contexto); null oculta el botón.
+  final Future<Either<Failure, List<String>>> Function(
+    String title,
+    String taskId,
+  )?
   suggestSteps;
 
   /// Tarea elegida en Hoy o en Tareas con «Empezar foco».
@@ -69,6 +75,14 @@ class FocusScreen extends StatelessWidget {
               scheduledAt: state.nextScheduledAt,
               onSchedule: (id) => _scheduleTomorrow(context, id),
             ),
+            const SizedBox(height: 9),
+            ResumeNotesCard(
+              tasks: summary.tasks,
+              saved: state.resumeSaved,
+              distractions: summary.distractions,
+              onSave: (id, note) =>
+                  bloc.add(FocusResumeNoteSaved(taskId: id, note: note)),
+            ),
             TextButton(
               onPressed: () => bloc.add(const FocusSummaryDismissed()),
               child: const Text('Cerrar resumen'),
@@ -118,6 +132,15 @@ class FocusScreen extends StatelessWidget {
     final focused = session.tasks
         .where((t) => t.id == state.currentTaskId && !t.done)
         .firstOrNull;
+    final showRecall =
+        focused != null &&
+        !rest &&
+        !done &&
+        focused.recallNotes.isNotEmpty &&
+        !state.recallDismissed.contains(focused.id);
+    final proofStep = [
+      for (final t in session.tasks) ...t.steps,
+    ].where((s) => s.id == state.proofStepId).firstOrNull;
     return LifeQuestPage(
       title: 'Foco',
       subtitle: 'Ciclo $cycle de ${session.maxCycles}',
@@ -141,6 +164,16 @@ class FocusScreen extends StatelessWidget {
           done: session.cyclesDone,
           accent: accent,
         ),
+        if (showRecall) ...[
+          const SizedBox(height: 16),
+          RecallCard(
+            task: focused,
+            questions: state.recall[focused.id],
+            asking: state.recallAsking == focused.id,
+            onAsk: () => bloc.add(FocusRecallRequested(focused.id)),
+            onDismiss: () => bloc.add(FocusRecallDismissed(focused.id)),
+          ),
+        ],
         if (!done && !rest) ...[
           const SizedBox(height: 8),
           CycleIntention(
@@ -185,6 +218,25 @@ class FocusScreen extends StatelessWidget {
             onSuggestSteps: suggestSteps == null
                 ? null
                 : () => _suggestSteps(context, focused.id, focused.title),
+            onResources: () async {
+              await showResourcesSheet(
+                context,
+                target: ResourceTarget.task(focused.id),
+                title: focused.title,
+              );
+              bloc.add(const FocusRequested());
+            },
+          ),
+        ],
+        if (proofStep != null && proofStep.done) ...[
+          const SizedBox(height: 12),
+          StepProofPrompt(
+            stepTitle: proofStep.title,
+            busy: state.busy,
+            onProof: (draft) => bloc.add(
+              FocusStepProofSaved(stepId: proofStep.id, proof: draft),
+            ),
+            onSkip: () => bloc.add(const FocusStepProofSkipped()),
           ),
         ],
         const SizedBox(height: 14),
@@ -230,6 +282,17 @@ class FocusScreen extends StatelessWidget {
               ],
             ],
           ),
+        if (!done)
+          TextButton.icon(
+            style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+            onPressed: () => _captureDistraction(context),
+            icon: const Icon(Icons.inbox_outlined, size: 20),
+            label: Text(
+              state.distractions == 0
+                  ? 'Anotar distracción'
+                  : 'Anotar distracción · ${state.distractions} en la Bandeja',
+            ),
+          ),
         const SizedBox(height: 6),
         SizedBox(
           width: double.infinity,
@@ -263,12 +326,27 @@ class FocusScreen extends StatelessWidget {
     String title,
   ) async {
     final bloc = context.read<FocusBloc>();
-    final result = await suggestSteps!(title);
+    final result = await suggestSteps!(title, taskId);
     if (!context.mounted) return;
     result.match(
       (failure) => showLifeQuestMessage(context, failure.message),
       (titles) => bloc.add(FocusStepsAdded(taskId: taskId, titles: titles)),
     );
+  }
+
+  /// Saca la idea de la cabeza sin salir del ciclo.
+  Future<void> _captureDistraction(BuildContext context) async {
+    final bloc = context.read<FocusBloc>();
+    final text = await askLifeQuestText(
+      context,
+      title: 'Anotar distracción',
+      label: 'Lo que te vino a la cabeza',
+      confirmLabel: 'A la Bandeja',
+      maxLength: 500,
+    );
+    if (text != null && text.trim().isNotEmpty) {
+      bloc.add(FocusDistractionCaptured(text));
+    }
   }
 
   Future<void> _addStep(BuildContext context, String taskId) async {

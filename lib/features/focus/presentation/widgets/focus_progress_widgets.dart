@@ -148,7 +148,11 @@ class FocusTaskCard extends StatelessWidget {
     required this.onCompleteStep,
     required this.onAddStep,
     this.onSuggestSteps,
+    this.onResources,
   });
+
+  /// Abre los recursos de la tarea; null oculta el botón.
+  final VoidCallback? onResources;
 
   /// El asistente propone los pasos; null oculta el botón.
   final Future<void> Function()? onSuggestSteps;
@@ -223,6 +227,8 @@ class FocusTaskCard extends StatelessWidget {
                       : () => onCompleteStep(step.id),
                 ),
                 title: step.title,
+                subtitle:
+                    step.proof ?? (step.proofPhoto ? 'Con foto de prueba' : null),
               ),
           ],
           const SizedBox(height: 4),
@@ -237,6 +243,17 @@ class FocusTaskCard extends StatelessWidget {
                 icon: const Icon(Icons.add_rounded, size: 20),
                 label: const Text('Añadir paso'),
               ),
+              if (onResources != null)
+                TextButton.icon(
+                  style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                  onPressed: onResources,
+                  icon: const Icon(Icons.attach_file_rounded, size: 20),
+                  label: Text(
+                    task.resources == 0
+                        ? 'Recursos'
+                        : 'Recursos (${task.resources})',
+                  ),
+                ),
             ],
           ),
         ],

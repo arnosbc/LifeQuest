@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/resources/resource.dart';
+import 'package:proyecto_movil/core/widgets/resources_sheet.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
@@ -161,6 +163,14 @@ class StageScreen extends StatelessWidget {
             enabled: idle,
             actions: [
               (
+                label: 'Recursos',
+                onSelected: () => showResourcesSheet(
+                  context,
+                  target: ResourceTarget(ResourceTargetKind.goal, goal.id),
+                  title: goal.title,
+                ),
+              ),
+              (
                 label: 'Archivar',
                 onSelected: () => bloc.add(
                   StageItemArchived(kind: StageItemKind.goal, id: goal.id),
@@ -195,6 +205,11 @@ class StageScreen extends StatelessWidget {
             // Símbolo + texto: el color nunca va solo.
             urgencyLabel: _urgencyLabel(project.urgency),
             onAddTask: onOpenTasks,
+            onResources: () => showResourcesSheet(
+              context,
+              target: ResourceTarget(ResourceTargetKind.project, project.id),
+              title: project.title,
+            ),
             onCompleteTask: idle
                 ? (id) => bloc.add(StageTaskCompleted(id))
                 : null,

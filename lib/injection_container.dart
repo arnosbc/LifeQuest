@@ -19,6 +19,8 @@ import 'package:proyecto_movil/features/assistant/presentation/blocs/assistant_b
 import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
 import 'package:proyecto_movil/core/calendar/device_phone_calendar.dart';
 import 'package:proyecto_movil/core/calendar/phone_event.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
+import 'package:proyecto_movil/core/resources/supabase_resource_repository.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/connect_calendar.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_reminder.dart';
 import 'package:proyecto_movil/features/home/domain/usecases/schedule_task.dart';
@@ -51,6 +53,10 @@ import 'package:proyecto_movil/features/focus/domain/usecases/complete_focus_cyc
 import 'package:proyecto_movil/features/focus/domain/usecases/complete_session_task.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/add_focus_step.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/end_focus.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/capture_distraction.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/get_recall_questions.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/save_resume_note.dart';
+import 'package:proyecto_movil/features/focus/domain/usecases/save_step_proof.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/schedule_focus_task.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/get_focus_board.dart';
 import 'package:proyecto_movil/features/focus/domain/usecases/start_focus.dart';
@@ -225,6 +231,10 @@ Future<void> initDependencies() async {
   );
 
   // ---------- Calendario del teléfono (core: lo leen Hoy y el Asistente) ----------
+  // Recursos (045): los usan Tareas, Proyectos y metas, el Asistente y Foco.
+  sl.registerLazySingleton<ResourceRepository>(
+    () => SupabaseResourceRepository(sl()),
+  );
   sl.registerLazySingleton<PhoneCalendar>(
     () => DevicePhoneCalendar(SharedPreferencesAsync()),
   );
@@ -244,9 +254,9 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => ListenVoice(sl()));
   sl.registerLazySingleton<VoiceInput>(SpeechVoiceInput.new);
   sl.registerLazySingleton(() => InterpretCapture(sl()));
-  sl.registerLazySingleton(() => BreakDownTask(sl()));
+  sl.registerLazySingleton(() => BreakDownTask(sl(), sl()));
   sl.registerLazySingleton(() => PlanGoal(sl()));
-  sl.registerLazySingleton(() => SaveCapture(sl()));
+  sl.registerLazySingleton(() => SaveCapture(sl(), sl()));
   sl.registerLazySingleton(() => ApplyDayPlan(sl()));
   sl.registerLazySingleton<AssistantRepository>(
     () => AssistantRepositoryImpl(sl(), sl()),
@@ -290,8 +300,16 @@ Future<void> initDependencies() async {
       addStep: sl(),
       schedule: sl(),
       end: sl(),
+      saveProof: sl(),
+      saveResume: sl(),
+      captureDistraction: sl(),
+      recallQuestions: sl(),
     ),
   );
+  sl.registerLazySingleton(() => SaveStepProof(sl()));
+  sl.registerLazySingleton(() => SaveResumeNote(sl()));
+  sl.registerLazySingleton(() => CaptureDistraction(sl()));
+  sl.registerLazySingleton(() => GetRecallQuestions(sl()));
   sl.registerLazySingleton(() => AddFocusStep(sl()));
   sl.registerLazySingleton(() => ScheduleFocusTask(sl()));
   sl.registerLazySingleton(() => GetFocusBoard(sl()));

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proyecto_movil/core/resources/resource.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
+import 'package:proyecto_movil/core/widgets/resources_sheet.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/tasks/domain/entities/task.dart';
@@ -109,6 +111,11 @@ class TasksScreen extends StatelessWidget {
       enabled: idle,
       onDone: () => done(task.id),
       onEdit: () => _editTask(context, state, task),
+      onResources: () => showResourcesSheet(
+        context,
+        target: ResourceTarget.task(task.id),
+        title: task.title,
+      ),
       onRename: (title) =>
           context.read<TasksBloc>().add(TaskRenamed(task.id, title)),
       onDelete: () => context.read<TasksBloc>().add(TaskDeleted(task.id)),

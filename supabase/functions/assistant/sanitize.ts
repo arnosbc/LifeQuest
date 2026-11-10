@@ -91,3 +91,16 @@ export function sanitizeGoal(raw: unknown, input: string): GoalPlan | null {
     specific, measurable, achievable, relevant, steps,
   };
 }
+
+/// Repaso: 1–3 preguntas cortas de una línea; null si no hay ninguna.
+export function sanitizeQuestions(raw: unknown): string[] | null {
+  const list = Array.isArray((raw as { questions?: unknown })?.questions)
+    ? (raw as { questions: unknown[] }).questions
+    : [];
+  const clean = list
+    .map(text)
+    .map((s) => s?.replace(/^(?:[-*•]|\d+[.)])\s*/, '').trim())
+    .filter((s): s is string => !!s);
+  const questions = [...new Set(clean)].slice(0, 3);
+  return questions.length ? questions : null;
+}

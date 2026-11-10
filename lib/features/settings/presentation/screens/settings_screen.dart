@@ -180,10 +180,12 @@ class SettingsScreen extends StatelessWidget {
                       context,
                       title: '¿Activar la IA?',
                       message:
-                          'Lo que escribas en «Anotar» y los títulos que '
-                          'dividas en pasos se envían a Gemini (Google). En '
-                          'su capa gratis, Google puede usar ese texto para '
-                          'mejorar sus modelos. No envíes datos sensibles. '
+                          'Lo que escribas en «Anotar», los títulos que '
+                          'dividas en pasos, los recursos (fotos, PDF, notas '
+                          'y enlaces) de esa tarea y tus notas de repaso se '
+                          'envían a Gemini (Google). En su capa gratis, Google '
+                          'puede usarlos para mejorar sus modelos. No adjuntes '
+                          'datos sensibles. '
                           'Puedes apagarla cuando quieras.',
                       confirmLabel: 'Activar',
                     )) {

@@ -136,3 +136,60 @@ class FocusEnded extends FocusEvent {
 class FocusSummaryDismissed extends FocusEvent {
   const FocusSummaryDismissed();
 }
+
+/// Prueba opcional del paso recién hecho: nota o foto.
+class FocusStepProofSaved extends FocusEvent {
+  const FocusStepProofSaved({required this.stepId, required this.proof});
+
+  final String stepId;
+  final ResourceDraft proof;
+
+  @override
+  List<Object?> get props => [stepId, proof];
+}
+
+/// «Ahora no» a la prueba del paso.
+class FocusStepProofSkipped extends FocusEvent {
+  const FocusStepProofSkipped();
+}
+
+/// «Dónde lo dejé» de una tarea sin terminar, desde el resumen.
+class FocusResumeNoteSaved extends FocusEvent {
+  const FocusResumeNoteSaved({required this.taskId, required this.note});
+
+  final String taskId;
+  final String note;
+
+  @override
+  List<Object?> get props => [taskId, note];
+}
+
+/// Una idea que distrae, a la Bandeja.
+class FocusDistractionCaptured extends FocusEvent {
+  const FocusDistractionCaptured(this.text);
+
+  final String text;
+
+  @override
+  List<Object?> get props => [text];
+}
+
+/// Pedir preguntas de repaso de la tarea.
+class FocusRecallRequested extends FocusEvent {
+  const FocusRecallRequested(this.taskId);
+
+  final String taskId;
+
+  @override
+  List<Object?> get props => [taskId];
+}
+
+/// Cerrar la tarjeta de repaso de la tarea.
+class FocusRecallDismissed extends FocusEvent {
+  const FocusRecallDismissed(this.taskId);
+
+  final String taskId;
+
+  @override
+  List<Object?> get props => [taskId];
+}

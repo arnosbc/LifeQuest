@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
+import 'package:proyecto_movil/core/widgets/resources_sheet.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
 import 'package:proyecto_movil/features/assistant/presentation/blocs/capture_bloc.dart';
@@ -94,7 +95,11 @@ class _CaptureViewState extends State<CaptureView> {
   );
 
   void _notify(BuildContext context, CaptureState state) => switch (state) {
-    CaptureSaved() => Navigator.pop(context, true),
+    CaptureSaved(:final notice) => () {
+      // El aviso queda en la pantalla de abajo al cerrar la hoja.
+      if (notice != null) showLifeQuestMessage(context, notice);
+      Navigator.pop(context, true);
+    }(),
     CapturePreview(:final message?) ||
     CaptureWriting(:final message?) => showLifeQuestMessage(context, message),
     _ => null,
@@ -312,6 +317,31 @@ class _CaptureViewState extends State<CaptureView> {
               title: step.title,
               subtitle: 'Para el ${_day(step.due).toLowerCase()}',
             ),
+        ],
+        if (!d.isNote && !d.isReminder && !widget.preferInbox) ...[
+          const SizedBox(height: 14),
+          Text('Recursos (opcional)', style: QText.meta(q.text2)),
+          const SizedBox(height: 6),
+          if (state.attachments.isNotEmpty) ...[
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final a in state.attachments)
+                  InputChip(
+                    avatar: QIcon(resourceIcon(a.kind), color: q.text2, size: 16),
+                    label: Text(a.title, overflow: TextOverflow.ellipsis),
+                    deleteButtonTooltipMessage: 'Quitar «${a.title}»',
+                    onDeleted: () => bloc.add(CaptureAttachmentRemoved(a)),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+          ],
+          ResourcePickButtons(
+            enabled: !state.busy,
+            onPicked: (a) => bloc.add(CaptureAttachmentAdded(a)),
+          ),
         ],
         const SizedBox(height: 6),
         Text(

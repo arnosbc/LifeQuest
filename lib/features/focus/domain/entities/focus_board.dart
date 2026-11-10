@@ -2,14 +2,26 @@ import 'package:equatable/equatable.dart';
 
 /// Paso (subtarea) de una tarea de la sesión; se marca con complete_task.
 class FocusStep extends Equatable {
-  const FocusStep({required this.id, required this.title, this.done = false});
+  const FocusStep({
+    required this.id,
+    required this.title,
+    this.done = false,
+    this.proof,
+    this.proofPhoto = false,
+  });
 
   final String id;
   final String title;
   final bool done;
 
+  /// Prueba del paso (045): lo que el usuario escribió que hizo.
+  final String? proof;
+
+  /// Hay una foto como prueba.
+  final bool proofPhoto;
+
   @override
-  List<Object?> get props => [id, title, done];
+  List<Object?> get props => [id, title, done, proof, proofPhoto];
 }
 
 /// Tarea dentro de la mochila de Foco (o candidata a entrar).
@@ -20,11 +32,19 @@ class FocusTask extends Equatable {
     this.done = false,
     this.cycles = 0,
     this.steps = const [],
+    this.resumeNote,
+    this.resources = 0,
   });
 
   final String id;
   final String title;
   final bool done;
+
+  /// «Dónde lo dejé» de la última sesión (045).
+  final String? resumeNote;
+
+  /// Recursos adjuntos a la tarea.
+  final int resources;
 
   /// Ciclos cobrados con esta tarea en la sesión.
   final int cycles;
@@ -35,8 +55,28 @@ class FocusTask extends Equatable {
   /// Primer paso sin hacer: lo que toca ahora dentro de la tarea.
   FocusStep? get nextStep => steps.where((s) => !s.done).firstOrNull;
 
+  /// Lo que el usuario dejó escrito la última vez: su nota de retomar y las
+  /// pruebas de los pasos hechos (máx. 4). Es el material del repaso.
+  List<String> get recallNotes => [
+    ?resumeNote,
+    for (final s in steps)
+      if (s.done && s.proof != null) '${s.title}: ${s.proof}',
+  ].take(4).toList();
+
+  /// Propuesta para «Dónde lo dejé»: el usuario la edita.
+  String get resumeSuggestion =>
+      nextStep == null ? '' : 'Sigue: ${nextStep!.title}';
+
   @override
-  List<Object?> get props => [id, title, done, cycles, steps];
+  List<Object?> get props => [
+    id,
+    title,
+    done,
+    cycles,
+    steps,
+    resumeNote,
+    resources,
+  ];
 }
 
 /// Nivel y XP del personaje, para la barra en vivo.
@@ -169,7 +209,11 @@ class FocusSummary extends Equatable {
     this.tasks = const [],
     this.weekMinutes = 0,
     this.prevWeekMinutes = 0,
+    this.distractions = 0,
   });
+
+  /// Ideas que se mandaron a la Bandeja durante la sesión.
+  final int distractions;
 
   final int cycles;
   final int xp;
@@ -188,7 +232,9 @@ class FocusSummary extends Equatable {
     required List<FocusTask> tasks,
     required int weekMinutes,
     required int prevWeekMinutes,
+    int distractions = 0,
   }) => FocusSummary(
+    distractions: distractions,
     cycles: cycles,
     xp: xp,
     coins: coins,
@@ -207,5 +253,6 @@ class FocusSummary extends Equatable {
     tasks,
     weekMinutes,
     prevWeekMinutes,
+    distractions,
   ];
 }

@@ -16,6 +16,7 @@ El tutor rechazó la versión RPG: crear una tarea (manual o con IA) solo guarda
 - **Diseño minimal sobrio:** `docs/diseño/DESIGN.md` (zinc + índigo, Inter). Reemplaza «Bosque vivo».
 - Donde este documento hable de la ambientación o de módulos quitados, vale solo como historia del diseño.
 - Código renombrado: las features `dungeon` y `missions` ahora son `focus` y `tasks` (clases `Focus*`, `Task*`); las RPC de la base conservan su nombre (`dungeon_overview`, `missions_overview`…). Errores de Supabase con `core/errors/supabase_guard.dart`. RF/UC por actualizar: `docs/rf-uc-rework.md`.
+- **Recursos (045):** enlaces, fotos, PDF y notas por tarea, proyecto o meta (`core/resources`, `ResourceRepository`, hoja `showResourcesSheet`); la IA los lee al dividir en pasos. Foco deja prueba por paso, «Dónde lo dejé», repaso y distracciones a la Bandeja.
 
 ---
 

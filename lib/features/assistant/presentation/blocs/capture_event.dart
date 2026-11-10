@@ -52,6 +52,25 @@ class CaptureBreakdownRequested extends CaptureEvent {
   const CaptureBreakdownRequested();
 }
 
+/// Adjuntó un recurso en la vista previa.
+class CaptureAttachmentAdded extends CaptureEvent {
+  const CaptureAttachmentAdded(this.draft);
+
+  final ResourceDraft draft;
+
+  @override
+  List<Object?> get props => [draft];
+}
+
+class CaptureAttachmentRemoved extends CaptureEvent {
+  const CaptureAttachmentRemoved(this.draft);
+
+  final ResourceDraft draft;
+
+  @override
+  List<Object?> get props => [draft];
+}
+
 /// Guardar como tarea o, con [toInbox], en la Bandeja.
 class CaptureConfirmed extends CaptureEvent {
   const CaptureConfirmed({this.toInbox = false});
