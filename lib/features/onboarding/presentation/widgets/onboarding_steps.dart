@@ -33,7 +33,7 @@ class WelcomeStep extends StatelessWidget {
         kicker: 'Bienvenido a LifeQuest',
         title: 'Organiza, avanza y ve cómo creces',
         lead:
-            'Soy tu Asistente. Te ayudo a convertir lo que quieres lograr en '
+            '¡Hola! Soy Nevi. Te ayudo a convertir lo que quieres lograr en '
             'pasos concretos y a ver tu progreso real.',
       ),
       for (final (icon, title, text) in _promises) ...[

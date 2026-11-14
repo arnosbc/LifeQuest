@@ -66,6 +66,8 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
       importance: Importance.max,
       priority: Priority.max,
       category: AndroidNotificationCategory.reminder,
+      // La cara de Nevi, como Duo en los avisos de Duolingo.
+      largeIcon: DrawableResourceAndroidBitmap('widget_mascot_waiting'),
     ),
     NotificationKind.motivational: AndroidNotificationDetails(
       'motivational_v2',
@@ -73,6 +75,7 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
       channelDescription: 'Lo que creas, logros, niveles y cofres listos.',
       importance: Importance.high,
       priority: Priority.high,
+      largeIcon: DrawableResourceAndroidBitmap('widget_mascot_happy'),
     ),
     NotificationKind.informative: AndroidNotificationDetails(
       'informational_v2',
@@ -80,6 +83,7 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
       channelDescription: 'El resumen con lo que vence y lo pendiente.',
       importance: Importance.high,
       priority: Priority.high,
+      largeIcon: DrawableResourceAndroidBitmap('widget_mascot_happy'),
     ),
   };
 
