@@ -17,6 +17,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **Un solo usuario (CLAUDE.md §1, §10).** No hay ranking social: la Liga compite contra **10 rivales simulados** por el servidor, deterministas por usuario y semana, que avanzan al ritmo de la división. La pantalla lo explica. Se descartaron de las referencias el muro de amigos y la suscripción de pago.
 - **El servidor manda en la economía (§8).** Desafíos y Liga se calculan y cobran con funciones `SECURITY DEFINER` (`challenges_overview`, `claim_challenge`); cada cofre se cobra una sola vez y pasa por `_award`. Metas y premios son reglas **provisionales** en `game_rules` (`challenge_*`, `league_base_xp`).
 - **Las tareas se completan en Foco (040).** El camino guía el orden pero no bloquea: cualquier tarea de hoy se puede empezar en Foco. Los hábitos sí siguen el orden por prioridad (idea del audio).
+- **La mascota se llama Nevi** (decisión del usuario 2026-11-14) y es la voz de la app: guía el onboarding, firma recordatorios y avisos en primera persona y su cara es el ícono de las notificaciones.
 - **Ético primero (§9).** Sin dark patterns: la racha rota se muestra con ánimo («tu récord sigue ahí»), nunca con culpa; las animaciones respetan «reducir movimiento» del sistema.
 - **Una sola dependencia nueva: `audioplayers`.** Confeti dibujado a mano, vibración del sistema (`HapticFeedback`), imágenes WebP de la mascota (22 archivos, 847 KB) y 3 sonidos propios generados por síntesis (`assets/sounds/*.wav`, 84 KB, sin derechos de terceros).
 
@@ -32,6 +33,8 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-131** La app celebra los logros: vibración al tocar y al ganar, confeti al recibir recompensas, pantalla de racha una vez al día y la mascota en la subida de nivel. Todo se desactiva si el sistema pide reducir el movimiento.
 - **RF-132** Si la racha de un hábito se reinicia, la pantalla de Hábitos anima a retomarlo mostrando el récord.
 - **RF-133** La app reproduce sonidos cortos al cumplir una tarea o hábito, al cobrar un cofre o desafío y al subir de nivel; el usuario los apaga en Configuración → Apariencia (encendidos por defecto).
+- **RF-134** Nevi guía el onboarding (una pose y un globo por paso), firma los recordatorios del día y los avisos («Nevi: …», con tono de invitación) y su cara aparece en las notificaciones. (`053`, `055`)
+- **RF-135** Los recordatorios llegan por push (Firebase Cloud Messaging) aunque la app esté cerrada; el servidor los envía cada 5 minutos según las mismas reglas y nunca duplica lo que ya mostró el teléfono. (`050`, `054`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
@@ -42,7 +45,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 
 ## Archivos principales
 
-- Servidor: `supabase/migrations/052_challenges_league.sql` (+ `supabase/tests/052_challenges_league.test.mjs`), `051_habit_priority.sql`.
+- Servidor: `053_nevi_reminders.sql`, `054_push_tick.sql`, `055_nevi_notifications.sql` y la Edge Function `push-dispatch`; `supabase/migrations/052_challenges_league.sql` (+ `supabase/tests/052_challenges_league.test.mjs`), `051_habit_priority.sql`.
 - App: `features/challenges/` (Desafíos y Liga), `features/home/presentation/widgets/task_path.dart`, `progress_card.dart` (`HomeStatusBar`), `home_link_card.dart` (`GoalBanner`), `core/widgets/questly/quest_path.dart` (`QuestPath`, `QuestPathNode`, `MascotPose`), `confetti.dart`, `reward_moment.dart`.
 - Arte: `assets/images/mascota/mascota_<pose>_<izquierda|derecha>.webp` (11 poses × 2 lados).
 
