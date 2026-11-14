@@ -1,5 +1,5 @@
 -- Instalación completa de LifeQuest en un proyecto de Supabase NUEVO (vacío).
--- Generado 2026-11-13: esquema base v1 + migraciones 001–055 en orden.
+-- Generado 2026-11-13: esquema base v1 + migraciones 001–056 en orden.
 -- Pegar completo en Supabase → SQL Editor → Run. Solo para una base vacía:
 -- en una base vieja choca (complete_habit de 001/005 vs. 037).
 
@@ -9455,6 +9455,210 @@ begin
   ) x
   on conflict (user_id, event_key) where event_key is not null do nothing;
 end $$;
+
+commit;
+
+-- ===== 056_activity_streak.sql =====
+-- Migración 056 · Racha diaria de actividad (requiere 041).
+-- Ejecutar una vez en Supabase → SQL Editor. Se puede volver a ejecutar.
+--
+-- Como en Duolingo, la racha del Inicio cuenta días seguidos con al menos una
+-- actividad real: tarea, misión de mentor, hábito cumplido, ciclo de Foco, paso
+-- de tarea guiada, proyecto o meta (quest_log_entries con result = 'completed').
+-- Cofres, desafíos y logros no cuentan: son premios, no esfuerzo. Un mal hábito
+-- se registra como 'failed' y tampoco cuenta.
+-- Si hoy aún no hay actividad, la racha sigue viva desde ayer hasta que acabe
+-- el día. Se calcula (CLAUDE.md §8: lo derivable no se guarda). Las rachas por
+-- hábito (habits.current_streak) no cambian.
+--
+-- home_dashboard es la misma copia de 041 con streak_days de _activity_streak.
+
+begin;
+
+create or replace function public._activity_streak(
+  p_uid uuid,
+  p_day date,
+  p_utc_offset_minutes integer default 0
+)
+returns integer
+language sql
+stable
+-- invoker: lee quest_log_entries con su RLS (cada quien solo ve lo suyo).
+security invoker
+set search_path = ''
+as $$
+  with days as (
+    -- Día local del usuario de cada actividad (mismo desfase que el Inicio).
+    select distinct (q.occurred_at at time zone 'UTC'
+                     + make_interval(mins => p_utc_offset_minutes))::date as d
+    from public.quest_log_entries q
+    where q.user_id = p_uid
+      and q.result = 'completed'
+      and q.source_type::text in ('task', 'npc', 'habit', 'dungeon', 'task_step', 'project', 'goal')
+      and q.occurred_at > now() - interval '400 days'
+  ),
+  anchor as (
+    select case when exists (select 1 from days where d = p_day) then p_day
+                else p_day - 1 end as a
+  ),
+  ranked as (
+    select d, row_number() over (order by d desc) as rn
+    from days, anchor where d <= anchor.a
+  )
+  -- Días consecutivos hacia atrás desde el ancla: al primer hueco deja de contar.
+  select count(*)::int from ranked, anchor where ranked.d = anchor.a - (ranked.rn::int - 1)
+$$;
+
+revoke all on function public._activity_streak(uuid, date, integer) from public, anon;
+grant execute on function public._activity_streak(uuid, date, integer) to authenticated;
+
+create or replace function public.home_dashboard(
+  p_day date,
+  p_utc_offset_minutes integer default 0
+)
+returns jsonb
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  with day as (
+    select start_at, start_at + interval '1 day' as end_at
+    from (
+      select (p_day::timestamp - make_interval(mins => p_utc_offset_minutes))
+             at time zone 'UTC' as start_at
+    ) s
+  ),
+  today_habits as (
+    select h.id, h.name, h.current_streak, h.created_at,
+           exists (
+             select 1 from public.habit_records r
+             where r.habit_id = h.id and r.completed_on = p_day
+           ) as done
+    from public.habits h
+    where h.user_id = auth.uid()
+      and h.type = 'good'
+      and (h.frequency = 'daily'
+           or extract(dow from p_day)::int = any (h.specific_days))
+  )
+  select jsonb_build_object(
+    'display_name', p.display_name,
+    'character_class', p.character_class,
+    'level', s.level,
+    'current_xp', s.current_xp,
+    'xp_to_next_level', s.xp_to_next_level,
+    'coins', s.coins,
+    'hp_current', s.hp_current,
+    'hp_max', s.hp_max,
+    'is_weakened', s.is_weakened,
+    'priority_mission', (
+      select jsonb_build_object(
+        'id', t.id,
+        'title', t.title,
+        'due_date', t.due_date,
+        'priority', t.priority,
+        'xp_reward', t.xp_reward,
+        'coin_reward', t.coin_reward
+      )
+      from public.tasks t
+      where t.user_id = auth.uid()
+        and t.parent_task_id is null
+        and t.status in ('pending', 'in_progress')
+      order by coalesce(t.due_date < now() + interval '24 hours', false) desc,
+               t.priority desc,
+               t.due_date asc nulls last,
+               t.created_at
+      limit 1
+    ),
+    'habits', coalesce((
+      select jsonb_agg(
+        jsonb_build_object('id', id, 'name', name, 'done', done)
+        order by created_at
+      )
+      from today_habits
+    ), '[]'::jsonb),
+    'habits_done', (select count(*) from today_habits where done),
+    'habits_total', (select count(*) from today_habits),
+    -- 056: racha de días con actividad (estilo Duolingo), no solo de hábitos.
+    'streak_days', public._activity_streak(auth.uid(), p_day, p_utc_offset_minutes),
+    -- 038: lista «Hoy» del Inicio (plan S2). Vencen hoy, vencidas o de
+    -- prioridad alta; la app quita la que ya muestra como Siguiente paso.
+    'today_tasks', coalesce((
+      select jsonb_agg(jsonb_build_object(
+               'id', t.id,
+               'title', t.title,
+               'priority', t.priority,
+               'due_date', t.due_date,
+               'xp_reward', t.xp_reward,
+               'overdue', coalesce(t.due_date < now(), false))
+             order by t.due_date nulls last, t.created_at)
+      from (
+        select t.* from public.tasks t, day
+        where t.user_id = auth.uid()
+          and t.parent_task_id is null
+          and t.status in ('pending', 'in_progress')
+          and (t.due_date < day.end_at or t.priority = 'high')
+        order by t.due_date nulls last, t.created_at
+        limit 6
+      ) t
+    ), '[]'::jsonb),
+    -- 041: tarjetas del Inicio de Main.dc.html (Mentores, Bandeja y Meta).
+    'mentor_task', (
+      select jsonb_build_object('id', t.id, 'title', t.title,
+                                'xp_reward', t.xp_reward, 'mentor', n.name)
+      from public.tasks t join public.npcs n on n.id = t.npc_id
+      where t.user_id = auth.uid() and t.status in ('pending', 'in_progress')
+      order by t.created_at desc
+      limit 1
+    ),
+    'inbox_count', (
+      select count(*) from public.brain_dump_entries
+      where user_id = auth.uid() and status = 'pending'
+    ),
+    'top_goal', (
+      select jsonb_build_object('id', g.id, 'title', g.title, 'due_date', g.due_date,
+                                'hp', g.boss_current_hp, 'max_hp', g.boss_max_hp)
+      from public.goals g
+      where g.user_id = auth.uid() and g.status in ('not_started', 'in_progress')
+        and g.archived_at is null
+      order by g.due_date nulls last, g.created_at
+      limit 1
+    ),
+    'missions_done', (
+      select count(*) from public.tasks t, day
+      where t.user_id = auth.uid()
+        and t.parent_task_id is null
+        and t.status = 'completed'
+        and t.completed_at >= day.start_at and t.completed_at < day.end_at
+    ),
+    'missions_total', (
+      select count(*) from public.tasks t, day
+      where t.user_id = auth.uid()
+        and t.parent_task_id is null
+        and ((t.status = 'completed'
+              and t.completed_at >= day.start_at
+              and t.completed_at < day.end_at)
+             or (t.status in ('pending', 'in_progress')
+                 and t.due_date >= day.start_at
+                 and t.due_date < day.end_at))
+    ),
+    'focus_minutes', (
+      select coalesce(sum(least(
+        f.total_minutes,
+        floor(extract(epoch from coalesce(f.ended_at, now()) - f.started_at)
+              / 60)::int
+      )), 0)
+      from public.focus_sessions f, day
+      where f.user_id = auth.uid()
+        and f.started_at >= day.start_at and f.started_at < day.end_at
+    )
+  )
+  from public.profiles p
+  left join public.character_stats s on s.user_id = p.id
+  where p.id = auth.uid()
+$$;
+revoke all on function public.home_dashboard(date, integer) from public, anon;
+grant execute on function public.home_dashboard(date, integer) to authenticated;
 
 commit;
 

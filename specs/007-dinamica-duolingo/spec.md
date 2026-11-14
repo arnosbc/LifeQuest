@@ -35,6 +35,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-133** La app reproduce sonidos cortos al cumplir una tarea o hábito, al cobrar un cofre o desafío y al subir de nivel; el usuario los apaga en Configuración → Apariencia (encendidos por defecto).
 - **RF-134** Nevi guía el onboarding (una pose y un globo por paso), firma los recordatorios del día y los avisos («Nevi: …», con tono de invitación) y su cara aparece en las notificaciones. (`053`, `055`)
 - **RF-135** Los recordatorios llegan por push (Firebase Cloud Messaging) aunque la app esté cerrada; el servidor los envía cada 5 minutos según las mismas reglas y nunca duplica lo que ya mostró el teléfono. (`050`, `054`)
+- **RF-136** La racha del Inicio cuenta días seguidos con al menos una actividad real (tarea, hábito cumplido, ciclo de Foco, paso guiado, proyecto o meta); si hoy aún no hay actividad sigue viva desde ayer. Premios y malos hábitos no cuentan. Se calcula, no se guarda. (`056`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
