@@ -29,6 +29,7 @@ class WelcomeStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const _Heading(
+        pose: 'saludando',
         kicker: 'Bienvenido a LifeQuest',
         title: 'Organiza, avanza y ve cómo creces',
         lead:
@@ -53,6 +54,7 @@ class IdentityStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const _Heading(
+        pose: 'pensando',
         kicker: 'Tu propósito',
         title: '¿En quién te quieres convertir?',
         lead:
@@ -96,6 +98,7 @@ class SkillStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const _Heading(
+        pose: 'leyendo',
         kicker: 'Tu primera área',
         title: '¿Qué quieres hacer crecer?',
         lead:
@@ -155,6 +158,7 @@ class DifficultyStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       _Heading(
+        pose: 'escalando',
         kicker: 'Tu ritmo',
         title: '¿A qué ritmo quieres avanzar?',
         lead: DifficultyPicker.sameCoins(options)
@@ -194,6 +198,7 @@ class SummaryStep extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const _Heading(
+        pose: 'celebrando',
         kicker: 'Todo listo',
         title: '¡Tu cuenta está lista!',
         lead: 'Esto es lo que elegiste. Puedes cambiarlo cuando quieras.',
@@ -241,11 +246,14 @@ InputDecoration _fieldDecoration(
 
 class _Heading extends StatelessWidget {
   const _Heading({
+    required this.pose,
     required this.kicker,
     required this.title,
     required this.lead,
   });
 
+  /// Pose de la mascota que «dice» [lead] (assets/images/mascota).
+  final String pose;
   final String kicker;
   final String title;
   final String lead;
@@ -265,11 +273,78 @@ class _Heading extends StatelessWidget {
             style: QText.title1(q.text).copyWith(fontSize: 28, height: 1.12),
           ),
         ),
-        const SizedBox(height: 6),
-        Text(lead, style: QText.body(q.text2)),
+        const SizedBox(height: QSpace.m),
+        // La mascota guía el onboarding: el texto sale de su globo.
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            MascotPose(pose: pose, size: 96),
+            Expanded(child: _SpeechBubble(text: lead)),
+          ],
+        ),
       ],
     );
   }
+}
+
+/// Globo de diálogo con el pico hacia la mascota (izquierda).
+class _SpeechBubble extends StatelessWidget {
+  const _SpeechBubble({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Row(
+      children: [
+        CustomPaint(
+          size: const Size(10, 18),
+          painter: _BubbleTail(fill: q.card, stroke: q.border),
+        ),
+        Expanded(
+          child: Container(
+            // Pega el borde con el pico.
+            transform: Matrix4.translationValues(-2, 0, 0),
+            padding: const EdgeInsets.all(QSpace.m),
+            decoration: BoxDecoration(
+              color: q.card,
+              borderRadius: BorderRadius.circular(QRadius.block),
+              border: Border.all(color: q.border, width: 2),
+            ),
+            child: Text(text, style: QText.body(q.text).copyWith(fontSize: 15)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BubbleTail extends CustomPainter {
+  const _BubbleTail({required this.fill, required this.stroke});
+
+  final Color fill;
+  final Color stroke;
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final path = Path()
+      ..moveTo(s.width, 0)
+      ..lineTo(0, s.height / 2)
+      ..lineTo(s.width, s.height);
+    canvas.drawPath(path, Paint()..color = fill);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = stroke
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BubbleTail old) =>
+      old.fill != fill || old.stroke != stroke;
 }
 
 class _Promise extends StatelessWidget {
