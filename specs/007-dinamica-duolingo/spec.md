@@ -37,6 +37,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-135** Los recordatorios llegan por push (Firebase Cloud Messaging) aunque la app esté cerrada; el servidor los envía cada 5 minutos según las mismas reglas y nunca duplica lo que ya mostró el teléfono. (`050`, `054`)
 - **RF-136** La racha del Inicio cuenta días seguidos con al menos una actividad real (tarea, hábito cumplido, ciclo de Foco, paso guiado, proyecto o meta); si hoy aún no hay actividad sigue viva desde ayer. Premios y malos hábitos no cuentan. Se calcula, no se guarda. (`056`)
 - **RF-137** El usuario desbloquea 12 logros (primera tarea, 10 y 50 tareas, primer hábito, rachas de 3, 7 y 30 días, 10 ciclos de Foco, 10 cofres, 10 desafíos, nivel 5 y ascenso de liga). El servidor los revisa tras cada actividad, paga su premio una sola vez y Nevi avisa; se ven en Perfil → Logros. La primera recompensa de cada día muestra la pantalla de racha con la racha diaria. (`057`)
+- **RF-138** Los recordatorios de la noche (19:30 y 21:30) defienden la racha diaria del Inicio y no aparecen si hoy ya hubo alguna actividad real. (`058`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
@@ -62,4 +63,4 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - «Gana 30 XP» y «Completa 2 tareas» se cumplen, sus cofres se cobran una sola vez y el Desafío del mes pasa de 0/30 a 2/30.
 - La Liga refleja la XP de la semana (de #11 a #8 con 45 XP).
 - Nada se desborda con texto grande (1,3×) en pantallas de 360 dp (prueba automática).
-- Pruebas: 176 comprobaciones SQL y 324 pruebas Flutter en verde.
+- Pruebas: 202 comprobaciones SQL y 329 pruebas Flutter en verde.
