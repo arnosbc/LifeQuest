@@ -21,6 +21,7 @@ class RewardMomentListener extends StatefulWidget {
     required this.rewards,
     required this.child,
     this.sounds,
+    this.streakNow,
   });
 
   final Stream<RewardOutcome> rewards;
@@ -28,6 +29,9 @@ class RewardMomentListener extends StatefulWidget {
 
   /// Sonido de cada logro; null en pruebas.
   final SoundEffects? sounds;
+
+  /// Racha diaria de actividad (056) para la pantalla de racha; null en pruebas.
+  final Future<int?> Function()? streakNow;
 
   @override
   State<RewardMomentListener> createState() => _RewardMomentListenerState();
@@ -72,13 +76,15 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
     showConfetti(context, pieces: big ? 120 : 60);
     if (big) {
       _levelUp(outcome);
-    } else if (outcome.streak case final streak? when streak > 0) {
-      _streakOncePerDay(streak);
+    } else {
+      _streakOncePerDay(outcome);
     }
   }
 
   /// Pantalla de racha estilo Duolingo, la primera vez del día que avanza.
-  void _streakOncePerDay(int streak) {
+  /// La primera recompensa del día (tarea, hábito o Foco) muestra la racha
+  /// diaria; sin respuesta del servidor usa la del hábito, si la trae.
+  Future<void> _streakOncePerDay(RewardOutcome outcome) async {
     final now = DateTime.now();
     final last = _streakShownOn;
     if (last != null &&
@@ -87,7 +93,17 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
         last.day == now.day) {
       return;
     }
+    // Solo el esfuerzo cuenta: un cofre o desafío (solo Monedas) no abre la racha.
+    if (outcome.xp == 0) return;
     _streakShownOn = now;
+    int? streak;
+    try {
+      streak = await widget.streakNow?.call();
+    } on Exception {
+      streak = null;
+    }
+    streak ??= outcome.streak;
+    if (!mounted || streak == null || streak <= 0) return;
     final q = context.q;
     showQuestlyDialog<void>(
       context,

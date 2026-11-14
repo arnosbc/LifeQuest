@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/rewards/reward_feed.dart';
@@ -31,6 +32,7 @@ class AppShell extends StatelessWidget {
       child: RewardMomentListener(
         rewards: sl<RewardFeed>().stream,
         sounds: sl<SoundEffects>(),
+        streakNow: _activityStreak,
         child: Scaffold(
           backgroundColor: q.bg,
           body: MascotBackground(
@@ -60,4 +62,23 @@ class AppShell extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Racha diaria de actividad (056) para la pantalla de racha.
+// shortcut: consulta directa desde app/ (composición) en vez de una feature;
+// moverla a home/data si crece (p. ej. mejor racha o calendario de racha).
+Future<int?> _activityStreak() async {
+  final client = sl<SupabaseClient>();
+  final uid = client.auth.currentUser?.id;
+  if (uid == null) return null;
+  final now = DateTime.now();
+  final result = await client.rpc<dynamic>(
+    '_activity_streak',
+    params: {
+      'p_uid': uid,
+      'p_day': now.toIso8601String().substring(0, 10),
+      'p_utc_offset_minutes': now.timeZoneOffset.inMinutes,
+    },
+  );
+  return (result as num?)?.toInt();
 }

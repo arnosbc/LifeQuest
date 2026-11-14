@@ -36,6 +36,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-134** Nevi guía el onboarding (una pose y un globo por paso), firma los recordatorios del día y los avisos («Nevi: …», con tono de invitación) y su cara aparece en las notificaciones. (`053`, `055`)
 - **RF-135** Los recordatorios llegan por push (Firebase Cloud Messaging) aunque la app esté cerrada; el servidor los envía cada 5 minutos según las mismas reglas y nunca duplica lo que ya mostró el teléfono. (`050`, `054`)
 - **RF-136** La racha del Inicio cuenta días seguidos con al menos una actividad real (tarea, hábito cumplido, ciclo de Foco, paso guiado, proyecto o meta); si hoy aún no hay actividad sigue viva desde ayer. Premios y malos hábitos no cuentan. Se calcula, no se guarda. (`056`)
+- **RF-137** El usuario desbloquea 12 logros (primera tarea, 10 y 50 tareas, primer hábito, rachas de 3, 7 y 30 días, 10 ciclos de Foco, 10 cofres, 10 desafíos, nivel 5 y ascenso de liga). El servidor los revisa tras cada actividad, paga su premio una sola vez y Nevi avisa; se ven en Perfil → Logros. La primera recompensa de cada día muestra la pantalla de racha con la racha diaria. (`057`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
