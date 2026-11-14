@@ -23,6 +23,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
   late HabitType _type = widget.type;
   final Set<int> _days = {};
   int _severity = 5;
+  HabitPriority _priority = HabitPriority.medium;
   String? _skillId;
 
   // Orden de lunes a domingo; el valor es 0 = domingo … 6 = sábado.
@@ -49,6 +50,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
       NewHabit(
         name: _name.text.trim(),
         type: _type,
+        priority: _priority,
         specificDays: _type == HabitType.good ? (_days.toList()..sort()) : [],
         hpPenalty: _type == HabitType.bad ? _severity : 0,
         skillId: _skillId,
@@ -109,6 +111,24 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             ),
             const SizedBox(height: 8),
             if (_type == HabitType.good) ...[
+              Text(
+                'Prioridad: las altas van primero en tu Camino.',
+                style: TextStyle(color: context.lq.muted, fontSize: 12),
+              ),
+              const SizedBox(height: 6),
+              SegmentedButton<HabitPriority>(
+                segments: const [
+                  ButtonSegment(value: HabitPriority.high, label: Text('Alta')),
+                  ButtonSegment(
+                    value: HabitPriority.medium,
+                    label: Text('Media'),
+                  ),
+                  ButtonSegment(value: HabitPriority.low, label: Text('Baja')),
+                ],
+                selected: {_priority},
+                onSelectionChanged: (s) => setState(() => _priority = s.first),
+              ),
+              const SizedBox(height: 12),
               Text(
                 '¿Qué días? (ninguno = todos los días)',
                 style: TextStyle(color: context.lq.muted, fontSize: 12),

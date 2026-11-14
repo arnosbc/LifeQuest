@@ -18,6 +18,10 @@ class HabitsBoardModel {
           id: h['id'] as String,
           name: h['name'] as String,
           type: HabitType.values.byName(h['type'] as String),
+          // Antes de 051 no llega: media.
+          priority:
+              HabitPriority.values.asNameMap()[h['priority']] ??
+              HabitPriority.medium,
           specificDays: [
             for (final d in h['specific_days'] as List<dynamic>? ?? const [])
               (d as num).toInt(),

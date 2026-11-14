@@ -161,6 +161,12 @@ import 'package:proyecto_movil/features/stats/data/repositories/stats_repository
 import 'package:proyecto_movil/features/stats/domain/repositories/stats_repository.dart';
 import 'package:proyecto_movil/features/stats/domain/usecases/get_stats.dart';
 import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
+import 'package:proyecto_movil/features/challenges/data/datasources/challenges_remote_datasource.dart';
+import 'package:proyecto_movil/features/challenges/data/repositories/challenges_repository_impl.dart';
+import 'package:proyecto_movil/features/challenges/domain/repositories/challenges_repository.dart';
+import 'package:proyecto_movil/features/challenges/domain/usecases/claim_challenge.dart';
+import 'package:proyecto_movil/features/challenges/domain/usecases/get_challenges.dart';
+import 'package:proyecto_movil/features/challenges/presentation/blocs/challenges_bloc.dart';
 import 'package:proyecto_movil/features/inventory/data/datasources/inventory_remote_datasource.dart';
 import 'package:proyecto_movil/features/inventory/data/repositories/inventory_repository_impl.dart';
 import 'package:proyecto_movil/features/inventory/domain/repositories/inventory_repository.dart';
@@ -194,6 +200,8 @@ import 'package:proyecto_movil/features/guided_task/domain/usecases/set_guided_s
 import 'package:proyecto_movil/features/guided_task/domain/usecases/toggle_guided_step.dart';
 import 'package:proyecto_movil/features/guided_task/presentation/blocs/guided_task_bloc.dart';
 
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
+
 final sl = GetIt.instance;
 
 /// Registra todas las dependencias. Llamar una vez, después de
@@ -203,6 +211,9 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
   // Recompensas que pagó el servidor, para el momento de recompensa (AppShell).
   sl.registerLazySingleton(RewardFeed.new);
+  // Sonidos de logro; la preferencia se lee antes de mostrar nada.
+  sl.registerSingleton(SoundEffects());
+  await sl<SoundEffects>().load();
 
   // ---------- Auth ----------
   // Bloc: singleton porque la sesión es de toda la app.
@@ -549,6 +560,19 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<InventoryRemoteDataSource>(
     () => InventoryRemoteDataSourceImpl(sl()),
+  );
+
+  // ---------- Desafíos y Liga (052) ----------
+  sl.registerFactory(
+    () => ChallengesBloc(getChallenges: sl(), claimChallenge: sl()),
+  );
+  sl.registerLazySingleton(() => GetChallenges(sl()));
+  sl.registerLazySingleton(() => ClaimChallenge(sl()));
+  sl.registerLazySingleton<ChallengesRepository>(
+    () => ChallengesRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<ChallengesRemoteDataSource>(
+    () => ChallengesRemoteDataSourceImpl(sl(), sl()),
   );
 
   // ---------- Avisos ----------

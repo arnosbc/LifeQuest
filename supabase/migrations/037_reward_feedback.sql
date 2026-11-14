@@ -17,7 +17,7 @@ begin;
 create or replace function public._award(
   p_uid uuid,
   p_source public.quest_source,
-  p_source_id uuid,Con
+  p_source_id uuid,
   p_xp integer,
   p_coins integer,
   p_skill_id uuid default null,

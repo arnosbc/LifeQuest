@@ -3,11 +3,15 @@ import 'package:equatable/equatable.dart';
 /// Bueno: da recompensa una vez por día. Malo: resta vida por evento.
 enum HabitType { good, bad }
 
+/// Orden del Camino: los de mayor prioridad van primero (migración 051).
+enum HabitPriority { high, medium, low }
+
 class Habit extends Equatable {
   const Habit({
     required this.id,
     required this.name,
     required this.type,
+    this.priority = HabitPriority.medium,
     this.specificDays = const [],
     this.skillName,
     this.hpPenalty = 0,
@@ -22,6 +26,7 @@ class Habit extends Equatable {
   final String id;
   final String name;
   final HabitType type;
+  final HabitPriority priority;
 
   /// Días que toca (0 = domingo … 6 = sábado); vacío = diario.
   final List<int> specificDays;
@@ -45,6 +50,7 @@ class Habit extends Equatable {
     id,
     name,
     type,
+    priority,
     specificDays,
     skillName,
     hpPenalty,

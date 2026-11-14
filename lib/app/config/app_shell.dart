@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/rewards/reward_feed.dart';
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
+import 'package:proyecto_movil/core/widgets/mascot_background.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/questly/reward_moment.dart';
 import 'package:proyecto_movil/injection_container.dart';
@@ -28,9 +30,13 @@ class AppShell extends StatelessWidget {
       // Lo que pagó el servidor se muestra aquí, en cualquier pestaña.
       child: RewardMomentListener(
         rewards: sl<RewardFeed>().stream,
+        sounds: sl<SoundEffects>(),
         child: Scaffold(
           backgroundColor: q.bg,
-          body: SafeArea(bottom: false, child: navigationShell),
+          body: MascotBackground(
+            veil: q.bg,
+            child: SafeArea(bottom: false, child: navigationShell),
+          ),
           // Brain Dump a un toque desde cualquier pestaña (Modelo de Fogg), salvo
           // en la Mazmorra: dentro del Deep Working, sin ruido (CLAUDE.md §8).
           floatingActionButton: navigationShell.currentIndex == 3

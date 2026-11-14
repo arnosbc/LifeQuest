@@ -127,14 +127,21 @@ class DeepWorkSessionCard extends StatelessWidget {
                             color: context.lq.deepGreen,
                           ),
                         ),
-                      IconButton(
-                        tooltip: 'Completar «${task.title}»',
-                        onPressed: onComplete == null
-                            ? null
-                            : () => onComplete!(task.id),
-                        icon: Icon(
-                          Icons.check_circle_outline,
-                          color: context.lq.deepGreen,
+                      Semantics(
+                        label: 'Completar «${task.title}»',
+                        excludeSemantics: true,
+                        button: true,
+                        child: TextButton.icon(
+                          onPressed: onComplete == null
+                              ? null
+                              : () => onComplete!(task.id),
+                          style: TextButton.styleFrom(
+                            foregroundColor: context.lq.deepGreen,
+                            minimumSize: const Size(48, 48),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          icon: const Icon(Icons.check_circle_outline),
+                          label: const Text('Completar'),
                         ),
                       ),
                     ],

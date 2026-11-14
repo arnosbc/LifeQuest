@@ -1,5 +1,7 @@
 package com.example.proyecto_movil
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +20,19 @@ class MainActivity : FlutterActivity() {
   override fun onNewIntent(intent: Intent) {
     stashWidgetLink(intent)
     super.onNewIntent(intent)
+  }
+
+  // Al abrir la app el widget recalcula el ánimo de la mascota aunque el Inicio
+  // no cargue (sin internet, o pasada la medianoche).
+  override fun onResume() {
+    super.onResume()
+    val ids = AppWidgetManager.getInstance(this)
+        .getAppWidgetIds(ComponentName(this, LifeQuestWidgetProvider::class.java))
+    if (ids.isEmpty()) return
+    sendBroadcast(
+        Intent(this, LifeQuestWidgetProvider::class.java)
+            .setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids))
   }
 
   private fun stashWidgetLink(intent: Intent?) {

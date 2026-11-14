@@ -7,9 +7,11 @@ import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
 import 'package:proyecto_movil/app/home_screen_widget.dart';
+import 'package:proyecto_movil/core/widgets/mascot_background.dart';
 import 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';
 import 'package:proyecto_movil/app/config/design_preview_screen.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
@@ -31,6 +33,8 @@ import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.da
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
+import 'package:proyecto_movil/features/challenges/presentation/blocs/challenges_bloc.dart';
+import 'package:proyecto_movil/features/challenges/presentation/screens/challenges_screen.dart';
 import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
 import 'package:proyecto_movil/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
@@ -108,11 +112,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
       ),
       GoRoute(
         path: RoutePaths.login,
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => const _AlwaysDark(child: LoginScreen()),
       ),
       GoRoute(
         path: RoutePaths.register,
-        builder: (context, state) => const RegisterScreen(),
+        builder: (context, state) => const _AlwaysDark(child: RegisterScreen()),
       ),
       GoRoute(
         path: RoutePaths.checkEmail,
@@ -123,9 +127,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             : RoutePaths.login,
         builder: (context, state) {
           final pending = state.extra! as AuthEmailConfirmationRequired;
-          return CheckEmailScreen(
-            username: pending.username,
-            email: pending.email,
+          return _AlwaysDark(
+            child: CheckEmailScreen(
+              username: pending.username,
+              email: pending.email,
+            ),
           );
         },
       ),
@@ -243,30 +249,18 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.dungeon,
                     onShown: (c) =>
                         c.read<DungeonBloc>().add(const DungeonRequested()),
-                    // La Mazmorra siempre es oscura (CLAUDE.md §14).
-                    child:
-                        BlocSelector<
-                          AppearanceBloc,
-                          AppearanceState,
-                          ThemeRealm
-                        >(
-                          selector: (state) => state.realm,
-                          builder: (context, realm) => Theme(
-                            data: LifeQuestTheme.build(
-                              questlyRealmOf(realm),
-                              dark: true,
-                            ),
-                            child: Builder(
-                              builder: (context) => ColoredBox(
-                                color: context.lq.background,
-                                child: DungeonScreen(
-                                  initialTaskId:
-                                      state.uri.queryParameters['task'],
-                                ),
-                              ),
-                            ),
+                    // La Mazmorra siempre es oscura (CLAUDE.md §14), con el
+                    // fondo de la mascota bajo un velo oscuro.
+                    child: _AlwaysDark(
+                      child: Builder(
+                        builder: (context) => MascotBackground(
+                          veil: context.lq.background,
+                          child: DungeonScreen(
+                            initialTaskId: state.uri.queryParameters['task'],
                           ),
                         ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -363,6 +357,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
               body: SafeArea(
                 child: AppearanceScreen(
                   onBack: () => context.pop(),
+                  soundsOn: sl<SoundEffects>().enabled,
+                  onSoundsChanged: sl<SoundEffects>().setEnabled,
                   onOpenDesignPreview: kDebugMode
                       ? () => context.push(RoutePaths.designPreview)
                       : null,
@@ -471,6 +467,13 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         ),
       ),
       _section(
+        RoutePaths.challenges,
+        (context) => BlocProvider(
+          create: (_) => sl<ChallengesBloc>()..add(const ChallengesRequested()),
+          child: const ChallengesScreen(),
+        ),
+      ),
+      _section(
         RoutePaths.stats,
         (context) => BlocProvider(
           create: (_) => sl<StatsBloc>()..add(const StatsRequested()),
@@ -572,4 +575,22 @@ class _BlocRefresh extends ChangeNotifier {
     _subscription.cancel();
     super.dispose();
   }
+}
+
+/// Tema oscuro del reino elegido, sin importar el modo del sistema: Mazmorra
+/// (CLAUDE.md §14) y Acceso (login, registro y correo, sobre la noche).
+class _AlwaysDark extends StatelessWidget {
+  const _AlwaysDark({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      BlocSelector<AppearanceBloc, AppearanceState, ThemeRealm>(
+        selector: (state) => state.realm,
+        builder: (context, realm) => Theme(
+          data: LifeQuestTheme.build(questlyRealmOf(realm), dark: true),
+          child: child,
+        ),
+      );
 }

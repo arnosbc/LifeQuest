@@ -7,6 +7,7 @@ class NewHabit extends Equatable {
   const NewHabit({
     required this.name,
     required this.type,
+    this.priority = HabitPriority.medium,
     this.specificDays = const [],
     this.hpPenalty = 0,
     this.skillId,
@@ -14,6 +15,7 @@ class NewHabit extends Equatable {
 
   final String name;
   final HabitType type;
+  final HabitPriority priority;
 
   /// Solo hábitos buenos; vacío = diario.
   final List<int> specificDays;
@@ -23,5 +25,12 @@ class NewHabit extends Equatable {
   final String? skillId;
 
   @override
-  List<Object?> get props => [name, type, specificDays, hpPenalty, skillId];
+  List<Object?> get props => [
+    name,
+    type,
+    priority,
+    specificDays,
+    hpPenalty,
+    skillId,
+  ];
 }

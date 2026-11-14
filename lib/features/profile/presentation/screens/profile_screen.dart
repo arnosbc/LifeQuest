@@ -135,143 +135,138 @@ class ProfileScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: 96),
       children: [
-        BlocBuilder<ProfileLookCubit, ProfileLook>(
-          builder: (context, look) => CharacterCard(
-            name: name,
-            profile: profile,
-            look: look,
-            onEditIdentity: editIdentity,
-            onChooseTitle: chooseTitle,
-            onCustomize: customize,
-          ),
-        ),
-        // La hoja clara se monta sobre la cabecera morada.
-        Transform.translate(
-          offset: const Offset(0, -24),
-          child: Container(
-            decoration: BoxDecoration(
-              color: lq.background,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(28),
+        // La cabecera que personaliza el usuario va en un cuadro; alrededor se
+        // ve el fondo de la mascota de todas las pestañas (AppShell).
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BlocBuilder<ProfileLookCubit, ProfileLook>(
+              builder: (context, look) => CharacterCard(
+                name: name,
+                profile: profile,
+                look: look,
+                bottomInset: 24,
+                onEditIdentity: editIdentity,
+                onChooseTitle: chooseTitle,
+                onCustomize: customize,
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Guardando o refrescando: una línea fina, sin tapar nada.
-                SizedBox(
-                  height: 3,
-                  child: saving
-                      ? LinearProgressIndicator(
-                          color: lq.deepGreen,
-                          backgroundColor: Colors.transparent,
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 4),
-                _group(
-                  child: Column(
-                    children: [
-                      AccountActionTile(
-                        icon: Icons.person_outline_rounded,
-                        title: 'Personalizar perfil',
-                        onTap: customize,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.menu_book_outlined,
-                        title: 'Actividad',
-                        onTap: onOpenJournal,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.insights_outlined,
-                        title: 'Estadísticas',
-                        onTap: onOpenStats,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.visibility_outlined,
-                        title: 'Visión',
-                        onTap: onOpenVision,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.inventory_2_outlined,
-                        title: 'Logros',
-                        onTap: onOpenInventory,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.storefront_outlined,
-                        title: 'Recompensas',
-                        onTap: onOpenMarketplace,
-                      ),
-                      divider(),
-                      if (onAddHomeWidget case final add?) ...[
-                        AccountActionTile(
-                          icon: Icons.widgets_outlined,
-                          title: 'Widget en la pantalla de inicio',
-                          onTap: add,
-                        ),
-                        divider(),
-                      ],
-                      AccountActionTile(
-                        icon: Icons.notifications_outlined,
-                        title: 'Notificaciones',
-                        onTap: onOpenNotifications,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.settings_outlined,
-                        title: 'Configuración',
-                        onTap: onOpenSettings,
-                      ),
-                      divider(),
-                      AccountActionTile(
-                        icon: Icons.help_outline,
-                        title: 'Ayuda',
-                        onTap: onOpenHelp,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                HeroStatusCard(profile: profile),
-                const SizedBox(height: 28),
-                LifeQuestSectionHeading(
-                  'TUS ÁREAS',
-                  action: '${profile.skills.length} / ${profile.skillLimit}',
-                ),
-                if (profile.skills.isEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'Las áreas son las partes de tu vida que quieres hacer '
-                    'crecer. Cada tarea y hábito que vincules a una la hará '
-                    'subir de nivel.',
-                    style: TextStyle(
-                      color: lq.muted,
-                      fontSize: 13,
-                      height: 1.4,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Guardando o refrescando: una línea fina, sin tapar nada.
+              SizedBox(
+                height: 3,
+                child: saving
+                    ? LinearProgressIndicator(
+                        color: lq.deepGreen,
+                        backgroundColor: Colors.transparent,
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 4),
+              _group(
+                child: Column(
+                  children: [
+                    AccountActionTile(
+                      icon: Icons.person_outline_rounded,
+                      title: 'Personalizar perfil',
+                      onTap: customize,
                     ),
-                  ),
-                ],
-                for (final pair in _pairs([
-                  for (final skill in profile.skills)
-                    SkillTile(skill: skill, onTap: () => editSkill(skill)),
-                  if (profile.canAddSkill) AddSkillTile(onTap: addSkill),
-                ])) ...[const SizedBox(height: 8), _row(pair)],
-                if (onSignOut != null) ...[
-                  const SizedBox(height: 28),
-                  QuestlyButton(
-                    label: 'Cerrar sesión',
-                    variant: QuestlyButtonVariant.tonal,
-                    onPressed: onSignOut,
-                  ),
-                ],
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.menu_book_outlined,
+                      title: 'Actividad',
+                      onTap: onOpenJournal,
+                    ),
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.insights_outlined,
+                      title: 'Estadísticas',
+                      onTap: onOpenStats,
+                    ),
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.visibility_outlined,
+                      title: 'Visión',
+                      onTap: onOpenVision,
+                    ),
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Logros',
+                      onTap: onOpenInventory,
+                    ),
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.storefront_outlined,
+                      title: 'Recompensas',
+                      onTap: onOpenMarketplace,
+                    ),
+                    divider(),
+                    if (onAddHomeWidget case final add?) ...[
+                      AccountActionTile(
+                        icon: Icons.widgets_outlined,
+                        title: 'Widget en la pantalla de inicio',
+                        onTap: add,
+                      ),
+                      divider(),
+                    ],
+                    AccountActionTile(
+                      icon: Icons.notifications_outlined,
+                      title: 'Notificaciones',
+                      onTap: onOpenNotifications,
+                    ),
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.settings_outlined,
+                      title: 'Configuración',
+                      onTap: onOpenSettings,
+                    ),
+                    divider(),
+                    AccountActionTile(
+                      icon: Icons.help_outline,
+                      title: 'Ayuda',
+                      onTap: onOpenHelp,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              HeroStatusCard(profile: profile),
+              const SizedBox(height: 28),
+              LifeQuestSectionHeading(
+                'TUS ÁREAS',
+                action: '${profile.skills.length} / ${profile.skillLimit}',
+              ),
+              if (profile.skills.isEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Las áreas son las partes de tu vida que quieres hacer '
+                  'crecer. Cada tarea y hábito que vincules a una la hará '
+                  'subir de nivel.',
+                  style: TextStyle(color: lq.muted, fontSize: 13, height: 1.4),
+                ),
               ],
-            ),
+              for (final pair in _pairs([
+                for (final skill in profile.skills)
+                  SkillTile(skill: skill, onTap: () => editSkill(skill)),
+                if (profile.canAddSkill) AddSkillTile(onTap: addSkill),
+              ])) ...[const SizedBox(height: 8), _row(pair)],
+              if (onSignOut != null) ...[
+                const SizedBox(height: 28),
+                QuestlyButton(
+                  label: 'Cerrar sesión',
+                  variant: QuestlyButtonVariant.tonal,
+                  onPressed: onSignOut,
+                ),
+              ],
+            ],
           ),
         ),
       ],

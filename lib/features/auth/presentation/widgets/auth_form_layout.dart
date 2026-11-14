@@ -26,6 +26,9 @@ class AuthFormLayout extends StatelessWidget {
   static const _maxFormWidth = 480.0;
   static const _maxFormHeight = 880.0;
 
+  /// Cielo de noche de las montañas (montanas_noche.webp se funde en él).
+  static const night = Color(0xFF1A1038);
+
   @override
   Widget build(BuildContext context) {
     final q = context.q;
@@ -41,53 +44,75 @@ class AuthFormLayout extends StatelessWidget {
             ? Brightness.light
             : Brightness.dark,
       ),
-      child: Scaffold(
-        backgroundColor: q.bg,
-        body: SafeArea(
-          top: header == null,
-          child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ?header,
-                      Expanded(
-                        child: Padding(
-                          // En tablet o en horizontal el formulario no pasa de
-                          // _maxFormWidth × _maxFormHeight y queda centrado.
-                          padding: EdgeInsets.symmetric(
-                            horizontal: max(
-                              0,
-                              (constraints.maxWidth - _maxFormWidth) / 2,
-                            ),
-                            vertical: header != null
-                                ? 0
-                                : max(
+      // Noche con montañas al pie (como la Bienvenida); quedan detrás del
+      // Scaffold para que el teclado no las suba sobre los campos.
+      child: ColoredBox(
+        color: night,
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Image.asset(
+                'assets/images/montanas_noche.webp',
+                width: double.infinity,
+                fit: BoxFit.fitWidth,
+                excludeFromSemantics: true,
+              ),
+            ),
+            Scaffold(
+              backgroundColor: Colors.transparent,
+              body: SafeArea(
+                top: header == null,
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ?header,
+                            Expanded(
+                              child: Padding(
+                                // En tablet o en horizontal el formulario no pasa de
+                                // _maxFormWidth × _maxFormHeight y queda centrado.
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: max(
                                     0,
-                                    (constraints.maxHeight - _maxFormHeight) /
-                                        2,
+                                    (constraints.maxWidth - _maxFormWidth) / 2,
                                   ),
-                          ).add(padding),
-                          child: Form(
-                            key: formKey,
-                            child: AutofillGroup(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: children,
+                                  vertical: header != null
+                                      ? 0
+                                      : max(
+                                          0,
+                                          (constraints.maxHeight -
+                                                  _maxFormHeight) /
+                                              2,
+                                        ),
+                                ).add(padding),
+                                child: Form(
+                                  key: formKey,
+                                  child: AutofillGroup(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: children,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

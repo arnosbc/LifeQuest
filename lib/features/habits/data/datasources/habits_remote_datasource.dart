@@ -55,6 +55,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
         'p_specific_days': habit.specificDays,
         'p_hp_penalty': habit.hpPenalty,
         'p_skill_id': habit.skillId,
+        'p_priority': habit.priority.name,
       },
     );
     _rewards?.announce(

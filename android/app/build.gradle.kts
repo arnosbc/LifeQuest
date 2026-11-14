@@ -4,6 +4,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase (push FCM): solo si existe google-services.json; sin él la app
+// compila igual y los avisos siguen con la revisión cada ~15 min.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.example.proyecto_movil"
     compileSdk = flutter.compileSdkVersion
@@ -52,4 +58,5 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    testImplementation("junit:junit:4.13.2")
 }

@@ -20,13 +20,14 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
+        <!-- Una imagen por ánimo de la mascota (widgetMood en LifeQuestWidgetProvider). -->
         <ImageView
+            android:id="@+id/widget_mascot"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="48"
-            android:importantForAccessibility="no"
             android:scaleType="centerCrop"
-            android:src="@drawable/widget_mascot" />
+            android:src="@drawable/widget_mascot_waiting" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -142,6 +143,19 @@
                     android:maxLines="1"
                     android:text="0 de 3 misiones de hoy"
                     android:textColor="#FFFFFF" />
+
+                <Chronometer
+                    android:id="@+id/widget_countdown"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

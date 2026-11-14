@@ -36,7 +36,8 @@ const SUMMARY_MAX = 8000;
 const TEXT_MAX = 300_000;
 
 async function summarize(part: Record<string, unknown>): Promise<{ summary?: string; reason?: string }> {
-  const model = Deno.env.get('GEMINI_MODEL');
+  // Pegado en el panel puede traer espacios o 'models/': Gemini responde 400.
+  const model = (Deno.env.get('GEMINI_MODEL') ?? '').trim().replace(/^models\//, '');
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
@@ -51,7 +52,7 @@ async function summarize(part: Record<string, unknown>): Promise<{ summary?: str
         generationConfig: { temperature: 0.2, thinkingConfig: { thinkingLevel: 'low' } },
       }),
       // Un documento largo tarda más que una misión.
-      signal: AbortSignal.timeout(60_000),
+      signal: AbortSignal.timeout(120_000), // capa gratis lenta; límite de Supabase: 150 s
     },
   );
   if (!res.ok) {

@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
@@ -27,6 +29,11 @@ abstract class NotificationsLocalDataSource {
   Future<void> startPeriodicCheck();
 
   Future<void> stopPeriodicCheck();
+
+  /// Token de Firebase (FCM) para recibir push al instante; null si Firebase no
+  /// está configurado (sin google-services.json). [onRefresh] recibe los
+  /// tokens nuevos. Los push que llegan con la app abierta se muestran aquí.
+  Future<String?> pushToken({required void Function(String) onRefresh});
 }
 
 class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
@@ -179,6 +186,52 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
   });
+
+  static bool _pushListening = false;
+
+  @override
+  Future<String?> pushToken({required void Function(String) onRefresh}) async {
+    try {
+      await Firebase.initializeApp();
+    } catch (_) {
+      return null; // Firebase sin configurar: queda la revisión cada ~15 min
+    }
+    final messaging = FirebaseMessaging.instance;
+    if (!_pushListening) {
+      _pushListening = true;
+      // shortcut: getToken/onTokenRefresh están deprecados por register/FID;
+      // la API HTTP v1 de push-dispatch envía al token clásico. Migrar juntos.
+      // ignore: deprecated_member_use
+      messaging.onTokenRefresh.listen(onRefresh);
+      // Con la app cerrada el sistema muestra el push; abierta, se muestra aquí.
+      FirebaseMessaging.onMessage.listen((message) {
+        final n = message.notification;
+        if (n == null) return;
+        show([
+          AppNotification(
+            id:
+                message.data['id'] as String? ??
+                message.messageId ??
+                '${n.hashCode}',
+            kind: switch (message.data['type']) {
+              'critical' => NotificationKind.critical,
+              'motivational' => NotificationKind.motivational,
+              _ => NotificationKind.informative,
+            },
+            title: n.title ?? 'LifeQuest',
+            description: n.body ?? '',
+            createdAt: DateTime.now(),
+          ),
+        ]).ignore();
+      });
+    }
+    try {
+      // ignore: deprecated_member_use
+      return await messaging.getToken();
+    } catch (_) {
+      return null; // sin Google Play Services o sin red
+    }
+  }
 
   @override
   Future<void> stopPeriodicCheck() =>

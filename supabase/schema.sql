@@ -187,6 +187,8 @@ CREATE TABLE public.habits (
   xp_reward integer NOT NULL DEFAULT 0,
   coin_reward integer NOT NULL DEFAULT 0,
   hp_penalty integer NOT NULL DEFAULT 0,
+  -- Orden del Camino de hábitos (051_habit_priority.sql).
+  priority USER-DEFINED NOT NULL DEFAULT 'medium'::urgency_level,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT habits_pkey PRIMARY KEY (id),
   CONSTRAINT habits_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),

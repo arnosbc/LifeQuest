@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
@@ -59,7 +61,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-    expect(scaffold.backgroundColor, LifeQuestPalette.dark.background);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is ColoredBox && w.color == AuthFormLayout.night,
+      ),
+      findsOneWidget,
+    );
   });
 }

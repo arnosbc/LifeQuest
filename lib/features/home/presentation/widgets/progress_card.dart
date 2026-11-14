@@ -6,8 +6,9 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
 import 'package:proyecto_movil/features/home/presentation/widgets/home_format.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/how_it_works_sheet.dart';
 
-/// «Tu progreso» (Main.dc.html): insignia de nivel con su rango, barra de XP
-/// en 10 segmentos y Constancia · Monedas · Racha. Tocar abre el Perfil.
+/// «Tu progreso» (Main.dc.html): insignia de nivel con su rango y barra de XP
+/// en 10 segmentos. Constancia · Monedas · Racha viven en [HomeStatusBar].
+/// Tocar abre el Perfil.
 class ProgressCard extends StatelessWidget {
   const ProgressCard({
     super.key,
@@ -95,43 +96,6 @@ class ProgressCard extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: QSpace.xs),
-          Row(
-            children: [
-              Expanded(
-                child: _Stat(
-                  icon: QIcons.leaf,
-                  value: '${d.hpCurrent}',
-                  label:
-                      'Constancia ${d.hpCurrent} de ${d.hpMax}. ¿Cómo funciona?',
-                  bg: q.coralTint,
-                  fg: q.coralInk,
-                  onTap: () => onExplain?.call(HowItWorks.constancy),
-                ),
-              ),
-              const SizedBox(width: QSpace.s),
-              Expanded(
-                child: _Stat(
-                  icon: QIcons.coin,
-                  value: HomeFormat.number(d.coins),
-                  label: '${d.coins} Monedas. ¿Cómo funcionan?',
-                  bg: q.mustardTint,
-                  fg: q.mustardInk,
-                  onTap: () => onExplain?.call(HowItWorks.coins),
-                ),
-              ),
-              const SizedBox(width: QSpace.s),
-              Expanded(
-                child: _Stat(
-                  icon: QIcons.flame,
-                  value: '${d.streakDays} d',
-                  label: 'Racha de ${d.streakDays} días',
-                  bg: q.bg,
-                  fg: q.text,
-                ),
-              ),
-            ],
           ),
           if (d.isWeakened) ...[
             const SizedBox(height: QSpace.m),
@@ -232,4 +196,83 @@ class _Stat extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Barra fija del Inicio, como la de Duolingo: nivel, racha, Monedas y
+/// Constancia siempre a la vista. Cada cifra explica cómo funciona.
+class HomeStatusBar extends StatelessWidget {
+  const HomeStatusBar({
+    super.key,
+    required this.dashboard,
+    required this.onOpenProfile,
+    this.onExplain,
+  });
+
+  final HomeDashboard dashboard;
+  final VoidCallback onOpenProfile;
+  final ValueChanged<HowItWorks>? onExplain;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    final d = dashboard;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        QSpace.l,
+        QSpace.s,
+        QSpace.l,
+        QSpace.s,
+      ),
+      decoration: BoxDecoration(
+        color: q.bg,
+        border: Border(bottom: BorderSide(color: q.line)),
+      ),
+      child: Row(
+        children: [
+          Semantics(
+            button: true,
+            label: 'Nivel ${d.level}. Abrir perfil',
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: onOpenProfile,
+              child: Transform.scale(
+                scale: 0.8,
+                child: _LevelBadge(level: d.level),
+              ),
+            ),
+          ),
+          const SizedBox(width: QSpace.s),
+          Expanded(
+            child: _Stat(
+              icon: QIcons.flame,
+              value: '${d.streakDays}',
+              label: 'Racha de ${d.streakDays} días',
+              bg: Colors.transparent,
+              fg: d.streakDays > 0 ? q.coral : q.text3,
+            ),
+          ),
+          Expanded(
+            child: _Stat(
+              icon: QIcons.coin,
+              value: HomeFormat.number(d.coins),
+              label: '${d.coins} Monedas. ¿Cómo funcionan?',
+              bg: Colors.transparent,
+              fg: q.mustard,
+              onTap: () => onExplain?.call(HowItWorks.coins),
+            ),
+          ),
+          Expanded(
+            child: _Stat(
+              icon: QIcons.leaf,
+              value: '${d.hpCurrent}',
+              label: 'Constancia ${d.hpCurrent} de ${d.hpMax}. ¿Cómo funciona?',
+              bg: Colors.transparent,
+              fg: d.isWeakened ? q.coral : q.river,
+              onTap: () => onExplain?.call(HowItWorks.constancy),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -2,6 +2,8 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -179,10 +181,18 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('en tema oscuro usa la paleta oscura', (tester) async {
+  testWidgets('pinta la noche con montañas detrás del formulario', (
+    tester,
+  ) async {
     await tester.pumpWidget(app(themeMode: ThemeMode.dark));
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-    expect(scaffold.backgroundColor, LifeQuestPalette.dark.background);
+    expect(scaffold.backgroundColor, Colors.transparent);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is ColoredBox && w.color == AuthFormLayout.night,
+      ),
+      findsOneWidget,
+    );
   });
 }

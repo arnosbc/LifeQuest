@@ -163,7 +163,8 @@ async function suggest(
   reason?: string;
 }> {
   const prompt = buildPrompt(npc, previous, docs);
-  const model = Deno.env.get('GEMINI_MODEL');
+  // Pegado en el panel puede traer espacios o 'models/': Gemini responde 400.
+  const model = (Deno.env.get('GEMINI_MODEL') ?? '').trim().replace(/^models\//, '');
   const started = Date.now();
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -187,8 +188,9 @@ async function suggest(
           responseSchema: SCHEMA,
         },
       }),
-      // La guía es larga; pasado este tiempo se avisa y no se cobra nada.
-      signal: AbortSignal.timeout(45_000),
+      // La guía es larga y la capa gratis de Gemini puede tardar más de 45 s;
+      // 120 s cabe en el límite de 150 s de Supabase. Pasado esto se avisa y no se cobra.
+      signal: AbortSignal.timeout(120_000),
     },
   );
   console.log('gemini', model, res.status, `${Date.now() - started} ms`);

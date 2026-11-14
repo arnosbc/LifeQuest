@@ -8,14 +8,13 @@ import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/daily_chest_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/home_link_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/how_it_works_sheet.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/next_step_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/progress_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/quick_action.dart';
-import 'package:proyecto_movil/features/home/presentation/widgets/today_list.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/task_path.dart';
 
 /// Inicio = Hoy (Main.dc.html con DESIGN.md v2, plan S2): progreso, Siguiente
 /// paso, tareas de hoy y hábitos de hoy, todo marcable aquí mismo.
@@ -61,10 +60,22 @@ class HomeScreen extends StatelessWidget {
         message: message,
         onRetry: () => context.read<HomeBloc>().add(const HomeRequested()),
       ),
-      HomeSuccess() => RefreshIndicator(
-        color: context.q.ink,
-        onRefresh: () => _refresh(context.read<HomeBloc>()),
-        child: _content(context, state),
+      // La barra queda fija arriba mientras el resto se desplaza.
+      HomeSuccess(:final dashboard) => Column(
+        children: [
+          HomeStatusBar(
+            dashboard: dashboard,
+            onOpenProfile: () => onNavigate(4),
+            onExplain: (topic) => showHowItWorks(context, topic),
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              color: context.q.ink,
+              onRefresh: () => _refresh(context.read<HomeBloc>()),
+              child: _content(context, state),
+            ),
+          ),
+        ],
       ),
     },
   );
@@ -80,11 +91,6 @@ class HomeScreen extends StatelessWidget {
     final d = state.dashboard;
     final bloc = context.read<HomeBloc>();
     final next = d.priorityMission;
-    final today = [
-      for (final t in d.todayTasks)
-        if (t.id != next?.id) t,
-    ];
-    final busyNext = next != null && state.busyTaskId == next.id;
     return ListView(
       // Permite deslizar para refrescar aunque el contenido quepa.
       physics: const AlwaysScrollableScrollPhysics(),
@@ -109,24 +115,15 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const _MotivationBanner(),
-              _gap,
-              _SectionTitle(
-                'Tus metas',
-                action: 'Ver todas',
-                onAction: () => context.push(RoutePaths.goals),
-              ),
-              if (d.topGoal case final g?) ...[
-                TopGoalCard(
-                  title: g.title,
-                  progress: g.progress,
-                  onTap: () => context.push(RoutePaths.goals),
-                ),
-                const SizedBox(height: QSpace.m),
-              ],
-              QuestlyButton(
-                label: 'Agregar meta',
-                icon: QIcons.plus,
-                onPressed: () => context.go(RoutePaths.stage),
+              const SizedBox(height: QSpace.m),
+              HomeLinkCard(
+                icon: QIcons.trophy,
+                kicker: 'Desafíos y Liga',
+                title: 'Abre los cofres de hoy y sube de división',
+                detail: 'Desafíos del día, del mes y tu liga semanal',
+                tint: context.q.mustardTint,
+                ink: context.q.mustardInk,
+                onTap: () => context.push(RoutePaths.challenges),
               ),
               _gap,
               ProgressCard(
@@ -136,15 +133,32 @@ class HomeScreen extends StatelessWidget {
               ),
               _gap,
               _SectionTitle(
-                'Siguiente paso',
+                'Tu camino de hoy',
                 action: next == null ? null : '¿Por qué esta?',
                 onAction: () => context.push(RoutePaths.rpgenie),
               ),
-              NextStepCard(
-                mission: next,
-                busy: busyNext,
-                onFocus: () => context.go(RoutePaths.focusOn(next!.id)),
-                onCreate: () => context.go(RoutePaths.missions),
+              GoalBanner(
+                title: d.topGoal?.title,
+                progress: d.topGoal?.progress ?? 0,
+                onTap: () => d.topGoal == null
+                    ? context.go(RoutePaths.stage)
+                    : context.push(RoutePaths.goals),
+              ),
+              const SizedBox(height: QSpace.xl),
+              if (next == null) ...[
+                NextStepCard(
+                  mission: null,
+                  busy: false,
+                  onFocus: () {},
+                  onCreate: () => context.go(RoutePaths.missions),
+                ),
+                const SizedBox(height: QSpace.l),
+              ],
+              TaskPath(
+                dashboard: d,
+                claimingChest: state.claimingChest,
+                onFocus: (id) => context.go(RoutePaths.focusOn(id)),
+                onClaimChest: () => bloc.add(const HomeChestClaimed()),
               ),
               if (d.mentorTask case final m?) ...[
                 const SizedBox(height: QSpace.m),
@@ -172,19 +186,6 @@ class HomeScreen extends StatelessWidget {
                   onTap: () => context.push(RoutePaths.brainDump),
                 ),
               ],
-              if (today.isNotEmpty) ...[
-                _gap,
-                _SectionTitle(
-                  'Hoy',
-                  action: 'Ver todas',
-                  onAction: () => context.go(RoutePaths.missions),
-                ),
-                TodayList(
-                  tasks: today,
-                  busyTaskId: state.busyTaskId,
-                  onFocus: (id) => context.go(RoutePaths.focusOn(id)),
-                ),
-              ],
               _gap,
               _SectionTitle(
                 'Hábitos de hoy',
@@ -196,12 +197,6 @@ class HomeScreen extends StatelessWidget {
                 busyHabitId: state.busyHabitId,
                 onComplete: (id) => bloc.add(HomeHabitCompleted(id)),
                 onOpenHabits: () => onNavigate(2),
-              ),
-              const SizedBox(height: QSpace.m),
-              DailyChestCard(
-                chest: d.chest,
-                busy: state.claimingChest,
-                onClaim: () => bloc.add(const HomeChestClaimed()),
               ),
               _gap,
               const _SectionTitle('Más herramientas'),

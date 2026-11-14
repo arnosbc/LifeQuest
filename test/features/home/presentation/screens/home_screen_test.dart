@@ -48,7 +48,6 @@ void main() {
 
     expect(find.textContaining(', Ana'), findsOneWidget);
     expect(find.text('Preparar presentación del proyecto'), findsOneWidget);
-    expect(find.text('Prioridad alta'), findsOneWidget);
     expect(find.text('+350 XP'), findsOneWidget);
     expect(find.text('Experto · Nivel 24'), findsOneWidget);
     expect(find.text('Te faltan 4.150 XP para el nivel 25'), findsOneWidget);

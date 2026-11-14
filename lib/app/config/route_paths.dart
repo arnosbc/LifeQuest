@@ -52,6 +52,9 @@ abstract final class RoutePaths {
   static const vision = '/vision';
   static const inventory = '/inventory';
 
+  // Desafíos del día y del mes, y Liga semanal (052), desde Inicio.
+  static const challenges = '/challenges';
+
   // Tarea guiada con sus pasos (039, plan B1–B2).
   static const guidedTask = '/task/:id';
   static String task(String id) => '/task/$id';

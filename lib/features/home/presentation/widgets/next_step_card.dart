@@ -32,11 +32,28 @@ class NextStepCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('No tienes tareas pendientes', style: QText.title3(q.text)),
-            const SizedBox(height: QSpace.xs),
-            Text(
-              'Anota lo próximo que quieras lograr y te ayudo a empezar.',
-              style: QText.body(q.text2).copyWith(fontSize: 14),
+            Row(
+              children: [
+                const MascotPose(pose: 'durmiendo', size: 88),
+                const SizedBox(width: QSpace.m),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No tienes tareas pendientes',
+                        style: QText.title3(q.text),
+                      ),
+                      const SizedBox(height: QSpace.xs),
+                      Text(
+                        'Anota lo próximo que quieras lograr y te ayudo a '
+                        'empezar.',
+                        style: QText.body(q.text2).copyWith(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: QSpace.m),
             QuestlyButton(

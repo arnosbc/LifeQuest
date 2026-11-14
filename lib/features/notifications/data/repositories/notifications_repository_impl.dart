@@ -34,8 +34,25 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
           await _local.saveDeviceToken(await _remote.registerDevice());
         }
         await _local.startPeriodicCheck();
+        await _registerPush();
         return unit;
       });
+
+  /// Push al instante con FCM (050). Si falla, la revisión cada ~15 min sigue.
+  Future<void> _registerPush() async {
+    final device = await _local.readDeviceToken();
+    if (device == null) return;
+    Future<void> send(String fcm) async {
+      try {
+        await _remote.setPushToken(device, fcm);
+      } on Exception {
+        // Sin red: se reintenta al próximo inicio de sesión o cambio de token.
+      }
+    }
+
+    final fcm = await _local.pushToken(onRefresh: send);
+    if (fcm != null) await send(fcm);
+  }
 
   @override
   Future<Either<Failure, Unit>> disableOnDevice() => _run(() async {

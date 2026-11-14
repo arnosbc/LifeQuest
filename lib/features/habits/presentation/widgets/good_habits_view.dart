@@ -5,6 +5,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_calendar.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_path.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_row.dart';
 
 class GoodHabitsView extends StatelessWidget {
@@ -30,8 +31,20 @@ class GoodHabitsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final habits = board.good;
+    final current = board.currentOnPath;
+    final broken = board.brokenStreak;
     return Column(
       children: [
+        if (broken != null) ...[
+          _StreakComeback(habit: broken),
+          const SizedBox(height: 16),
+        ],
+        HabitPath(
+          path: board.path,
+          current: current,
+          busyHabitId: busyHabitId,
+          onComplete: onComplete,
+        ),
         LifeQuestSectionHeading(
           'HÁBITOS BUENOS',
           action: '${habits.length} activos',
@@ -39,16 +52,28 @@ class GoodHabitsView extends StatelessWidget {
         const SizedBox(height: 6),
         if (habits.isEmpty)
           LifeQuestSurface(
-            child: Text(
-              'Aún no tienes hábitos buenos. Crea uno pequeño para empezar.',
-              style: TextStyle(color: context.lq.muted, fontSize: 11),
+            child: Row(
+              children: [
+                const MascotPose(pose: 'durmiendo', size: 72),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Aún no tienes hábitos buenos. Crea uno pequeño para '
+                    'empezar.',
+                    style: TextStyle(color: context.lq.muted, fontSize: 13),
+                  ),
+                ),
+              ],
             ),
           ),
         for (final habit in habits)
           HabitRow(
             habit: habit,
             busy: busyHabitId == habit.id,
-            onComplete: onComplete == null ? null : () => onComplete!(habit.id),
+            // Candado del Camino: solo se cumple el hábito actual.
+            onComplete: onComplete == null || habit != current
+                ? null
+                : () => onComplete!(habit.id),
             menu: menuFor?.call(habit),
           ),
         const SizedBox(height: 16),
@@ -127,6 +152,44 @@ class _Growth extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Ánimo tras reiniciarse una racha (§7: invitación, nunca culpa).
+class _StreakComeback extends StatelessWidget {
+  const _StreakComeback({required this.habit});
+
+  final Habit habit;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return QuestlyCard(
+      child: Row(
+        children: [
+          const MascotPose(pose: 'triste_animada', size: 84),
+          const SizedBox(width: QSpace.m),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '¡A retomar «${habit.name}»!',
+                  style: QText.title3(q.text),
+                ),
+                const SizedBox(height: QSpace.xs),
+                Text(
+                  'Tu racha volvió a empezar, pero tu récord de '
+                  '${habit.bestStreak} ${habit.bestStreak == 1 ? 'día' : 'días'} '
+                  'sigue ahí. Hoy es un buen día para el primero.',
+                  style: QText.body(q.text2).copyWith(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

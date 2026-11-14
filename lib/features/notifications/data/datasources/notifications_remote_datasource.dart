@@ -17,6 +17,9 @@ abstract class NotificationsRemoteDataSource {
   /// Registra este dispositivo (036) y devuelve su código.
   Future<String> registerDevice();
 
+  /// Asocia el token FCM al dispositivo del código [token] (050).
+  Future<void> setPushToken(String token, String fcmToken);
+
   /// Da de baja el código; funciona también sin sesión.
   Future<void> unregisterDevice(String token);
 
@@ -53,6 +56,14 @@ class NotificationsRemoteDataSourceImpl
   @override
   Future<String> registerDevice() =>
       _guard(() => _client.rpc<String>('register_device'));
+
+  @override
+  Future<void> setPushToken(String token, String fcmToken) => _guard(
+    () => _client.rpc<void>(
+      'set_push_token',
+      params: {'p_token': token, 'p_fcm_token': fcmToken},
+    ),
+  );
 
   @override
   Future<void> unregisterDevice(String token) => _guard(

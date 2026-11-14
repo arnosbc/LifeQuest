@@ -1,11 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:proyecto_movil/core/entities/reward_outcome.dart';
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
 import 'package:proyecto_movil/core/theme/questly_icons.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
+import 'package:proyecto_movil/core/widgets/questly/confetti.dart';
+import 'package:proyecto_movil/core/widgets/questly/quest_path.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly_button.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly_dialog.dart';
 
@@ -16,10 +20,14 @@ class RewardMomentListener extends StatefulWidget {
     super.key,
     required this.rewards,
     required this.child,
+    this.sounds,
   });
 
   final Stream<RewardOutcome> rewards;
   final Widget child;
+
+  /// Sonido de cada logro; null en pruebas.
+  final SoundEffects? sounds;
 
   @override
   State<RewardMomentListener> createState() => _RewardMomentListenerState();
@@ -29,6 +37,10 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
   StreamSubscription<RewardOutcome>? _sub;
   OverlayEntry? _entry;
   Timer? _timer;
+
+  // shortcut: en memoria; si la app se reinicia el mismo día la pantalla de
+  // racha puede salir otra vez. Guardarlo en shared_preferences si molesta.
+  DateTime? _streakShownOn;
 
   static const _visible = Duration(milliseconds: 2800);
 
@@ -47,7 +59,62 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
     Overlay.of(context, rootOverlay: true).insert(entry);
     _entry = entry;
     _timer = Timer(_visible, _hide);
-    if (outcome.levelUp || outcome.areaLevelUp) _levelUp(outcome);
+    final big = outcome.levelUp || outcome.areaLevelUp;
+    big ? HapticFeedback.heavyImpact() : HapticFeedback.mediumImpact();
+    // Solo Monedas (sin XP): cofre o desafío cobrado.
+    widget.sounds?.play(
+      big
+          ? Sfx.nivel
+          : outcome.xp == 0 && outcome.coins > 0
+          ? Sfx.monedas
+          : Sfx.tarea,
+    );
+    showConfetti(context, pieces: big ? 120 : 60);
+    if (big) {
+      _levelUp(outcome);
+    } else if (outcome.streak case final streak? when streak > 0) {
+      _streakOncePerDay(streak);
+    }
+  }
+
+  /// Pantalla de racha estilo Duolingo, la primera vez del día que avanza.
+  void _streakOncePerDay(int streak) {
+    final now = DateTime.now();
+    final last = _streakShownOn;
+    if (last != null &&
+        last.year == now.year &&
+        last.month == now.month &&
+        last.day == now.day) {
+      return;
+    }
+    _streakShownOn = now;
+    final q = context.q;
+    showQuestlyDialog<void>(
+      context,
+      title: streak == 1 ? '¡Empezaste una racha!' : '¡Racha de $streak días!',
+      message: 'Volver mañana la mantiene encendida. Paso a paso.',
+      content: Padding(
+        padding: const EdgeInsets.only(bottom: QSpace.s),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const MascotPose(pose: 'corriendo', size: 120),
+            const SizedBox(width: QSpace.s),
+            QIcon(QIcons.flame, color: q.coral, size: 40),
+            const SizedBox(width: QSpace.xs),
+            Text('$streak', style: QText.display(q.coral)),
+          ],
+        ),
+      ),
+      actions: [
+        Builder(
+          builder: (context) => QuestlyButton(
+            label: '¡Sigamos!',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+      ],
+    );
   }
 
   void _hide() {
@@ -69,7 +136,7 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
       ].join(' '),
       content: const Padding(
         padding: EdgeInsets.only(bottom: QSpace.s),
-        child: _Badge(),
+        child: Center(child: MascotPose(pose: 'celebrando', size: 140)),
       ),
       actions: [
         Builder(
@@ -91,24 +158,6 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
 
   @override
   Widget build(BuildContext context) => widget.child;
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge();
-
-  @override
-  Widget build(BuildContext context) {
-    final q = context.q;
-    return Center(
-      child: Container(
-        width: 72,
-        height: 72,
-        decoration: BoxDecoration(color: q.mustardTint, shape: BoxShape.circle),
-        alignment: Alignment.center,
-        child: QIcon(QIcons.trophy, color: q.mustardInk, size: 36),
-      ),
-    );
-  }
 }
 
 class _RewardCard extends StatelessWidget {

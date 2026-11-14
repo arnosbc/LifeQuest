@@ -22,9 +22,29 @@ abstract final class HomeScreenWidget {
       HomeWidget.saveWidgetData<int>('missions_goal', d.chest.required),
       HomeWidget.saveWidgetData<String>('next_task_id', next?.id),
       HomeWidget.saveWidgetData<String>('next_task_title', next?.title),
+      // El widget decide el ánimo de la mascota con esto y la hora actual.
+      HomeWidget.saveWidgetData<String>('saved_day', dayKey(DateTime.now())),
+      HomeWidget.saveWidgetData<bool>('day_done', dayDone(d)),
+      HomeWidget.saveWidgetData<int>('pending', pending(d)),
     ]);
     await HomeWidget.updateWidget(androidName: _provider);
   });
+
+  /// Fecha local `yyyy-MM-dd` (la lee `LocalDate.parse` en Kotlin).
+  static String dayKey(DateTime t) =>
+      '${t.year.toString().padLeft(4, '0')}-'
+      '${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}';
+
+  /// Día cumplido: todos los hábitos de hoy (los que llevan racha) o, sin
+  /// hábitos, el cofre del día.
+  static bool dayDone(HomeDashboard d) => d.habitsTotal > 0
+      ? d.habitsDone >= d.habitsTotal
+      : d.chest.progress >= d.chest.required;
+
+  /// Lo que falta hoy: hábitos sin hacer + tareas de la lista «Hoy».
+  static int pending(HomeDashboard d) =>
+      (d.habitsTotal - d.habitsDone).clamp(0, d.habitsTotal) +
+      d.todayTasks.length;
 
   /// Al cerrar sesión el widget deja de mostrar datos de la cuenta.
   static Future<void> clear() => _safely(() async {
@@ -36,6 +56,9 @@ abstract final class HomeScreenWidget {
       HomeWidget.saveWidgetData<int>('missions_done', 0),
       HomeWidget.saveWidgetData<String>('next_task_id', null),
       HomeWidget.saveWidgetData<String>('next_task_title', null),
+      HomeWidget.saveWidgetData<String>('saved_day', null),
+      HomeWidget.saveWidgetData<bool>('day_done', false),
+      HomeWidget.saveWidgetData<int>('pending', 0),
     ]);
     await HomeWidget.updateWidget(androidName: _provider);
   });

@@ -4,31 +4,31 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Marca de LifeQuest: montaña con bandera dentro de un círculo lavanda.
+/// Marca de LifeQuest: la mascota en un cuadro redondeado con un brillo lavanda.
 class LifeQuestLogo extends StatelessWidget {
   const LifeQuestLogo({super.key, this.size = 96});
 
   final double size;
 
-  static const _svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'
-      '<stop offset="0" stop-color="#EEE7FC"/>'
-      '<stop offset="1" stop-color="#CDBBF1"/></linearGradient></defs>'
-      '<circle cx="50" cy="50" r="46" fill="url(#g)"/>'
-      '<path d="M18 76 L38 54 L47 63 L62 42 L84 76Z" fill="#D9CCF6"/>'
-      '<path d="M30 76 L46 60 L54 68 L64 56 L76 76Z" fill="#B8A2E6"/>'
-      '<path d="M14 72 L36 46 L46 57 L62 32 L86 72" fill="none" '
-      'stroke="#4B3594" stroke-width="5" stroke-linecap="round" '
-      'stroke-linejoin="round"/>'
-      '<path d="M62 32 V12" stroke="#4B3594" stroke-width="3.5" '
-      'stroke-linecap="round"/>'
-      '<path d="M62 12 L77 17 L62 23Z" fill="#4B3594"/>'
-      '</svg>';
-
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
-    child: SvgPicture.string(_svg, width: size, height: size),
+    child: Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size * .24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFB79BFF).withValues(alpha: .55),
+            blurRadius: size * .3,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(size * .24),
+        child: Image.asset('assets/images/logo_mascota.jpg', fit: BoxFit.cover),
+      ),
+    ),
   );
 }
 

@@ -32,6 +32,10 @@ void main() {
     when(() => local.startPeriodicCheck()).thenAnswer((_) async {});
     when(() => local.stopPeriodicCheck()).thenAnswer((_) async {});
     when(() => local.show(any())).thenAnswer((_) async {});
+    // Push con FCM (050): sin token en las pruebas, solo queda la revisión.
+    when(
+      () => local.pushToken(onRefresh: any(named: 'onRefresh')),
+    ).thenAnswer((_) async => null);
   });
 
   group('enableOnDevice', () {

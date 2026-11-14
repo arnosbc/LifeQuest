@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 
-/// Bienvenida antes del login: paisaje de montañas, marca y «Comenzar».
+/// Bienvenida antes del login: la mascota de fondo, marca y «Comenzar».
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -22,15 +22,26 @@ class WelcomeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const LifeQuestLandscape(hiker: true, alignment: Alignment(0, .4)),
-          // Oscurece la parte baja para que el texto blanco se lea.
+          Image.asset(
+            'assets/images/fondo_mascota.jpg',
+            fit: BoxFit.cover,
+            alignment: const Alignment(0, .3),
+            excludeFromSemantics: true,
+          ),
+          // Oscurece arriba (marca) y abajo («Comenzar») para que el texto
+          // blanco se lea sobre la mascota.
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0x00000000), Color(0x003B2A72), _deep],
-                stops: [0, .55, .92],
+                colors: [
+                  Color(0xCC3B2A72),
+                  Color(0x003B2A72),
+                  Color(0x003B2A72),
+                  _deep,
+                ],
+                stops: [0, .4, .6, .9],
               ),
             ),
           ),

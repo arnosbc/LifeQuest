@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/app/app.dart';
@@ -46,6 +47,7 @@ void main() {
     appearanceBloc = MockAppearanceBloc();
     onboardingBloc = MockOnboardingBloc();
     sl.registerLazySingleton(RewardFeed.new);
+    sl.registerLazySingleton(SoundEffects.new);
     whenListen(
       onboardingBloc,
       const Stream<OnboardingState>.empty(),

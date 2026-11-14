@@ -186,7 +186,8 @@ if (import.meta.main) {
       parts.push(part);
     }
 
-    const model = Deno.env.get('GEMINI_MODEL');
+    // Pegado en el panel puede traer espacios o 'models/': Gemini responde 400.
+    const model = (Deno.env.get('GEMINI_MODEL') ?? '').trim().replace(/^models\//, '');
     const apiKey = Deno.env.get('GEMINI_API_KEY');
     if (!model || !apiKey) {
       console.error('Gemini secrets are not configured');
@@ -215,7 +216,7 @@ if (import.meta.main) {
               responseSchema: SCHEMA,
             },
           }),
-          signal: AbortSignal.timeout(45_000),
+          signal: AbortSignal.timeout(120_000), // capa gratis lenta; límite de Supabase: 150 s
         },
       );
     } catch (error) {

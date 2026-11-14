@@ -76,8 +76,15 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
         ),
         const SizedBox(height: 9),
         LifeQuestSectionHeading(
-          'TAREAS DE LA SESIÓN',
+          'ELIGE LAS TAREAS DE ESTA SESIÓN',
           action: '${_picked.length} / ${widget.board.maxTasks}',
+        ),
+        const SizedBox(height: 4),
+        // Marcar aquí solo elige; se confundía con completar (prueba 2026-11-14).
+        Text(
+          'Márcalas para llevarlas a la sesión. Las completas con «Completar» '
+          'cuando empieces.',
+          style: TextStyle(color: context.lq.muted, fontSize: 11),
         ),
         const SizedBox(height: 6),
         if (candidates.isEmpty)
