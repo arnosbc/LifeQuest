@@ -7,19 +7,24 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 class QuickAction extends StatelessWidget {
   const QuickAction({
     super.key,
-    required this.icon,
+    this.icon,
     required this.label,
     required this.onTap,
     this.vertical = false,
   });
 
-  final IconData icon;
+  /// Null: la cara de Nevi (el Asistente).
+  final IconData? icon;
   final String label;
   final VoidCallback onTap;
   final bool vertical;
 
   @override
   Widget build(BuildContext context) {
+    final tile = switch (icon) {
+      final IconData i => LifeQuestIconTile(i),
+      null => const LifeQuestIconTile.nevi(),
+    };
     final text = Text(
       label,
       maxLines: 2,
@@ -51,16 +56,10 @@ class QuickAction extends StatelessWidget {
                 ? const EdgeInsets.fromLTRB(6, 14, 6, 12)
                 : const EdgeInsets.all(10),
             child: vertical
-                ? Column(
-                    children: [
-                      LifeQuestIconTile(icon),
-                      const SizedBox(height: 8),
-                      text,
-                    ],
-                  )
+                ? Column(children: [tile, const SizedBox(height: 8), text])
                 : Row(
                     children: [
-                      LifeQuestIconTile(icon),
+                      tile,
                       const SizedBox(width: 10),
                       Expanded(child: text),
                     ],

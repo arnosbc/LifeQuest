@@ -73,7 +73,7 @@ class RpgenieScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const LifeQuestIconTile(Icons.auto_awesome),
+                    const LifeQuestIconTile.nevi(size: 40),
                     const SizedBox(width: 9),
                     Expanded(
                       child: Text(

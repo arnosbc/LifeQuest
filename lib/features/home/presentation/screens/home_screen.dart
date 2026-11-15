@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
   static const _tools = [
     (Icons.description_outlined, 'Documentos', RoutePaths.documents),
     (Icons.inbox_outlined, 'Bandeja de ideas', RoutePaths.brainDump),
-    (Icons.auto_awesome_outlined, 'Asistente', RoutePaths.rpgenie),
+    (null, 'Asistente', RoutePaths.rpgenie),
     (Icons.flag_outlined, 'Metas', RoutePaths.goals),
     (Icons.history_rounded, 'Actividad', RoutePaths.journal),
     (Icons.redeem_outlined, 'Recompensas', RoutePaths.marketplace),

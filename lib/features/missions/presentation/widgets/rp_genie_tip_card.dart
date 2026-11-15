@@ -9,14 +9,14 @@ class RpGenieTipCard extends StatelessWidget {
   Widget build(BuildContext context) => LifeQuestSurface(
     child: Row(
       children: [
-        LifeQuestIconTile(Icons.auto_awesome),
+        const LifeQuestIconTile.nevi(size: 40),
         SizedBox(width: 9),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'GENIE DE RP',
+                'NEVI, TU ASISTENTE',
                 style: TextStyle(
                   color: context.lq.deepGreen,
                   fontSize: 10,
