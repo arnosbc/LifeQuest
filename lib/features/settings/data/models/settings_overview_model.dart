@@ -29,6 +29,7 @@ class SettingsOverviewModel {
         longBreakEveryNCycles: intOr('long_break_every_n_cycles', 4),
         digestTime: _json['digest_time'] as String?,
         dailyReminders: _json['daily_reminders'] as bool?,
+        dailyXpGoal: (_json['daily_xp_goal'] as num?)?.toInt(),
       ),
       difficulties: [
         for (final d
@@ -59,6 +60,8 @@ class SettingsOverviewModel {
     'digest_time': settings.digestTime,
     // Solo si el servidor ya tiene la columna (048).
     'daily_reminders': ?settings.dailyReminders,
+    // Solo si el servidor ya tiene la columna (063).
+    'daily_xp_goal': ?settings.dailyXpGoal,
   };
 
   static GameDifficulty? _level(Object? name) =>

@@ -104,6 +104,27 @@ void main() {
       // Cambiar otra cosa conserva el interruptor.
       expect(after.withDigest('20:00').dailyReminders, isTrue);
     });
+
+    test('meta diaria de XP: solo se guarda si el servidor la tiene (063)', () {
+      final before = SettingsOverviewModel.fromJson({}).toEntity().settings;
+      expect(before.dailyXpGoal, isNull);
+      expect(
+        SettingsOverviewModel.toRow(before).containsKey('daily_xp_goal'),
+        isFalse,
+      );
+      final after = SettingsOverviewModel.fromJson({
+        'daily_xp_goal': 30,
+      }).toEntity().settings;
+      expect(
+        SettingsOverviewModel.toRow(after.withXpGoal(50))['daily_xp_goal'],
+        50,
+      );
+      // Cambiar otra cosa conserva la meta.
+      expect(
+        after.withXpGoal(100).withDifficulty(GameDifficulty.hard).dailyXpGoal,
+        100,
+      );
+    });
   });
 
   group('SettingsRepositoryImpl', () {

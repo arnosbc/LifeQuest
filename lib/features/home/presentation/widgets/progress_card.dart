@@ -242,6 +242,10 @@ class HomeStatusBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: QSpace.s),
+          if (d.dailyXpGoal case final goal?)
+            Expanded(
+              child: _GoalRing(xp: d.dailyXp, goal: goal),
+            ),
           Expanded(
             child: _Stat(
               icon: QIcons.flame,
@@ -272,6 +276,52 @@ class HomeStatusBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Meta diaria de XP (063): anillo que se llena con la XP de hoy y la cifra.
+class _GoalRing extends StatelessWidget {
+  const _GoalRing({required this.xp, required this.goal});
+
+  final int xp;
+  final int goal;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    final done = xp >= goal;
+    final color = done ? q.accent : q.mustard;
+    return Semantics(
+      label: done
+          ? 'Meta diaria cumplida: $xp de $goal XP'
+          : 'Meta diaria: $xp de $goal XP',
+      excludeSemantics: true,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: QSize.minTap),
+        alignment: Alignment.center,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            children: [
+              SizedBox.square(
+                dimension: 20,
+                child: CircularProgressIndicator(
+                  value: goal <= 0 ? 0 : (xp / goal).clamp(0, 1),
+                  strokeWidth: 3,
+                  color: color,
+                  backgroundColor: q.track,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                done ? '¡$goal!' : '$xp/$goal',
+                style: QText.number(color, size: 14),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

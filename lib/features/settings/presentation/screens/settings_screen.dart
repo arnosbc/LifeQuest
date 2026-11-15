@@ -161,6 +161,28 @@ class SettingsScreen extends StatelessWidget {
             : (level) =>
                   bloc.add(GameSettingsChanged(settings.withDifficulty(level))),
       ),
+      if (settings.dailyXpGoal case final goal?) ...[
+        const SizedBox(height: 12),
+        const LifeQuestSectionHeading('META DIARIA'),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            'La XP que quieres ganar cada día. Al cumplirla abres el cofre '
+            'de tu desafío diario.',
+            style: TextStyle(color: context.lq.muted, fontSize: 12),
+          ),
+        ),
+        QuestlySegmented<int>(
+          segments: [for (final n in GameSettings.xpGoals) (n, '$n XP')],
+          selected: goal,
+          onChanged: (n) {
+            if (!saving && n != goal) {
+              bloc.add(GameSettingsChanged(settings.withXpGoal(n)));
+            }
+          },
+        ),
+      ],
       const SizedBox(height: 12),
       const LifeQuestSectionHeading('REGLAS DEL JUEGO'),
       const SizedBox(height: 8),

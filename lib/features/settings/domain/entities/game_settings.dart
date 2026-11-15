@@ -17,7 +17,11 @@ class GameSettings extends Equatable {
     this.longBreakEveryNCycles = 4,
     this.digestTime,
     this.dailyReminders,
+    this.dailyXpGoal,
   });
+
+  /// Metas diarias de XP que acepta el servidor (063).
+  static const xpGoals = [30, 50, 100];
 
   // Mismos rangos que los checks de 016_settings.sql.
   static const dailyLimitRange = (min: 1, max: 50);
@@ -50,6 +54,10 @@ class GameSettings extends Equatable {
   /// los tiene (migración sin aplicar): no se muestra ni se guarda.
   final bool? dailyReminders;
 
+  /// Meta diaria de XP (063, el desafío «Gana N XP»); null = el servidor aún
+  /// no la tiene: no se muestra ni se guarda.
+  final int? dailyXpGoal;
+
   bool get isValid {
     bool within(int value, ({int min, int max}) range) =>
         value >= range.min && value <= range.max;
@@ -72,6 +80,7 @@ class GameSettings extends Equatable {
     longBreakEveryNCycles: longBreakEveryNCycles,
     digestTime: digestTime,
     dailyReminders: dailyReminders,
+    dailyXpGoal: dailyXpGoal,
   );
 
   GameSettings withNotifications({
@@ -90,6 +99,7 @@ class GameSettings extends Equatable {
     longBreakEveryNCycles: longBreakEveryNCycles,
     digestTime: digestTime,
     dailyReminders: dailyReminders,
+    dailyXpGoal: dailyXpGoal,
   );
 
   GameSettings withBreaks({
@@ -107,6 +117,7 @@ class GameSettings extends Equatable {
     longBreakEveryNCycles: longEveryNCycles,
     digestTime: digestTime,
     dailyReminders: dailyReminders,
+    dailyXpGoal: dailyXpGoal,
   );
 
   GameSettings withDigest(String? value) => GameSettings(
@@ -120,6 +131,7 @@ class GameSettings extends Equatable {
     longBreakEveryNCycles: longBreakEveryNCycles,
     digestTime: value,
     dailyReminders: dailyReminders,
+    dailyXpGoal: dailyXpGoal,
   );
 
   GameSettings withReminders(bool value) => GameSettings(
@@ -133,6 +145,21 @@ class GameSettings extends Equatable {
     longBreakEveryNCycles: longBreakEveryNCycles,
     digestTime: digestTime,
     dailyReminders: value,
+    dailyXpGoal: dailyXpGoal,
+  );
+
+  GameSettings withXpGoal(int value) => GameSettings(
+    difficulty: difficulty,
+    notificationDailyLimit: notificationDailyLimit,
+    silenceStart: silenceStart,
+    silenceEnd: silenceEnd,
+    criticalBypassSilence: criticalBypassSilence,
+    shortBreakMinutes: shortBreakMinutes,
+    longBreakMinutes: longBreakMinutes,
+    longBreakEveryNCycles: longBreakEveryNCycles,
+    digestTime: digestTime,
+    dailyReminders: dailyReminders,
+    dailyXpGoal: value,
   );
 
   @override
@@ -147,6 +174,7 @@ class GameSettings extends Equatable {
     longBreakEveryNCycles,
     digestTime,
     dailyReminders,
+    dailyXpGoal,
   ];
 }
 

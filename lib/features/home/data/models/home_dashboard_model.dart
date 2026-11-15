@@ -91,6 +91,8 @@ class HomeDashboardModel {
       missionsDone: _int(json['missions_done']),
       missionsTotal: _int(json['missions_total']),
       focusMinutes: _int(json['focus_minutes']),
+      dailyXp: _int((json['daily_goal'] as Map?)?['xp']),
+      dailyXpGoal: ((json['daily_goal'] as Map?)?['goal'] as num?)?.toInt(),
       chest: chest == null
           ? const DailyChest()
           : DailyChest(

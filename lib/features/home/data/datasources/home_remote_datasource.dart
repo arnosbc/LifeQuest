@@ -44,8 +44,21 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     // Null: aún no existe la fila de profiles de este usuario.
     if (json == null) throw const ServerException(code: 'profile_not_found');
     final chest = await _client.rpc<Map<String, dynamic>>('daily_chest_status');
-    return HomeDashboardModel.fromJson({...json, 'daily_chest': chest});
+    return HomeDashboardModel.fromJson({
+      ...json,
+      'daily_chest': chest,
+      'daily_goal': await _dailyGoal(),
+    });
   });
+
+  /// Meta diaria de XP (063). Sin la migración el Inicio sigue, sin el anillo.
+  Future<Map<String, dynamic>?> _dailyGoal() async {
+    try {
+      return await _client.rpc<Map<String, dynamic>?>('daily_goal');
+    } on PostgrestException {
+      return null;
+    }
+  }
 
   @override
   Future<void> completeHabit({required String habitId, required String day}) =>

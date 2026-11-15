@@ -154,6 +154,8 @@ class HomeDashboard extends Equatable {
     this.inboxCount = 0,
     this.topGoal,
     this.chest = const DailyChest(),
+    this.dailyXp = 0,
+    this.dailyXpGoal,
   });
 
   final String? displayName;
@@ -189,6 +191,11 @@ class HomeDashboard extends Equatable {
   final int focusMinutes;
   final DailyChest chest;
 
+  /// XP de hoy y la meta diaria (063); meta null = el servidor aún no la
+  /// tiene y la barra no muestra el anillo.
+  final int dailyXp;
+  final int? dailyXpGoal;
+
   @override
   List<Object?> get props => [
     displayName,
@@ -213,5 +220,7 @@ class HomeDashboard extends Equatable {
     missionsTotal,
     focusMinutes,
     chest,
+    dailyXp,
+    dailyXpGoal,
   ];
 }
