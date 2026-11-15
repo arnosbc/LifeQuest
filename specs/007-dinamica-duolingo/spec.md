@@ -55,6 +55,13 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **UC-33 Cobrar desafíos** (RF-125, RF-126): el usuario abre Desafíos y Liga desde el Inicio → ve el progreso → toca cada cofre dorado → recibe Monedas y suma puntos al Desafío del mes.
 - **UC-34 Revisar la Liga** (RF-127): el usuario abre la pestaña Liga → ve su división, su puesto, la zona de ascenso y descenso y cuántos días faltan; al empezar la semana siguiente ve si subió o bajó.
 - **UC-35 Retomar una racha** (RF-132): tras romperse una racha, la tarjeta de ánimo invita a cumplir el hábito hoy.
+- **UC-36 Consultar la racha diaria** (RF-136, RF-139): el usuario ve el 🔥 en la barra del Inicio → abre Perfil → ve «Racha de N días» y el calendario del mes con la intensidad de cada día → la primera recompensa del día muestra la pantalla de racha.
+- **UC-37 Desbloquear un logro** (RF-137, RF-142, RF-147): el usuario completa una actividad → el servidor revisa los logros → si cumple uno, paga sus Monedas y Nevi avisa por push → el usuario lo ve en la vitrina del Perfil y en Logros; en los hitos de 7, 30, 100 y 365 días la pantalla de racha celebra.
+- **UC-38 Proteger la racha con un Protector** (RF-140): el usuario compra un Protector en Recompensas → un día no registra actividad → esa noche el servidor gasta el Protector y la racha sigue → a la mañana siguiente Nevi lo cuenta en el resumen. Alterno: sin Protector guardado, la racha vuelve a 0 y el récord se conserva.
+- **UC-39 Elegir la meta diaria de XP** (RF-144): el usuario abre Configuración → Meta diaria → elige 30, 50 o 100 XP → el anillo del Inicio y el desafío «Gana N XP» usan la nueva meta → al cumplirla abre su cofre en Desafíos.
+- **UC-40 Recibir los avisos de Nevi** (RF-134, RF-135, RF-138, RF-141, RF-146): el servidor revisa cada 5 minutos y envía por push los recordatorios del día, el aviso de racha en riesgo (19:30 y 21:30, solo si hoy no hubo actividad), el resumen semanal (domingo 19:00) y los avisos de Liga (resultado el lunes, zona de ascenso desde el miércoles) → el usuario toca el aviso y entra a la app.
+- **UC-41 Terminar el día** (RF-143, RF-145): el usuario completa lo último pendiente → al volver al Inicio aparece el repaso del día (tareas, hábitos, XP, minutos de Foco y racha) → toca «Hasta mañana» → Nevi queda celebrando en el banner.
+- **UC-42 Primer ingreso** (RF-148): el usuario se registra → confirma su correo → inicia sesión → completa el Onboarding con Nevi → Nevi muestra la guía de 3 pasos (camino, barra de arriba, botón de ideas) → llega al Inicio. Alterno: toca fuera de la guía y la cierra.
 
 ## Archivos principales
 
@@ -67,10 +74,11 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - Muro de novedades de amigos y cualquier ranking contra personas reales (§10).
 - Suscripción de pago (el freemium sigue como idea futura, §1).
 
-## Criterios de aceptación (verificados en el teléfono el 2026-11-14)
+## Criterios de aceptación (verificados en el teléfono el 2026-11-14 y 2026-11-15)
 
 - Completar 3 tareas en Foco suma XP y Monedas, marca «3 tareas hechas hoy» en el camino y pone el cofre en «¡COBRAR!»; al cobrarlo da +15 Monedas y la mascota cambia a «celebrando».
 - «Gana 30 XP» y «Completa 2 tareas» se cumplen, sus cofres se cobran una sola vez y el Desafío del mes pasa de 0/30 a 2/30.
 - La Liga refleja la XP de la semana (de #11 a #8 con 45 XP).
+- 2026-11-15, prueba de campo: anillo 20/50 y «Gana 50 XP» con la meta elegida, Liga #9, vitrina 2/13, calendario de racha, «¡Día completo!» al terminar la última tarea, registro nuevo con confirmación de correo, Onboarding y guía de Nevi.
 - Nada se desborda con texto grande (1,3×) en pantallas de 360 dp (prueba automática).
 - Pruebas: 228 comprobaciones SQL y 346 pruebas Flutter en verde.
