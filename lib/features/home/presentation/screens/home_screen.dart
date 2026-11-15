@@ -67,6 +67,12 @@ class HomeScreen extends StatelessWidget {
         case final message?:
           showLifeQuestMessage(context, message);
         case null when dayComplete(success.dashboard):
+          // Si la meta diaria también se cumplió, el repaso llega con confeti.
+          if (success.dashboard.dailyXpGoal case final goal?
+              when success.dashboard.dailyXp >= goal) {
+            HapticFeedback.heavyImpact();
+            showConfetti(context, pieces: 120);
+          }
           showDayRecap(context, success.dashboard);
         case null:
           // Meta diaria cumplida (sin día completo): celebración corta.
