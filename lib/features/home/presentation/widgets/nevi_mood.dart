@@ -12,12 +12,15 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
   if (active && !pending) {
     return ('celebrando', '¡Camino de hoy completo! Descansa, te lo ganaste.');
   }
+  if (d.dailyXpGoal case final goal? when active && d.dailyXp >= goal) {
+    return ('meta_cumplida', '¡Meta de hoy cumplida! Lo que sigue es extra.');
+  }
   if (active) {
     return ('corriendo', '¡Vas muy bien! Sigamos con la siguiente.');
   }
   if (now.hour >= 19 && d.streakDays > 0) {
     final days = d.streakDays == 1 ? '1 día' : '${d.streakDays} días';
-    return ('pensando', 'Tu racha de $days te espera 🔥. Algo pequeño basta.');
+    return ('reloj', 'Tu racha de $days te espera 🔥. Algo pequeño basta.');
   }
   if (!pending) {
     return ('meditando', 'Hoy no hay pendientes. ¿Anotamos una tarea pequeña?');

@@ -134,7 +134,7 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             MascotPose(
-              pose: milestone != null ? 'celebrando' : 'corriendo',
+              pose: milestone != null ? 'medalla' : 'racha',
               size: 120,
             ),
             const SizedBox(width: QSpace.s),

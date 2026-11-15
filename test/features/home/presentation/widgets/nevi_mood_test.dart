@@ -27,13 +27,35 @@ void main() {
     focusMinutes: 0,
   );
 
+  test('con la meta diaria cumplida y aún pendientes, Nevi lo celebra', () {
+    final met = HomeDashboard(
+      level: 1,
+      currentXp: 0,
+      xpToNextLevel: 100,
+      coins: 0,
+      hpCurrent: 100,
+      hpMax: 100,
+      isWeakened: false,
+      habits: const [TodayHabit(id: 'h1', name: 'Leer', done: false)],
+      habitsDone: 0,
+      habitsTotal: 1,
+      streakDays: 1,
+      missionsDone: 2,
+      missionsTotal: 3,
+      focusMinutes: 30,
+      dailyXp: 55,
+      dailyXpGoal: 50,
+    );
+    expect(neviMood(met, morning).$1, 'meta_cumplida');
+  });
+
   test('con algo hecho y pendientes, Nevi corre', () {
     expect(neviMood(dashboard, morning).$1, 'corriendo');
   });
 
   test('de noche sin actividad, la racha espera (sin culpa)', () {
     final (pose, message) = neviMood(idle(), night);
-    expect(pose, 'pensando');
+    expect(pose, 'reloj');
     expect(message, 'Tu racha de 4 días te espera 🔥. Algo pequeño basta.');
   });
 

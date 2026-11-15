@@ -71,15 +71,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
       );
 
   List<Widget> _items(InventoryBoard b) => [
-    if (b.passes > 0)
+    if (b.passes > 0) ...[
+      const Center(child: MascotPose(pose: 'escudo', size: 96)),
       LifeQuestListRow(
         icon: Icons.verified_outlined,
         title: 'Protector de racha',
         subtitle:
             'Salva la racha de un hábito, o se usa solo si un día no hay actividad.',
         trailing: '×${b.passes}',
-      )
-    else
+      ),
+    ] else
       const LifeQuestListRow(
         icon: Icons.verified_outlined,
         title: 'No tienes protectores de racha',

@@ -53,7 +53,7 @@ class GoodHabitsView extends StatelessWidget {
           LifeQuestSurface(
             child: Row(
               children: [
-                const MascotPose(pose: 'durmiendo', size: 72),
+                const MascotPose(pose: 'planta', size: 72),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

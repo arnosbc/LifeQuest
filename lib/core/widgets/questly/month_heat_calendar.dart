@@ -15,7 +15,11 @@ class MonthHeatCalendar extends StatelessWidget {
     this.summary = 'con hábitos cumplidos',
     this.one = 'hábito',
     this.many = 'hábitos',
+    this.pose,
   });
+
+  /// Pose de Nevi junto al título (p. ej. «calendario» en el Perfil).
+  final String? pose;
 
   final DateTime month;
 
@@ -66,17 +70,30 @@ class MonthHeatCalendar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Semantics(
-            header: true,
-            child: Text(
-              '$title · ${_months[month.month - 1]}',
-              style: QText.title3(q.text).copyWith(fontSize: 17),
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '$active ${active == 1 ? 'día' : 'días'} $summary',
-            style: QText.body(q.text2).copyWith(fontSize: 13),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        '$title · ${_months[month.month - 1]}',
+                        style: QText.title3(q.text).copyWith(fontSize: 17),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$active ${active == 1 ? 'día' : 'días'} $summary',
+                      style: QText.body(q.text2).copyWith(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              if (pose case final p?)
+                ExcludeSemantics(child: MascotPose(pose: p, size: 72)),
+            ],
           ),
           const SizedBox(height: QSpace.m),
           ExcludeSemantics(

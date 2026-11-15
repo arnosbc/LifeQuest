@@ -83,7 +83,7 @@ class _HabitPlanSheetState extends State<_HabitPlanSheet> {
           Row(
             children: [
               MascotPose(
-                pose: plan == null ? 'pensando' : 'saludando',
+                pose: plan == null ? 'pensando' : 'planificando',
                 size: 72,
               ),
               const SizedBox(width: QSpace.s),

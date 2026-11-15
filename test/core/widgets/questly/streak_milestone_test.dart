@@ -41,7 +41,7 @@ void main() {
     expect(find.text('🏆 ¡Hito: 7 días de racha!'), findsOneWidget);
     expect(find.textContaining('Semana de fuego'), findsOneWidget);
     final pose = tester.widget<MascotPose>(find.byType(MascotPose));
-    expect(pose.pose, 'celebrando');
+    expect(pose.pose, 'medalla');
     await drain(tester);
   });
 

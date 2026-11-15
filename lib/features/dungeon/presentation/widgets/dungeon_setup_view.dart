@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/dungeon/domain/entities/dungeon_board.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/widgets/cycle_duration_card.dart';
@@ -58,6 +59,7 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const Center(child: MascotPose(pose: 'foco', size: 110)),
         CycleDurationCard(
           breaksNote:
               'Descansos: ${widget.board.shortBreakMinutes} min, y '

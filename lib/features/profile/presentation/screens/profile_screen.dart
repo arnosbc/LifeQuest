@@ -254,6 +254,7 @@ class ProfileScreen extends StatelessWidget {
                 summary: 'con actividad',
                 one: 'actividad',
                 many: 'actividades',
+                pose: 'calendario',
               ),
               const SizedBox(height: 28),
               LifeQuestSectionHeading(
