@@ -1,7 +1,7 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fpdart/fpdart.dart' show Left;
+import 'package:fpdart/fpdart.dart' show Left, Right;
 
 import 'package:proyecto_movil/features/guided_task/domain/entities/guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/entities/guided_step_evidence.dart';
@@ -151,16 +151,22 @@ class GuidedTaskBloc extends Bloc<GuidedTaskEvent, GuidedTaskState> {
     final current = state;
     if (current is! GuidedTaskSuccess || current.busy) return;
     emit(GuidedTaskSuccess(current.task, completing: true));
-    final made = await _generateSteps(current.task.id);
-    if (made case Left(value: final failure)) {
-      emit(GuidedTaskSuccess(current.task, message: failure.message));
-      return;
-    }
-    await _reload(
-      emit,
-      current.task,
-      'Nevi armó tus pasos. ¡Empieza por el primero!',
+    final made = await _generateSteps(
+      GenerateGuidedStepsParams(taskId: current.task.id, note: event.note),
     );
+    switch (made) {
+      case Left(value: final failure):
+        emit(GuidedTaskSuccess(current.task, message: failure.message));
+      case Right(value: final reply):
+        await _reload(
+          emit,
+          current.task,
+          reply ??
+              (event.note == null
+                  ? 'Nevi armó tus pasos. ¡Empieza por el primero!'
+                  : 'Nevi ajustó tus pasos.'),
+        );
+    }
   }
 
   Future<void> _reload(

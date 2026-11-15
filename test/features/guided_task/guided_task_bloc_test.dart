@@ -56,7 +56,9 @@ void main() {
   blocTest<GuidedTaskBloc, GuidedTaskState>(
     'Nevi arma los pasos: recarga la tarea ya guiada y lo avisa',
     setUp: () {
-      when(() => generate('t1')).thenAnswer((_) async => const Right(unit));
+      when(
+        () => generate(const GenerateGuidedStepsParams(taskId: 't1')),
+      ).thenAnswer((_) async => const Right(null));
       when(() => getTask('t1')).thenAnswer((_) async => Right(guided));
     },
     build: build,
@@ -72,16 +74,46 @@ void main() {
 
   blocTest<GuidedTaskBloc, GuidedTaskState>(
     'si la IA falla, la tarea queda igual y explica qué hacer',
-    setUp: () => when(() => generate('t1')).thenAnswer(
-      (_) async =>
-          const Left(ServerFailure('Nevi no pudo armar los pasos ahora.')),
-    ),
+    setUp: () =>
+        when(
+          () => generate(const GenerateGuidedStepsParams(taskId: 't1')),
+        ).thenAnswer(
+          (_) async =>
+              const Left(ServerFailure('Nevi no pudo armar los pasos ahora.')),
+        ),
     build: build,
     seed: () => GuidedTaskSuccess(plain),
     act: (bloc) => bloc.add(const GuidedStepsGenerated()),
     expect: () => [
       GuidedTaskSuccess(plain, completing: true),
       GuidedTaskSuccess(plain, message: 'Nevi no pudo armar los pasos ahora.'),
+    ],
+  );
+
+  blocTest<GuidedTaskBloc, GuidedTaskState>(
+    '«Hablar con Nevi»: manda la nota y muestra su respuesta',
+    setUp: () {
+      when(
+        () => generate(
+          const GenerateGuidedStepsParams(
+            taskId: 't1',
+            note: 'No tengo escritorio',
+          ),
+        ),
+      ).thenAnswer((_) async => const Right('Entiendo, usemos tu cama.'));
+      when(() => getTask('t1')).thenAnswer((_) async => Right(guided));
+    },
+    build: build,
+    seed: () => GuidedTaskSuccess(guided),
+    act: (bloc) =>
+        bloc.add(const GuidedStepsGenerated(note: 'No tengo escritorio')),
+    skip: 1,
+    expect: () => [
+      isA<GuidedTaskSuccess>().having(
+        (s) => s.message,
+        'respuesta de Nevi',
+        'Entiendo, usemos tu cama.',
+      ),
     ],
   );
 }

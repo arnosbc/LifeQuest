@@ -35,6 +35,20 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
   int _hints = 0;
   bool _pickingEvidence = false;
 
+  Future<void> _talkToNevi(BuildContext context) async {
+    final bloc = context.read<GuidedTaskBloc>();
+    final note = await askLifeQuestText(
+      context,
+      title: 'Hablar con Nevi',
+      label: 'Cuéntale qué pasa (p. ej. «no tengo escritorio»)',
+      confirmLabel: 'Enviar',
+      maxLength: 300,
+    );
+    if (note != null && note.trim().isNotEmpty) {
+      bloc.add(GuidedStepsGenerated(note: note.trim()));
+    }
+  }
+
   void _split(BuildContext context) =>
       _askSteps(context, context.read<GuidedTaskBloc>());
 
@@ -153,6 +167,18 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
             variant: QuestlyButtonVariant.tonal,
             onPressed: state.busy ? null : () => _split(context),
             disabledReason: 'Guardando…',
+          ),
+        ],
+        // Si un paso no aplica a su situación, la persona se lo cuenta a Nevi
+        // y la IA rehace los pendientes (067); los ya pagados se quedan.
+        if (task.steps.isNotEmpty && !task.completed) ...[
+          const SizedBox(height: QSpace.m),
+          QuestlyButton(
+            label: 'Hablar con Nevi',
+            icon: QIcons.spark,
+            variant: QuestlyButtonVariant.secondary,
+            onPressed: state.busy ? null : () => _talkToNevi(context),
+            disabledReason: 'Nevi está pensando…',
           ),
         ],
         if (task.steps.isNotEmpty) ...[

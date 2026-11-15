@@ -23,7 +23,9 @@ abstract class GuidedTaskRemoteDataSource {
   Future<void> setSteps(String taskId, List<String> steps);
 
   /// `npc-mission` con `task_id`: la IA arma la guía y la guarda.
-  Future<void> generateSteps(String taskId);
+  /// Con `note` («Hablar con Nevi») la IA rehace los pendientes; devuelve
+  /// su respuesta a la persona.
+  Future<String?> generateSteps(String taskId, {String? note});
 
   Future<GuidedStepReviewModel> reviewStep(
     String stepId,
@@ -81,12 +83,16 @@ class GuidedTaskRemoteDataSourceImpl implements GuidedTaskRemoteDataSource {
   );
 
   @override
-  Future<void> generateSteps(String taskId) async {
+  Future<String?> generateSteps(String taskId, {String? note}) async {
     try {
-      await _guard(
-        () =>
-            _client.functions.invoke('npc-mission', body: {'task_id': taskId}),
+      final response = await _guard(
+        () => _client.functions.invoke(
+          'npc-mission',
+          body: {'task_id': taskId, 'note': ?note},
+        ),
       );
+      final reply = (response.data as Map?)?['reply'];
+      return reply is String && reply.trim().isNotEmpty ? reply.trim() : null;
     } on ServerException catch (error) {
       // La función responde con error si Gemini falla: aviso propio.
       if (error.code == 'verification_unavailable') {

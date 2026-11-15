@@ -36,9 +36,15 @@ class GuidedStepsSet extends GuidedTaskEvent {
   List<Object?> get props => [steps];
 }
 
-/// Que Nevi (IA) arme los pasos de la tarea.
+/// Que Nevi (IA) arme los pasos; con [note] («Hablar con Nevi») rehace los
+/// pendientes según lo que cuenta la persona.
 class GuidedStepsGenerated extends GuidedTaskEvent {
-  const GuidedStepsGenerated();
+  const GuidedStepsGenerated({this.note});
+
+  final String? note;
+
+  @override
+  List<Object?> get props => [note];
 }
 
 class GuidedStepReviewRequested extends GuidedTaskEvent {

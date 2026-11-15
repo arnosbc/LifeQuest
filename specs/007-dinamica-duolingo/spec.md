@@ -53,6 +53,8 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-151** Los Mentores dejan de mostrarse en la app (Inicio, Más herramientas y Refugio); sus datos se conservan. La app se centra en hábitos y compromiso.
 - **RF-152** En cualquier tarea, «Que Nevi arme los pasos» genera con IA el objetivo, de 2 a 5 pasos verificables y pistas; cada paso puede respaldarse con evidencia (foto o archivo) que la IA revisa de forma orientativa.
 - **RF-153** En cada hábito, «Plan de Nevi» propone con IA la versión mínima de 2 minutos, el disparador, la recompensa y por qué importa (para un mal hábito: cómo evitar el disparador y con qué reemplazarlo). (`065`)
+- **RF-154** El resumen de una sesión de Foco suma toda la XP ganada, incluidos los pasos de las tareas guiadas. (`066`)
+- **RF-155** En una tarea guiada, «Hablar con Nevi» deja contarle a la IA qué pasa con los pasos; Nevi responde y rehace solo los pendientes adaptados a la situación, sin tocar los ya hechos ni cambiar la XP total. (`067`)
 
 ## Casos de uso (propuestos para el documento de UC)
 

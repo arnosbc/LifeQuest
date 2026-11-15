@@ -35,10 +35,10 @@ class GuidedTaskRepositoryImpl implements GuidedTaskRepository {
       });
 
   @override
-  Future<Either<Failure, Unit>> generateSteps(String taskId) => _run(() async {
-    await _remote.generateSteps(taskId);
-    return unit;
-  });
+  Future<Either<Failure, String?>> generateSteps(
+    String taskId, {
+    String? note,
+  }) => _run(() => _remote.generateSteps(taskId, note: note));
 
   @override
   Future<Either<Failure, GuidedStepReview>> reviewStep(

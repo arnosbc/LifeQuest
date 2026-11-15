@@ -7,6 +7,7 @@ import {
   cleanTitle,
   formatGuide,
   parsePlan,
+  parseReply,
   parseSuggestion,
 } from './index.ts';
 
@@ -86,4 +87,19 @@ Deno.test('buildTaskPrompt manda solo el título y qué significa completarla', 
     'Tarea: Estudiar para el parcial\nQué significa completarla: Repasar 3 temas',
   );
   assertEquals(buildTaskPrompt({ title: 'Leer', description: null }), 'Tarea: Leer');
+});
+
+Deno.test('buildTaskPrompt con lo que dijo la persona y los pasos hechos', () => {
+  const prompt = buildTaskPrompt({ title: 'Ordenar escritorio', description: null }, 'No tengo escritorio', [
+    'Retira lo que sobra',
+  ]);
+  assertEquals(prompt.includes('Pasos ya hechos:'), true);
+  assertEquals(prompt.includes('- Retira lo que sobra'), true);
+  assertEquals(prompt.endsWith('Lo que me dice la persona: No tengo escritorio'), true);
+});
+
+Deno.test('parseReply toma la respuesta de Nevi o null', () => {
+  assertEquals(parseReply('{"reply":"  Entiendo, usemos tu cama.  "}'), 'Entiendo, usemos tu cama.');
+  assertEquals(parseReply('{"steps":[]}'), null);
+  assertEquals(parseReply('nada'), null);
 });

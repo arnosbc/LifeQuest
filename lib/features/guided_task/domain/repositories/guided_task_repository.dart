@@ -17,8 +17,9 @@ abstract class GuidedTaskRepository {
   Future<Either<Failure, Unit>> setSteps(String taskId, List<String> steps);
 
   /// Nevi (IA) arma objetivo, pasos y pistas de la tarea y el servidor los
-  /// guarda (`npc-mission` en modo tarea + `attach_task_guide`).
-  Future<Either<Failure, Unit>> generateSteps(String taskId);
+  /// guarda (`npc-mission` en modo tarea + `adapt_task_guide`). Con [note]
+  /// («Hablar con Nevi») rehace solo los pendientes. Devuelve lo que responde.
+  Future<Either<Failure, String?>> generateSteps(String taskId, {String? note});
 
   /// Completa la tarea; el servidor paga lo que falte.
   Future<Either<Failure, Unit>> completeTask(String taskId);
