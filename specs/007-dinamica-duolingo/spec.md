@@ -45,6 +45,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-143** En el Inicio, Nevi cambia de pose y mensaje según el día: saluda, corre si ya hay avances, avisa del cofre listo, celebra el camino completo y, de noche sin actividad, recuerda que la racha espera (sin culpa).
 - **RF-144** El usuario elige su meta diaria de XP (30, 50 o 100) en Configuración; es la meta del desafío «Gana N XP» y la barra del Inicio muestra un anillo con la XP de hoy. (`063`)
 - **RF-145** Al completar lo último pendiente del día, la app muestra el repaso del día (tareas, hábitos, XP, minutos de Foco y racha) y Nevi se despide hasta mañana; no reaparece al solo abrir la app.
+- **RF-146** Nevi avisa al empezar la semana si el usuario subió, se mantuvo o bajó de división (con ánimo), y desde el miércoles, una vez por semana, cuando va entre los 3 primeros de la Liga. (`064`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
@@ -70,4 +71,4 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - «Gana 30 XP» y «Completa 2 tareas» se cumplen, sus cofres se cobran una sola vez y el Desafío del mes pasa de 0/30 a 2/30.
 - La Liga refleja la XP de la semana (de #11 a #8 con 45 XP).
 - Nada se desborda con texto grande (1,3×) en pantallas de 360 dp (prueba automática).
-- Pruebas: 224 comprobaciones SQL y 342 pruebas Flutter en verde.
+- Pruebas: 228 comprobaciones SQL y 342 pruebas Flutter en verde.

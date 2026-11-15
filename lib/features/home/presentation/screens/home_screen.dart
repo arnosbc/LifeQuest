@@ -271,6 +271,8 @@ class _NeviBanner extends StatelessWidget {
         boxShadow: qSolidShadow(q.cardShadow),
       ),
       child: Stack(
+        // Centra el mensaje en el alto mínimo del banner.
+        alignment: Alignment.centerLeft,
         children: [
           const Positioned(
             right: 0,
