@@ -197,6 +197,7 @@ import 'package:proyecto_movil/features/guided_task/domain/repositories/guided_t
 import 'package:proyecto_movil/features/guided_task/domain/usecases/complete_guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/get_guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/review_guided_step.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/generate_guided_steps.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/set_guided_steps.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/toggle_guided_step.dart';
 import 'package:proyecto_movil/features/guided_task/presentation/blocs/guided_task_bloc.dart';
@@ -297,9 +298,11 @@ Future<void> initDependencies() async {
       completeTask: sl(),
       reviewStep: sl(),
       setSteps: sl(),
+      generateSteps: sl(),
     ),
   );
   sl.registerLazySingleton(() => SetGuidedSteps(sl()));
+  sl.registerLazySingleton(() => GenerateGuidedSteps(sl()));
   sl.registerLazySingleton(() => GetGuidedTask(sl()));
   sl.registerLazySingleton(() => ToggleGuidedStep(sl()));
   sl.registerLazySingleton(() => ReviewGuidedStep(sl()));

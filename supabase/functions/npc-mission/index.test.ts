@@ -1,6 +1,6 @@
 // deno test supabase/functions/npc-mission
 import { assertEquals } from 'jsr:@std/assert@1';
-import { buildPrompt, cleanTitle, formatGuide, parseSuggestion } from './index.ts';
+import { buildPrompt, buildTaskPrompt, cleanTitle, formatGuide, parseSuggestion } from './index.ts';
 
 Deno.test('buildPrompt usa la noble misión como tema y lista las anteriores', () => {
   const npc = { name: 'Iris', noble_mission: 'Fundamentos de diseño gráfico', frequency: 'weekly', skills: { name: 'Diseño' } };
@@ -54,4 +54,12 @@ Deno.test('parseSuggestion tolera texto libre y campos vacíos', () => {
     { title: 'Estira', guide: null });
   assertEquals(parseSuggestion(undefined), { title: null, guide: null });
   assertEquals(formatGuide({ objective: 'x'.repeat(5000) })?.length, 4000);
+});
+
+Deno.test('buildTaskPrompt manda solo el título y qué significa completarla', () => {
+  assertEquals(
+    buildTaskPrompt({ title: 'Estudiar para el parcial', description: 'Repasar 3 temas' }),
+    'Tarea: Estudiar para el parcial\nQué significa completarla: Repasar 3 temas',
+  );
+  assertEquals(buildTaskPrompt({ title: 'Leer', description: null }), 'Tarea: Leer');
 });

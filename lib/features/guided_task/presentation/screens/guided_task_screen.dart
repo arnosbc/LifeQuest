@@ -99,6 +99,8 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
           ),
           if (task.steps.isEmpty) ...[
             const SizedBox(height: QSpace.s),
+            _NeviStepsButton(busy: state.busy),
+            const SizedBox(height: QSpace.s),
             QuestlyButton(
               label: 'Dividir en pasos',
               icon: QIcons.plus,
@@ -142,6 +144,8 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
                 : () => bloc.add(const GuidedTaskCompleted()),
             disabledReason: 'Completando…',
           ),
+          const SizedBox(height: QSpace.s),
+          _NeviStepsButton(busy: state.busy),
           const SizedBox(height: QSpace.s),
           QuestlyButton(
             label: 'Dividir en pasos',
@@ -737,5 +741,24 @@ class _Title extends StatelessWidget {
       header: true,
       child: Text(text, style: QText.title3(context.q.text)),
     ),
+  );
+}
+
+/// Nevi (IA) arma objetivo, pasos y pistas; tarda unos segundos.
+class _NeviStepsButton extends StatelessWidget {
+  const _NeviStepsButton({required this.busy});
+
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) => QuestlyButton(
+    label: 'Que Nevi arme los pasos',
+    icon: QIcons.spark,
+    variant: QuestlyButtonVariant.secondary,
+    onPressed: busy
+        ? null
+        : () =>
+              context.read<GuidedTaskBloc>().add(const GuidedStepsGenerated()),
+    disabledReason: 'Nevi está armando tus pasos…',
   );
 }

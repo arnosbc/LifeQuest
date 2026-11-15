@@ -22,6 +22,9 @@ abstract class GuidedTaskRemoteDataSource {
   /// `attach_task_guide` (039) solo con los pasos.
   Future<void> setSteps(String taskId, List<String> steps);
 
+  /// `npc-mission` con `task_id`: la IA arma la guía y la guarda.
+  Future<void> generateSteps(String taskId);
+
   Future<GuidedStepReviewModel> reviewStep(
     String stepId,
     List<GuidedStepEvidence> evidence,
@@ -76,6 +79,22 @@ class GuidedTaskRemoteDataSourceImpl implements GuidedTaskRemoteDataSource {
       },
     ),
   );
+
+  @override
+  Future<void> generateSteps(String taskId) async {
+    try {
+      await _guard(
+        () =>
+            _client.functions.invoke('npc-mission', body: {'task_id': taskId}),
+      );
+    } on ServerException catch (error) {
+      // La función responde con error si Gemini falla: aviso propio.
+      if (error.code == 'verification_unavailable') {
+        throw const ServerException(code: 'guide_unavailable');
+      }
+      rethrow;
+    }
+  }
 
   @override
   Future<GuidedStepReviewModel> reviewStep(

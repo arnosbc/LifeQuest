@@ -35,6 +35,12 @@ class GuidedTaskRepositoryImpl implements GuidedTaskRepository {
       });
 
   @override
+  Future<Either<Failure, Unit>> generateSteps(String taskId) => _run(() async {
+    await _remote.generateSteps(taskId);
+    return unit;
+  });
+
+  @override
   Future<Either<Failure, GuidedStepReview>> reviewStep(
     String stepId,
     List<GuidedStepEvidence> evidence,
@@ -84,6 +90,8 @@ class GuidedTaskRepositoryImpl implements GuidedTaskRepository {
     'step_not_found' =>
       'No encontramos ese paso. Vuelve atrás y ábrelo de nuevo.',
     'invalid_guide' => 'Escribe al menos un paso.',
+    'guide_unavailable' =>
+      'Nevi no pudo armar los pasos ahora. Inténtalo en un momento o divídela tú.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

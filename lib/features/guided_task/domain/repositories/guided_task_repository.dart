@@ -16,6 +16,10 @@ abstract class GuidedTaskRepository {
   /// Divide la tarea en pasos (1–8). Solo si ningún paso cobró todavía.
   Future<Either<Failure, Unit>> setSteps(String taskId, List<String> steps);
 
+  /// Nevi (IA) arma objetivo, pasos y pistas de la tarea y el servidor los
+  /// guarda (`npc-mission` en modo tarea + `attach_task_guide`).
+  Future<Either<Failure, Unit>> generateSteps(String taskId);
+
   /// Completa la tarea; el servidor paga lo que falte.
   Future<Either<Failure, Unit>> completeTask(String taskId);
 

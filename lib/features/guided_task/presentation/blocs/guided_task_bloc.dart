@@ -9,6 +9,7 @@ import 'package:proyecto_movil/features/guided_task/domain/entities/guided_step_
 import 'package:proyecto_movil/features/guided_task/domain/usecases/complete_guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/get_guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/review_guided_step.dart';
+import 'package:proyecto_movil/features/guided_task/domain/usecases/generate_guided_steps.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/set_guided_steps.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/toggle_guided_step.dart';
 
@@ -25,6 +26,7 @@ class GuidedTaskBloc extends Bloc<GuidedTaskEvent, GuidedTaskState> {
     required CompleteGuidedTask completeTask,
     required ReviewGuidedStep reviewStep,
     required SetGuidedSteps setSteps,
+    required GenerateGuidedSteps generateSteps,
   }) : _getTask = getTask, // ignore: prefer_initializing_formals
        // ignore: prefer_initializing_formals
        _toggleStep = toggleStep,
@@ -34,12 +36,15 @@ class GuidedTaskBloc extends Bloc<GuidedTaskEvent, GuidedTaskState> {
        _reviewStep = reviewStep,
        // ignore: prefer_initializing_formals
        _setSteps = setSteps,
+       // ignore: prefer_initializing_formals
+       _generateSteps = generateSteps,
        super(const GuidedTaskLoading()) {
     on<GuidedTaskRequested>(_onRequested, transformer: droppable());
     on<GuidedStepToggled>(_onStepToggled, transformer: droppable());
     on<GuidedTaskCompleted>(_onCompleted, transformer: droppable());
     on<GuidedStepReviewRequested>(_onReviewRequested, transformer: droppable());
     on<GuidedStepsSet>(_onStepsSet, transformer: droppable());
+    on<GuidedStepsGenerated>(_onStepsGenerated, transformer: droppable());
   }
 
   final GetGuidedTask _getTask;
@@ -47,6 +52,7 @@ class GuidedTaskBloc extends Bloc<GuidedTaskEvent, GuidedTaskState> {
   final CompleteGuidedTask _completeTask;
   final ReviewGuidedStep _reviewStep;
   final SetGuidedSteps _setSteps;
+  final GenerateGuidedSteps _generateSteps;
 
   Future<void> _onRequested(
     GuidedTaskRequested event,
@@ -136,6 +142,25 @@ class GuidedTaskBloc extends Bloc<GuidedTaskEvent, GuidedTaskState> {
       return;
     }
     await _reload(emit, current.task, 'Pasos guardados. ¡A por el primero!');
+  }
+
+  Future<void> _onStepsGenerated(
+    GuidedStepsGenerated event,
+    Emitter<GuidedTaskState> emit,
+  ) async {
+    final current = state;
+    if (current is! GuidedTaskSuccess || current.busy) return;
+    emit(GuidedTaskSuccess(current.task, completing: true));
+    final made = await _generateSteps(current.task.id);
+    if (made case Left(value: final failure)) {
+      emit(GuidedTaskSuccess(current.task, message: failure.message));
+      return;
+    }
+    await _reload(
+      emit,
+      current.task,
+      'Nevi armó tus pasos. ¡Empieza por el primero!',
+    );
   }
 
   Future<void> _reload(
