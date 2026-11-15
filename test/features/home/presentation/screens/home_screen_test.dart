@@ -105,6 +105,6 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.textContaining('Constancia está baja'), findsOneWidget);
-    expect(find.text('Mentores'), findsOneWidget);
+    expect(find.text('Mentores'), findsNothing);
   });
 }

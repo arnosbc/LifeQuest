@@ -44,7 +44,6 @@ class HomeScreen extends StatelessWidget {
     (Icons.inbox_outlined, 'Bandeja de ideas', RoutePaths.brainDump),
     (Icons.auto_awesome_outlined, 'Asistente', RoutePaths.rpgenie),
     (Icons.flag_outlined, 'Metas', RoutePaths.goals),
-    (Icons.groups_outlined, 'Mentores', RoutePaths.tavern),
     (Icons.history_rounded, 'Actividad', RoutePaths.journal),
     (Icons.redeem_outlined, 'Recompensas', RoutePaths.marketplace),
   ];
@@ -192,18 +191,6 @@ class HomeScreen extends StatelessWidget {
                 onFocus: (id) => context.go(RoutePaths.focusOn(id)),
                 onClaimChest: () => bloc.add(const HomeChestClaimed()),
               ),
-              if (d.mentorTask case final m?) ...[
-                const SizedBox(height: QSpace.m),
-                HomeLinkCard(
-                  icon: QIcons.users,
-                  kicker: 'Mentores',
-                  title: '${m.mentor} te dejó una tarea guiada',
-                  detail: '${m.title} · +${m.xpReward} XP',
-                  tint: context.q.riverTint,
-                  ink: context.q.riverInk,
-                  onTap: () => context.push(RoutePaths.task(m.id)),
-                ),
-              ],
               if (d.inboxCount > 0) ...[
                 const SizedBox(height: QSpace.m),
                 HomeLinkCard(

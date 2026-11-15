@@ -166,7 +166,8 @@ class MarketplaceScreen extends StatelessWidget {
         const SizedBox(height: 14),
         const LifeQuestSectionHeading('MEJORAS'),
         const SizedBox(height: 7),
-        for (final b in board.refuge)
+        // Mentores ocultos (decisión del usuario 2026-11-15): sin «Más mentores».
+        for (final b in board.refuge.where((b) => b.building != 'estandarte'))
           LifeQuestActionRow(
             icon: _improvements[b.building]?.$1 ?? Icons.home_outlined,
             title:

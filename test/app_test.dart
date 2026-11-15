@@ -210,15 +210,10 @@ void main() {
     expect(find.byType(QuestlyNavBar), findsOneWidget);
     expect(find.byTooltip('Avisos, 2 sin leer'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('Mentores'), 200);
+    // Mentores ocultos (2026-11-15): ni tarjeta ni botón en Más herramientas.
+    await tester.scrollUntilVisible(find.text('Más herramientas'), 200);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Mentores'));
-    await tester.pumpAndSettle();
-    expect(find.text('Vera · Salud'), findsOneWidget);
-
-    await tester.tap(find.byTooltip('Volver'));
-    await tester.pumpAndSettle();
-    expect(find.text('Más herramientas'), findsOneWidget);
+    expect(find.text('Mentores'), findsNothing);
 
     // La barra sigue el diseño: Inicio · Planificador · Hábitos · Foco · Perfil.
     for (final tab in ['Inicio', 'Planificador', 'Hábitos', 'Foco', 'Perfil']) {
