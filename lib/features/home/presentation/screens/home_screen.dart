@@ -11,6 +11,7 @@ import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/home_link_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/how_it_works_sheet.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/nevi_mood.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/next_step_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/progress_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/quick_action.dart';
@@ -114,7 +115,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _MotivationBanner(),
+              _NeviBanner(mood: neviMood(d, DateTime.now())),
               const SizedBox(height: QSpace.m),
               HomeLinkCard(
                 icon: QIcons.trophy,
@@ -237,15 +238,18 @@ class HomeScreen extends StatelessWidget {
       };
 }
 
-/// «Cada pequeño paso también es progreso.» con montañas a la derecha.
-class _MotivationBanner extends StatelessWidget {
-  const _MotivationBanner();
+/// Nevi según el día ([neviMood]) sobre las montañas, con su mensaje a la izquierda.
+class _NeviBanner extends StatelessWidget {
+  const _NeviBanner({required this.mood});
+
+  final (String, String) mood;
 
   @override
   Widget build(BuildContext context) {
     final q = context.q;
+    final (pose, message) = mood;
     return Container(
-      height: 96,
+      constraints: const BoxConstraints(minHeight: 96),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: q.tint,
@@ -265,12 +269,17 @@ class _MotivationBanner extends StatelessWidget {
               child: LifeQuestLandscape(alignment: Alignment(0, .6)),
             ),
           ),
+          Positioned(
+            right: 8,
+            bottom: 0,
+            child: ExcludeSemantics(child: MascotPose(pose: pose, size: 92)),
+          ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 150, 0),
+            padding: const EdgeInsets.fromLTRB(20, 16, 108, 16),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Cada pequeño paso también es progreso.',
+                message,
                 style: QText.label(q.text).copyWith(height: 1.4),
               ),
             ),
