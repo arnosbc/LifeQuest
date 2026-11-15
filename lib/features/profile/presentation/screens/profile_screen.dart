@@ -9,6 +9,7 @@ import 'package:proyecto_movil/features/profile/domain/entities/profile_look.dar
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/account_action_tile.dart';
+import 'package:proyecto_movil/features/profile/presentation/widgets/achievement_showcase.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/character_card.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/hero_status_card.dart';
 import 'package:proyecto_movil/features/profile/presentation/widgets/profile_look_sheet.dart';
@@ -239,6 +240,8 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               HeroStatusCard(profile: profile),
+              const SizedBox(height: 20),
+              AchievementShowcase(profile: profile, onOpen: onOpenInventory),
               const SizedBox(height: 20),
               // Racha diaria: cada día con actividad real se enciende (059).
               MonthHeatCalendar(

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/app/first_tour.dart';
 import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 import 'package:proyecto_movil/core/sound/sound_effects.dart';
 import 'package:proyecto_movil/core/widgets/mascot_background.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/questly/reward_moment.dart';
+import 'package:proyecto_movil/features/onboarding/presentation/blocs/onboarding_bloc.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 /// Barra de navegación inferior. Cada pestaña es una rama del router que
@@ -18,9 +21,22 @@ class AppShell extends StatelessWidget {
 
   final StatefulNavigationShell navigationShell;
 
+  // shortcut: en memoria; un segundo usuario nuevo en el mismo proceso no
+  // vería la guía. Reiniciarlo al cerrar sesión si hiciera falta.
+  static bool _tourShown = false;
+
   @override
   Widget build(BuildContext context) {
     final q = context.q;
+    // Recién terminó el Onboarding: Nevi muestra la guía una sola vez.
+    if (context.read<OnboardingBloc>().state case OnboardingNotNeeded(
+      justCompleted: true,
+    ) when !_tourShown) {
+      _tourShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) showFirstTour(context);
+      });
+    }
     // Iconos de las barras del sistema legibles sobre el fondo de cada tema.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: (q.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/features/profile/data/models/character_profile_model.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
@@ -104,6 +105,34 @@ void main() {
     expect(find.text('2 / 6'), findsOneWidget);
     expect(find.text('Añadir área'), findsOneWidget);
   });
+
+  testWidgets(
+    'vitrina de logros: insignias, conteo y abre Logros (360 dp, 1,3×)',
+    (tester) async {
+      final withAchievements = CharacterProfileModel.fromJson({
+        ...profileJson,
+        'achievements': [
+          {'name': 'Semana de fuego', 'unlocked_at': '2026-11-15T10:00:00Z'},
+          {'name': 'Maestro del foco', 'unlocked_at': '2026-11-14T10:00:00Z'},
+          {'name': 'Primer paso', 'unlocked_at': '2026-11-13T10:00:00Z'},
+          {'name': 'Leyenda', 'unlocked_at': null},
+        ],
+      }).toEntity();
+      await pump(
+        tester,
+        ProfileSuccess(withAchievements),
+        width: 360,
+        textScale: 1.3,
+      );
+
+      expect(find.text('Tus logros'), findsOneWidget);
+      expect(find.text('3/4'), findsOneWidget);
+      expect(find.text('Maestro del foco'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Tus logros'));
+      expect(otherOpened, 1);
+    },
+  );
 
   testWidgets('constancia baja explica la regla vigente', (tester) async {
     const weakened = CharacterProfile(

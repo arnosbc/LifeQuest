@@ -68,7 +68,7 @@ void main() {
   );
 
   blocTest<OnboardingBloc, OnboardingState>(
-    'terminar o saltar guarda y deja de estar pendiente',
+    'terminar o saltar guarda, deja de estar pendiente y pide la guía de Nevi',
     setUp: () =>
         when(() => complete(any())).thenAnswer((_) async => const Right(unit)),
     build: build,
@@ -76,7 +76,7 @@ void main() {
     act: (bloc) => bloc.add(const OnboardingSubmitted(choices)),
     expect: () => const [
       OnboardingPending(pendingStatus, saving: true),
-      OnboardingNotNeeded(),
+      OnboardingNotNeeded(justCompleted: true),
     ],
     verify: (_) => verify(() => complete(choices)).called(1),
   );
