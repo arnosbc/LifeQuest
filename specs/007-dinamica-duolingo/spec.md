@@ -49,6 +49,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-147** El Perfil muestra una vitrina con los 3 logros más recientes y el conteo (p. ej. 3/13); tocarla abre Logros.
 - **RF-148** Al terminar el Onboarding, Nevi muestra una guía de 3 pasos (el camino, la barra de arriba y el botón de ideas); se cierra tocando fuera y no vuelve a salir.
 - **RF-149** Al cumplir la meta diaria de XP la app lo celebra (confeti, vibración y aviso que invita a abrir su cofre) y el repaso del día la incluye; el widget «Mi día» muestra la XP de hoy contra la meta.
+- **RF-150** Si hay una sesión de Foco abierta y el usuario toca «Empezar» en otra tarea abierta, esa tarea se suma a la sesión (hasta 5) y queda elegida; con 5 tareas la app lo explica.
 
 ## Casos de uso (propuestos para el documento de UC)
 

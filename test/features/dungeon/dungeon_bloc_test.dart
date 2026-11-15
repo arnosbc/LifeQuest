@@ -43,6 +43,7 @@ void main() {
   late MockCompleteDungeonCycle completeCycle;
   late MockCompleteSessionTask completeTask;
   late MockEndDungeon end;
+  late MockAddSessionTask addTask;
   late DateTime now;
   const failure = ServerFailure('Sin conexión.');
 
@@ -62,6 +63,7 @@ void main() {
     completeCycle = MockCompleteDungeonCycle();
     completeTask = MockCompleteSessionTask();
     end = MockEndDungeon();
+    addTask = MockAddSessionTask();
     now = DateTime(2026, 10, 25, 9);
   });
 
@@ -71,6 +73,7 @@ void main() {
     completeCycle: completeCycle,
     completeTask: completeTask,
     end: end,
+    addTask: addTask,
     clock: () => now,
     ticker: () => const Stream.empty(),
   );
@@ -84,6 +87,53 @@ void main() {
     now: now,
     phaseEndsAt: now.add(const Duration(minutes: 25)),
     currentTaskId: 't1',
+  );
+
+  // «Empezar en Foco» con una sesión ya abierta: la tarea se suma y queda elegida.
+  blocTest<DungeonBloc, DungeonState>(
+    'con sesión abierta, la tarea tocada se suma a la sesión y queda elegida',
+    setUp: () {
+      const t3 = DungeonTask(id: 't3', title: 'Leer');
+      final withT3 = DungeonBoard(
+        candidates: const [t3],
+        session: DungeonSession(
+          id: 's1',
+          totalMinutes: 60,
+          cycleMinutes: 25,
+          tasks: const [_t1, _t2, t3],
+        ),
+      );
+      var calls = 0;
+      when(() => getBoard(any())).thenAnswer(
+        (_) async => Right(
+          calls++ == 0
+              ? DungeonBoard(candidates: const [t3], session: _board().session)
+              : withT3,
+        ),
+      );
+      when(() => addTask(any())).thenAnswer((_) async => const Right(unit));
+    },
+    build: build,
+    act: (bloc) => bloc.add(const DungeonRequested(taskId: 't3')),
+    skip: 1,
+    expect: () => [
+      isA<DungeonReady>()
+          .having((s) => s.currentTaskId, 'tarea elegida', 't3')
+          .having((s) => s.board.session!.tasks.length, 'tareas', 3),
+    ],
+    verify: (_) => verify(
+      () => addTask(
+        const CompleteDungeonCycleParams(sessionId: 's1', taskId: 't3'),
+      ),
+    ).called(1),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'una tarea ya cerrada (fuera de candidatas) no se suma a la sesión',
+    setUp: () => givenBoard(_board()),
+    build: build,
+    act: (bloc) => bloc.add(const DungeonRequested(taskId: 'vieja')),
+    verify: (_) => verifyNever(() => addTask(any())),
   );
 
   blocTest<DungeonBloc, DungeonState>(

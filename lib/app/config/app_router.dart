@@ -242,13 +242,20 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
               GoRoute(
                 path: RoutePaths.dungeon,
                 builder: (context, state) => BlocProvider(
-                  create: (_) =>
-                      sl<DungeonBloc>()..add(const DungeonRequested()),
+                  create: (_) => sl<DungeonBloc>()
+                    ..add(
+                      DungeonRequested(
+                        taskId: state.uri.queryParameters['task'],
+                      ),
+                    ),
                   child: _ReloadOnShow(
                     location: shellLocation,
                     path: RoutePaths.dungeon,
-                    onShown: (c) =>
-                        c.read<DungeonBloc>().add(const DungeonRequested()),
+                    onShown: (c) => c.read<DungeonBloc>().add(
+                      DungeonRequested(
+                        taskId: state.uri.queryParameters['task'],
+                      ),
+                    ),
                     // La Mazmorra siempre es oscura (CLAUDE.md §14), con el
                     // fondo de la mascota bajo un velo oscuro.
                     child: _AlwaysDark(

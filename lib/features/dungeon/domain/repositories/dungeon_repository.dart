@@ -23,6 +23,12 @@ abstract class DungeonRepository {
   /// Completa una misión de la mochila; devuelve lo que pagó el servidor.
   Future<Either<Failure, DungeonReward>> completeTask(String taskId);
 
+  /// Suma una tarea abierta a la sesión en curso (tope de 5, trigger de 006).
+  Future<Either<Failure, Unit>> addTask({
+    required String sessionId,
+    required String taskId,
+  });
+
   /// Cierra la sesión sin perder lo ganado.
   Future<Either<Failure, DungeonSummary>> end(String sessionId);
 }

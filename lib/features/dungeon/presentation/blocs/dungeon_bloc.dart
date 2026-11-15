@@ -7,6 +7,7 @@ import 'package:fpdart/fpdart.dart' show Left;
 
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/dungeon/domain/entities/dungeon_board.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/add_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_dungeon_cycle.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
@@ -25,6 +26,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     required this._completeCycle,
     required this._completeTask,
     required this._end,
+    required this._addTask,
     DateTime Function()? clock,
     Stream<void> Function()? ticker,
   }) : _clock = clock ?? DateTime.now,
@@ -48,6 +50,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
   final CompleteDungeonCycle _completeCycle;
   final CompleteSessionTask _completeTask;
   final EndDungeon _end;
+  final AddSessionTask _addTask;
   final DateTime Function() _clock;
   late final StreamSubscription<void> _ticks;
 
@@ -98,13 +101,36 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
   ) async {
     final current = state;
     if (current is! DungeonReady) emit(const DungeonLoading());
-    final result = await _getBoard(const NoParams());
+    var result = await _getBoard(const NoParams());
+    final wanted = event.taskId;
+    final session = result.toNullable()?.session;
+    String? message;
+    // Tarea abierta que aún no está en la sesión en curso: se suma.
+    if (wanted != null &&
+        session != null &&
+        !session.tasks.any((t) => t.id == wanted) &&
+        result.toNullable()!.candidates.any((t) => t.id == wanted)) {
+      final added = await _addTask(
+        CompleteDungeonCycleParams(sessionId: session.id, taskId: wanted),
+      );
+      message = added.fold((f) => f.message, (_) => null);
+      if (added.isRight()) result = await _getBoard(const NoParams());
+    }
     emit(
       result.match(
         (failure) => current is DungeonReady
             ? current.copyWith(message: failure.message)
             : DungeonFailure(failure.message),
-        (board) => _refreshed(board),
+        (board) => switch (_refreshed(board)) {
+          final DungeonReady ready
+              when wanted != null &&
+                  (board.session?.tasks.any((t) => t.id == wanted) ?? false) =>
+            ready.copyWith(currentTaskId: () => wanted, message: message),
+          final DungeonReady ready when message != null => ready.copyWith(
+            message: message,
+          ),
+          final other => other,
+        },
       ),
     );
   }

@@ -24,6 +24,8 @@ abstract class DungeonRemoteDataSource {
 
   Future<DungeonRewardModel> completeTask(String taskId);
 
+  Future<void> addTask({required String sessionId, required String taskId});
+
   Future<DungeonSummaryModel> end(String sessionId);
 }
 
@@ -75,6 +77,17 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
       ),
     ),
   );
+
+  // El RLS exige que la sesión sea del usuario; el trigger de 006 revisa el
+  // tope de tareas y que la tarea también lo sea.
+  @override
+  Future<void> addTask({required String sessionId, required String taskId}) =>
+      _guard(
+        () => _client.from('focus_session_tasks').upsert({
+          'session_id': sessionId,
+          'task_id': taskId,
+        }, ignoreDuplicates: true),
+      );
 
   @override
   Future<DungeonSummaryModel> end(String sessionId) => _guard(

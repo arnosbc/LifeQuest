@@ -35,9 +35,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('Nevi muestra 3 pasos y cabe en 360 dp con 1,3×', (
-    tester,
-  ) async {
+  testWidgets('Nevi muestra 3 pasos y cabe en 360 dp con 1,3×', (tester) async {
     await open(tester);
     expect(find.text('Hola, soy Nevi 👋 · Tu camino de hoy'), findsOneWidget);
     expect(find.text('1 de 3'), findsOneWidget);

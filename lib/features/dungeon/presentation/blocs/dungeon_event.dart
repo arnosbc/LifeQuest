@@ -7,9 +7,15 @@ sealed class DungeonEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Cargar o refrescar la Mazmorra.
+/// Cargar o refrescar la Mazmorra. Con [taskId] («Empezar en Foco» con una
+/// sesión ya abierta) esa tarea se suma a la sesión y queda elegida.
 class DungeonRequested extends DungeonEvent {
-  const DungeonRequested();
+  const DungeonRequested({this.taskId});
+
+  final String? taskId;
+
+  @override
+  List<Object?> get props => [taskId];
 }
 
 /// Entrar con la duración, el ciclo y la mochila elegidos.

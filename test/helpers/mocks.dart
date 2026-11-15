@@ -60,6 +60,7 @@ import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart'
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/data/datasources/dungeon_remote_datasource.dart';
 import 'package:proyecto_movil/features/dungeon/domain/repositories/dungeon_repository.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/add_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_dungeon_cycle.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
@@ -157,6 +158,8 @@ class MockCompleteDungeonCycle extends Mock implements CompleteDungeonCycle {}
 class MockCompleteSessionTask extends Mock implements CompleteSessionTask {}
 
 class MockEndDungeon extends Mock implements EndDungeon {}
+
+class MockAddSessionTask extends Mock implements AddSessionTask {}
 
 class MockDungeonBloc extends MockBloc<DungeonEvent, DungeonState>
     implements DungeonBloc {}
