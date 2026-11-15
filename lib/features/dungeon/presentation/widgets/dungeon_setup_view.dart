@@ -41,14 +41,23 @@ class _DungeonSetupViewState extends State<DungeonSetupView> {
   @override
   void didUpdateWidget(DungeonSetupView old) {
     super.didUpdateWidget(old);
-    if (old.initialTaskId != widget.initialTaskId) _pickInitial();
+    // También con cada tablero nuevo: una tarea recién creada llega a las
+    // candidatas después de abrir Foco con `?task=`.
+    _pickInitial();
   }
+
+  /// La tarea de `?task=` ya se marcó (o se intentó con espacio): no se
+  /// vuelve a marcar si el usuario la quita.
+  String? _pickedInitial;
 
   void _pickInitial() {
     final id = widget.initialTaskId;
-    if (id == null || _picked.contains(id)) return;
-    if (_picked.length >= widget.board.maxTasks) return;
-    if (widget.board.candidates.any((t) => t.id == id)) _picked.add(id);
+    if (id == null || id == _pickedInitial) return;
+    if (!widget.board.candidates.any((t) => t.id == id)) return;
+    _pickedInitial = id;
+    if (!_picked.contains(id) && _picked.length < widget.board.maxTasks) {
+      _picked.add(id);
+    }
   }
 
   @override
