@@ -41,6 +41,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-139** El Perfil muestra la racha diaria y un calendario del mes donde cada día se enciende según cuántas actividades reales hubo. (`059`)
 - **RF-140** Si un día no hay actividad y el usuario tiene un Protector de racha guardado, esa noche se gasta solo y la racha diaria sigue viva (el día protegido no suma). Nevi lo cuenta en el resumen de la mañana. (`060`)
 - **RF-141** Cada domingo a las 19:00 Nevi envía el resumen de la semana (XP, días con actividad, tareas, racha y mejora frente a la semana pasada); una semana sin actividad recibe ánimo, nunca culpa, y a quien lleva 2 semanas sin usar la app no se le escribe. (`061`)
+- **RF-142** Al llegar a 7, 30, 100 y 365 días de racha la pantalla de racha celebra el hito con Nevi, confeti y sonido; los hitos de 7, 30 y 100 días dan su logro con Monedas («Semana de fuego», «Llama eterna», «Leyenda»). (`062`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
@@ -66,4 +67,4 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - «Gana 30 XP» y «Completa 2 tareas» se cumplen, sus cofres se cobran una sola vez y el Desafío del mes pasa de 0/30 a 2/30.
 - La Liga refleja la XP de la semana (de #11 a #8 con 45 XP).
 - Nada se desborda con texto grande (1,3×) en pantallas de 360 dp (prueba automática).
-- Pruebas: 216 comprobaciones SQL y 330 pruebas Flutter en verde.
+- Pruebas: 219 comprobaciones SQL y 332 pruebas Flutter en verde.

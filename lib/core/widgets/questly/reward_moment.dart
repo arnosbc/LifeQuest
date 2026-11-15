@@ -48,6 +48,15 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
 
   static const _visible = Duration(milliseconds: 2800);
 
+  /// Hitos de racha: la pantalla cambia a celebración. Los de 7, 30 y 100
+  /// días coinciden con los logros de 057/062, que pagan las Monedas.
+  static const _milestones = {
+    7: '¡Una semana entera! Ganaste el logro «Semana de fuego».',
+    30: '¡Un mes sin soltarla! Ganaste el logro «Llama eterna».',
+    100: '¡Cien días! Ganaste el logro «Leyenda».',
+    365: '¡Un año completo! Esto ya es parte de quién eres.',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -105,16 +114,29 @@ class _RewardMomentListenerState extends State<RewardMomentListener> {
     streak ??= outcome.streak;
     if (!mounted || streak == null || streak <= 0) return;
     final q = context.q;
+    final milestone = _milestones[streak];
+    if (milestone != null) {
+      HapticFeedback.heavyImpact();
+      widget.sounds?.play(Sfx.nivel);
+      showConfetti(context, pieces: 160);
+    }
     showQuestlyDialog<void>(
       context,
-      title: streak == 1 ? '¡Empezaste una racha!' : '¡Racha de $streak días!',
-      message: 'Volver mañana la mantiene encendida. Paso a paso.',
+      title: milestone != null
+          ? '🏆 ¡Hito: $streak días de racha!'
+          : streak == 1
+          ? '¡Empezaste una racha!'
+          : '¡Racha de $streak días!',
+      message: milestone ?? 'Volver mañana la mantiene encendida. Paso a paso.',
       content: Padding(
         padding: const EdgeInsets.only(bottom: QSpace.s),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const MascotPose(pose: 'corriendo', size: 120),
+            MascotPose(
+              pose: milestone != null ? 'celebrando' : 'corriendo',
+              size: 120,
+            ),
             const SizedBox(width: QSpace.s),
             QIcon(QIcons.flame, color: q.coral, size: 40),
             const SizedBox(width: QSpace.xs),
