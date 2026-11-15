@@ -20,6 +20,9 @@ abstract final class HomeScreenWidget {
       // Misiones de hoy = las que abren el cofre del día.
       HomeWidget.saveWidgetData<int>('missions_done', d.chest.progress),
       HomeWidget.saveWidgetData<int>('missions_goal', d.chest.required),
+      // Meta diaria de XP (063); 0 = el servidor aún no la tiene.
+      HomeWidget.saveWidgetData<int>('xp_done', d.dailyXp),
+      HomeWidget.saveWidgetData<int>('xp_goal', d.dailyXpGoal ?? 0),
       HomeWidget.saveWidgetData<String>('next_task_id', next?.id),
       HomeWidget.saveWidgetData<String>('next_task_title', next?.title),
       // El widget decide el ánimo de la mascota con esto y la hora actual.
@@ -54,6 +57,8 @@ abstract final class HomeScreenWidget {
       HomeWidget.saveWidgetData<int>('hp', 0),
       HomeWidget.saveWidgetData<int>('level', 1),
       HomeWidget.saveWidgetData<int>('missions_done', 0),
+      HomeWidget.saveWidgetData<int>('xp_done', 0),
+      HomeWidget.saveWidgetData<int>('xp_goal', 0),
       HomeWidget.saveWidgetData<String>('next_task_id', null),
       HomeWidget.saveWidgetData<String>('next_task_title', null),
       HomeWidget.saveWidgetData<String>('saved_day', null),
