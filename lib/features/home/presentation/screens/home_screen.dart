@@ -8,6 +8,7 @@ import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
+import 'package:proyecto_movil/features/home/presentation/widgets/day_recap.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/habit_strip.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/home_link_card.dart';
 import 'package:proyecto_movil/features/home/presentation/widgets/how_it_works_sheet.dart';
@@ -50,9 +51,22 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocConsumer<HomeBloc, HomeState>(
-    listenWhen: (_, state) => state is HomeSuccess && state.message != null,
-    listener: (context, state) =>
-        showLifeQuestMessage(context, (state as HomeSuccess).message!),
+    listenWhen: (previous, state) =>
+        state is HomeSuccess &&
+        (state.message != null ||
+            // Repaso del día: solo al pasar de «con pendientes» a «todo hecho».
+            (previous is HomeSuccess &&
+                !dayComplete(previous.dashboard) &&
+                dayComplete(state.dashboard))),
+    listener: (context, state) {
+      final success = state as HomeSuccess;
+      switch (success.message) {
+        case final message?:
+          showLifeQuestMessage(context, message);
+        case null:
+          showDayRecap(context, success.dashboard);
+      }
+    },
     builder: (context, state) => switch (state) {
       HomeInitial() || HomeLoading() => Center(
         child: CircularProgressIndicator(color: context.q.ink),

@@ -3,12 +3,8 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
 /// Cómo se ve Nevi en el Inicio según el día: (pose, mensaje). Tono de
 /// invitación (§7): de noche la racha «te espera», nunca «la vas a perder».
 (String, String) neviMood(HomeDashboard d, DateTime now) {
-  // Algo hecho hoy: tarea, hábito o minutos de Foco (contadores de hoy de 038).
-  final active = d.missionsDone > 0 || d.habitsDone > 0 || d.focusMinutes > 0;
-  final pending =
-      d.priorityMission != null ||
-      d.todayTasks.isNotEmpty ||
-      d.habitsDone < d.habitsTotal;
+  final active = _active(d);
+  final pending = _pending(d);
 
   if (active && d.chest.ready) {
     return ('cofre', '¡Tu cofre del día está listo! Ábrelo en el camino.');
@@ -31,3 +27,15 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
   }
   return ('saludando', 'Cada pequeño paso también es progreso.');
 }
+
+/// Ya hubo actividad hoy y no queda nada pendiente: el día está completo.
+bool dayComplete(HomeDashboard d) => _active(d) && !_pending(d);
+
+// Algo hecho hoy: tarea, hábito o minutos de Foco (contadores de hoy de 038).
+bool _active(HomeDashboard d) =>
+    d.missionsDone > 0 || d.habitsDone > 0 || d.focusMinutes > 0;
+
+bool _pending(HomeDashboard d) =>
+    d.priorityMission != null ||
+    d.todayTasks.isNotEmpty ||
+    d.habitsDone < d.habitsTotal;

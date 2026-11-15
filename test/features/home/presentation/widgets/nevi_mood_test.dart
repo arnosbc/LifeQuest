@@ -86,4 +86,10 @@ void main() {
     );
     expect(neviMood(chest, night).$1, 'cofre');
   });
+
+  test('día completo: hubo actividad y no queda nada', () {
+    expect(dayComplete(dashboard), isFalse); // aún hay pendientes
+    expect(dayComplete(emptyDashboard), isFalse); // nada hecho
+    expect(dayComplete(idle()), isFalse);
+  });
 }
