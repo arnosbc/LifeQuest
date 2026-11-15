@@ -2,16 +2,33 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 
-/// Mapa de calor del mes (Habitos.dc.html): 4 intensidades según cuántos
-/// hábitos buenos se cumplieron cada día, con su leyenda. La semana empieza
-/// en lunes. El color nunca va solo: cada día dice su cifra a TalkBack.
-class HabitCalendar extends StatelessWidget {
-  const HabitCalendar({super.key, required this.month, required this.heat});
+/// Mapa de calor del mes (Habitos.dc.html): 4 intensidades según cuántas
+/// cosas se hicieron cada día, con su leyenda. La semana empieza en lunes.
+/// El color nunca va solo: cada día dice su cifra a TalkBack. Lo usan
+/// Hábitos (hábitos cumplidos) y Perfil (actividad de la racha diaria).
+class MonthHeatCalendar extends StatelessWidget {
+  const MonthHeatCalendar({
+    super.key,
+    required this.month,
+    required this.heat,
+    this.title = 'Mapa de calor',
+    this.summary = 'con hábitos cumplidos',
+    this.one = 'hábito',
+    this.many = 'hábitos',
+  });
 
   final DateTime month;
 
-  /// Día del mes → hábitos buenos cumplidos.
+  /// Día del mes → cuántas cosas se hicieron.
   final Map<int, int> heat;
+
+  /// «`title` · noviembre» y «N días `summary`».
+  final String title;
+  final String summary;
+
+  /// Unidad de cada día para TalkBack: «Día 3: 2 hábitos».
+  final String one;
+  final String many;
 
   static const _months = [
     'enero',
@@ -52,13 +69,13 @@ class HabitCalendar extends StatelessWidget {
           Semantics(
             header: true,
             child: Text(
-              'Mapa de calor · ${_months[month.month - 1]}',
+              '$title · ${_months[month.month - 1]}',
               style: QText.title3(q.text).copyWith(fontSize: 17),
             ),
           ),
           const SizedBox(height: 2),
           Text(
-            '$active ${active == 1 ? 'día' : 'días'} con hábitos cumplidos',
+            '$active ${active == 1 ? 'día' : 'días'} $summary',
             style: QText.body(q.text2).copyWith(fontSize: 13),
           ),
           const SizedBox(height: QSpace.m),
@@ -128,8 +145,8 @@ class HabitCalendar extends StatelessWidget {
     final strong = n >= 2;
     return Semantics(
       label: n == 0
-          ? 'Día $day: sin hábitos'
-          : 'Día $day: $n ${n == 1 ? 'hábito' : 'hábitos'}',
+          ? 'Día $day: sin $many'
+          : 'Día $day: $n ${n == 1 ? one : many}',
       excludeSemantics: true,
       child: Container(
         decoration: BoxDecoration(

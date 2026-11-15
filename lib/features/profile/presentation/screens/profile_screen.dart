@@ -239,6 +239,19 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               HeroStatusCard(profile: profile),
+              const SizedBox(height: 20),
+              // Racha diaria: cada día con actividad real se enciende (059).
+              MonthHeatCalendar(
+                month: DateTime.now(),
+                heat: profile.activityHeat,
+                title: profile.activityStreak > 0
+                    ? '🔥 Racha de ${profile.activityStreak} '
+                          '${profile.activityStreak == 1 ? 'día' : 'días'}'
+                    : 'Tu racha',
+                summary: 'con actividad',
+                one: 'actividad',
+                many: 'actividades',
+              ),
               const SizedBox(height: 28),
               LifeQuestSectionHeading(
                 'TUS ÁREAS',

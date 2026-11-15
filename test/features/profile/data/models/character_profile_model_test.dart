@@ -22,6 +22,18 @@ void main() {
     expect(entity.earnedTitles, isEmpty);
   });
 
+  test('lee la racha y los días del mes de activity_month (059)', () {
+    final entity = CharacterProfileModel.fromJson(const {
+      'activity': {
+        'streak': 3,
+        'days': {'13': 1, '14': 2, 'x': 9},
+      },
+    }).toEntity();
+
+    expect(entity.activityStreak, 3);
+    expect(entity.activityHeat, {13: 1, 14: 2});
+  });
+
   test('un título sin nombre se ignora', () {
     final entity = CharacterProfileModel.fromJson(const {
       'active_title': {'id': 't1', 'name': ' '},

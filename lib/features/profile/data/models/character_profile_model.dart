@@ -1,7 +1,8 @@
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 
 /// Respuesta JSON de la RPC `profile_overview`
-/// (supabase/migrations/002_profile.sql, ampliada en 009_profile_titles.sql).
+/// (supabase/migrations/002_profile.sql, ampliada en 009_profile_titles.sql),
+/// más `activity` con la respuesta de `activity_month` (059).
 class CharacterProfileModel {
   const CharacterProfileModel(this.json);
 
@@ -15,6 +16,8 @@ class CharacterProfileModel {
         .cast<Map<String, dynamic>>();
     final titles = (json['titles'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
+    final activity = json['activity'] as Map<String, dynamic>? ?? const {};
+    final days = activity['days'] as Map<String, dynamic>? ?? const {};
     return CharacterProfile(
       displayName: _text(json['display_name']),
       characterClass: _text(json['character_class']),
@@ -43,6 +46,10 @@ class CharacterProfileModel {
       ],
       activeTitle: _title(json['active_title'] as Map<String, dynamic>?),
       earnedTitles: [for (final title in titles) ?_title(title)],
+      activityStreak: _int(activity['streak']),
+      activityHeat: {
+        for (final e in days.entries) ?int.tryParse(e.key): _int(e.value),
+      },
     );
   }
 

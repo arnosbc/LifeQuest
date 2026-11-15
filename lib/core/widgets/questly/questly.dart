@@ -10,6 +10,7 @@ export 'package:proyecto_movil/core/widgets/questly/questly_dialog.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_hero.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_nav_bar.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_pressable.dart';
+export 'package:proyecto_movil/core/widgets/questly/month_heat_calendar.dart';
 export 'package:proyecto_movil/core/widgets/questly/quest_path.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_segmented.dart';
 export 'package:proyecto_movil/core/widgets/questly/questly_sheet.dart';

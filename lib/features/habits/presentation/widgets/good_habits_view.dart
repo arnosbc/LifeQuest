@@ -4,7 +4,6 @@ import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
-import 'package:proyecto_movil/features/habits/presentation/widgets/habit_calendar.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_path.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_row.dart';
 
@@ -109,7 +108,7 @@ class GoodHabitsView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        HabitCalendar(month: now, heat: board.monthHeat),
+        MonthHeatCalendar(month: now, heat: board.monthHeat),
       ],
     );
   }

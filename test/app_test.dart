@@ -344,7 +344,13 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('Configuración').hitTestable(),
       200,
-      scrollable: find.byType(Scrollable).last,
+      // La lista del Perfil (el calendario de racha también es un Scrollable).
+      scrollable: find
+          .ancestor(
+            of: find.text('Configuración'),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     await tester.tap(find.text('Configuración'));
     await tester.pumpAndSettle();
