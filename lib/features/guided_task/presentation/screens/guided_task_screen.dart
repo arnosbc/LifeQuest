@@ -537,8 +537,11 @@ class _ReviewCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: q.ink),
+              // Nevi con lupa revisa la evidencia (el texto dice el resultado).
+              const ExcludeSemantics(child: MascotPose(pose: 'lupa', size: 64)),
               const SizedBox(width: QSpace.s),
+              Icon(icon, color: q.ink),
+              const SizedBox(width: QSpace.xs),
               Expanded(child: Text(label, style: QText.title3(q.text))),
             ],
           ),
