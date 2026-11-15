@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/confetti.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
@@ -56,15 +58,24 @@ class HomeScreen extends StatelessWidget {
         (state.message != null ||
             // Repaso del día: solo al pasar de «con pendientes» a «todo hecho».
             (previous is HomeSuccess &&
-                !dayComplete(previous.dashboard) &&
-                dayComplete(state.dashboard))),
+                ((!dayComplete(previous.dashboard) &&
+                        dayComplete(state.dashboard)) ||
+                    goalJustMet(previous.dashboard, state.dashboard)))),
     listener: (context, state) {
       final success = state as HomeSuccess;
       switch (success.message) {
         case final message?:
           showLifeQuestMessage(context, message);
-        case null:
+        case null when dayComplete(success.dashboard):
           showDayRecap(context, success.dashboard);
+        case null:
+          // Meta diaria cumplida (sin día completo): celebración corta.
+          HapticFeedback.heavyImpact();
+          showConfetti(context);
+          showQuestlyToast(
+            context,
+            '¡Meta diaria cumplida! Abre su cofre en Desafíos 🎁',
+          );
       }
     },
     builder: (context, state) => switch (state) {

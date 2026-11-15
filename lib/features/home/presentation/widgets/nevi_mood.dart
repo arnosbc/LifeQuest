@@ -28,6 +28,12 @@ import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart
   return ('saludando', 'Cada pequeño paso también es progreso.');
 }
 
+/// La XP de hoy acaba de alcanzar la meta diaria (063) entre dos cargas.
+bool goalJustMet(HomeDashboard before, HomeDashboard now) {
+  final goal = now.dailyXpGoal;
+  return goal != null && before.dailyXp < goal && now.dailyXp >= goal;
+}
+
 /// Ya hubo actividad hoy y no queda nada pendiente: el día está completo.
 bool dayComplete(HomeDashboard d) => _active(d) && !_pending(d);
 

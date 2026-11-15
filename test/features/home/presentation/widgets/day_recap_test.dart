@@ -26,6 +26,7 @@ void main() {
     missionsTotal: 3,
     focusMinutes: 75,
     dailyXp: 95,
+    dailyXpGoal: 50,
   );
 
   testWidgets('el repaso resume el día y cabe en 360 dp con 1,3×', (
@@ -60,6 +61,7 @@ void main() {
     expect(find.text('3 tareas'), findsOneWidget);
     expect(find.text('1 de 1 hábitos'), findsOneWidget);
     expect(find.text('95 XP ganada'), findsOneWidget);
+    expect(find.text('Meta diaria cumplida: 50 XP'), findsOneWidget);
     expect(find.text('75 min de Foco'), findsOneWidget);
     expect(find.text('Racha de 1 día'), findsOneWidget);
     expect(tester.takeException(), isNull);

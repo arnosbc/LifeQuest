@@ -92,4 +92,29 @@ void main() {
     expect(dayComplete(emptyDashboard), isFalse); // nada hecho
     expect(dayComplete(idle()), isFalse);
   });
+
+  test('meta diaria: celebra solo al cruzarla, una vez', () {
+    HomeDashboard withXp(int xp, {int? goal = 50}) => HomeDashboard(
+      level: 1,
+      currentXp: 0,
+      xpToNextLevel: 100,
+      coins: 0,
+      hpCurrent: 100,
+      hpMax: 100,
+      isWeakened: false,
+      habits: const [],
+      habitsDone: 0,
+      habitsTotal: 0,
+      streakDays: 0,
+      missionsDone: 0,
+      missionsTotal: 0,
+      focusMinutes: 0,
+      dailyXp: xp,
+      dailyXpGoal: goal,
+    );
+    expect(goalJustMet(withXp(40), withXp(55)), isTrue);
+    expect(goalJustMet(withXp(55), withXp(70)), isFalse); // ya estaba cumplida
+    expect(goalJustMet(withXp(10), withXp(40)), isFalse); // aún no
+    expect(goalJustMet(withXp(40), withXp(55, goal: null)), isFalse); // sin 063
+  });
 }

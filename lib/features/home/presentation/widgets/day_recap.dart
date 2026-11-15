@@ -17,6 +17,8 @@ Future<void> showDayRecap(BuildContext context, HomeDashboard d) {
     if (d.habitsTotal > 0)
       (QIcons.leaf, '${d.habitsDone} de ${d.habitsTotal} hábitos'),
     if (d.dailyXp > 0) (QIcons.star, '${d.dailyXp} XP ganada'),
+    if (d.dailyXpGoal case final goal? when d.dailyXp >= goal)
+      (QIcons.trophy, 'Meta diaria cumplida: $goal XP'),
     if (d.focusMinutes > 0) (QIcons.focus, '${d.focusMinutes} min de Foco'),
     if (d.streakDays > 0)
       (
