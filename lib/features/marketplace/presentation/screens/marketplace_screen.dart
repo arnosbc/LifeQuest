@@ -154,7 +154,8 @@ class MarketplaceScreen extends StatelessWidget {
             protector,
             state,
             enabled: idle,
-            note: 'Disponibles: ${board.passes}',
+            note:
+                'Disponibles: ${board.passes} · se usa solo si un día no hay actividad',
             onBuy: () => buy(
               'Protector de racha',
               protector.cost,

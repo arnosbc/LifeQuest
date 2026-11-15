@@ -75,7 +75,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
       LifeQuestListRow(
         icon: Icons.verified_outlined,
         title: 'Protector de racha',
-        subtitle: 'Disponible para proteger una racha.',
+        subtitle:
+            'Salva la racha de un hábito, o se usa solo si un día no hay actividad.',
         trailing: '×${b.passes}',
       )
     else

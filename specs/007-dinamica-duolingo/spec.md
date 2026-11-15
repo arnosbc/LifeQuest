@@ -39,6 +39,7 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-137** El usuario desbloquea 12 logros (primera tarea, 10 y 50 tareas, primer hábito, rachas de 3, 7 y 30 días, 10 ciclos de Foco, 10 cofres, 10 desafíos, nivel 5 y ascenso de liga). El servidor los revisa tras cada actividad, paga su premio una sola vez y Nevi avisa; se ven en Perfil → Logros. La primera recompensa de cada día muestra la pantalla de racha con la racha diaria. (`057`)
 - **RF-138** Los recordatorios de la noche (19:30 y 21:30) defienden la racha diaria del Inicio y no aparecen si hoy ya hubo alguna actividad real. (`058`)
 - **RF-139** El Perfil muestra la racha diaria y un calendario del mes donde cada día se enciende según cuántas actividades reales hubo. (`059`)
+- **RF-140** Si un día no hay actividad y el usuario tiene un Protector de racha guardado, esa noche se gasta solo y la racha diaria sigue viva (el día protegido no suma). Nevi lo cuenta en el resumen de la mañana. (`060`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
@@ -64,4 +65,4 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - «Gana 30 XP» y «Completa 2 tareas» se cumplen, sus cofres se cobran una sola vez y el Desafío del mes pasa de 0/30 a 2/30.
 - La Liga refleja la XP de la semana (de #11 a #8 con 45 XP).
 - Nada se desborda con texto grande (1,3×) en pantallas de 360 dp (prueba automática).
-- Pruebas: 206 comprobaciones SQL y 330 pruebas Flutter en verde.
+- Pruebas: 212 comprobaciones SQL y 330 pruebas Flutter en verde.
