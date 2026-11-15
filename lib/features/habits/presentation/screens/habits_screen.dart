@@ -5,14 +5,20 @@ import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/habit_plan_usecases.dart';
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/bad_habits_view.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/create_habit_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/good_habits_view.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_plan_sheet.dart';
 
 /// Hábitos. Necesita un [HabitsBloc] por encima (lo provee el router).
 class HabitsScreen extends StatefulWidget {
-  const HabitsScreen({super.key});
+  const HabitsScreen({super.key, this.getPlan, this.generatePlan});
+
+  /// Plan de Nevi (065); sin ellos el menú no muestra la opción.
+  final GetHabitPlan? getPlan;
+  final GenerateHabitPlan? generatePlan;
 
   @override
   State<HabitsScreen> createState() => _HabitsScreenState();
@@ -74,6 +80,16 @@ class _HabitsScreenState extends State<HabitsScreen> {
       onRename: (name) => bloc.add(HabitRenamed(habit.id, name)),
       onDelete: () => bloc.add(HabitDeleted(habit.id)),
       deleteMessage: 'Se borra también su historial y su racha.',
+      extraLabel: 'Plan de Nevi',
+      onExtra: switch ((widget.getPlan, widget.generatePlan)) {
+        (final get?, final generate?) => () => showHabitPlanSheet(
+          context,
+          habit: habit,
+          getPlan: get,
+          generatePlan: generate,
+        ),
+        _ => null,
+      },
     );
     final today = [
       for (final h in state.board.good)

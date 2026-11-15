@@ -1,6 +1,30 @@
 // deno test supabase/functions/npc-mission
 import { assertEquals } from 'jsr:@std/assert@1';
-import { buildPrompt, buildTaskPrompt, cleanTitle, formatGuide, parseSuggestion } from './index.ts';
+import {
+  buildHabitPrompt,
+  buildPrompt,
+  buildTaskPrompt,
+  cleanTitle,
+  formatGuide,
+  parsePlan,
+  parseSuggestion,
+} from './index.ts';
+
+Deno.test('buildHabitPrompt dice si el hábito es bueno o malo', () => {
+  assertEquals(
+    buildHabitPrompt({ name: 'Fumar', type: 'bad', frequency: 'daily' }),
+    'Hábito: Fumar\nTipo: malo (quiere dejarlo)\nFrecuencia: daily',
+  );
+});
+
+Deno.test('parsePlan exige la versión mínima y limpia espacios', () => {
+  assertEquals(
+    parsePlan('{"tiny":" Leer una página ","cue":"Después de cenar","reward":"","why":"Calma"}'),
+    { tiny: 'Leer una página', cue: 'Después de cenar', why: 'Calma' },
+  );
+  assertEquals(parsePlan('{"cue":"sin tiny"}'), null);
+  assertEquals(parsePlan('no es json'), null);
+});
 
 Deno.test('buildPrompt usa la noble misión como tema y lista las anteriores', () => {
   const npc = { name: 'Iris', noble_mission: 'Fundamentos de diseño gráfico', frequency: 'weekly', skills: { name: 'Diseño' } };

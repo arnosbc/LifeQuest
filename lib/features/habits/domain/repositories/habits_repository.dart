@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit_plan.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
 
@@ -23,4 +24,10 @@ abstract class HabitsRepository {
   Future<Either<Failure, Unit>> renameHabit(String habitId, String name);
 
   Future<Either<Failure, Unit>> deleteHabit(String habitId);
+
+  /// Plan de Nevi guardado (065); null si aún no tiene.
+  Future<Either<Failure, HabitPlan?>> getPlan(String habitId);
+
+  /// Nevi (IA) arma el plan y el servidor lo guarda.
+  Future<Either<Failure, HabitPlan>> generatePlan(String habitId);
 }

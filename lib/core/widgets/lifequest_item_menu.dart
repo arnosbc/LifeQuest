@@ -14,6 +14,8 @@ class LifeQuestItemMenu extends StatelessWidget {
     this.enabled = true,
     this.maxLength = 200,
     this.deleteMessage,
+    this.extraLabel,
+    this.onExtra,
   });
 
   final String name;
@@ -24,6 +26,10 @@ class LifeQuestItemMenu extends StatelessWidget {
 
   /// Qué pasa al borrar, si no es obvio.
   final String? deleteMessage;
+
+  /// Opción adicional arriba del menú (p. ej. «Plan de Nevi» en Hábitos).
+  final String? extraLabel;
+  final VoidCallback? onExtra;
 
   Future<void> _onSelected(BuildContext context, bool delete) async {
     if (delete) {
@@ -49,14 +55,18 @@ class LifeQuestItemMenu extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => PopupMenuButton<bool>(
+  Widget build(BuildContext context) => PopupMenuButton<int>(
     enabled: enabled,
     tooltip: 'Opciones de «$name»',
     icon: Icon(Icons.more_vert, color: context.lq.muted, size: 20),
-    onSelected: (delete) => _onSelected(context, delete),
-    itemBuilder: (_) => const [
-      PopupMenuItem(value: false, child: Text('Renombrar')),
-      PopupMenuItem(value: true, child: Text('Borrar')),
+    // 0 renombrar · 1 borrar · 2 la opción adicional.
+    onSelected: (option) =>
+        option == 2 ? onExtra?.call() : _onSelected(context, option == 1),
+    itemBuilder: (_) => [
+      if (extraLabel case final label? when onExtra != null)
+        PopupMenuItem(value: 2, child: Text(label)),
+      const PopupMenuItem(value: 0, child: Text('Renombrar')),
+      const PopupMenuItem(value: 1, child: Text('Borrar')),
     ],
   );
 }

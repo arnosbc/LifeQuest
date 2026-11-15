@@ -231,7 +231,7 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.habits,
                     onShown: (c) =>
                         c.read<HabitsBloc>().add(const HabitsRequested()),
-                    child: const HabitsScreen(),
+                    child: HabitsScreen(getPlan: sl(), generatePlan: sl()),
                   ),
                 ),
               ),

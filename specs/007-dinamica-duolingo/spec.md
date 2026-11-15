@@ -50,6 +50,9 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - **RF-148** Al terminar el Onboarding, Nevi muestra una guía de 3 pasos (el camino, la barra de arriba y el botón de ideas); se cierra tocando fuera y no vuelve a salir.
 - **RF-149** Al cumplir la meta diaria de XP la app lo celebra (confeti, vibración y aviso que invita a abrir su cofre) y el repaso del día la incluye; el widget «Mi día» muestra la XP de hoy contra la meta.
 - **RF-150** Si hay una sesión de Foco abierta y el usuario toca «Empezar» en otra tarea abierta, esa tarea se suma a la sesión (hasta 5) y queda elegida; con 5 tareas la app lo explica.
+- **RF-151** Los Mentores dejan de mostrarse en la app (Inicio, Más herramientas y Refugio); sus datos se conservan. La app se centra en hábitos y compromiso.
+- **RF-152** En cualquier tarea, «Que Nevi arme los pasos» genera con IA el objetivo, de 2 a 5 pasos verificables y pistas; cada paso puede respaldarse con evidencia (foto o archivo) que la IA revisa de forma orientativa.
+- **RF-153** En cada hábito, «Plan de Nevi» propone con IA la versión mínima de 2 minutos, el disparador, la recompensa y por qué importa (para un mal hábito: cómo evitar el disparador y con qué reemplazarlo). (`065`)
 
 ## Casos de uso (propuestos para el documento de UC)
 
@@ -83,4 +86,4 @@ LifeQuest ya convertía tareas, hábitos y metas en un RPG, pero el progreso se 
 - La Liga refleja la XP de la semana (de #11 a #8 con 45 XP).
 - 2026-11-15, prueba de campo: anillo 20/50 y «Gana 50 XP» con la meta elegida, Liga #9, vitrina 2/13, calendario de racha, «¡Día completo!» al terminar la última tarea, registro nuevo con confirmación de correo, Onboarding y guía de Nevi.
 - Nada se desborda con texto grande (1,3×) en pantallas de 360 dp (prueba automática).
-- Pruebas: 228 comprobaciones SQL y 349 pruebas Flutter en verde.
+- Pruebas: 232 comprobaciones SQL y 354 pruebas Flutter en verde.

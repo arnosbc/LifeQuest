@@ -25,6 +25,12 @@ abstract class HabitsRemoteDataSource {
   Future<void> renameHabit(String habitId, String name);
 
   Future<void> deleteHabit(String habitId);
+
+  /// `habits.plan` (065) con el RLS del usuario; null si no tiene.
+  Future<Map<String, dynamic>?> getPlan(String habitId);
+
+  /// `npc-mission` con `habit_id`: la IA arma el plan y lo guarda.
+  Future<Map<String, dynamic>> generatePlan(String habitId);
 }
 
 class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
@@ -99,6 +105,33 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   Future<void> deleteHabit(String habitId) => _guard(
     () => _client.rpc<void>('delete_habit', params: {'p_habit_id': habitId}),
   );
+
+  @override
+  Future<Map<String, dynamic>?> getPlan(String habitId) => _guard(() async {
+    final row = await _client
+        .from('habits')
+        .select('plan')
+        .eq('id', habitId)
+        .maybeSingle();
+    return row?['plan'] as Map<String, dynamic>?;
+  });
+
+  @override
+  Future<Map<String, dynamic>> generatePlan(String habitId) => _guard(() async {
+    try {
+      final response = await _client.functions.invoke(
+        'npc-mission',
+        body: {'habit_id': habitId},
+      );
+      final plan = (response.data as Map?)?['plan'];
+      if (plan is! Map<String, dynamic>) {
+        throw const ServerException(code: 'plan_unavailable');
+      }
+      return plan;
+    } on FunctionException {
+      throw const ServerException(code: 'plan_unavailable');
+    }
+  });
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej.
   /// `already_completed`); se pasa como [ServerException.code].

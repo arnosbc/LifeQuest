@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/habits/data/datasources/habits_remote_datasource.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit_plan.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/repositories/habits_repository.dart';
@@ -56,6 +57,33 @@ class HabitsRepositoryImpl implements HabitsRepository {
       '${now.month.toString().padLeft(2, '0')}-'
       '${now.day.toString().padLeft(2, '0')}';
 
+  @override
+  Future<Either<Failure, HabitPlan?>> getPlan(String habitId) =>
+      _run(() async => _plan(await _remote.getPlan(habitId)));
+
+  @override
+  Future<Either<Failure, HabitPlan>> generatePlan(String habitId) => _run(
+    () async =>
+        _plan(await _remote.generatePlan(habitId)) ??
+        (throw const ServerException(code: 'plan_unavailable')),
+  );
+
+  static HabitPlan? _plan(Map<String, dynamic>? json) {
+    String? text(String key) => switch (json?[key]) {
+      final String s when s.trim().isNotEmpty => s.trim(),
+      _ => null,
+    };
+    final tiny = text('tiny');
+    return tiny == null
+        ? null
+        : HabitPlan(
+            tiny: tiny,
+            cue: text('cue'),
+            reward: text('reward'),
+            why: text('why'),
+          );
+  }
+
   Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
     try {
       return Right(await action());
@@ -75,6 +103,8 @@ class HabitsRepositoryImpl implements HabitsRepository {
     'already_completed' => 'Ese hábito ya quedó registrado hoy. ¡Bien hecho!',
     'not_scheduled' => 'Este hábito no toca hoy. Te espera su próximo día.',
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',
+    'plan_unavailable' || 'invalid_plan' =>
+      'Nevi no pudo armar tu plan ahora. Inténtalo en un momento.',
     'invalid_day' =>
       'La fecha de tu teléfono no coincide con la de hoy. Revísala y reintenta.',
     'invalid_name' => 'Dale a tu hábito un nombre de hasta 100 caracteres.',
