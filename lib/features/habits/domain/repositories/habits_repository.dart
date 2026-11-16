@@ -23,6 +23,9 @@ abstract class HabitsRepository {
 
   Future<Either<Failure, Unit>> renameHabit(String habitId, String name);
 
+  /// Pone o quita (null) la hora «HH:MM» del hábito.
+  Future<Either<Failure, Unit>> setHabitTime(String habitId, String? time);
+
   Future<Either<Failure, Unit>> deleteHabit(String habitId);
 
   /// Plan de Nevi guardado (065); null si aún no tiene.

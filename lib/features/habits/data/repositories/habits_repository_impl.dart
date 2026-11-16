@@ -47,6 +47,13 @@ class HabitsRepositoryImpl implements HabitsRepository {
       });
 
   @override
+  Future<Either<Failure, Unit>> setHabitTime(String habitId, String? time) =>
+      _run(() async {
+        await _remote.setHabitTime(habitId, time);
+        return unit;
+      });
+
+  @override
   Future<Either<Failure, Unit>> deleteHabit(String habitId) => _run(() async {
     await _remote.deleteHabit(habitId);
     return unit;

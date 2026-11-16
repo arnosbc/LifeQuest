@@ -178,6 +178,7 @@ import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_b
 import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_time.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/rename_npc.dart';
 import 'package:proyecto_movil/features/tavern/domain/usecases/suggest_npc_mission.dart';
@@ -397,9 +398,11 @@ Future<void> initDependencies() async {
       registerBadHabit: sl(),
       renameHabit: sl(),
       deleteHabit: sl(),
+      setHabitTime: sl(),
     ),
   );
   sl.registerLazySingleton(() => RenameHabit(sl()));
+  sl.registerLazySingleton(() => SetHabitTime(sl()));
   sl.registerLazySingleton(() => DeleteHabit(sl()));
   sl.registerLazySingleton(() => GetHabitsBoard(sl()));
   sl.registerLazySingleton(() => CreateHabit(sl()));

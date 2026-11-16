@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/complete_good_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_time.dart';
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 
 import '../../../helpers/mocks.dart';
@@ -16,6 +17,7 @@ void main() {
   late MockCreateHabit createHabit;
   late MockCompleteGoodHabit completeGood;
   late MockRegisterBadHabit registerBad;
+  late _SetTime setTime;
   final now = DateTime(2026, 10, 25, 9);
   const failure = ServerFailure('Algo salió mal.');
 
@@ -30,6 +32,7 @@ void main() {
     createHabit = MockCreateHabit();
     completeGood = MockCompleteGoodHabit();
     registerBad = MockRegisterBadHabit();
+    setTime = _SetTime();
   });
 
   HabitsBloc build() => HabitsBloc(
@@ -39,6 +42,7 @@ void main() {
     registerBadHabit: registerBad,
     renameHabit: MockRenameHabit(),
     deleteHabit: MockDeleteHabit(),
+    setHabitTime: setTime,
     clock: () => now,
   );
 
@@ -117,4 +121,43 @@ void main() {
       ),
     ],
   );
+
+  blocTest<HabitsBloc, HabitsState>(
+    'elegir la hora de un hábito la guarda, relee y lo explica (071)',
+    setUp: () {
+      when(
+        () => setTime(const HabitTimeParams('h1', '20:00')),
+      ).thenAnswer((_) async => const Right(unit));
+      givenBoard(const Right(habitsBoard));
+    },
+    build: build,
+    seed: () => const HabitsSuccess(emptyHabitsBoard),
+    act: (bloc) => bloc.add(const HabitTimeSet('h1', '20:00')),
+    expect: () => [
+      const HabitsSuccess(emptyHabitsBoard, busyHabitId: 'h1'),
+      const HabitsSuccess(
+        habitsBoard,
+        message: 'Listo: Nevi te avisará a esa hora si aún no lo haces.',
+      ),
+    ],
+  );
+
+  blocTest<HabitsBloc, HabitsState>(
+    'quitar la hora la borra y lo dice',
+    setUp: () {
+      when(
+        () => setTime(const HabitTimeParams('h1', null)),
+      ).thenAnswer((_) async => const Right(unit));
+      givenBoard(const Right(habitsBoard));
+    },
+    build: build,
+    seed: () => const HabitsSuccess(emptyHabitsBoard),
+    act: (bloc) => bloc.add(const HabitTimeSet('h1', null)),
+    skip: 1,
+    expect: () => [
+      const HabitsSuccess(habitsBoard, message: 'Quitaste la hora del hábito.'),
+    ],
+  );
 }
+
+class _SetTime extends Mock implements SetHabitTime {}

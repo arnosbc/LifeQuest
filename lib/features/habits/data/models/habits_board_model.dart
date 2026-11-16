@@ -34,6 +34,7 @@ class HabitsBoardModel {
           doneToday: h['done_today'] as bool? ?? false,
           todayCount: _int(h['today_count']),
           week: (h['week'] as List<dynamic>? ?? const []).cast<bool>(),
+          reminderTime: h['reminder_time'] as String?,
         ),
     ],
     weekXp: _int(json['week_xp']),

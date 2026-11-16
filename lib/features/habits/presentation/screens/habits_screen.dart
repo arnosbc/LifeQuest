@@ -11,6 +11,7 @@ import 'package:proyecto_movil/features/habits/presentation/widgets/bad_habits_v
 import 'package:proyecto_movil/features/habits/presentation/widgets/create_habit_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/good_habits_view.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_plan_sheet.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_time.dart';
 
 /// Hábitos. Necesita un [HabitsBloc] por encima (lo provee el router).
 class HabitsScreen extends StatefulWidget {
@@ -80,16 +81,33 @@ class _HabitsScreenState extends State<HabitsScreen> {
       onRename: (name) => bloc.add(HabitRenamed(habit.id, name)),
       onDelete: () => bloc.add(HabitDeleted(habit.id)),
       deleteMessage: 'Se borra también su historial y su racha.',
-      extraLabel: 'Plan de Nevi',
-      onExtra: switch ((widget.getPlan, widget.generatePlan)) {
-        (final get?, final generate?) => () => showHabitPlanSheet(
-          context,
-          habit: habit,
-          getPlan: get,
-          generatePlan: generate,
-        ),
-        _ => null,
-      },
+      extras: [
+        if ((widget.getPlan, widget.generatePlan) case (
+          final get?,
+          final generate?,
+        ))
+          (
+            'Plan de Nevi',
+            () => showHabitPlanSheet(
+              context,
+              habit: habit,
+              getPlan: get,
+              generatePlan: generate,
+            ),
+          ),
+        // 071: Nevi avisa a esa hora si aún no lo hiciste.
+        if (habit.type == HabitType.good) ...[
+          (
+            habit.reminderTime == null ? 'Elegir hora' : 'Cambiar la hora',
+            () async {
+              final time = await pickHabitTime(context, habit.reminderTime);
+              if (time != null) bloc.add(HabitTimeSet(habit.id, time));
+            },
+          ),
+          if (habit.reminderTime != null)
+            ('Quitar la hora', () => bloc.add(HabitTimeSet(habit.id, null))),
+        ],
+      ],
     );
     final today = [
       for (final h in state.board.good)

@@ -24,6 +24,9 @@ abstract class HabitsRemoteDataSource {
 
   Future<void> renameHabit(String habitId, String name);
 
+  /// Pone o quita (null) la hora «HH:MM» del hábito (071).
+  Future<void> setHabitTime(String habitId, String? time);
+
   Future<void> deleteHabit(String habitId);
 
   /// `habits.plan` (065) con el RLS del usuario; null si no tiene.
@@ -52,7 +55,7 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
 
   @override
   Future<void> createHabit(NewHabit habit) => _guard(() async {
-    await _client.rpc<void>(
+    final id = await _client.rpc<String>(
       'create_habit',
       params: {
         'p_name': habit.name,
@@ -64,6 +67,12 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
         'p_priority': habit.priority.name,
       },
     );
+    if (habit.reminderTime case final time?) {
+      await _client.rpc<void>(
+        'set_habit_time',
+        params: {'p_habit_id': id, 'p_time': time},
+      );
+    }
     _rewards?.announce(
       'Nuevo hábito: ${habit.name}',
       'Ya está en tu lista. Te recordaremos cuando esté pendiente.',
@@ -98,6 +107,14 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
     () => _client.rpc<void>(
       'rename_habit',
       params: {'p_habit_id': habitId, 'p_name': name},
+    ),
+  );
+
+  @override
+  Future<void> setHabitTime(String habitId, String? time) => _guard(
+    () => _client.rpc<void>(
+      'set_habit_time',
+      params: {'p_habit_id': habitId, 'p_time': time},
     ),
   );
 

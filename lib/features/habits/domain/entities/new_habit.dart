@@ -11,6 +11,7 @@ class NewHabit extends Equatable {
     this.specificDays = const [],
     this.hpPenalty = 0,
     this.skillId,
+    this.reminderTime,
   });
 
   final String name;
@@ -24,6 +25,9 @@ class NewHabit extends Equatable {
   final int hpPenalty;
   final String? skillId;
 
+  /// Hora opcional del hábito «HH:MM» (071).
+  final String? reminderTime;
+
   @override
   List<Object?> get props => [
     name,
@@ -32,5 +36,6 @@ class NewHabit extends Equatable {
     specificDays,
     hpPenalty,
     skillId,
+    reminderTime,
   ];
 }
