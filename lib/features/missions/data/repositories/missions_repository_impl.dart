@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/data/datasources/missions_remote_datasource.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/missions_board.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dart';
@@ -61,6 +62,15 @@ class MissionsRepositoryImpl implements MissionsRepository {
         await _remote.renameMission(missionId, title);
         return unit;
       });
+
+  @override
+  Future<Either<Failure, Unit>> setMissionRepeat(
+    String missionId,
+    MissionRepeat? repeat,
+  ) => _run(() async {
+    await _remote.setMissionRepeat(missionId, repeat?.name);
+    return unit;
+  });
 
   @override
   Future<Either<Failure, Unit>> deleteMission(String missionId) =>

@@ -5,7 +5,9 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
+import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/missions_board.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/set_mission_repeat.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 
 import '../../../../helpers/mocks.dart';
@@ -15,6 +17,7 @@ void main() {
   late MockGetMissionsBoard getBoard;
   late MockCreateMission createMission;
   late MockCompleteMission completeMission;
+  late _MockSetRepeat setRepeat;
   const failure = ServerFailure('Algo salió mal.');
 
   setUpAll(() {
@@ -26,6 +29,7 @@ void main() {
     getBoard = MockGetMissionsBoard();
     createMission = MockCreateMission();
     completeMission = MockCompleteMission();
+    setRepeat = _MockSetRepeat();
   });
 
   MissionsBloc build() => MissionsBloc(
@@ -34,6 +38,7 @@ void main() {
     completeMission: completeMission,
     renameMission: MockRenameMission(),
     deleteMission: MockDeleteMission(),
+    setMissionRepeat: setRepeat,
   );
 
   void givenBoard(Either<Failure, MissionsBoard> result) =>
@@ -108,4 +113,26 @@ void main() {
       const MissionsSuccess(emptyBoard, message: '¡Tarea completada!'),
     ],
   );
+
+  blocTest<MissionsBloc, MissionsState>(
+    '073: elegir la repetición la guarda y recarga con aviso',
+    setUp: () {
+      when(
+        () => setRepeat(const RepeatParams('t1', MissionRepeat.daily)),
+      ).thenAnswer((_) async => const Right(unit));
+      givenBoard(const Right(board));
+    },
+    build: build,
+    seed: () => const MissionsSuccess(board),
+    act: (bloc) => bloc.add(const MissionRepeatSet('t1', MissionRepeat.daily)),
+    expect: () => [
+      const MissionsSuccess(board, busyMissionId: 't1'),
+      const MissionsSuccess(
+        board,
+        message: 'Listo: al completarla, vuelve sola en su día.',
+      ),
+    ],
+  );
 }
+
+class _MockSetRepeat extends Mock implements SetMissionRepeat {}

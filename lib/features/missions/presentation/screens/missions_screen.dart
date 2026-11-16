@@ -11,6 +11,7 @@ import 'package:proyecto_movil/features/missions/presentation/blocs/missions_blo
 import 'package:proyecto_movil/features/missions/presentation/widgets/create_mission_sheet.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/mission_importance_card.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/mission_tile.dart';
+import 'package:proyecto_movil/features/missions/presentation/widgets/missions_format.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/prioritized_mission_card.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/rp_genie_tip_card.dart';
 
@@ -88,7 +89,27 @@ class MissionsScreen extends StatelessWidget {
           context.read<MissionsBloc>().add(MissionRenamed(mission.id, title)),
       onDelete: () =>
           context.read<MissionsBloc>().add(MissionDeleted(mission.id)),
-      deleteMessage: 'Se borran también sus pasos. No se puede deshacer.',
+      deleteMessage: mission.repeat == null
+          ? 'Se borran también sus pasos. No se puede deshacer.'
+          : 'Se borran sus pasos y deja de repetirse. No se puede deshacer.',
+      // 073: al completarla, la siguiente aparece sola en su día.
+      extras: [
+        for (final r in MissionRepeat.values)
+          if (r != mission.repeat)
+            (
+              'Repetir: ${MissionsFormat.repeat(r).toLowerCase()}',
+              () => context.read<MissionsBloc>().add(
+                MissionRepeatSet(mission.id, r),
+              ),
+            ),
+        if (mission.repeat != null)
+          (
+            'No repetir',
+            () => context.read<MissionsBloc>().add(
+              MissionRepeatSet(mission.id, null),
+            ),
+          ),
+      ],
     );
 
     return LifeQuestPage(

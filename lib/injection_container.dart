@@ -176,6 +176,7 @@ import 'package:proyecto_movil/features/inventory/domain/repositories/inventory_
 import 'package:proyecto_movil/features/inventory/domain/usecases/get_inventory.dart';
 import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/set_mission_repeat.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_time.dart';
@@ -347,9 +348,11 @@ Future<void> initDependencies() async {
       completeMission: sl(),
       renameMission: sl(),
       deleteMission: sl(),
+      setMissionRepeat: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetMissionsBoard(sl()));
+  sl.registerLazySingleton(() => SetMissionRepeat(sl()));
   sl.registerLazySingleton(() => RenameMission(sl()));
   sl.registerLazySingleton(() => DeleteMission(sl()));
   sl.registerLazySingleton(() => CreateMission(sl()));

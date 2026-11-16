@@ -6,6 +6,9 @@ enum MissionPriority { low, medium, high }
 /// Grupo del Daily Highlight (RF-089), en el orden en que se muestran.
 enum MissionBucket { urgent, high, medium, low, pending }
 
+/// Cada cuánto vuelve la tarea al completarla (073). El nombre es el del SQL.
+enum MissionRepeat { daily, weekdays, weekly, monthly }
+
 /// Misión abierta (tarea sin padre). La recompensa la fija el servidor.
 class Mission extends Equatable {
   const Mission({
@@ -22,6 +25,7 @@ class Mission extends Equatable {
     this.goalTitle,
     this.subtasksTotal = 0,
     this.subtasksDone = 0,
+    this.repeat,
   });
 
   final String id;
@@ -38,6 +42,9 @@ class Mission extends Equatable {
   final int subtasksTotal;
   final int subtasksDone;
 
+  /// null = no se repite.
+  final MissionRepeat? repeat;
+
   @override
   List<Object?> get props => [
     id,
@@ -53,5 +60,6 @@ class Mission extends Equatable {
     goalTitle,
     subtasksTotal,
     subtasksDone,
+    repeat,
   ];
 }

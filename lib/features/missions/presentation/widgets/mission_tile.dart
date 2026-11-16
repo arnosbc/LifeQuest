@@ -57,7 +57,11 @@ class MissionTile extends StatelessWidget {
                 ),
                 Text(
                   '${MissionsFormat.due(mission.dueDate, now)} · '
-                  '${MissionsFormat.origin(mission)}',
+                  '${MissionsFormat.origin(mission)}'
+                  '${switch (mission.repeat) {
+                    final r? => ' · ↻ ${MissionsFormat.repeat(r)}',
+                    null => '',
+                  }}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: context.lq.muted, fontSize: 9),

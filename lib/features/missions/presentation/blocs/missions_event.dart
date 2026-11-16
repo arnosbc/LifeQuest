@@ -43,6 +43,16 @@ class MissionRenamed extends MissionsEvent {
   List<Object?> get props => [missionId, title];
 }
 
+class MissionRepeatSet extends MissionsEvent {
+  const MissionRepeatSet(this.missionId, this.repeat);
+
+  final String missionId;
+  final MissionRepeat? repeat;
+
+  @override
+  List<Object?> get props => [missionId, repeat];
+}
+
 class MissionDeleted extends MissionsEvent {
   const MissionDeleted(this.missionId);
 

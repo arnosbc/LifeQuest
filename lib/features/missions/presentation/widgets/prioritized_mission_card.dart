@@ -79,6 +79,8 @@ class PrioritizedMissionCard extends StatelessWidget {
           'Fecha límite',
           MissionsFormat.due(mission.dueDate, now),
         ),
+        if (mission.repeat case final r?)
+          _detail(context, 'Se repite', '↻ ${MissionsFormat.repeat(r)}'),
         if (mission.subtasksTotal > 0)
           _detail(
             context,

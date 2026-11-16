@@ -13,6 +13,8 @@ import 'package:proyecto_movil/features/missions/domain/usecases/create_mission.
 import 'package:proyecto_movil/features/missions/domain/usecases/delete_mission.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/get_missions_board.dart';
 import 'package:proyecto_movil/features/missions/domain/usecases/rename_mission.dart';
+import 'package:proyecto_movil/features/missions/domain/usecases/set_mission_repeat.dart';
+import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 
 part 'missions_event.dart';
 part 'missions_state.dart';
@@ -24,6 +26,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
     required this._completeMission,
     required this._renameMission,
     required this._deleteMission,
+    this._setMissionRepeat,
   }) : super(const MissionsInitial()) {
     // droppable: toques repetidos mientras trabaja se ignoran.
     on<MissionsRequested>(_onRequested, transformer: droppable());
@@ -35,6 +38,17 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
         e.missionId,
         () => _renameMission(RenameParams(e.missionId, e.title)),
         'Tarea renombrada.',
+      ),
+      transformer: droppable(),
+    );
+    on<MissionRepeatSet>(
+      (e, emit) => _change(
+        emit,
+        e.missionId,
+        () => _setMissionRepeat!(RepeatParams(e.missionId, e.repeat)),
+        e.repeat == null
+            ? 'La tarea ya no se repite.'
+            : 'Listo: al completarla, vuelve sola en su día.',
       ),
       transformer: droppable(),
     );
@@ -54,6 +68,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
   final CompleteMission _completeMission;
   final RenameMission _renameMission;
   final DeleteMission _deleteMission;
+  final SetMissionRepeat? _setMissionRepeat;
 
   Future<void> _onRequested(
     MissionsRequested event,
@@ -125,11 +140,8 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
     emit(
       reloaded.match(
         (failure) => MissionsSuccess(previous, message: failure.message),
-        (board) => MissionsSuccess(
-          board,
-          message: message,
-          focusTaskId: focusTaskId,
-        ),
+        (board) =>
+            MissionsSuccess(board, message: message, focusTaskId: focusTaskId),
       ),
     );
   }

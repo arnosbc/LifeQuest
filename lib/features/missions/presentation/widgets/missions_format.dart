@@ -2,6 +2,14 @@ import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 
 /// Textos de fechas, urgencia y origen de las tareas, en español.
 abstract final class MissionsFormat {
+  /// Etiqueta de la repetición (073).
+  static String repeat(MissionRepeat repeat) => switch (repeat) {
+    MissionRepeat.daily => 'Cada día',
+    MissionRepeat.weekdays => 'Entre semana',
+    MissionRepeat.weekly => 'Cada semana',
+    MissionRepeat.monthly => 'Cada mes',
+  };
+
   static const _months = [
     'ene',
     'feb',

@@ -20,6 +20,9 @@ abstract class MissionsRemoteDataSource {
   Future<void> renameMission(String missionId, String title);
 
   Future<void> deleteMission(String missionId);
+
+  /// `set_task_repeat` (073); [rule] null deja de repetir.
+  Future<void> setMissionRepeat(String missionId, String? rule);
 }
 
 class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
@@ -81,6 +84,14 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
   @override
   Future<void> deleteMission(String missionId) => _guard(
     () => _client.rpc<void>('delete_task', params: {'p_task_id': missionId}),
+  );
+
+  @override
+  Future<void> setMissionRepeat(String missionId, String? rule) => _guard(
+    () => _client.rpc<void>(
+      'set_task_repeat',
+      params: {'p_task_id': missionId, 'p_rule': rule},
+    ),
   );
 
   Future<T> _guard<T>(Future<T> Function() action) async {
