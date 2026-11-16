@@ -5,10 +5,12 @@ import 'package:proyecto_movil/app/home_screen_widget.dart';
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 
 void main() {
+  const taskId = '7f1c2b0e-4a5d-4e2f-9b1a-3c4d5e6f7a8b';
+
   test('los enlaces del widget llevan a la pantalla correcta', () {
     expect(
-      HomeScreenWidget.routeFor(Uri.parse('lifequest://focus?task=t1')),
-      RoutePaths.focusOn('t1'),
+      HomeScreenWidget.routeFor(Uri.parse('lifequest://focus?task=$taskId')),
+      RoutePaths.focusOn(taskId),
     );
     expect(
       HomeScreenWidget.routeFor(Uri.parse('lifequest://focus')),
@@ -20,6 +22,25 @@ void main() {
     );
     expect(HomeScreenWidget.routeFor(Uri.parse('https://x.com')), isNull);
     expect(HomeScreenWidget.routeFor(null), isNull);
+  });
+
+  // H-05 (OWASP M4): cualquier app puede abrir lifequest://focus?task=…; solo
+  // un UUID llega como id de tarea, lo demás abre Foco sin tarea.
+  test('H-05: un id de tarea que no es UUID no llega a la ruta', () {
+    for (final evil in [
+      "1' OR '1'='1",
+      '../../admin',
+      'abc&task=otra',
+      '%00',
+      'x' * 5000,
+    ]) {
+      final uri = Uri(
+        scheme: 'lifequest',
+        host: 'focus',
+        queryParameters: {'task': evil},
+      );
+      expect(HomeScreenWidget.routeFor(uri), RoutePaths.dungeon, reason: evil);
+    }
   });
   HomeDashboard dash({
     int done = 0,

@@ -77,12 +77,17 @@ abstract final class HomeScreenWidget {
     return true;
   }
 
+  static final _uuid = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+  );
+
   /// Enlace del widget → ruta de la app; null si no es del widget.
   static String? routeFor(Uri? uri) {
     if (uri == null || uri.scheme != 'lifequest') return null;
     return switch (uri.host) {
+      // H-05 (M4): cualquier app puede abrir este enlace; solo un UUID pasa.
       'focus' => switch (uri.queryParameters['task']) {
-        final String id when id.isNotEmpty => RoutePaths.focusOn(id),
+        final String id when _uuid.hasMatch(id) => RoutePaths.focusOn(id),
         _ => RoutePaths.dungeon,
       },
       _ => RoutePaths.home,
