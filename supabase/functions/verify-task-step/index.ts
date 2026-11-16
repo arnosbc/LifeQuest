@@ -211,7 +211,7 @@ if (import.meta.main) {
             generationConfig: {
               temperature: 0.2,
               thinkingConfig: {
-                thinkingLevel: Deno.env.get('GEMINI_THINKING_LEVEL') || 'low',
+                thinkingLevel: Deno.env.get('GEMINI_THINKING_LEVEL')?.trim() || 'low',
               },
               responseMimeType: 'application/json',
               responseSchema: SCHEMA,

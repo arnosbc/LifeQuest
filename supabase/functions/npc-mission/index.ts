@@ -289,7 +289,7 @@ async function suggest(
         // primeros: se elige con el secret opcional GEMINI_THINKING_LEVEL.
         generationConfig: {
           temperature: 0.9,
-          thinkingConfig: { thinkingLevel: Deno.env.get('GEMINI_THINKING_LEVEL') || 'low' },
+          thinkingConfig: { thinkingLevel: Deno.env.get('GEMINI_THINKING_LEVEL')?.trim() || 'low' },
           responseMimeType: 'application/json',
           responseSchema: schema,
         },
