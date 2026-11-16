@@ -3,16 +3,20 @@ import 'dart:async';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fpdart/fpdart.dart' show Left;
+import 'package:fpdart/fpdart.dart' show Either, Left;
+
+import 'package:proyecto_movil/core/errors/failures.dart';
 
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/dungeon/domain/entities/dungeon_board.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/add_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_dungeon_cycle.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_habit.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/get_dungeon_board.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/start_dungeon.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/toggle_session_step.dart';
 
 part 'dungeon_event.dart';
 part 'dungeon_state.dart';
@@ -27,6 +31,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     required this._completeTask,
     required this._end,
     required this._addTask,
+    required this._toggleStep,
+    required this._completeHabit,
     DateTime Function()? clock,
     Stream<void> Function()? ticker,
   }) : _clock = clock ?? DateTime.now,
@@ -38,6 +44,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     on<DungeonBreakSkipped>(_onBreakSkipped);
     on<DungeonTaskSelected>(_onTaskSelected);
     on<DungeonTaskCompleted>(_onTaskCompleted, transformer: droppable());
+    on<DungeonStepDone>(_onStepDone, transformer: droppable());
+    on<DungeonHabitDone>(_onHabitDone, transformer: droppable());
     on<DungeonEnded>(_onEnded, transformer: droppable());
     on<DungeonSummaryDismissed>(_onSummaryDismissed);
     _ticks = (ticker ?? _everySecond)().listen(
@@ -51,6 +59,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
   final CompleteSessionTask _completeTask;
   final EndDungeon _end;
   final AddSessionTask _addTask;
+  final ToggleSessionStep _toggleStep;
+  final CompleteSessionHabit _completeHabit;
   final DateTime Function() _clock;
   late final StreamSubscription<void> _ticks;
 
@@ -88,11 +98,13 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     );
   }
 
-  /// Mantiene la misión elegida si sigue abierta; si no, la primera abierta.
+  /// Mantiene lo elegido (tarea o hábito) si sigue abierto; si no, lo
+  /// primero abierto.
   static String? _nextTask(DungeonSession session, String? current) {
-    final open = session.tasks.where((t) => !t.done);
+    final items = session.items;
+    final open = items.where((t) => !t.done);
     if (open.any((t) => t.id == current)) return current;
-    return open.isEmpty ? session.tasks.firstOrNull?.id : open.first.id;
+    return open.isEmpty ? items.firstOrNull?.id : open.first.id;
   }
 
   Future<void> _onRequested(
@@ -162,6 +174,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         totalMinutes: event.totalMinutes,
         cycleMinutes: event.cycleMinutes,
         taskIds: event.taskIds,
+        habitIds: event.habitIds,
       ),
     );
     if (started case Left(value: final failure)) {
@@ -223,7 +236,11 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     if (taskId == null) return;
     emit(current.copyWith(busy: true));
     final claimed = await _completeCycle(
-      CompleteDungeonCycleParams(sessionId: session.id, taskId: taskId),
+      CompleteDungeonCycleParams(
+        sessionId: session.id,
+        taskId: taskId,
+        isHabit: session.habits.any((h) => h.id == taskId),
+      ),
     );
     final now = _clock();
     if (claimed case Left(value: final failure)) {
@@ -333,6 +350,57 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
             ? latest.currentTaskId
             : _nextTask(board.session!, latest.currentTaskId),
         message: _taskMessage(reward, board.session),
+      ),
+    );
+  }
+
+  /// Paso hecho sin salir de Foco; si era el último, la tarea se completa.
+  Future<void> _onStepDone(
+    DungeonStepDone event,
+    Emitter<DungeonState> emit,
+  ) => _act(
+    emit,
+    () async => (await _toggleStep(event.stepId)).map(
+      (completed) => completed
+          ? '¡Tarea completada! Era el último paso.'
+          : '¡Paso hecho! Sigue con el siguiente.',
+    ),
+  );
+
+  Future<void> _onHabitDone(
+    DungeonHabitDone event,
+    Emitter<DungeonState> emit,
+  ) => _act(
+    emit,
+    () async => (await _completeHabit(
+      event.habitId,
+    )).map((_) => '¡Hábito cumplido hoy! Tu racha sigue viva.'),
+  );
+
+  /// Ejecuta una acción del servidor, relee la sesión y avisa con su mensaje.
+  Future<void> _act(
+    Emitter<DungeonState> emit,
+    Future<Either<Failure, String>> Function() action,
+  ) async {
+    final current = state;
+    if (current is! DungeonReady || current.busy) return;
+    emit(current.copyWith(busy: true));
+    final result = await action();
+    if (result case Left(value: final failure)) {
+      emit(_latest(current).copyWith(busy: false, message: failure.message));
+      return;
+    }
+    final reloaded = await _getBoard(const NoParams());
+    final latest = _latest(current);
+    final board = reloaded.getOrElse((_) => latest.board);
+    emit(
+      latest.copyWith(
+        board: board,
+        busy: false,
+        currentTaskId: () => board.session == null
+            ? latest.currentTaskId
+            : _nextTask(board.session!, latest.currentTaskId),
+        message: result.getOrElse((_) => ''),
       ),
     );
   }

@@ -31,6 +31,8 @@ import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session
 import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/get_dungeon_board.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/start_dungeon.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/toggle_session_step.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_habit.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/goals/data/datasources/goals_remote_datasource.dart';
 import 'package:proyecto_movil/features/goals/data/repositories/goals_repository_impl.dart';
@@ -367,9 +369,13 @@ Future<void> initDependencies() async {
       completeTask: sl(),
       end: sl(),
       addTask: sl(),
+      toggleStep: sl(),
+      completeHabit: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetDungeonBoard(sl()));
+  sl.registerLazySingleton(() => ToggleSessionStep(sl()));
+  sl.registerLazySingleton(() => CompleteSessionHabit(sl()));
   sl.registerLazySingleton(() => AddSessionTask(sl()));
   sl.registerLazySingleton(() => StartDungeon(sl()));
   sl.registerLazySingleton(() => CompleteDungeonCycle(sl()));

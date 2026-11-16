@@ -17,6 +17,7 @@ class StartDungeon implements UseCase<String, StartDungeonParams> {
         totalMinutes: params.totalMinutes,
         cycleMinutes: params.cycleMinutes,
         taskIds: params.taskIds,
+        habitIds: params.habitIds,
       );
 }
 
@@ -25,12 +26,14 @@ class StartDungeonParams extends Equatable {
     required this.totalMinutes,
     required this.cycleMinutes,
     required this.taskIds,
+    this.habitIds = const [],
   });
 
   final int totalMinutes;
   final int cycleMinutes;
   final List<String> taskIds;
+  final List<String> habitIds;
 
   @override
-  List<Object?> get props => [totalMinutes, cycleMinutes, taskIds];
+  List<Object?> get props => [totalMinutes, cycleMinutes, taskIds, habitIds];
 }

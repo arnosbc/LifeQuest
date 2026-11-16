@@ -76,11 +76,12 @@ class DungeonScreen extends StatelessWidget {
             board: state.board,
             initialTaskId: initialTaskId,
             busy: state.busy,
-            onStart: (total, cycle, tasks) => bloc.add(
+            onStart: (total, cycle, tasks, habits) => bloc.add(
               DungeonStarted(
                 totalMinutes: total,
                 cycleMinutes: cycle,
                 taskIds: tasks,
+                habitIds: habits,
               ),
             ),
           ),
@@ -120,12 +121,13 @@ class DungeonScreen extends StatelessWidget {
         DeepWorkSessionCard(
           session: session,
           currentTaskId: state.currentTaskId,
+          busy: state.busy,
           onSelect: (id) => bloc.add(DungeonTaskSelected(id)),
-          onComplete: state.busy
-              ? null
-              : (id) => bloc.add(DungeonTaskCompleted(id)),
-          // Los pasos se marcan aquí, con la sesión abierta; al volver se
-          // relee la sesión por si el último paso completó la tarea.
+          onComplete: (id) => bloc.add(DungeonTaskCompleted(id)),
+          onStepDone: (id) => bloc.add(DungeonStepDone(id)),
+          onHabitDone: (id) => bloc.add(DungeonHabitDone(id)),
+          // Revisar con fotos o dividir en pasos, con la sesión abierta; al
+          // volver se relee por si el último paso completó la tarea.
           onOpenSteps: (id) async {
             await context.push(RoutePaths.task(id));
             bloc.add(const DungeonRequested());

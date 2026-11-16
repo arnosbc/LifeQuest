@@ -24,14 +24,16 @@ class DungeonStarted extends DungeonEvent {
     required this.totalMinutes,
     required this.cycleMinutes,
     required this.taskIds,
+    this.habitIds = const [],
   });
 
   final int totalMinutes;
   final int cycleMinutes;
   final List<String> taskIds;
+  final List<String> habitIds;
 
   @override
-  List<Object?> get props => [totalMinutes, cycleMinutes, taskIds];
+  List<Object?> get props => [totalMinutes, cycleMinutes, taskIds, habitIds];
 }
 
 /// Pasó un segundo (lo envía el propio bloc).
@@ -64,6 +66,26 @@ class DungeonTaskCompleted extends DungeonEvent {
 
   @override
   List<Object?> get props => [taskId];
+}
+
+/// Marcar el paso actual de una tarea sin salir de Foco.
+class DungeonStepDone extends DungeonEvent {
+  const DungeonStepDone(this.stepId);
+
+  final String stepId;
+
+  @override
+  List<Object?> get props => [stepId];
+}
+
+/// Cumplir hoy un hábito de la sesión.
+class DungeonHabitDone extends DungeonEvent {
+  const DungeonHabitDone(this.habitId);
+
+  final String habitId;
+
+  @override
+  List<Object?> get props => [habitId];
 }
 
 /// Terminar la sesión antes o después de agotar los ciclos.

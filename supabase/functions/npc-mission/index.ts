@@ -49,6 +49,7 @@ const TASK_SYSTEM = [
   '- title: el mismo título de la tarea.',
   '- objective: 1 frase con qué logrará al terminar.',
   '- steps: de 2 a 5 pasos concretos; cada uno se puede comprobar (algo hecho, escrito o entregado).',
+  '- step_minutes: cuántos minutos toma cada paso, en el mismo orden que steps (enteros realistas, de 1 a 120).',
   '- hints: de 2 a 4 ayudas: cómo empezar, cómo no atascarse y un error común.',
   '- search: 1 o 2 términos de búsqueda si el tema requiere aprender algo (sin enlaces).',
   '- reply: 1 o 2 frases tuyas a la persona, en segunda persona y con ánimo.',
@@ -141,6 +142,7 @@ const SCHEMA = {
     hints: { type: 'ARRAY', items: { type: 'STRING' } },
     search: { type: 'ARRAY', items: { type: 'STRING' } },
     reply: { type: 'STRING' },
+    step_minutes: { type: 'ARRAY', items: { type: 'INTEGER' } },
   },
   // reply obligatorio: Flash-Lite omite los campos opcionales.
   required: ['title', 'objective', 'steps', 'hints', 'reply'],
@@ -207,6 +209,8 @@ export function parseGuide(text: unknown): {
   steps: string[];
   hints: string[];
   search: string[];
+  /// Minutos de cada paso (mismo orden); null donde no vino un número válido.
+  minutes: (number | null)[];
 } | null {
   if (typeof text !== 'string') return null;
   try {
@@ -215,11 +219,15 @@ export function parseGuide(text: unknown): {
     const steps = texts(raw.steps, 5);
     if (!steps.length) return null;
     const objective = typeof raw.objective === 'string' ? raw.objective.trim() : '';
+    const given = Array.isArray(raw.step_minutes) ? raw.step_minutes : [];
     return {
       objective: objective || null,
       steps,
       hints: texts(raw.hints, 4),
       search: texts(raw.search, 2),
+      minutes: steps.map((_, i) =>
+        Number.isInteger(given[i]) && given[i] > 0 ? Math.min(given[i], 120) : null
+      ),
     };
   } catch {
     return null;
@@ -388,6 +396,12 @@ if (import.meta.main) {
         p_guide: result.structured,
       });
       if (error) return json({ error: error.message }, 409);
+      // Minutos para que Foco proponga el tiempo (068); si falla, Foco usa un bloque.
+      const { error: minutesError } = await supabase.rpc('set_step_minutes', {
+        p_task_id: task_id,
+        p_minutes: result.structured.minutes,
+      });
+      if (minutesError) console.error('set_step_minutes', minutesError.message);
       return json({
         ok: true,
         steps: result.structured.steps.length,

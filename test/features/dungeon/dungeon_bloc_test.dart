@@ -44,6 +44,8 @@ void main() {
   late MockCompleteSessionTask completeTask;
   late MockEndDungeon end;
   late MockAddSessionTask addTask;
+  late MockToggleSessionStep toggleStep;
+  late MockCompleteSessionHabit completeHabit;
   late DateTime now;
   const failure = ServerFailure('Sin conexión.');
 
@@ -64,6 +66,8 @@ void main() {
     completeTask = MockCompleteSessionTask();
     end = MockEndDungeon();
     addTask = MockAddSessionTask();
+    toggleStep = MockToggleSessionStep();
+    completeHabit = MockCompleteSessionHabit();
     now = DateTime(2026, 10, 25, 9);
   });
 
@@ -74,6 +78,8 @@ void main() {
     completeTask: completeTask,
     end: end,
     addTask: addTask,
+    toggleStep: toggleStep,
+    completeHabit: completeHabit,
     clock: () => now,
     ticker: () => const Stream.empty(),
   );
@@ -381,5 +387,99 @@ void main() {
         summary: const DungeonSummary(cycles: 1, xp: 10, coins: 3, minutes: 26),
       ),
     ],
+  );
+
+  // ---- Foco unificado (068) ----
+  const habit = DungeonTask(id: 'h1', title: 'Leer', isHabit: true);
+  DungeonBoard withHabit({bool done = false}) => DungeonBoard(
+    session: DungeonSession(
+      id: 's1',
+      totalMinutes: 60,
+      cycleMinutes: 25,
+      tasks: const [_t1],
+      habits: [DungeonTask(id: 'h1', title: 'Leer', isHabit: true, done: done)],
+    ),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'paso hecho en Foco: lo marca, relee y avisa',
+    setUp: () {
+      when(() => toggleStep('p1')).thenAnswer((_) async => const Right(false));
+      givenBoard(_board());
+    },
+    build: build,
+    seed: () => focus(_board()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p1')),
+    expect: () => [
+      focus(_board()).copyWith(busy: true),
+      focus(_board()).copyWith(message: '¡Paso hecho! Sigue con el siguiente.'),
+    ],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'el último paso completa la tarea y lo dice',
+    setUp: () {
+      when(() => toggleStep('p9')).thenAnswer((_) async => const Right(true));
+      givenBoard(_board());
+    },
+    build: build,
+    seed: () => focus(_board()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p9')),
+    skip: 1,
+    expect: () => [
+      focus(_board()).copyWith(message: '¡Tarea completada! Era el último paso.'),
+    ],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'si el servidor no deja marcar el paso, avisa sin perder la sesión',
+    setUp: () =>
+        when(() => toggleStep('p1')).thenAnswer((_) async => const Left(failure)),
+    build: build,
+    seed: () => focus(_board()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p1')),
+    skip: 1,
+    expect: () => [focus(_board()).copyWith(message: 'Sin conexión.')],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'hábito hecho en Foco: lo cumple y pasa a lo siguiente abierto',
+    setUp: () {
+      when(() => completeHabit('h1')).thenAnswer((_) async => const Right(unit));
+      givenBoard(withHabit(done: true));
+    },
+    build: build,
+    seed: () => focus(withHabit()).copyWith(currentTaskId: () => 'h1'),
+    act: (bloc) => bloc.add(const DungeonHabitDone('h1')),
+    skip: 1,
+    expect: () => [
+      focus(withHabit(done: true)).copyWith(
+        currentTaskId: () => 't1',
+        message: '¡Hábito cumplido hoy! Tu racha sigue viva.',
+      ),
+    ],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'el bloque de un hábito se cobra como hábito',
+    setUp: () {
+      when(() => completeCycle(any())).thenAnswer((_) async => const Right(unit));
+      givenBoard(withHabit());
+    },
+    build: build,
+    seed: () => focus(withHabit()).copyWith(currentTaskId: () => habit.id),
+    act: (bloc) {
+      now = now.add(const Duration(minutes: 25));
+      bloc.add(const DungeonTicked());
+    },
+    verify: (_) => verify(
+      () => completeCycle(
+        const CompleteDungeonCycleParams(
+          sessionId: 's1',
+          taskId: 'h1',
+          isHabit: true,
+        ),
+      ),
+    ).called(1),
   );
 }

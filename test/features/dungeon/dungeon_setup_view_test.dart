@@ -17,7 +17,7 @@ void main() {
           board: board,
           busy: false,
           initialTaskId: 'nueva',
-          onStart: (_, _, _) {},
+          onStart: (_, _, _, _) {},
         ),
       ),
     ),
@@ -49,4 +49,38 @@ void main() {
       expect(find.text('1 / 5'), findsOneWidget);
     },
   );
+
+  test('el tiempo sugerido suma lo estimado y redondea a 30 min', () {
+    const estimated = DungeonTask(id: 'a', title: 'A', minutes: 50);
+    const plain = DungeonTask(id: 'b', title: 'B');
+    const habit = DungeonTask(id: 'h', title: 'Leer', isHabit: true);
+    // 50 + un bloque de 25 + 25 = 100 → 2 h.
+    expect(DungeonSetupView.suggestedMinutes([estimated, plain, habit], 25), 120);
+    // Nada estimado: al menos un ciclo, redondeado a 30.
+    expect(DungeonSetupView.suggestedMinutes(const [], 45), 60);
+    // Tope del servidor: 8 h.
+    expect(
+      DungeonSetupView.suggestedMinutes(
+        const [DungeonTask(id: 'x', title: 'X', minutes: 900)],
+        25,
+      ),
+      480,
+    );
+  });
+
+  testWidgets('muestra los hábitos de hoy con su propia sección', (tester) async {
+    await tester.pumpWidget(
+      view(
+        const DungeonBoard(
+          candidates: [
+            DungeonTask(id: 't', title: 'Ordenar', minutes: 25, stepCount: 4),
+          ],
+          habitCandidates: [DungeonTask(id: 'h', title: 'Leer', isHabit: true)],
+        ),
+      ),
+    );
+    expect(find.text('HÁBITOS DE HOY'), findsOneWidget);
+    expect(find.text('Leer'), findsOneWidget);
+    expect(find.text('4 pasos · ~25 min'), findsOneWidget);
+  });
 }

@@ -108,6 +108,43 @@ void main() {
     );
   });
 
+  test('DungeonBoardModel lee minutos, el paso actual y los hábitos (068)', () {
+    final board = DungeonBoardModel.fromJson({
+      'session': {
+        'id': 's1',
+        'total_minutes': 60,
+        'cycle_minutes': 25,
+        'tasks': [
+          {
+            'id': 't1',
+            'title': 'Ordenar',
+            'minutes': 20,
+            'step_count': 4,
+            'step': {'id': 'p2', 'title': 'Separa', 'position': 2, 'minutes': 5},
+          },
+        ],
+        'habits': [
+          {'id': 'h1', 'title': 'Leer', 'done': true, 'cycles': 1},
+        ],
+      },
+      'habit_candidates': [
+        {'id': 'h2', 'title': 'Meditar'},
+      ],
+    }).toEntity();
+    final task = board.session!.tasks.single;
+    expect(task.minutes, 20);
+    expect(
+      task.step,
+      const DungeonStep(id: 'p2', title: 'Separa', position: 2, minutes: 5),
+    );
+    expect(
+      board.session!.habits.single,
+      const DungeonTask(id: 'h1', title: 'Leer', done: true, cycles: 1, isHabit: true),
+    );
+    expect(board.session!.items.map((i) => i.id), ['t1', 'h1']);
+    expect(board.habitCandidates.single.isHabit, isTrue);
+  });
+
   group('DungeonRepositoryImpl', () {
     late MockDungeonRemoteDataSource remote;
     late DungeonRepositoryImpl repository;
@@ -134,7 +171,12 @@ void main() {
 
     test('traduce los motivos del servidor', () async {
       when(
-        () => remote.start(totalMinutes: 60, cycleMinutes: 25, taskIds: ['t1']),
+        () => remote.start(
+          totalMinutes: 60,
+          cycleMinutes: 25,
+          taskIds: ['t1'],
+          habitIds: const [],
+        ),
       ).thenThrow(const ServerException(code: 'session_already_open'));
       expect(
         await repository.start(
@@ -152,12 +194,12 @@ void main() {
 
     test('sin conexión devuelve NetworkFailure', () async {
       when(
-        () => remote.completeCycle(sessionId: 's1', taskId: 't1'),
+        () => remote.completeCycle(sessionId: 's1', itemId: 't1'),
       ).thenThrow(const NetworkException());
       expect(
         (await repository.completeCycle(
           sessionId: 's1',
-          taskId: 't1',
+          itemId: 't1',
         )).getLeft().toNullable(),
         isA<NetworkFailure>(),
       );

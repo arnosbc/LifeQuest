@@ -1,23 +1,67 @@
 import 'package:equatable/equatable.dart';
 
-/// Misión dentro de la mochila de la Mazmorra (o candidata a entrar).
+/// Paso pendiente de una tarea guiada, para hacerlo sin salir de Foco (068).
+class DungeonStep extends Equatable {
+  const DungeonStep({
+    required this.id,
+    required this.title,
+    required this.position,
+    this.minutes,
+  });
+
+  final String id;
+  final String title;
+  final int position;
+
+  /// Estimación de Nevi; null si no la hay.
+  final int? minutes;
+
+  @override
+  List<Object?> get props => [id, title, position, minutes];
+}
+
+/// Lo que se hace en una sesión de Foco: una tarea o un hábito de hoy (068).
 class DungeonTask extends Equatable {
   const DungeonTask({
     required this.id,
     required this.title,
     this.done = false,
     this.cycles = 0,
+    this.isHabit = false,
+    this.minutes,
+    this.stepCount = 0,
+    this.step,
   });
 
   final String id;
   final String title;
   final bool done;
 
-  /// Ciclos cobrados con esta tarea en la sesión.
+  /// Ciclos cobrados con esta tarea (o hábito) en la sesión.
   final int cycles;
+  final bool isHabit;
+
+  /// Minutos que Nevi estima para lo que falta; null si no hay estimación.
+  final int? minutes;
+  final int stepCount;
+
+  /// Paso que toca ahora; null sin pasos pendientes.
+  final DungeonStep? step;
+
+  /// Tiempo que propone Foco: la estimación o, sin ella, un bloque.
+  int minutesOr(int cycleMinutes) => minutes ?? cycleMinutes;
 
   @override
-  List<Object?> get props => [id, title, done, cycles];
+  List<Object?> get props => [
+    id,
+    title,
+    done,
+    cycles,
+    isHabit,
+    minutes,
+    stepCount,
+    step,
+  ];
 }
 
 /// Sesión de Deep Working abierta.
@@ -27,6 +71,7 @@ class DungeonSession extends Equatable {
     required this.totalMinutes,
     required this.cycleMinutes,
     required this.tasks,
+    this.habits = const [],
     this.cyclesDone = 0,
     this.xpEarned = 0,
     this.coinsEarned = 0,
@@ -37,7 +82,13 @@ class DungeonSession extends Equatable {
   final int totalMinutes;
   final int cycleMinutes;
   final List<DungeonTask> tasks;
+
+  /// Hábitos de hoy dentro de la sesión ([DungeonTask.isHabit]).
+  final List<DungeonTask> habits;
   final int cyclesDone;
+
+  /// Tareas y hábitos, en el orden en que se muestran.
+  List<DungeonTask> get items => [...tasks, ...habits];
 
   /// Lo ganado en la sesión: ciclos y misiones de la mochila (033).
   final int xpEarned;
@@ -59,6 +110,7 @@ class DungeonSession extends Equatable {
     totalMinutes,
     cycleMinutes,
     tasks,
+    habits,
     cyclesDone,
     xpEarned,
     coinsEarned,
@@ -84,6 +136,7 @@ class DungeonBoard extends Equatable {
   const DungeonBoard({
     this.session,
     this.candidates = const [],
+    this.habitCandidates = const [],
     this.maxTasks = 5,
     this.cycleXp = 10,
     this.shortBreakMinutes = 5,
@@ -96,6 +149,9 @@ class DungeonBoard extends Equatable {
 
   /// Misiones abiertas para llenar la mochila.
   final List<DungeonTask> candidates;
+
+  /// Hábitos buenos de hoy aún sin cumplir; cuentan en el tope [maxTasks].
+  final List<DungeonTask> habitCandidates;
   final int maxTasks;
 
   /// XP base por ciclo (sin multiplicadores).
@@ -117,6 +173,7 @@ class DungeonBoard extends Equatable {
   List<Object?> get props => [
     session,
     candidates,
+    habitCandidates,
     maxTasks,
     cycleXp,
     shortBreakMinutes,

@@ -16,7 +16,8 @@ class CompleteDungeonCycle
   Future<Either<Failure, Unit>> call(CompleteDungeonCycleParams params) =>
       _repository.completeCycle(
         sessionId: params.sessionId,
-        taskId: params.taskId,
+        itemId: params.taskId,
+        isHabit: params.isHabit,
       );
 }
 
@@ -24,11 +25,14 @@ class CompleteDungeonCycleParams extends Equatable {
   const CompleteDungeonCycleParams({
     required this.sessionId,
     required this.taskId,
+    this.isHabit = false,
   });
 
   final String sessionId;
+  /// Tarea del bloque o, con [isHabit], el hábito.
   final String taskId;
+  final bool isHabit;
 
   @override
-  List<Object?> get props => [sessionId, taskId];
+  List<Object?> get props => [sessionId, taskId, isHabit];
 }

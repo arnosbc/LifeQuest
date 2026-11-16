@@ -6,6 +6,7 @@ import {
   buildTaskPrompt,
   cleanTitle,
   formatGuide,
+  parseGuide,
   parsePlan,
   parseReply,
   parseSuggestion,
@@ -102,4 +103,13 @@ Deno.test('parseReply toma la respuesta de Nevi o null', () => {
   assertEquals(parseReply('{"reply":"  Entiendo, usemos tu cama.  "}'), 'Entiendo, usemos tu cama.');
   assertEquals(parseReply('{"steps":[]}'), null);
   assertEquals(parseReply('nada'), null);
+});
+
+Deno.test('parseGuide trae los minutos de cada paso, con tope y null si no son válidos', () => {
+  const guide = parseGuide(JSON.stringify({
+    steps: ['Junta los cuadernos', 'Separa lo que no usas', 'Ordena la pila'],
+    step_minutes: [5, 500, 'diez'],
+  }));
+  assertEquals(guide?.minutes, [5, 120, null]);
+  assertEquals(parseGuide(JSON.stringify({ steps: ['Uno'] }))?.minutes, [null]);
 });
