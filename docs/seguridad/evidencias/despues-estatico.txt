@@ -1,0 +1,24 @@
+# Evidencias DESPUÉS de las correcciones (APK release v1.30.0+46 final, 2026-11-16)
+
+## H-02 · Certificado de firma (apksigner verify --print-certs)
+Signer #1 certificate DN: CN=LifeQuest, OU=Programacion Movil, O=UNICESAR, C=CO
+
+## H-03 / H-04 · Atributos de <application> (aapt dump xmltree)
+A: android:allowBackup(0x01010280)=(type 0x12)0x0
+A: android:fullBackupContent(0x010104eb)=(type 0x12)0x0
+A: android:usesCleartextTraffic(0x010104ec)=(type 0x12)0x0
+A: android:networkSecurityConfig(0x01010527)=@0x7f120005
+A: android:dataExtractionRules(0x0101063e)=@0x7f120000
+
+## H-03 · Lo que reporta Android del paquete instalado (dumpsys package)
+flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+(ya no aparece ALLOW_BACKUP)
+
+## H-06 · Nombres de clases dentro de libapp.so
+nombres de clases propias legibles en libapp.so: (ninguno: Dart ofuscado)
+
+## H-06 · R8
+mapping.txt generado por R8: 41937437 bytes
+Tamaño del APK: antes 44124512 bytes → después 35715963 bytes
+
+## Funcionamiento: el APK ofuscado abre la app (pantalla de bienvenida) en el teléfono.

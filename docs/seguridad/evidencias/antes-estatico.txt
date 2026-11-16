@@ -1,0 +1,22 @@
+# Evidencias ANTES de las correcciones (APK release v1.29.0, 2026-11-16)
+
+## H-02 · Certificado de firma (apksigner verify --print-certs)
+Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
+
+## H-03 / H-04 · Atributos de <application> (aapt dump xmltree)
+(ninguno de: allowBackup, dataExtractionRules, networkSecurityConfig, usesCleartextTraffic) → Android usa sus valores por defecto: copias de seguridad ACTIVAS
+
+## H-06 · Nombres de clases legibles dentro de libapp.so (sin ofuscar)
+nombres de clases propias legibles en libapp.so: DungeonBloc, DungeonRemoteDataSource, GuidedTaskBloc, HabitsRemoteDataSource
+
+## H-06 · R8 en Gradle
+43:            isMinifyEnabled = false
+44:            isShrinkResources = false
+
+## H-03 · Lo que reporta Android del paquete instalado (dumpsys package)
+flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+
+## H-05 · Prueba test/app/home_screen_widget_test.dart (falla antes de corregir)
+Expected: '/dungeon'
+  Actual: '/dungeon?task=1\' OR \'1\'=\'1'
+→ el id del enlace lifequest://focus?task=… llega sin validar a la ruta.

@@ -1,0 +1,11 @@
+# H-01 DESPUÉS · sesión cifrada con flutter_secure_storage (AES-GCM + llave RSA-OAEP en Android Keystore)
+Mismo comando que antes: adb shell run-as com.example.proyecto_movil cat shared_prefs/FlutterSharedPreferences.xml
+
+Claves en FlutterSharedPreferences.xml: flutter.supabase.auth.token-code-verifier
+¿access_token legible en SharedPreferences?: False
+
+Almacén cifrado (shared_prefs/FlutterSecureStorage.xml):
+  clave: VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIHNlY3VyZSBzdG9yYWdlCg_sb-zwjfqwqroznc | valor: xn18NLyo8KeFHnOEXVp7MDaO… (cifrado) | ¿contiene "access_token"?: False
+
+La app abrió con la sesión del usuario: la migración pasó la sesión al almacén cifrado sin pedir iniciar sesión otra vez.
+Pendiente que limpia el commit: la clave suelta supabase.auth.token-code-verifier (versión anterior).
