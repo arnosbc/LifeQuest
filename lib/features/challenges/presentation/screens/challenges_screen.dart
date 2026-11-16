@@ -117,8 +117,12 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
   List<Widget> _leagueView(BuildContext context, League league) {
     final q = context.q;
     final standings = league.standings;
-    // 11 jugadores: top 3 sube; los 3 últimos bajan (salvo en la primera).
-    final canDrop = league.division > 0;
+    // 072: top 3 sube; los 3 últimos bajan con 7 o más (salvo en la primera).
+    final dropAt = league.hasDropZone ? standings.length - 3 : -1;
+    final prize = switch (league.lastRank) {
+      final r? when r <= 3 && r <= league.prizes.length => league.prizes[r - 1],
+      _ => null,
+    };
     return [
       _LeagueHeader(league: league),
       if (league.lastResult case final r? when r != LeagueResult.stayed) ...[
@@ -134,6 +138,16 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
           ),
         ),
       ],
+      if (prize != null) ...[
+        const SizedBox(height: QSpace.m),
+        QuestlyCard(
+          child: Text(
+            '🏆 Quedaste #${league.lastRank} la semana pasada: +$prize Monedas'
+            '${league.lastRank == 1 ? ' y un Pase de Recuperación' : ''}.',
+            style: QText.body(q.text),
+          ),
+        ),
+      ],
       const SizedBox(height: QSpace.l),
       for (final (i, rival) in standings.indexed) ...[
         if (i == 3)
@@ -142,7 +156,7 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
             icon: Icons.keyboard_double_arrow_up_rounded,
             color: q.ink,
           ),
-        if (i == 8 && canDrop)
+        if (i == dropAt)
           _ZoneDivider(
             label: 'ZONA DE DESCENSO',
             icon: Icons.keyboard_double_arrow_down_rounded,
@@ -155,10 +169,21 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
           me: rival == null,
         ),
       ],
+      if (league.rivals.isEmpty) ...[
+        const SizedBox(height: QSpace.m),
+        Text(
+          'Aún no hay más personas en tu división esta semana. Cuando entren, '
+          'aparecerán aquí.',
+          style: QText.body(q.text2),
+          textAlign: TextAlign.center,
+        ),
+      ],
       const SizedBox(height: QSpace.l),
       Text(
-        'Tus rivales son simulados y avanzan al ritmo de tu división: compites '
-        'contra tu propia constancia, no contra otras personas.',
+        'Compites con las personas que usan LifeQuest en tu división. '
+        '${league.prizes.length == 3 ? 'Premios al cerrar la semana: 1.º ${league.prizes[0]} '
+                  'Monedas y un Pase de Recuperación, 2.º ${league.prizes[1]} y '
+                  '3.º ${league.prizes[2]} Monedas.' : ''}',
         style: QText.meta(q.text3),
         textAlign: TextAlign.center,
       ),

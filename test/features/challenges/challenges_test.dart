@@ -76,6 +76,8 @@ void main() {
       'league': {
         'division': 2,
         'last_result': 'promoted',
+        'last_rank': 1,
+        'prizes': [50, 35, 20],
         'days_left': 3,
         'xp': 10,
         'rivals': [
@@ -87,6 +89,20 @@ void main() {
     expect(board.month.daysLeft, 4);
     expect(board.league.lastResult, LeagueResult.promoted);
     expect(board.league.rank, 1);
+    expect(board.league.lastRank, 1);
+    expect(board.league.prizes, [50, 35, 20]);
+  });
+
+  test('072: la zona de descenso solo existe con 7 o más y fuera de la primera', () {
+    League withPlayers(int division, int n) => League(
+      division: division,
+      daysLeft: 1,
+      xp: 0,
+      rivals: [for (var i = 0; i < n - 1; i++) Rival(name: '$i', xp: i)],
+    );
+    expect(withPlayers(1, 7).hasDropZone, isTrue);
+    expect(withPlayers(1, 6).hasDropZone, isFalse);
+    expect(withPlayers(0, 9).hasDropZone, isFalse);
   });
 
   group('ChallengesBloc', () {

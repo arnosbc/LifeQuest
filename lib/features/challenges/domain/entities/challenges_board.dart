@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 /// Desafíos y Liga estilo Duolingo (052): metas pequeñas del día con cofre,
-/// el Desafío del mes y la liga semanal contra rivales simulados.
+/// el Desafío del mes y la liga semanal con las personas de tu división (072).
 class ChallengesBoard extends Equatable {
   const ChallengesBoard({
     required this.daily,
@@ -70,6 +70,8 @@ class League extends Equatable {
     required this.xp,
     required this.rivals,
     this.lastResult,
+    this.lastRank,
+    this.prizes = const [],
   });
 
   /// 0 (la primera) a 9 (la más alta).
@@ -82,6 +84,15 @@ class League extends Equatable {
 
   /// Cómo terminó la semana pasada; null si no jugó.
   final LeagueResult? lastResult;
+
+  /// Puesto con que cerró la semana pasada (072); null si no jugó.
+  final int? lastRank;
+
+  /// Monedas del 1.º, 2.º y 3.º al cerrar la semana (el 1.º gana también un Pase).
+  final List<int> prizes;
+
+  /// Últimos 3 bajan solo con 7 o más personas y fuera de la primera división.
+  bool get hasDropZone => division > 0 && standings.length >= 7;
 
   /// Tabla ordenada por XP con el usuario incluido (`null` = el usuario).
   /// Ante empate, el usuario va primero.
@@ -96,7 +107,15 @@ class League extends Equatable {
   int get rank => standings.indexOf(null) + 1;
 
   @override
-  List<Object?> get props => [division, daysLeft, xp, rivals, lastResult];
+  List<Object?> get props => [
+    division,
+    daysLeft,
+    xp,
+    rivals,
+    lastResult,
+    lastRank,
+    prizes,
+  ];
 }
 
 class Rival extends Equatable {

@@ -36,6 +36,8 @@ class ChallengesBoardModel {
         daysLeft: _int(l['days_left']),
         xp: _int(l['xp']),
         lastResult: LeagueResult.values.asNameMap()[l['last_result']],
+        lastRank: (l['last_rank'] as num?)?.toInt(),
+        prizes: [for (final p in l['prizes'] as List<dynamic>? ?? []) _int(p)],
         rivals: [
           for (final r in _list(l['rivals']))
             Rival(name: r['name'] as String, xp: _int(r['xp'])),
