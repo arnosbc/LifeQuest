@@ -169,18 +169,53 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
             'La XP que quieres ganar cada día. Al cumplirla abres el cofre '
-            'de tu desafío diario.',
+            'de tu desafío diario. Es una meta, no un límite: puedes ganar '
+            'más.',
             style: TextStyle(color: context.lq.muted, fontSize: 12),
           ),
         ),
-        QuestlySegmented<int>(
-          segments: [for (final n in GameSettings.xpGoals) (n, '$n XP')],
-          selected: goal,
-          onChanged: (n) {
-            if (!saving && n != goal) {
-              bloc.add(GameSettingsChanged(settings.withXpGoal(n)));
-            }
-          },
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Bajar la meta diaria',
+              onPressed:
+                  saving ||
+                      goal - GameSettings.xpGoalStep <
+                          GameSettings.xpGoalRange.min
+                  ? null
+                  : () => bloc.add(
+                      GameSettingsChanged(
+                        settings.withXpGoal(goal - GameSettings.xpGoalStep),
+                      ),
+                    ),
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            Expanded(
+              child: Text(
+                '$goal XP al día',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.lq.ink,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Subir la meta diaria',
+              onPressed:
+                  saving ||
+                      goal + GameSettings.xpGoalStep >
+                          GameSettings.xpGoalRange.max
+                  ? null
+                  : () => bloc.add(
+                      GameSettingsChanged(
+                        settings.withXpGoal(goal + GameSettings.xpGoalStep),
+                      ),
+                    ),
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
         ),
       ],
       const SizedBox(height: 12),

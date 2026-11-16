@@ -10,7 +10,7 @@ for (const f of ['003_security.sql', '004_structure.sql', '005_rewards.sql', '00
   '011_habits.sql', '012_dungeon.sql', '013_stage.sql', '014_goals.sql', '015_onboarding.sql',
   '016_settings.sql', '017_dungeon_breaks.sql', '036_device_notifications.sql',
   '043_settings_digest.sql', '045_more_reminders.sql', '048_daily_reminders.sql',
-  '052_challenges_league.sql', '063_daily_xp_goal.sql', '063_daily_xp_goal.sql']) {
+  '052_challenges_league.sql', '063_daily_xp_goal.sql', '063_daily_xp_goal.sql', '070_daily_xp_goal_free.sql']) {
   await db.exec(migration(f));
 }
 await db.exec(`insert into auth.users values ('${U1}', '{}'), ('${U2}', '{}')`);
@@ -43,4 +43,13 @@ await call(U1, `select claim_challenge('xp') r`);
 ok('063: el cofre de XP se abre al llegar a la meta elegida, no antes');
 
 await rejects(setGoal(U1, 10), /daily_xp_goal_check/);
-ok('063: solo 30, 50 o 100 (nunca una meta que abarate el cofre)');
+await rejects(setGoal(U1, 65), /daily_xp_goal_check/);
+await rejects(setGoal(U1, 510), /daily_xp_goal_check/);
+ok('070: nunca menos de 30 (abarataría el cofre), de 10 en 10 y hasta 500');
+
+await setGoal(U1, 60);
+assert.deepEqual(await goal(U1), { xp: 50, goal: 60 });
+assert.equal(await xpTarget(U1), 60);
+await log(U1, 100);
+assert.deepEqual(await goal(U1), { xp: 150, goal: 60 });
+ok('070: meta libre (60) y la XP del día sigue sumando aunque la pase');

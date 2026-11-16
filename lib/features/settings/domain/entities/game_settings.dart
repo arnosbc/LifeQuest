@@ -20,8 +20,10 @@ class GameSettings extends Equatable {
     this.dailyXpGoal,
   });
 
-  /// Metas diarias de XP que acepta el servidor (063).
-  static const xpGoals = [30, 50, 100];
+  /// Meta diaria de XP que acepta el servidor (070): de 10 en 10. Es un
+  /// objetivo, no un tope; el mínimo protege el cofre del desafío diario.
+  static const xpGoalRange = (min: 30, max: 500);
+  static const xpGoalStep = 10;
 
   // Mismos rangos que los checks de 016_settings.sql.
   static const dailyLimitRange = (min: 1, max: 50);
