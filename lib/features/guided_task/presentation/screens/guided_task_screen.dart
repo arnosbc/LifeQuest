@@ -283,7 +283,8 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
             'Los archivos se enviarán a Gemini para analizar este paso y no se '
             'guardarán en LifeQuest. Gemini puede procesar el contenido según '
             'sus propias condiciones; evita incluir datos personales o sensibles. '
-            'La revisión puede equivocarse y no decide si puedes avanzar.',
+            'Si la evidencia coincide, Nevi marca el paso; si no, puedes '
+            'avanzar igual. La revisión puede equivocarse.',
         actions: [
           QuestlyButton(
             label: 'Enviar a revisión',
@@ -305,10 +306,10 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
     }
   }
 
-  /// Pregunta si la evidencia es una foto nueva o archivos del teléfono;
-  /// null si cierra la hoja.
+  /// Foto(s) nuevas, fotos de la galería o archivos (hasta 5, para pasos con
+  /// varias instrucciones); null si cierra la hoja.
   Future<List<XFile>?> _pickEvidence() async {
-    final camera = await showQuestlySheet<bool>(
+    final source = await showQuestlySheet<String>(
       context,
       title: 'Agregar evidencia',
       child: Builder(
@@ -317,29 +318,68 @@ class _GuidedTaskScreenState extends State<GuidedTaskScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Tomar foto'),
-              onTap: () => Navigator.of(context).pop(true),
+              title: const Text('Tomar fotos'),
+              subtitle: const Text('Una por cada parte del paso. Hasta 5.'),
+              onTap: () => Navigator.of(context).pop('camera'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Elegir de la galería'),
+              subtitle: const Text('Varias fotos a la vez. Hasta 5.'),
+              onTap: () => Navigator.of(context).pop('gallery'),
             ),
             ListTile(
               leading: const Icon(Icons.folder_open_outlined),
               title: const Text('Buscar en archivos'),
               subtitle: const Text('Imágenes, PDF, Word o texto. Hasta 5.'),
-              onTap: () => Navigator.of(context).pop(false),
+              onTap: () => Navigator.of(context).pop('files'),
             ),
           ],
         ),
       ),
     );
-    if (camera == null) return null;
-    if (camera) {
-      // Reducida y en JPEG: cabe holgada en el límite de 10 MB.
-      final photo = await ImagePicker().pickImage(
-        source: ImageSource.camera,
+    if (source == null) return null;
+    // Reducidas y en JPEG: 5 caben holgadas en el límite de 10 MB.
+    final picker = ImagePicker();
+    if (source == 'gallery') {
+      return picker.pickMultiImage(
         maxWidth: 2048,
         maxHeight: 2048,
         imageQuality: 85,
+        limit: GuidedStepEvidence.maxFiles,
       );
-      return photo == null ? const [] : [photo];
+    }
+    if (source == 'camera') {
+      final photos = <XFile>[];
+      while (mounted && photos.length < GuidedStepEvidence.maxFiles) {
+        final photo = await picker.pickImage(
+          source: ImageSource.camera,
+          maxWidth: 2048,
+          maxHeight: 2048,
+          imageQuality: 85,
+        );
+        if (photo == null) break;
+        photos.add(photo);
+        if (!mounted || photos.length == GuidedStepEvidence.maxFiles) break;
+        final another = await showQuestlyDialog<bool>(
+          context,
+          title: '${photos.length} de ${GuidedStepEvidence.maxFiles} fotos',
+          message: '¿Quieres tomar otra foto de este paso?',
+          actions: [
+            QuestlyButton(
+              label: 'Tomar otra',
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+            QuestlyButton(
+              label: 'Listo, revisar',
+              variant: QuestlyButtonVariant.text,
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+          ],
+        );
+        if (another != true) break;
+      }
+      return photos;
     }
     final files = await FilePicker.pickFiles(
       dialogTitle: 'Evidencia del paso',
