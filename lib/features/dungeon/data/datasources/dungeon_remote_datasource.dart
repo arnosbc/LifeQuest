@@ -89,7 +89,8 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
       'toggle_task_step',
       params: {'p_step_id': stepId},
     );
-    return result['done'] == true;
+    // 'done' es el paso; la tarea terminó si viene 'task_completed' (044).
+    return result['task_completed'] == true;
   });
 
   // Día local del teléfono, como en Hábitos.
