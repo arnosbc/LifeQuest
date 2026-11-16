@@ -75,7 +75,11 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
 
   /// Estado al cargar un tablero. Con sesión abierta se empieza un ciclo
   /// completo: el avance local de un ciclo a medias no se guarda.
-  DungeonReady _fresh(DungeonBoard board, {DungeonSummary? summary}) {
+  DungeonReady _fresh(
+    DungeonBoard board, {
+    DungeonSummary? summary,
+    String? message,
+  }) {
     final now = _clock();
     final session = board.session;
     if (session == null) {
@@ -84,6 +88,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         phase: DungeonPhase.setup,
         now: now,
         summary: summary,
+        message: message,
       );
     }
     final done = session.cyclesDone >= session.maxCycles;
@@ -145,6 +150,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         },
       ),
     );
+    // Al volver de la tarea guiada (p. ej. la revisión tachó el último paso).
+    result.map(_endIfAllDone);
   }
 
   /// Refrescar la misma sesión conserva el cronómetro; si cambió, empieza de cero.
@@ -352,6 +359,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         message: _taskMessage(reward, board.session),
       ),
     );
+    _endIfAllDone(board);
   }
 
   /// Paso hecho sin salir de Foco; si era el último, la tarea se completa.
@@ -403,6 +411,17 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         message: result.getOrElse((_) => ''),
       ),
     );
+    _endIfAllDone(board);
+  }
+
+  /// Todo lo de la sesión cumplido: se cierra sola y muestra el resumen
+  /// (idea del usuario 2026-11-16). El bloque a medias no se cobra, igual
+  /// que al tocar «Finalizar».
+  void _endIfAllDone(DungeonBoard board) {
+    final items = board.session?.items ?? const [];
+    if (items.isNotEmpty && items.every((i) => i.done)) {
+      add(const DungeonEnded(allDone: true));
+    }
   }
 
   /// «+12 XP · +4 Monedas» y, si se pudo leer, el total de la sesión.
@@ -440,6 +459,9 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
           (_) => DungeonBoard(candidates: current.board.candidates),
         ),
         summary: summary,
+        message: event.allDone
+            ? '¡Terminaste todo! Cerré la sesión y guardé lo que ganaste.'
+            : null,
       ),
     );
   }

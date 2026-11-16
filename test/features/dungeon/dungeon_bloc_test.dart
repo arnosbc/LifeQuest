@@ -482,4 +482,62 @@ void main() {
       ),
     ).called(1),
   );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'cumplido lo último de la sesión, se cierra sola y muestra el resumen',
+    setUp: () {
+      when(() => completeHabit('h1')).thenAnswer((_) async => const Right(unit));
+      when(() => end('s1')).thenAnswer(
+        (_) async => const Right(
+          DungeonSummary(cycles: 0, xp: 25, coins: 8, minutes: 0, missions: 1),
+        ),
+      );
+      var calls = 0;
+      when(() => getBoard(any())).thenAnswer((_) async {
+        calls++;
+        // Primero la sesión con todo hecho; tras cerrar, sin sesión.
+        return Right(
+          calls == 1
+              ? DungeonBoard(
+                  session: DungeonSession(
+                    id: 's1',
+                    totalMinutes: 60,
+                    cycleMinutes: 25,
+                    tasks: const [
+                      DungeonTask(id: 't1', title: 'Estudiar', done: true),
+                    ],
+                    habits: const [
+                      DungeonTask(id: 'h1', title: 'Leer', isHabit: true, done: true),
+                    ],
+                  ),
+                )
+              : const DungeonBoard(),
+        );
+      });
+    },
+    build: build,
+    seed: () => focus(withHabit()).copyWith(currentTaskId: () => 'h1'),
+    act: (bloc) => bloc.add(const DungeonHabitDone('h1')),
+    wait: const Duration(milliseconds: 50),
+    verify: (bloc) {
+      verify(() => end('s1')).called(1);
+      final last = bloc.state as DungeonReady;
+      expect(last.phase, DungeonPhase.setup);
+      expect(last.summary?.xp, 25);
+      expect(last.message, contains('¡Terminaste todo!'));
+    },
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'si aún queda algo pendiente, la sesión sigue abierta',
+    setUp: () {
+      when(() => toggleStep('p1')).thenAnswer((_) async => const Right(false));
+      givenBoard(withHabit());
+    },
+    build: build,
+    seed: () => focus(withHabit()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p1')),
+    wait: const Duration(milliseconds: 50),
+    verify: (_) => verifyNever(() => end(any())),
+  );
 }

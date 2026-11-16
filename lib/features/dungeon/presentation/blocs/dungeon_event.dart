@@ -88,9 +88,15 @@ class DungeonHabitDone extends DungeonEvent {
   List<Object?> get props => [habitId];
 }
 
-/// Terminar la sesión antes o después de agotar los ciclos.
+/// Terminar la sesión antes o después de agotar los ciclos. Con [allDone]
+/// la cierra el propio bloc porque ya se cumplió todo lo de la sesión.
 class DungeonEnded extends DungeonEvent {
-  const DungeonEnded();
+  const DungeonEnded({this.allDone = false});
+
+  final bool allDone;
+
+  @override
+  List<Object?> get props => [allDone];
 }
 
 /// Cerrar el resumen de la sesión terminada.
