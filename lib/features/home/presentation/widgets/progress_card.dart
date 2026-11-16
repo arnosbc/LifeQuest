@@ -316,7 +316,9 @@ class _GoalRing extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                done ? '¡$goal!' : '$xp/$goal',
+                // Siempre la XP real de hoy: con «¡meta!» dejaba de subir al
+                // cumplirla (prueba del usuario 2026-11-16). Cumplida = color.
+                '$xp/$goal',
                 style: QText.number(color, size: 14),
               ),
             ],
