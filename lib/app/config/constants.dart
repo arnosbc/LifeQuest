@@ -13,6 +13,10 @@ abstract final class AppConstants {
     'GOOGLE_WEB_CLIENT_ID',
   );
 
+  /// H-04 (M5): solo HTTPS hacia el backend.
+  static bool isSecureUrl(String url) =>
+      Uri.tryParse(url)?.scheme == 'https' && Uri.parse(url).host.isNotEmpty;
+
   static void ensureSupabaseConfigured() {
     if (supabaseUrl.isEmpty || supabaseKey.isEmpty) {
       throw StateError(
@@ -20,6 +24,9 @@ abstract final class AppConstants {
         'supabase.example.json a supabase.json, rellénalo y ejecuta: '
         'flutter run --dart-define-from-file=supabase.json',
       );
+    }
+    if (!isSecureUrl(supabaseUrl)) {
+      throw StateError('SUPABASE_URL debe empezar por https://');
     }
   }
 }
