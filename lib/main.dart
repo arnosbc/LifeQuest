@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/app/config/constants.dart';
+import 'package:proyecto_movil/core/storage/secure_session_storage.dart';
 import 'package:proyecto_movil/app/observers/app_bloc_observer.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/notifications/domain/usecases/disable_device_notifications.dart';
@@ -21,6 +22,15 @@ Future<void> main() async {
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,
     publishableKey: AppConstants.supabaseKey,
+    // H-01 (M9): sesión y PKCE cifrados con el Keystore, no en texto plano.
+    authOptions: FlutterAuthClientOptions(
+      localStorage: SecureSessionStorage(
+        persistSessionKey:
+            'sb-${Uri.parse(AppConstants.supabaseUrl).host.split('.').first}'
+            '-auth-token',
+      ),
+      pkceAsyncStorage: const SecurePkceStorage(),
+    ),
   );
   await initDependencies();
   Bloc.observer = const AppBlocObserver();
