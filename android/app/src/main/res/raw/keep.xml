@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- H-06: con isShrinkResources los recursos que se buscan por nombre en
+     tiempo de ejecución (íconos de los avisos, caras de Nevi del widget) se
+     borrarían; se conservan todos los drawables y mipmaps. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/*,@mipmap/*" />

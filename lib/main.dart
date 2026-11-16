@@ -16,6 +16,15 @@ import 'package:proyecto_movil/injection_container.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await _start();
+  } on Object catch (error) {
+    // Nunca una pantalla en negro: si algo falla al arrancar, se dice qué.
+    runApp(_StartupError(error));
+  }
+}
+
+Future<void> _start() async {
   // Las fuentes van en assets/google_fonts: nunca se descargan.
   GoogleFonts.config.allowRuntimeFetching = false;
   AppConstants.ensureSupabaseConfigured();
@@ -43,7 +52,7 @@ Future<void> main() async {
   await (
     authBloc.stream.firstWhere((state) => state is! AuthInitial),
     appearanceBloc.stream.firstWhere((state) => state is AppearanceSuccess),
-  ).wait;
+  ).wait.timeout(const Duration(seconds: 15));
 
   runApp(
     App(
@@ -52,6 +61,38 @@ Future<void> main() async {
       onboardingBloc: sl<OnboardingBloc>(),
       enableDeviceNotifications: sl<EnableDeviceNotifications>(),
       disableDeviceNotifications: sl<DisableDeviceNotifications>(),
+    ),
+  );
+}
+
+/// Pantalla mínima si el arranque falla (sin red, configuración, plugin).
+class _StartupError extends StatelessWidget {
+  const _StartupError(this.error);
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'No pudimos iniciar LifeQuest.',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              const Text('Revisa tu conexión y vuelve a abrir la app.'),
+              const SizedBox(height: 16),
+              SelectableText('$error', style: const TextStyle(fontSize: 12)),
+            ],
+          ),
+        ),
+      ),
     ),
   );
 }

@@ -2,6 +2,15 @@
 # desde Flutter/Android y R8 no ve esas llamadas: si las borra o renombra, la
 # app queda en negro (pasó con shared_preferences) o fallan los avisos.
 
+# shared_preferences_android 2.5 y path_provider_android 2.3 llaman clases de
+# Java por nombre desde Dart (package:jni): R8 no ve esas llamadas. Sin estas
+# reglas quita kotlin.Unit/kotlin.Result y la app arranca en negro
+# (ClassNotFoundException: "kotlin/Result", visto en el teléfono 2026-11-16).
+-keep class kotlin.** { *; }
+-keep class kotlinx.coroutines.** { *; }
+-keep class com.github.dart_lang.jni.** { *; }
+-keep class com.github.dart_lang.jni_flutter.** { *; }
+
 # Plugins oficiales de Flutter (Pigeon/JNI: shared_preferences, path_provider…).
 -keep class io.flutter.plugins.** { *; }
 -keep class io.flutter.plugin.** { *; }
