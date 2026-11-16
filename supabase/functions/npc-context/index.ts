@@ -13,6 +13,7 @@ import {
   kindOf,
   type DocKind,
 } from '../_shared/file_parts.ts';
+import { geminiFetch } from '../_shared/gemini_fetch.ts';
 
 export { docxText, documentPart, kindOf } from '../_shared/file_parts.ts';
 
@@ -38,7 +39,7 @@ const TEXT_MAX = 300_000;
 async function summarize(part: Record<string, unknown>): Promise<{ summary?: string; reason?: string }> {
   // Pegado en el panel puede traer espacios o 'models/': Gemini responde 400.
   const model = (Deno.env.get('GEMINI_MODEL') ?? '').trim().replace(/^models\//, '');
-  const res = await fetch(
+  const res = await geminiFetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: 'POST',

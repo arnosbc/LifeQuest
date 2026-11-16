@@ -1,9 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/features/guided_task/domain/entities/guided_step_evidence.dart';
+import 'package:proyecto_movil/features/guided_task/domain/entities/guided_step_review.dart';
 import 'package:proyecto_movil/features/guided_task/domain/entities/guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/complete_guided_task.dart';
 import 'package:proyecto_movil/features/guided_task/domain/usecases/generate_guided_steps.dart';
@@ -39,16 +43,36 @@ void main() {
     ],
   );
 
+  late _ToggleStub toggle;
+  late _ReviewStub review;
+  final evidence = [
+    GuidedStepEvidence(
+      name: 'foto.jpg',
+      mimeType: 'image/jpeg',
+      bytes: Uint8List.fromList([1, 2, 3]),
+    ),
+  ];
+  GuidedStepReview reviewOf(GuidedStepAssessment a) =>
+      GuidedStepReview(assessment: a, feedback: 'Se ve bien.', nextAction: '');
+
+  setUpAll(() {
+    registerFallbackValue(
+      ReviewGuidedStepParams(stepId: 's1', evidence: const []),
+    );
+  });
+
   setUp(() {
     getTask = _Get();
     generate = _Generate();
+    toggle = _ToggleStub();
+    review = _ReviewStub();
   });
 
   GuidedTaskBloc build() => GuidedTaskBloc(
     getTask: getTask,
-    toggleStep: _ToggleStub(),
+    toggleStep: toggle,
     completeTask: _CompleteStub(),
-    reviewStep: _ReviewStub(),
+    reviewStep: review,
     setSteps: _SetStub(),
     generateSteps: generate,
   );
@@ -113,6 +137,73 @@ void main() {
         (s) => s.message,
         'respuesta de Nevi',
         'Entiendo, usemos tu cama.',
+      ),
+    ],
+  );
+
+  blocTest<GuidedTaskBloc, GuidedTaskState>(
+    'evidencia que coincide: Nevi tacha el paso y lo avisa',
+    setUp: () {
+      when(() => review(any())).thenAnswer(
+        (_) async => Right(reviewOf(GuidedStepAssessment.supports)),
+      );
+      when(() => toggle('s1')).thenAnswer((_) async => const Right(false));
+      when(() => getTask('t1')).thenAnswer((_) async => Right(guided));
+    },
+    build: build,
+    seed: () => GuidedTaskSuccess(guided),
+    act: (bloc) =>
+        bloc.add(GuidedStepReviewRequested(stepId: 's1', evidence: evidence)),
+    expect: () => [
+      GuidedTaskSuccess(guided, reviewingStepId: 's1'),
+      GuidedTaskSuccess(guided, busyStepId: 's1'),
+      GuidedTaskSuccess(
+        guided,
+        message: 'Nevi confirmó el paso. ¡Sigue con el siguiente!',
+      ),
+    ],
+    verify: (_) => verify(() => toggle('s1')).called(1),
+  );
+
+  blocTest<GuidedTaskBloc, GuidedTaskState>(
+    'avance parcial: solo muestra la revisión, no marca nada',
+    setUp: () => when(() => review(any())).thenAnswer(
+      (_) async => Right(reviewOf(GuidedStepAssessment.partial)),
+    ),
+    build: build,
+    seed: () => GuidedTaskSuccess(guided),
+    act: (bloc) =>
+        bloc.add(GuidedStepReviewRequested(stepId: 's1', evidence: evidence)),
+    expect: () => [
+      GuidedTaskSuccess(guided, reviewingStepId: 's1'),
+      GuidedTaskSuccess(
+        guided,
+        review: reviewOf(GuidedStepAssessment.partial),
+      ),
+    ],
+    verify: (_) => verifyNever(() => toggle(any())),
+  );
+
+  blocTest<GuidedTaskBloc, GuidedTaskState>(
+    'coincide pero sin Foco: deja la revisión y explica por qué no avanzó',
+    setUp: () {
+      when(() => review(any())).thenAnswer(
+        (_) async => Right(reviewOf(GuidedStepAssessment.supports)),
+      );
+      when(() => toggle('s1')).thenAnswer(
+        (_) async => const Left(ServerFailure('Empieza en Foco para avanzar.')),
+      );
+    },
+    build: build,
+    seed: () => GuidedTaskSuccess(guided),
+    act: (bloc) =>
+        bloc.add(GuidedStepReviewRequested(stepId: 's1', evidence: evidence)),
+    skip: 2,
+    expect: () => [
+      GuidedTaskSuccess(
+        guided,
+        review: reviewOf(GuidedStepAssessment.supports),
+        message: 'Empieza en Foco para avanzar.',
       ),
     ],
   );

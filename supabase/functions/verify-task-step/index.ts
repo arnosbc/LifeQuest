@@ -6,6 +6,7 @@ import { decodeBase64 } from 'jsr:@std/encoding@1/base64';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 import { evidencePart } from '../_shared/file_parts.ts';
+import { geminiFetch } from '../_shared/gemini_fetch.ts';
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
@@ -196,7 +197,7 @@ if (import.meta.main) {
 
     let response: Response;
     try {
-      response = await fetch(
+      response = await geminiFetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           method: 'POST',

@@ -11,6 +11,7 @@
 // Añadir un contador por usuario si el cupo se agota.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { geminiFetch } from '../_shared/gemini_fetch.ts';
 
 const SYSTEM = [
   'Eres el Asistente de una app de productividad que enseña paso a paso.',
@@ -141,7 +142,8 @@ const SCHEMA = {
     search: { type: 'ARRAY', items: { type: 'STRING' } },
     reply: { type: 'STRING' },
   },
-  required: ['title', 'objective', 'steps', 'hints'],
+  // reply obligatorio: Flash-Lite omite los campos opcionales.
+  required: ['title', 'objective', 'steps', 'hints', 'reply'],
 };
 
 /// Límites de accept_npc_mission (031).
@@ -262,7 +264,7 @@ async function suggest(
   // Pegado en el panel puede traer espacios o 'models/': Gemini responde 400.
   const model = (Deno.env.get('GEMINI_MODEL') ?? '').trim().replace(/^models\//, '');
   const started = Date.now();
-  const res = await fetch(
+  const res = await geminiFetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: 'POST',

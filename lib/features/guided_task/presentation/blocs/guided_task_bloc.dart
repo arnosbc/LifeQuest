@@ -120,10 +120,38 @@ class GuidedTaskBloc extends Bloc<GuidedTaskEvent, GuidedTaskState> {
     final result = await _reviewStep(
       ReviewGuidedStepParams(stepId: event.stepId, evidence: event.evidence),
     );
-    result.match(
-      (failure) =>
-          emit(GuidedTaskSuccess(current.task, message: failure.message)),
-      (review) => emit(GuidedTaskSuccess(current.task, review: review)),
+    final GuidedStepReview review;
+    switch (result) {
+      case Left(value: final failure):
+        emit(GuidedTaskSuccess(current.task, message: failure.message));
+        return;
+      case Right(value: final r):
+        review = r;
+    }
+    if (review.assessment != GuidedStepAssessment.supports) {
+      emit(GuidedTaskSuccess(current.task, review: review));
+      return;
+    }
+    // La evidencia coincide: Nevi tacha el paso con las mismas reglas que
+    // «Listo» (Foco activo, sin doble cobro). Si no se puede, queda su tarjeta.
+    emit(GuidedTaskSuccess(current.task, busyStepId: event.stepId));
+    final toggled = await _toggleStep(event.stepId);
+    if (toggled case Left(value: final failure)) {
+      emit(
+        GuidedTaskSuccess(
+          current.task,
+          review: review,
+          message: failure.message,
+        ),
+      );
+      return;
+    }
+    await _reload(
+      emit,
+      current.task,
+      toggled.getOrElse((_) => false)
+          ? '¡Tarea completada!'
+          : 'Nevi confirmó el paso. ¡Sigue con el siguiente!',
     );
   }
 
