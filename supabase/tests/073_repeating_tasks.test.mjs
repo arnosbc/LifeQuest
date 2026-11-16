@@ -15,7 +15,7 @@ for (const f of ['003_security.sql', '004_structure.sql', '005_rewards.sql', '00
   '031_npc_mission_guide.sql', '033_dungeon_rewards.sql', '037_reward_feedback.sql',
   '038_home_today.sql', '039_task_steps.sql', '040_focus_required.sql', '066_dungeon_loot_steps.sql',
   '067_adapt_task_guide.sql', '068_focus_unified.sql', '069_dungeon_loot_habits.sql',
-  '073_repeating_tasks.sql', '073_repeating_tasks.sql']) {
+  '073_repeating_tasks.sql', '073_repeating_tasks.sql', '074_repeat_keep_due.sql']) {
   await db.exec(migration(f));
 }
 await db.exec(`insert into auth.users values ('${U1}', '{}'), ('${U2}', '{}')`);
@@ -50,10 +50,10 @@ await rejects(call(U2, `select set_task_repeat($1, 'daily') r`, [t]), /task_not_
 await rejects(call(U1, `select set_task_repeat($1, 'hourly') r`, [t]), /invalid_repeat_rule/);
 await call(U1, `select set_task_repeat($1, 'daily') r`, [t]);
 let row = await one(`select repeat_rule, series_id, (due_date at time zone 'America/Bogota')::date::text d from tasks where id = $1`, [t]);
-assert.deepEqual([row.repeat_rule, row.series_id, row.d], ['daily', t, today]);
+assert.deepEqual([row.repeat_rule, row.series_id, row.d], ['daily', t, null]);
 const m = (await call(U1, `select missions_overview() r`)).missions.find((x) => x.id === t);
 assert.equal(m.repeat_rule, 'daily');
-ok('073: set_task_repeat solo del dueño, con regla válida; sin fecha toma hoy');
+ok('073/074: set_task_repeat solo del dueño, con regla válida, sin tocar la fecha');
 
 // Abierta: no se duplica. Completada: la siguiente aparece cuando llega su día, no antes.
 assert.equal(await spawn(today), 0);

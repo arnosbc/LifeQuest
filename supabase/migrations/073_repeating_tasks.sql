@@ -6,7 +6,7 @@
 --      'weekdays' (lunes a viernes), 'weekly' o 'monthly'. tasks.series_id une
 --      las copias de una misma tarea (= id de la primera).
 --   2. set_task_repeat(id, regla | null): elige o quita la repetición de una
---      tarea abierta. Sin fecha límite, toma hoy a las 23:59.
+--      tarea abierta (074: sin tocar su fecha límite).
 --   3. _spawn_repeating_tasks() (cron 00:12 local, después de daily_maintenance):
 --      si la serie no tiene ninguna copia abierta, crea la siguiente cuando
 --      llega su día, con los mismos datos y pasos (sin cobrar). Así la de
