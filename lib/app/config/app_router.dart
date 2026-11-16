@@ -211,7 +211,7 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                         create: (_) =>
                             sl<MissionsBloc>()..add(const MissionsRequested()),
                         child: MissionsScreen(
-                          onStartFocus: () => context.go(RoutePaths.dungeon),
+                          onStartFocus: (id) => context.go(RoutePaths.focusOn(id)),
                         ),
                       ),
                     ),

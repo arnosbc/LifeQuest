@@ -56,11 +56,11 @@ void main() {
   );
 
   blocTest<MissionsBloc, MissionsState>(
-    'crear con Focus recarga y pide abrir la Mazmorra',
+    'crear con Focus recarga y pide abrir Foco con la tarea nueva',
     setUp: () {
       when(
         () => createMission(any()),
-      ).thenAnswer((_) async => const Right(unit));
+      ).thenAnswer((_) async => const Right('t-new'));
       givenBoard(const Right(board));
     },
     build: build,
@@ -71,7 +71,7 @@ void main() {
       const MissionsSuccess(
         board,
         message: 'Tarea creada. Tu sesión de foco te espera.',
-        focusRequested: true,
+        focusTaskId: 't-new',
       ),
     ],
     verify: (_) => verify(() => createMission(newMission)).called(1),

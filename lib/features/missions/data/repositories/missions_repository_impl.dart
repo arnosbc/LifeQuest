@@ -17,11 +17,8 @@ class MissionsRepositoryImpl implements MissionsRepository {
       _run(() async => (await _remote.getBoard()).toEntity());
 
   @override
-  Future<Either<Failure, Unit>> createMission(NewMission mission) =>
-      _run(() async {
-        await _remote.createMission(mission);
-        return unit;
-      });
+  Future<Either<Failure, String>> createMission(NewMission mission) =>
+      _run(() => _remote.createMission(mission));
 
   @override
   Future<Either<Failure, Unit>> completeMission(String missionId) =>

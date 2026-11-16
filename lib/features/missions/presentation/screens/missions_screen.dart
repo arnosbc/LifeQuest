@@ -18,8 +18,8 @@ import 'package:proyecto_movil/features/missions/presentation/widgets/rp_genie_t
 class MissionsScreen extends StatelessWidget {
   const MissionsScreen({super.key, required this.onStartFocus});
 
-  /// Abre la Mazmorra tras "Crear e iniciar Focus".
-  final VoidCallback onStartFocus;
+  /// Abre Foco con la tarea recién creada ("Crear e iniciar Focus").
+  final ValueChanged<String> onStartFocus;
 
   @override
   Widget build(BuildContext context) =>
@@ -32,7 +32,7 @@ class MissionsScreen extends StatelessWidget {
           if (state.message case final message?) {
             showLifeQuestMessage(context, message);
           }
-          if (state.focusRequested) onStartFocus();
+          if (state.focusTaskId case final id?) onStartFocus(id);
         },
         builder: (context, state) => switch (state) {
           MissionsInitial() || MissionsLoading() => Center(

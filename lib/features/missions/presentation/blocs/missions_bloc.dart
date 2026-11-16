@@ -88,13 +88,14 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
       emit(MissionsSuccess(current.board, message: failure.message));
       return;
     }
+    final taskId = created.getOrElse((_) => '');
     await _reload(
       emit,
       current.board,
       event.startFocus
           ? 'Tarea creada. Tu sesión de foco te espera.'
           : 'Tarea creada. Un paso más hacia tu meta.',
-      focusRequested: event.startFocus,
+      focusTaskId: event.startFocus ? taskId : null,
     );
   }
 
@@ -118,7 +119,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
     Emitter<MissionsState> emit,
     MissionsBoard previous,
     String message, {
-    bool focusRequested = false,
+    String? focusTaskId,
   }) async {
     final reloaded = await _getMissionsBoard(const NoParams());
     emit(
@@ -127,7 +128,7 @@ class MissionsBloc extends Bloc<MissionsEvent, MissionsState> {
         (board) => MissionsSuccess(
           board,
           message: message,
-          focusRequested: focusRequested,
+          focusTaskId: focusTaskId,
         ),
       ),
     );

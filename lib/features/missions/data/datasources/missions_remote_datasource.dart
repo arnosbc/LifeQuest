@@ -12,7 +12,8 @@ import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 abstract class MissionsRemoteDataSource {
   Future<MissionsBoardModel> getBoard();
 
-  Future<void> createMission(NewMission mission);
+  /// Devuelve el id de la tarea creada.
+  Future<String> createMission(NewMission mission);
 
   Future<void> completeMission(String missionId);
 
@@ -36,8 +37,8 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
   });
 
   @override
-  Future<void> createMission(NewMission mission) => _guard(() async {
-    await _client.rpc<void>(
+  Future<String> createMission(NewMission mission) => _guard(() async {
+    final created = await _client.rpc<Map<String, dynamic>>(
       'create_task',
       params: {
         'p_title': mission.title,
@@ -54,6 +55,7 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
       'Nueva tarea: ${mission.title}',
       'Agregada a tus pendientes. ¡Tú puedes!',
     );
+    return created['id'] as String;
   });
 
   @override

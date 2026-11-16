@@ -29,8 +29,8 @@ void main() {
   });
 
   test('createMission pasa la misión al datasource', () async {
-    when(() => remote.createMission(any())).thenAnswer((_) async {});
-    expect(await repository.createMission(newMission), const Right(unit));
+    when(() => remote.createMission(any())).thenAnswer((_) async => 't-new');
+    expect(await repository.createMission(newMission), const Right('t-new'));
     verify(() => remote.createMission(newMission)).called(1);
   });
 

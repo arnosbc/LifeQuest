@@ -1,5 +1,6 @@
 // Prueba la migración 068 (Foco unificado: minutos por paso, paso actual y hábitos).
 // Uso: cd supabase/tests && node 068_focus_unified.test.mjs
+// 069: el botín de la sesión suma los hábitos cumplidos dentro de Foco.
 import assert from 'node:assert/strict';
 
 import { U1, U2, createFullDb, migration, ok, rejects } from './bootstrap.mjs';
@@ -14,7 +15,7 @@ for (const f of ['003_security.sql', '004_structure.sql', '005_rewards.sql', '00
   '028_edit_delete.sql', '029_notifications.sql', '030_npc_noble_mission.sql',
   '031_npc_mission_guide.sql', '033_dungeon_rewards.sql', '037_reward_feedback.sql',
   '038_home_today.sql', '039_task_steps.sql', '040_focus_required.sql', '066_dungeon_loot_steps.sql',
-  '067_adapt_task_guide.sql', '068_focus_unified.sql', '068_focus_unified.sql']) {
+  '067_adapt_task_guide.sql', '068_focus_unified.sql', '068_focus_unified.sql', '069_dungeon_loot_habits.sql']) {
   await db.exec(migration(f));
 }
 await db.exec(`insert into auth.users values ('${U1}', '{}'), ('${U2}', '{}')`);
@@ -86,3 +87,13 @@ board = await call(U1, `select dungeon_overview() r`);
 assert.equal(board.session.habits[0].done, true);
 assert.deepEqual(board.habit_candidates, []);
 ok('068: el hábito cumplido sale marcado y deja de ser candidato');
+
+// 069: el hábito cumplido en la sesión suma al botín (XP de 2 bloques + pasos + hábito).
+const habitXp = (await one(`select xp_awarded x from quest_log_entries
+  where source_type = 'habit' and source_id = $1`, [habitId])).x;
+const loot = (await one(`select xp from _dungeon_loot($1)`, [sid])).xp;
+const withoutHabit = (await one(`select coalesce(sum(xp_awarded), 0)::int x from quest_log_entries
+  where source_type in ('dungeon', 'task_step', 'task')`)).x;
+assert.ok(habitXp > 0);
+assert.equal(Number(loot), withoutHabit + habitXp);
+ok(`069: el botín de la sesión incluye el hábito (+${habitXp} XP)`);

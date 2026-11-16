@@ -8,7 +8,8 @@ import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dar
 abstract class MissionsRepository {
   Future<Either<Failure, MissionsBoard>> getBoard();
 
-  Future<Either<Failure, Unit>> createMission(NewMission mission);
+  /// Devuelve el id de la tarea creada (para abrirla en Foco).
+  Future<Either<Failure, String>> createMission(NewMission mission);
 
   /// Completa la misión; el servidor da XP y Monedas.
   Future<Either<Failure, Unit>> completeMission(String missionId);
