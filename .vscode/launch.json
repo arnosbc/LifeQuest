@@ -1,0 +1,22 @@
+{
+  // ▶ Ejecutar en VS Code con las claves de supabase.json (no se sube a Git:
+  // cópialo de supabase.example.json y pon las de tu proyecto de Supabase).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "LifeQuest",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=supabase.json"]
+    },
+    {
+      "name": "LifeQuest (release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=supabase.json"]
+    }
+  ]
+}
