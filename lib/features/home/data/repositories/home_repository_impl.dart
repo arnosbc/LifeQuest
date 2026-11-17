@@ -36,6 +36,12 @@ class HomeRepositoryImpl implements HomeRepository {
     return unit;
   });
 
+  @override
+  Future<Either<Failure, Unit>> completeTask(String taskId) => _run(() async {
+    await _remote.completeTask(taskId);
+    return unit;
+  });
+
   static String _day(DateTime now) =>
       '${now.year.toString().padLeft(4, '0')}-'
       '${now.month.toString().padLeft(2, '0')}-'
@@ -62,10 +68,16 @@ class HomeRepositoryImpl implements HomeRepository {
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',
     'invalid_day' =>
       'La fecha de tu teléfono no coincide con la de hoy. Revísala y reintenta.',
-    'chest_already_claimed' => 'Ya abriste el cofre de hoy. Mañana habrá otro.',
-    'chest_locked' => 'Cumple tus misiones del día para abrir el cofre.',
+    'chest_already_claimed' =>
+      'Ya cobraste la recompensa de hoy. Mañana habrá otra.',
+    'chest_locked' => 'Completa tus tareas del día para cobrar la recompensa.',
+    'task_not_open' =>
+      'Esa tarea ya estaba completada. Desliza para actualizar.',
+    'task_steps_pending' =>
+      'Completa los pasos de esta tarea para poder terminarla.',
+    'task_not_found' => 'No encontramos esa tarea. Desliza para actualizar.',
     'profile_not_found' =>
-      'Estamos preparando tu personaje. Desliza para actualizar en un momento.',
+      'Estamos preparando tu cuenta. Desliza para actualizar en un momento.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

@@ -22,6 +22,37 @@ void main() {
     expect(entity.earnedTitles, isEmpty);
   });
 
+  test('lee la racha y los días del mes de activity_month (059)', () {
+    final entity = CharacterProfileModel.fromJson(const {
+      'activity': {
+        'streak': 3,
+        'days': {'13': 1, '14': 2, 'x': 9},
+      },
+    }).toEntity();
+
+    expect(entity.activityStreak, 3);
+    expect(entity.activityHeat, {13: 1, 14: 2});
+  });
+
+  test('vitrina: 3 logros más recientes y el conteo', () {
+    final entity = CharacterProfileModel.fromJson(const {
+      'achievements': [
+        {'name': 'Buen hábito', 'unlocked_at': '2026-11-15T10:00:00Z'},
+        {'name': 'Primer paso', 'unlocked_at': '2026-11-14T10:00:00Z'},
+        {'name': 'Racha encendida', 'unlocked_at': '2026-11-13T10:00:00Z'},
+        {'name': 'Aventurero', 'unlocked_at': '2026-11-12T10:00:00Z'},
+        {'name': 'Leyenda', 'unlocked_at': null},
+      ],
+    }).toEntity();
+
+    expect(entity.recentAchievements, [
+      'Buen hábito',
+      'Primer paso',
+      'Racha encendida',
+    ]);
+    expect((entity.achievementsUnlocked, entity.achievementsTotal), (4, 5));
+  });
+
   test('un título sin nombre se ignora', () {
     final entity = CharacterProfileModel.fromJson(const {
       'active_title': {'id': 't1', 'name': ' '},

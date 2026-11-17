@@ -55,7 +55,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     emit(
       result.match(
         (failure) => OnboardingPending(current.status, error: failure.message),
-        (_) => const OnboardingNotNeeded(),
+        (_) => const OnboardingNotNeeded(justCompleted: true),
       ),
     );
   }

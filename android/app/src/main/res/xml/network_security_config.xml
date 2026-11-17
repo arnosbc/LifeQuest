@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- H-04 (M5): sin tráfico en claro y solo certificados del sistema (un CA
+     instalado por el usuario no puede interceptar Supabase ni Gemini). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

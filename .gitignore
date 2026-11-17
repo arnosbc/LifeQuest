@@ -49,3 +49,12 @@ supabase.json
 
 # Grafo generado por graphify
 graphify-out/
+
+# Locales: ajustes propios de Claude Code y caché de la CLI de Supabase.
+.claude/settings.local.json
+supabase/.temp/
+
+# Configuración de Firebase con su clave: cada quien usa la suya.
+/android/app/google-services.json
+# Binario de la herramienta de diseño impeccable (19 MB), no es parte de la app.
+.claude/skills/impeccable/scripts/bin/

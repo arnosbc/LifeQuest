@@ -24,7 +24,7 @@ class MissionsSuccess extends MissionsState {
     this.saving = false,
     this.busyMissionId,
     this.message,
-    this.focusRequested = false,
+    this.focusTaskId,
   });
 
   final MissionsBoard board;
@@ -32,17 +32,19 @@ class MissionsSuccess extends MissionsState {
   /// Refresco en curso (deslizar hacia abajo).
   final bool refreshing;
 
-  /// Creando una misión.
+  /// Creando una tarea.
   final bool saving;
 
-  /// Misión que se está completando.
+  /// Tarea que se está completando.
   final String? busyMissionId;
 
   /// Aviso puntual para mostrar en un snackbar.
   final String? message;
 
-  /// La misión se creó con "Crear e iniciar Focus": abrir la Mazmorra.
-  final bool focusRequested;
+  /// La tarea se creó con "Crear e iniciar Focus": abrir Foco con ella.
+  final String? focusTaskId;
+
+  bool get focusRequested => focusTaskId != null;
 
   @override
   List<Object?> get props => [
@@ -51,7 +53,7 @@ class MissionsSuccess extends MissionsState {
     saving,
     busyMissionId,
     message,
-    focusRequested,
+    focusTaskId,
   ];
 }
 

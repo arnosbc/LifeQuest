@@ -66,7 +66,8 @@ class RpgenieBloc extends Bloc<RpgenieEvent, RpgenieState> {
     await result.match(
       (failure) async =>
           emit(RpgenieSuccess(current.board, message: failure.message)),
-      (_) => _load(emit, message: '¡Misión cumplida! Aquí va la siguiente.'),
+      (_) =>
+          _load(emit, message: '¡Tarea completada! Aquí va el siguiente paso.'),
     );
   }
 }

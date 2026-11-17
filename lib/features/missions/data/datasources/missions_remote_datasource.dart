@@ -6,24 +6,32 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/missions/data/models/missions_board_model.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 
 /// RPCs de Misiones en Supabase. Lanza [ServerException] o [NetworkException].
 abstract class MissionsRemoteDataSource {
   Future<MissionsBoardModel> getBoard();
 
-  Future<void> createMission(NewMission mission);
+  /// Devuelve el id de la tarea creada.
+  Future<String> createMission(NewMission mission);
 
   Future<void> completeMission(String missionId);
 
   Future<void> renameMission(String missionId, String title);
 
   Future<void> deleteMission(String missionId);
+
+  /// `set_task_repeat` (073); [rule] null deja de repetir.
+  Future<void> setMissionRepeat(String missionId, String? rule);
 }
 
 class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
-  const MissionsRemoteDataSourceImpl(this._client);
+  const MissionsRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<MissionsBoardModel> getBoard() => _guard(() async {
@@ -32,8 +40,8 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
   });
 
   @override
-  Future<void> createMission(NewMission mission) => _guard(
-    () => _client.rpc<void>(
+  Future<String> createMission(NewMission mission) => _guard(() async {
+    final created = await _client.rpc<Map<String, dynamic>>(
       'create_task',
       params: {
         'p_title': mission.title,
@@ -45,12 +53,22 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
         'p_goal_id': mission.goalId,
         'p_subtasks': mission.subtasks,
       },
-    ),
-  );
+    );
+    _rewards?.announce(
+      'Nueva tarea: ${mission.title}',
+      'Agregada a tus pendientes. ¡Tú puedes!',
+    );
+    return created['id'] as String;
+  });
 
   @override
   Future<void> completeMission(String missionId) => _guard(
-    () => _client.rpc<void>('complete_task', params: {'p_task_id': missionId}),
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_task',
+        params: {'p_task_id': missionId},
+      ),
+    ),
   );
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej. `task_not_open`);
@@ -66,6 +84,14 @@ class MissionsRemoteDataSourceImpl implements MissionsRemoteDataSource {
   @override
   Future<void> deleteMission(String missionId) => _guard(
     () => _client.rpc<void>('delete_task', params: {'p_task_id': missionId}),
+  );
+
+  @override
+  Future<void> setMissionRepeat(String missionId, String? rule) => _guard(
+    () => _client.rpc<void>(
+      'set_task_repeat',
+      params: {'p_task_id': missionId, 'p_rule': rule},
+    ),
   );
 
   Future<T> _guard<T>(Future<T> Function() action) async {

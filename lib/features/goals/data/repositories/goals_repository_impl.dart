@@ -43,14 +43,16 @@ class GoalsRepositoryImpl implements GoalsRepository {
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
-    'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+    'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
+    'task_steps_pending' =>
+      'Completa los pasos de esta tarea para poder terminarla.',
     'task_not_found' ||
     'project_not_found' ||
     'item_not_found' => 'Eso ya no está aquí. Desliza para actualizar.',
     'project_has_open_tasks' =>
       'A este proyecto aún le quedan misiones abiertas. ¡Ya casi!',
     'project_has_no_completed_tasks' =>
-      'Completa al menos una misión del proyecto para cerrarlo.',
+      'Completa al menos una tarea del proyecto para cerrarlo.',
     'project_no_real_work' =>
       'Las misiones de este proyecto se cerraron muy rápido. '
           'Avanza en una más y vuelve a intentarlo.',

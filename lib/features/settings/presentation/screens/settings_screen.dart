@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/settings/domain/entities/game_settings.dart';
 import 'package:proyecto_movil/features/settings/presentation/blocs/settings_bloc.dart';
@@ -16,6 +17,7 @@ class SettingsScreen extends StatelessWidget {
     required this.onBack,
     required this.onSignOut,
     required this.onOpenAppearance,
+    this.onChangePassword,
   });
 
   final String userName;
@@ -28,6 +30,10 @@ class SettingsScreen extends StatelessWidget {
   /// Abre la pantalla de Apariencia (modo claro, oscuro o del sistema).
   final VoidCallback onOpenAppearance;
 
+  /// Cambia la contraseña; devuelve el error en español o null si salió bien.
+  /// Lo provee la app (la sesión vive en auth).
+  final Future<String?> Function(String password)? onChangePassword;
+
   @override
   Widget build(
     BuildContext context,
@@ -36,13 +42,10 @@ class SettingsScreen extends StatelessWidget {
     listener: (context, state) =>
         showLifeQuestMessage(context, (state as SettingsSuccess).message!),
     builder: (context, state) => LifeQuestPage(
-      title: 'Configuración',
-      subtitle: 'Tus reglas del juego. Cámbialas cuando quieras.',
-      trailing: IconButton(
-        onPressed: onBack,
-        tooltip: 'Volver al perfil',
-        icon: Icon(Icons.close_rounded, color: context.lq.ink),
-      ),
+      title: 'Ajustes',
+      icon: QIcons.gear,
+      subtitle: 'Tus reglas. Cámbialas cuando quieras.',
+      onBack: onBack,
       children: [
         AccountCard(
           userName: userName,
@@ -89,6 +92,13 @@ class SettingsScreen extends StatelessWidget {
             'La Tienda estará disponible próximamente.',
           ),
         ),
+        if (onChangePassword case final change?)
+          SettingLink(
+            icon: Icons.lock_outline,
+            title: 'Cambiar contraseña',
+            description: 'Elige una nueva de al menos 6 caracteres.',
+            onTap: () => _changePassword(context, change),
+          ),
         const SizedBox(height: 12),
         Text(
           'Tu progreso está guardado en la nube. Puedes volver a entrar '
@@ -151,6 +161,63 @@ class SettingsScreen extends StatelessWidget {
             : (level) =>
                   bloc.add(GameSettingsChanged(settings.withDifficulty(level))),
       ),
+      if (settings.dailyXpGoal case final goal?) ...[
+        const SizedBox(height: 12),
+        const LifeQuestSectionHeading('META DIARIA'),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            'La XP que quieres ganar cada día. Al cumplirla abres el cofre '
+            'de tu desafío diario. Es una meta, no un límite: puedes ganar '
+            'más.',
+            style: TextStyle(color: context.lq.muted, fontSize: 12),
+          ),
+        ),
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Bajar la meta diaria',
+              onPressed:
+                  saving ||
+                      goal - GameSettings.xpGoalStep <
+                          GameSettings.xpGoalRange.min
+                  ? null
+                  : () => bloc.add(
+                      GameSettingsChanged(
+                        settings.withXpGoal(goal - GameSettings.xpGoalStep),
+                      ),
+                    ),
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            Expanded(
+              child: Text(
+                '$goal XP al día',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.lq.ink,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Subir la meta diaria',
+              onPressed:
+                  saving ||
+                      goal + GameSettings.xpGoalStep >
+                          GameSettings.xpGoalRange.max
+                  ? null
+                  : () => bloc.add(
+                      GameSettingsChanged(
+                        settings.withXpGoal(goal + GameSettings.xpGoalStep),
+                      ),
+                    ),
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
+        ),
+      ],
       const SizedBox(height: 12),
       const LifeQuestSectionHeading('REGLAS DEL JUEGO'),
       const SizedBox(height: 8),
@@ -162,11 +229,67 @@ class SettingsScreen extends StatelessWidget {
       ),
       SettingLink(
         icon: Icons.timer_outlined,
-        title: 'Descansos de la Mazmorra',
+        title: 'Descansos del Modo Foco',
         description: breaksSummary(settings),
         onTap: saving ? null : () => edit(showBreaksSheet),
       ),
     ];
+  }
+
+  Future<void> _changePassword(
+    BuildContext context,
+    Future<String?> Function(String password) change,
+  ) async {
+    final first = TextEditingController();
+    final second = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final password = await showQuestlyDialog<String>(
+      context,
+      title: 'Cambiar contraseña',
+      content: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: first,
+              obscureText: true,
+              autofillHints: const [AutofillHints.newPassword],
+              decoration: const InputDecoration(labelText: 'Nueva contraseña'),
+              validator: (v) => v == null || v.length < 6
+                  ? 'Usa al menos 6 caracteres.'
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: second,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Repítela'),
+              validator: (v) =>
+                  v != first.text ? 'Las contraseñas no coinciden.' : null,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Builder(
+          builder: (context) => QuestlyButton(
+            label: 'Guardar contraseña',
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.of(context).pop(first.text);
+              }
+            },
+          ),
+        ),
+      ],
+    );
+    first.dispose();
+    second.dispose();
+    if (password == null || !context.mounted) return;
+    final error = await change(password);
+    if (!context.mounted) return;
+    showLifeQuestMessage(context, error ?? 'Contraseña cambiada.');
   }
 
   Future<void> _confirmSignOut(BuildContext context) async {

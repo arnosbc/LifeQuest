@@ -2,6 +2,8 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -35,8 +37,8 @@ void main() {
       );
 
   Future<void> tapCreateAccount(WidgetTester tester) async {
-    await tester.ensureVisible(find.text('Crear cuenta'));
-    await tester.tap(find.text('Crear cuenta'));
+    await tester.ensureVisible(find.text('Registrarse'));
+    await tester.tap(find.text('Registrarse'));
     await tester.pumpAndSettle();
   }
 
@@ -50,10 +52,9 @@ void main() {
       tester.getSemantics(find.byTooltip('Mostrar contraseña').first),
       isSemantics(isButton: true, isTextField: false),
     );
-    final password = tester
-        .getSemantics(find.byType(EditableText).at(2))
-        .getSemanticsData();
-    expect(password.label, 'Contraseña');
+    final passwordNode = tester.getSemantics(find.byType(EditableText).at(2));
+    expect(passwordNode, isSemantics(isTextField: true));
+    expect(passwordNode.getSemanticsData().label, startsWith('Contraseña'));
     expect(
       tester.getSemantics(find.byType(Checkbox)),
       isSemantics(label: 'Acepto los términos y condiciones'),
@@ -71,7 +72,9 @@ void main() {
     await tapCreateAccount(tester);
 
     expect(
-      find.text('Revisa el correo: parece que falta algo (ej.: tu@correo.com).'),
+      find.text(
+        'Revisa el correo: parece que falta algo (ej.: tu@correo.com).',
+      ),
       findsOneWidget,
     );
     expect(find.text('Acepta los términos para continuar.'), findsOneWidget);
@@ -178,10 +181,18 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('en tema oscuro usa la paleta oscura', (tester) async {
+  testWidgets('pinta la noche con montañas detrás del formulario', (
+    tester,
+  ) async {
     await tester.pumpWidget(app(themeMode: ThemeMode.dark));
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-    expect(scaffold.backgroundColor, LifeQuestPalette.dark.background);
+    expect(scaffold.backgroundColor, Colors.transparent);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is ColoredBox && w.color == AuthFormLayout.night,
+      ),
+      findsOneWidget,
+    );
   });
 }

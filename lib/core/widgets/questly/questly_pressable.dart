@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
@@ -60,7 +61,13 @@ class _QuestlyPressableState extends State<QuestlyPressable> {
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            onTap: widget.onTap,
+            // Toque con respuesta física, como los botones de Duolingo.
+            onTap: widget.onTap == null
+                ? null
+                : () {
+                    HapticFeedback.selectionClick();
+                    widget.onTap!();
+                  },
             borderRadius: borderRadius,
             splashFactory: NoSplash.splashFactory,
             highlightColor: Colors.transparent,

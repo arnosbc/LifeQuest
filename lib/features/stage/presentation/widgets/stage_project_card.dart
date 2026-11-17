@@ -4,7 +4,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 
 /// Proyecto desplegable: progreso y urgencia arriba; al abrirlo, sus
-/// misiones (con ✓ para completarlas) y las acciones del proyecto.
+/// tareas (con ✓ para completarlas) y las acciones del proyecto.
 class StageProjectCard extends StatelessWidget {
   const StageProjectCard({
     super.key,
@@ -62,7 +62,7 @@ class StageProjectCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$details\n${project.tasksDone} de ${project.tasksTotal} misiones · $urgencyLabel',
+                    '$details\n${project.tasksDone} de ${project.tasksTotal} tareas · $urgencyLabel',
                     style: TextStyle(color: context.lq.muted, fontSize: 10),
                   ),
                   const SizedBox(height: 5),
@@ -81,7 +81,7 @@ class StageProjectCard extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Aún no tiene misiones.',
+                      'Aún no tiene tareas.',
                       style: TextStyle(color: context.lq.muted, fontSize: 11),
                     ),
                   ),
@@ -114,12 +114,12 @@ class StageProjectCard extends StatelessWidget {
                         )
                       else
                         IconButton(
-                          tooltip: 'Completar «${task.title}»',
+                          tooltip: 'Empezar en Foco «${task.title}»',
                           onPressed: onCompleteTask == null
                               ? null
                               : () => onCompleteTask!(task.id),
                           icon: Icon(
-                            Icons.check_circle_outline,
+                            Icons.play_circle_outline_rounded,
                             color: context.lq.deepGreen,
                           ),
                         ),
@@ -131,7 +131,7 @@ class StageProjectCard extends StatelessWidget {
                     TextButton.icon(
                       onPressed: onAddMission,
                       icon: const Icon(Icons.add),
-                      label: const Text('Misión'),
+                      label: const Text('Tarea'),
                     ),
                     if (project.canComplete)
                       FilledButton.tonal(

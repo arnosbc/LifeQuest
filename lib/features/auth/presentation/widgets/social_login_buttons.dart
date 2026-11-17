@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Separador «o continúa con» + botones de Google y Apple (aún sin conectar).
+/// Separador «o» + «Continuar con Google».
 class SocialLoginButtons extends StatelessWidget {
-  const SocialLoginButtons({super.key, required this.onNotice});
+  const SocialLoginButtons({super.key, required this.onGoogle});
 
-  final ValueChanged<String> onNotice;
+  /// Null mientras carga: el botón no se puede volver a tocar.
+  final VoidCallback? onGoogle;
+
+  static const _googleG =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">'
+      '<path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 '
+      '30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.1C12.4 13.7 17.7 9.5 24 '
+      '9.5z"/>'
+      '<path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 '
+      '2.9-2.2 5.3-4.6 7l7.2 5.6c4.2-3.9 7.1-9.6 7.1-17.1z"/>'
+      '<path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9'
+      '-6.1C1 16.6 0 20.2 0 24s1 7.4 2.6 10.7l7.9-6.1z"/>'
+      '<path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.2-5.6c-2 1.4'
+      '-4.6 2.2-8.7 2.2-6.3 0-11.6-4.2-13.5-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 '
+      '48z"/>'
+      '</svg>';
 
   @override
   Widget build(BuildContext context) {
     final q = context.q;
-    final style = OutlinedButton.styleFrom(
-      minimumSize: const Size.fromHeight(52),
-      foregroundColor: q.text,
-      backgroundColor: q.card,
-      textStyle: QText.label(q.text).copyWith(fontSize: 15),
-      side: BorderSide(color: q.inputBorder, width: 1.5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(QRadius.button),
-      ),
-    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -30,9 +36,9 @@ class SocialLoginButtons extends StatelessWidget {
             children: [
               Expanded(child: Divider(height: 1, color: q.border)),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
-                  'o continúa con',
+                  'o',
                   style: QText.body(q.text2).copyWith(fontSize: 13),
                 ),
               ),
@@ -40,27 +46,21 @@ class SocialLoginButtons extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () =>
-                    onNotice('El inicio con Google estará disponible pronto.'),
-                style: style,
-                child: const Text('Google'),
-              ),
+        const SizedBox(height: QSpace.l),
+        OutlinedButton.icon(
+          onPressed: onGoogle,
+          icon: SvgPicture.string(_googleG, width: 18, height: 18),
+          label: const Text('Continuar con Google'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(52),
+            foregroundColor: q.text,
+            backgroundColor: q.card,
+            textStyle: QText.label(q.text).copyWith(fontSize: 15),
+            side: BorderSide(color: q.accent, width: 1.2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(QRadius.action),
             ),
-            const SizedBox(width: QSpace.s),
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () =>
-                    onNotice('El inicio con Apple estará disponible pronto.'),
-                style: style,
-                child: const Text('Apple'),
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     );

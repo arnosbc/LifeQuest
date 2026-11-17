@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/goals/domain/entities/goals_board.dart';
 import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
 
-/// Objetivos: cada Meta es un jefe. Atacar = completar una tarea o un
-/// proyecto vinculado. Necesita un [GoalsBloc] por encima.
+/// Metas y su avance a partir de las tareas y proyectos vinculados.
+/// Necesita un [GoalsBloc] por encima.
 class GoalsScreen extends StatelessWidget {
   const GoalsScreen({super.key, required this.onCreateGoal});
 
-  /// Las Metas se crean con S.M.A.R.T. desde Stage.
+  /// Las Metas se crean con S.M.A.R.T. desde el Planificador.
   final VoidCallback onCreateGoal;
 
   @override
@@ -35,15 +38,16 @@ class GoalsScreen extends StatelessWidget {
           );
         },
         child: LifeQuestPage(
-          title: 'Objetivos',
-          subtitle: 'Cada meta es un jefe que puedes vencer.',
+          title: 'Metas',
+          icon: QIcons.flag,
+          subtitle: 'Cada tarea que completas acerca tu meta al 100 %.',
           children: [
             if (state.board.goals.isEmpty)
               const LifeQuestListRow(
                 icon: Icons.flag_outlined,
-                title: 'Aún no hay jefes a la vista',
+                title: 'Aún no tienes metas',
                 subtitle:
-                    'Crea una meta S.M.A.R.T. y cada misión vinculada la golpeará.',
+                    'Crea una meta S.M.A.R.T. y las tareas vinculadas la harán avanzar.',
               ),
             for (final goal in state.board.goals)
               _BossCard(goal: goal, state: state),
@@ -53,7 +57,7 @@ class GoalsScreen extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onCreateGoal,
                 icon: const Icon(Icons.add),
-                label: const Text('Nueva meta en Stage'),
+                label: const Text('Nueva meta en el Planificador'),
               ),
             ),
           ],
@@ -73,11 +77,14 @@ class _BossCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<GoalsBloc>();
     final idle = state.busyKey == null;
-    final ratio = goal.maxHp == 0 ? 0.0 : goal.currentHp / goal.maxHp;
+    final ratio = goal.maxHp <= 0
+        ? 0.0
+        : ((goal.maxHp - goal.currentHp) / goal.maxHp).clamp(0.0, 1.0);
+    final progress = (ratio * 100).round();
     final (skin, skinColor) = switch (goal.status) {
-      GoalStatus.completed => ('Éxito', context.lq.deepGreen),
-      GoalStatus.expired => ('El jefe escapó… por ahora', context.lq.muted),
-      _ => ('¡Sigue así!', context.lq.deepGreen),
+      GoalStatus.completed => ('Meta cumplida', context.lq.deepGreen),
+      GoalStatus.expired => ('La fecha pasó', context.lq.muted),
+      _ => ('En progreso', context.lq.deepGreen),
     };
     final smart = [
       ('Específica', goal.smart.specific),
@@ -95,7 +102,7 @@ class _BossCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const LifeQuestIconTile(Icons.whatshot),
+                const LifeQuestIconTile(Icons.flag_outlined),
                 const SizedBox(width: 9),
                 Expanded(
                   child: Text(
@@ -122,13 +129,13 @@ class _BossCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Semantics(
-              label: 'Vida del jefe: ${goal.currentHp} de ${goal.maxHp}',
+              label: 'Avance de la meta: $progress %',
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
                   value: ratio,
                   minHeight: 10,
-                  color: context.lq.error,
+                  color: context.q.river,
                   backgroundColor: context.lq.line,
                 ),
               ),
@@ -136,7 +143,7 @@ class _BossCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               [
-                'Vida ${goal.currentHp}/${goal.maxHp}',
+                '$progress % de avance',
                 if (goal.dueDate != null)
                   'Hasta el ${LifeQuestDates.day(goal.dueDate!)}',
                 ?goal.skillName,
@@ -145,11 +152,11 @@ class _BossCard extends StatelessWidget {
             ),
             if (goal.active) ...[
               const SizedBox(height: 12),
-              const LifeQuestSectionHeading('ATAQUES DISPONIBLES'),
+              const LifeQuestSectionHeading('LO QUE LA HACE AVANZAR'),
               const SizedBox(height: 7),
               if (goal.attacks.isEmpty)
                 Text(
-                  'Vincula misiones o proyectos a esta meta desde Stage para atacar.',
+                  'Vincula tareas o proyectos a esta meta desde el Planificador para avanzar.',
                   style: TextStyle(color: context.lq.muted, fontSize: 12),
                 ),
               for (final a in goal.attacks)
@@ -159,20 +166,26 @@ class _BossCard extends StatelessWidget {
                       : Icons.bolt,
                   title: a.title,
                   subtitle: a.kind == AttackKind.project
-                      ? 'Proyecto · −${a.damage} de vida'
-                      : 'Misión · −${a.damage} de vida',
-                  actionLabel: 'Atacar',
+                      ? 'Proyecto · +${a.damage} % de avance'
+                      : 'Tarea · +${a.damage} % de avance',
+                  actionLabel: a.kind == AttackKind.project
+                      ? 'Completar'
+                      : 'Empezar en Foco',
                   busy: state.busyKey == a.id,
-                  onAction: idle
-                      ? () => bloc.add(BossAttacked(goalId: goal.id, attack: a))
-                      : null,
+                  // 040: las tareas se completan en Foco; los proyectos, aquí.
+                  onAction: !idle
+                      ? null
+                      : a.kind == AttackKind.task
+                      ? () => context.go(RoutePaths.focusOn(a.id))
+                      : () =>
+                            bloc.add(BossAttacked(goalId: goal.id, attack: a)),
                 ),
             ] else ...[
               const SizedBox(height: 10),
               if (goal.status == GoalStatus.expired)
                 Text(
                   'Conservas toda la XP ganada. Puedes replantear la meta '
-                  'en Stage o archivarla.',
+                  'en el Planificador o archivarla.',
                   style: TextStyle(color: context.lq.ink, fontSize: 12),
                 ),
               Align(
@@ -188,13 +201,13 @@ class _BossCard extends StatelessWidget {
             ],
             if (goal.hits.isNotEmpty) ...[
               const SizedBox(height: 8),
-              const LifeQuestSectionHeading('GOLPES RECIENTES'),
+              const LifeQuestSectionHeading('ACTIVIDAD RECIENTE'),
               const SizedBox(height: 4),
               for (final h in goal.hits)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Text(
-                    '−${h.damage} · ${h.title}'
+                    '+${h.damage} % · ${h.title}'
                     '${h.at == null ? '' : ' · ${LifeQuestDates.day(h.at!)}'}',
                     style: TextStyle(color: context.lq.ink, fontSize: 12),
                   ),

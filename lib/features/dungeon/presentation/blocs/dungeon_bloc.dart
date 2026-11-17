@@ -3,15 +3,20 @@ import 'dart:async';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fpdart/fpdart.dart' show Left;
+import 'package:fpdart/fpdart.dart' show Either, Left;
+
+import 'package:proyecto_movil/core/errors/failures.dart';
 
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/dungeon/domain/entities/dungeon_board.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/add_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_dungeon_cycle.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_habit.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/complete_session_task.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/end_dungeon.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/get_dungeon_board.dart';
 import 'package:proyecto_movil/features/dungeon/domain/usecases/start_dungeon.dart';
+import 'package:proyecto_movil/features/dungeon/domain/usecases/toggle_session_step.dart';
 
 part 'dungeon_event.dart';
 part 'dungeon_state.dart';
@@ -25,6 +30,9 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     required this._completeCycle,
     required this._completeTask,
     required this._end,
+    required this._addTask,
+    required this._toggleStep,
+    required this._completeHabit,
     DateTime Function()? clock,
     Stream<void> Function()? ticker,
   }) : _clock = clock ?? DateTime.now,
@@ -36,6 +44,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     on<DungeonBreakSkipped>(_onBreakSkipped);
     on<DungeonTaskSelected>(_onTaskSelected);
     on<DungeonTaskCompleted>(_onTaskCompleted, transformer: droppable());
+    on<DungeonStepDone>(_onStepDone, transformer: droppable());
+    on<DungeonHabitDone>(_onHabitDone, transformer: droppable());
     on<DungeonEnded>(_onEnded, transformer: droppable());
     on<DungeonSummaryDismissed>(_onSummaryDismissed);
     _ticks = (ticker ?? _everySecond)().listen(
@@ -48,6 +58,9 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
   final CompleteDungeonCycle _completeCycle;
   final CompleteSessionTask _completeTask;
   final EndDungeon _end;
+  final AddSessionTask _addTask;
+  final ToggleSessionStep _toggleStep;
+  final CompleteSessionHabit _completeHabit;
   final DateTime Function() _clock;
   late final StreamSubscription<void> _ticks;
 
@@ -62,7 +75,11 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
 
   /// Estado al cargar un tablero. Con sesión abierta se empieza un ciclo
   /// completo: el avance local de un ciclo a medias no se guarda.
-  DungeonReady _fresh(DungeonBoard board, {DungeonSummary? summary}) {
+  DungeonReady _fresh(
+    DungeonBoard board, {
+    DungeonSummary? summary,
+    String? message,
+  }) {
     final now = _clock();
     final session = board.session;
     if (session == null) {
@@ -71,6 +88,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         phase: DungeonPhase.setup,
         now: now,
         summary: summary,
+        message: message,
       );
     }
     final done = session.cyclesDone >= session.maxCycles;
@@ -85,11 +103,13 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     );
   }
 
-  /// Mantiene la misión elegida si sigue abierta; si no, la primera abierta.
+  /// Mantiene lo elegido (tarea o hábito) si sigue abierto; si no, lo
+  /// primero abierto.
   static String? _nextTask(DungeonSession session, String? current) {
-    final open = session.tasks.where((t) => !t.done);
+    final items = session.items;
+    final open = items.where((t) => !t.done);
     if (open.any((t) => t.id == current)) return current;
-    return open.isEmpty ? session.tasks.firstOrNull?.id : open.first.id;
+    return open.isEmpty ? items.firstOrNull?.id : open.first.id;
   }
 
   Future<void> _onRequested(
@@ -98,15 +118,40 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
   ) async {
     final current = state;
     if (current is! DungeonReady) emit(const DungeonLoading());
-    final result = await _getBoard(const NoParams());
+    var result = await _getBoard(const NoParams());
+    final wanted = event.taskId;
+    final session = result.toNullable()?.session;
+    String? message;
+    // Tarea abierta que aún no está en la sesión en curso: se suma.
+    if (wanted != null &&
+        session != null &&
+        !session.tasks.any((t) => t.id == wanted) &&
+        result.toNullable()!.candidates.any((t) => t.id == wanted)) {
+      final added = await _addTask(
+        CompleteDungeonCycleParams(sessionId: session.id, taskId: wanted),
+      );
+      message = added.fold((f) => f.message, (_) => null);
+      if (added.isRight()) result = await _getBoard(const NoParams());
+    }
     emit(
       result.match(
         (failure) => current is DungeonReady
             ? current.copyWith(message: failure.message)
             : DungeonFailure(failure.message),
-        (board) => _refreshed(board),
+        (board) => switch (_refreshed(board)) {
+          final DungeonReady ready
+              when wanted != null &&
+                  (board.session?.tasks.any((t) => t.id == wanted) ?? false) =>
+            ready.copyWith(currentTaskId: () => wanted, message: message),
+          final DungeonReady ready when message != null => ready.copyWith(
+            message: message,
+          ),
+          final other => other,
+        },
       ),
     );
+    // Al volver de la tarea guiada (p. ej. la revisión tachó el último paso).
+    result.map(_endIfAllDone);
   }
 
   /// Refrescar la misma sesión conserva el cronómetro; si cambió, empieza de cero.
@@ -136,6 +181,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         totalMinutes: event.totalMinutes,
         cycleMinutes: event.cycleMinutes,
         taskIds: event.taskIds,
+        habitIds: event.habitIds,
       ),
     );
     if (started case Left(value: final failure)) {
@@ -146,9 +192,9 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     emit(
       board.match(
         (failure) => current.copyWith(busy: false, message: failure.message),
-        (b) => _fresh(
-          b,
-        ).copyWith(message: '¡Entraste a la Mazmorra! A por el primer ciclo.'),
+        (b) => _fresh(b).copyWith(
+          message: 'Has iniciado el Modo Foco. Vamos con el primer bloque.',
+        ),
       ),
     );
   }
@@ -179,7 +225,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
           now: now,
           phase: DungeonPhase.focus,
           phaseEndsAt: () => now.add(Duration(minutes: session.cycleMinutes)),
-          message: 'Descanso terminado. ¡Siguiente mazmorra!',
+          message: 'Descanso terminado. Puedes seguir cuando quieras.',
         ),
       );
       return;
@@ -197,7 +243,11 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
     if (taskId == null) return;
     emit(current.copyWith(busy: true));
     final claimed = await _completeCycle(
-      CompleteDungeonCycleParams(sessionId: session.id, taskId: taskId),
+      CompleteDungeonCycleParams(
+        sessionId: session.id,
+        taskId: taskId,
+        isHabit: session.habits.any((h) => h.id == taskId),
+      ),
     );
     final now = _clock();
     if (claimed case Left(value: final failure)) {
@@ -228,8 +278,8 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         phaseEndsAt: () => done ? null : now.add(board.breakAfter(cycles)),
         currentTaskId: () => _nextTask(s, taskId),
         message: done
-            ? '¡Último ciclo superado! Termina la sesión para ver tu botín.'
-            : '¡Mazmorra superada! Toma un descanso.',
+            ? '¡Bloque completado! Termina la sesión para ver el resumen.'
+            : '¡Bloque completado! Toma un descanso.',
       ),
     );
   }
@@ -309,6 +359,69 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         message: _taskMessage(reward, board.session),
       ),
     );
+    _endIfAllDone(board);
+  }
+
+  /// Paso hecho sin salir de Foco; si era el último, la tarea se completa.
+  Future<void> _onStepDone(
+    DungeonStepDone event,
+    Emitter<DungeonState> emit,
+  ) => _act(
+    emit,
+    () async => (await _toggleStep(event.stepId)).map(
+      (completed) => completed
+          ? '¡Tarea completada! Era el último paso.'
+          : '¡Paso hecho! Sigue con el siguiente.',
+    ),
+  );
+
+  Future<void> _onHabitDone(
+    DungeonHabitDone event,
+    Emitter<DungeonState> emit,
+  ) => _act(
+    emit,
+    () async => (await _completeHabit(
+      event.habitId,
+    )).map((_) => '¡Hábito cumplido hoy! Tu racha sigue viva.'),
+  );
+
+  /// Ejecuta una acción del servidor, relee la sesión y avisa con su mensaje.
+  Future<void> _act(
+    Emitter<DungeonState> emit,
+    Future<Either<Failure, String>> Function() action,
+  ) async {
+    final current = state;
+    if (current is! DungeonReady || current.busy) return;
+    emit(current.copyWith(busy: true));
+    final result = await action();
+    if (result case Left(value: final failure)) {
+      emit(_latest(current).copyWith(busy: false, message: failure.message));
+      return;
+    }
+    final reloaded = await _getBoard(const NoParams());
+    final latest = _latest(current);
+    final board = reloaded.getOrElse((_) => latest.board);
+    emit(
+      latest.copyWith(
+        board: board,
+        busy: false,
+        currentTaskId: () => board.session == null
+            ? latest.currentTaskId
+            : _nextTask(board.session!, latest.currentTaskId),
+        message: result.getOrElse((_) => ''),
+      ),
+    );
+    _endIfAllDone(board);
+  }
+
+  /// Todo lo de la sesión cumplido: se cierra sola y muestra el resumen
+  /// (idea del usuario 2026-11-16). El bloque a medias no se cobra, igual
+  /// que al tocar «Finalizar».
+  void _endIfAllDone(DungeonBoard board) {
+    final items = board.session?.items ?? const [];
+    if (items.isNotEmpty && items.every((i) => i.done)) {
+      add(const DungeonEnded(allDone: true));
+    }
   }
 
   /// «+12 XP · +4 Monedas» y, si se pudo leer, el total de la sesión.
@@ -321,7 +434,7 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
         ? ''
         : ' En esta sesión llevas ${session.xpEarned} XP '
               'y ${session.coinsEarned} Monedas.';
-    return '¡Misión completada! $gained.$total';
+    return '¡Tarea completada! $gained.$total';
   }
 
   /// El estado actual si sigue listo (los tics lo avanzan mientras esperamos).
@@ -346,6 +459,9 @@ class DungeonBloc extends Bloc<DungeonEvent, DungeonState> {
           (_) => DungeonBoard(candidates: current.board.candidates),
         ),
         summary: summary,
+        message: event.allDone
+            ? '¡Terminaste todo! Cerré la sesión y guardé lo que ganaste.'
+            : null,
       ),
     );
   }

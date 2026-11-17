@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Llama de la racha: lavanda con el centro claro. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp"
+    android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="#9D7CF0"
+        android:pathData="M24,3C26,11 37,15 37,29A13,13 0,0 1,11 29C11,22 14,18 17,15C17,21 19,24 22,25C20,17 21,9 24,3Z" />
+    <path android:fillColor="#C9B6FF"
+        android:pathData="M24,17C25,22 31,25 31,32A7,7 0,0 1,17 32C17,28 19,26 21,24C21,27 22,29 24,29C23,25 23,21 24,17Z" />
+    <path android:fillColor="#F4EEFF"
+        android:pathData="M24,27C25,30 28,31 28,34A4,4 0,0 1,20 34C20,32 21,31 22,30C22,32 23,32 24,32C23.5,30.5 23.5,29 24,27Z" />
+</vector>

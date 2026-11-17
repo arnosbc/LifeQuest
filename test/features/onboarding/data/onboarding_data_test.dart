@@ -85,20 +85,20 @@ void main() {
 
       expect(
         await failWith(const ServerException(code: 'skill_exists')),
-        const ServerFailure('Ya tienes una skill con ese nombre.'),
+        const ServerFailure('Ya tienes un área con ese nombre.'),
       );
       expect(
         await failWith(
           const ServerException(code: 'violates check', statusCode: '23514'),
         ),
         const ServerFailure(
-          'Usa una identidad de hasta 280 caracteres y una skill de hasta 40.',
+          'Usa una identidad de hasta 280 caracteres y un nombre de área de hasta 40.',
         ),
       );
       expect(
         await failWith(const ServerException(code: 'otro')),
         const ServerFailure(
-          'No pudimos guardar tu aventura. Inténtalo de nuevo.',
+          'No pudimos guardar tus preferencias. Inténtalo de nuevo.',
         ),
       );
       expect(

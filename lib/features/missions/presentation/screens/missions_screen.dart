@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/create_mission_sheet.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/mission_importance_card.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/mission_tile.dart';
+import 'package:proyecto_movil/features/missions/presentation/widgets/missions_format.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/prioritized_mission_card.dart';
 import 'package:proyecto_movil/features/missions/presentation/widgets/rp_genie_tip_card.dart';
 
-/// Misiones. Necesita un [MissionsBloc] por encima (lo provee el router).
+/// Tareas. Necesita un [MissionsBloc] por encima (lo provee el router).
 class MissionsScreen extends StatelessWidget {
   const MissionsScreen({super.key, required this.onStartFocus});
 
-  /// Abre la Mazmorra tras "Crear e iniciar Focus".
-  final VoidCallback onStartFocus;
+  /// Abre Foco con la tarea recién creada ("Crear e iniciar Focus").
+  final ValueChanged<String> onStartFocus;
 
   @override
   Widget build(BuildContext context) =>
@@ -28,7 +33,7 @@ class MissionsScreen extends StatelessWidget {
           if (state.message case final message?) {
             showLifeQuestMessage(context, message);
           }
-          if (state.focusRequested) onStartFocus();
+          if (state.focusTaskId case final id?) onStartFocus(id);
         },
         builder: (context, state) => switch (state) {
           MissionsInitial() || MissionsLoading() => Center(
@@ -61,6 +66,7 @@ class MissionsScreen extends StatelessWidget {
     final bloc = context.read<MissionsBloc>();
     final result = await showModalBottomSheet<CreateMissionResult>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -74,8 +80,8 @@ class MissionsScreen extends StatelessWidget {
     final now = DateTime.now();
     final missions = state.board.missions;
     final idle = state.busyMissionId == null && !state.saving;
-    void complete(String id) =>
-        context.read<MissionsBloc>().add(MissionCompleted(id));
+    // 040: se completan dentro del Modo Foco.
+    void complete(String id) => context.go(RoutePaths.focusOn(id));
     Widget menu(Mission mission) => LifeQuestItemMenu(
       name: mission.title,
       enabled: idle,
@@ -83,17 +89,38 @@ class MissionsScreen extends StatelessWidget {
           context.read<MissionsBloc>().add(MissionRenamed(mission.id, title)),
       onDelete: () =>
           context.read<MissionsBloc>().add(MissionDeleted(mission.id)),
-      deleteMessage: 'Se borran también sus subtareas. No se puede deshacer.',
+      deleteMessage: mission.repeat == null
+          ? 'Se borran también sus pasos. No se puede deshacer.'
+          : 'Se borran sus pasos y deja de repetirse. No se puede deshacer.',
+      // 073: al completarla, la siguiente aparece sola en su día.
+      extras: [
+        for (final r in MissionRepeat.values)
+          if (r != mission.repeat)
+            (
+              'Repetir: ${MissionsFormat.repeat(r).toLowerCase()}',
+              () => context.read<MissionsBloc>().add(
+                MissionRepeatSet(mission.id, r),
+              ),
+            ),
+        if (mission.repeat != null)
+          (
+            'No repetir',
+            () => context.read<MissionsBloc>().add(
+              MissionRepeatSet(mission.id, null),
+            ),
+          ),
+      ],
     );
 
     return LifeQuestPage(
-      title: 'Misiones',
-      subtitle: 'Cada paso cuenta para tu siguiente nivel.',
+      title: 'Tareas',
+      icon: QIcons.focus,
+      subtitle: 'Cada tarea completada suma a tu nivel.',
       children: [
         if (missions.isEmpty)
           LifeQuestSurface(
             child: Text(
-              'No tienes misiones abiertas. Crea la primera y da el siguiente paso.',
+              'No tienes tareas abiertas. Crea la primera y da el siguiente paso.',
               style: TextStyle(color: context.lq.muted, fontSize: 12),
             ),
           )
@@ -106,6 +133,7 @@ class MissionsScreen extends StatelessWidget {
             busy: state.busyMissionId == missions.first.id,
             onComplete: idle ? () => complete(missions.first.id) : null,
             menu: menu(missions.first),
+            onOpen: () => context.push(RoutePaths.task(missions.first.id)),
           ),
           const SizedBox(height: 14),
           const MissionImportanceCard(),
@@ -113,7 +141,7 @@ class MissionsScreen extends StatelessWidget {
         if (missions.length > 1) ...[
           const SizedBox(height: 16),
           LifeQuestSectionHeading(
-            'OTRAS MISIONES',
+            'OTRAS TAREAS',
             action: '${missions.length - 1} activas',
           ),
           const SizedBox(height: 7),
@@ -124,6 +152,7 @@ class MissionsScreen extends StatelessWidget {
               busy: state.busyMissionId == mission.id,
               onComplete: idle ? () => complete(mission.id) : null,
               menu: menu(mission),
+              onOpen: () => context.push(RoutePaths.task(mission.id)),
             ),
             const SizedBox(height: 7),
           ],
@@ -140,7 +169,7 @@ class MissionsScreen extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.add),
-            label: Text(state.saving ? 'Creando misión…' : 'Crear misión'),
+            label: Text(state.saving ? 'Creando tarea…' : 'Crear tarea'),
           ),
         ),
       ],

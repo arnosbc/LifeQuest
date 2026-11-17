@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:proyecto_movil/core/theme/questly_icons.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Cabecera (Hero.dc.html, DESIGN.md v2 §5): banda de color con formas
-/// geométricas del tema. Con [onBack] muestra «volver» y el kicker baja.
+/// Cabecera clara del diseño LifeQuest. Con [onBack]: flecha a la izquierda y
+/// título centrado («Detalle de meta»). Sin él: título grande a la izquierda
+/// con [kicker] debajo como bajada («Hola, Estevan»).
 class QuestlyHero extends StatelessWidget {
   const QuestlyHero({
     super.key,
     required this.kicker,
     required this.heading,
     this.icon = QIcons.focus,
-    this.tone,
     this.onBack,
     this.backLabel = 'Volver',
     this.onAction,
@@ -24,10 +23,9 @@ class QuestlyHero extends StatelessWidget {
 
   final String kicker;
   final String heading;
-  final QIcons icon;
 
-  /// Null: el del tema y modo actuales.
-  final QHeroTone? tone;
+  /// Se conserva por compatibilidad; la cabecera clara no lo dibuja.
+  final QIcons icon;
   final VoidCallback? onBack;
   final String backLabel;
   final VoidCallback? onAction;
@@ -39,113 +37,76 @@ class QuestlyHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = tone ?? context.q.hero;
-    final kickerRow = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        QIcon(icon, color: t.kicker, size: 14, strokeWidth: 2.3),
-        const SizedBox(width: 6),
-        Flexible(
-          child: Text(
-            kicker.toUpperCase(),
-            overflow: TextOverflow.ellipsis,
-            style: QText.meta(t.kicker),
-          ),
-        ),
-      ],
-    );
-    return SizedBox(
-      height: QSize.hero,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(QRadius.hero),
-        ),
-        child: ColoredBox(
-          color: t.bg,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: ExcludeSemantics(
-                  child: SvgPicture.string(shapesSvg(t), fit: BoxFit.cover),
+    final q = context.q;
+    final action = onAction == null
+        ? const SizedBox(width: QSize.minTap)
+        : _HeroButton(
+            icon: actionIcon,
+            label: actionLabel!,
+            onTap: onAction!,
+            badge: badge,
+          );
+    if (onBack != null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+        child: Row(
+          children: [
+            _HeroButton(icon: QIcons.back, label: backLabel, onTap: onBack!),
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text(
+                  heading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: QText.title3(q.text).copyWith(fontSize: 17),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 12, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minHeight: QSize.minTap,
-                      ),
-                      child: Row(
-                        children: [
-                          if (onBack != null)
-                            Transform.translate(
-                              offset: const Offset(-12, 0),
-                              child: _HeroButton(
-                                icon: QIcons.back,
-                                label: backLabel,
-                                onTap: onBack!,
-                                round: true,
-                              ),
-                            )
-                          else
-                            Flexible(child: kickerRow),
-                          const Spacer(),
-                          if (onAction != null)
-                            _HeroButton(
-                              icon: actionIcon,
-                              label: actionLabel!,
-                              onTap: onAction!,
-                              badge: badge,
-                            ),
-                        ],
-                      ),
+            ),
+            action,
+          ],
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 8, 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      heading,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: QText.title2(q.text).copyWith(fontSize: 24),
                     ),
-                    if (onBack != null) kickerRow,
-                    const SizedBox(height: 4),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 260),
-                      child: Semantics(
-                        header: true,
-                        child: Text(
-                          heading,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: QText.title1(
-                            QHeroTone.text,
-                          ).copyWith(letterSpacing: -0.3),
-                        ),
-                      ),
+                  ),
+                  if (kicker.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      kicker,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: QText.body(q.text2).copyWith(fontSize: 14),
                     ),
                   ],
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          action,
+        ],
       ),
     );
   }
-
-  static String _hex(Color c) =>
-      '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
-
-  // Círculos concéntricos a la derecha y un arco abajo: quedan fuera del
-  // ancho del título (20 + 260 px), así no bajan el contraste del texto.
-  /// También la usa la cabecera de Acceso (auth_header.dart).
-  static String shapesSvg(QHeroTone t) =>
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 156" '
-      'preserveAspectRatio="xMaxYMid slice">'
-      '<circle cx="356" cy="134" r="96" fill="${_hex(t.shape1)}"/>'
-      '<circle cx="356" cy="134" r="58" fill="${_hex(t.shape2)}"/>'
-      '<circle cx="356" cy="134" r="24" fill="${_hex(t.shape3)}"/>'
-      '<path d="M-10 156 Q120 128 250 156Z" fill="${_hex(t.shape3)}" '
-      'opacity=".55"/>'
-      '<circle cx="292" cy="30" r="5" fill="${_hex(t.dot)}" opacity=".85"/>'
-      '<circle cx="270" cy="52" r="2.4" fill="${_hex(t.dot)}" opacity=".6"/>'
-      '</svg>';
 }
 
 class _HeroButton extends StatelessWidget {
@@ -153,19 +114,17 @@ class _HeroButton extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
-    this.round = false,
     this.badge,
   });
 
   final QIcons icon;
   final String label;
   final VoidCallback onTap;
-  final bool round;
   final String? badge;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(round ? QRadius.pill : QRadius.button);
+    final q = context.q;
     return Semantics(
       button: true,
       label: badge == null ? label : '$label, $badge',
@@ -174,48 +133,39 @@ class _HeroButton extends StatelessWidget {
       child: Tooltip(
         message: label,
         excludeFromSemantics: true,
-        child: Material(
-          color: round ? Colors.transparent : QHeroTone.actionBg,
-          borderRadius: radius,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: radius,
-            child: SizedBox.square(
-              dimension: QSize.minTap,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  QIcon(
-                    icon,
-                    color: QHeroTone.text,
-                    size: round ? 22 : 20,
-                    strokeWidth: round ? 2.4 : 2.2,
-                  ),
-                  if (badge != null)
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: Container(
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: QHeroTone.badgeBg,
-                          borderRadius: BorderRadius.circular(QRadius.pill),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          badge!,
-                          style: QText.label(
-                            QHeroTone.badgeText,
-                          ).copyWith(fontSize: 10, fontWeight: FontWeight.w800),
-                        ),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox.square(
+            dimension: QSize.minTap,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                QIcon(icon, color: q.text, size: 22, strokeWidth: 2),
+                if (badge != null)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: q.accent,
+                        borderRadius: BorderRadius.circular(QRadius.pill),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        badge!,
+                        style: QText.label(
+                          q.onAccent,
+                        ).copyWith(fontSize: 10, fontWeight: FontWeight.w700),
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
           ),
         ),

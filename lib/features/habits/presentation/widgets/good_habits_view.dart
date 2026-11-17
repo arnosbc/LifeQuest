@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
-import 'package:proyecto_movil/features/habits/presentation/widgets/habit_calendar.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_path.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_row.dart';
 
 class GoodHabitsView extends StatelessWidget {
@@ -29,90 +30,166 @@ class GoodHabitsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final habits = board.good;
-    final streak = habits.fold(
-      0,
-      (best, h) => h.currentStreak > best ? h.currentStreak : best,
-    );
+    final current = board.currentOnPath;
+    final broken = board.brokenStreak;
     return Column(
       children: [
-        LifeQuestSurface(
-          color: context.lq.softGreen,
-          child: Row(
-            children: [
-              const Text('🔥', style: TextStyle(fontSize: 24)),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      streak == 0
-                          ? 'Empieza tu racha hoy'
-                          : 'Racha actual $streak ${streak == 1 ? 'día' : 'días'}',
-                      style: TextStyle(
-                        color: context.lq.ink,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'Cada hábito positivo suma XP y monedas. Cada día superado refuerza tu progreso.',
-                      style: TextStyle(
-                        color: context.lq.muted,
-                        fontSize: 9,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        if (broken != null) ...[
+          _StreakComeback(habit: broken),
+          const SizedBox(height: 16),
+        ],
+        HabitPath(
+          path: board.path,
+          current: current,
+          busyHabitId: busyHabitId,
+          onComplete: onComplete,
         ),
-        const SizedBox(height: 13),
         LifeQuestSectionHeading(
-          'BUENOS HÁBITOS',
+          'HÁBITOS BUENOS',
           action: '${habits.length} activos',
         ),
         const SizedBox(height: 6),
         if (habits.isEmpty)
           LifeQuestSurface(
-            child: Text(
-              'Aún no tienes hábitos buenos. Crea uno pequeño para empezar.',
-              style: TextStyle(color: context.lq.muted, fontSize: 11),
+            child: Row(
+              children: [
+                const MascotPose(pose: 'planta', size: 72),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Aún no tienes hábitos buenos. Crea uno pequeño para '
+                    'empezar.',
+                    style: TextStyle(color: context.lq.muted, fontSize: 13),
+                  ),
+                ),
+              ],
             ),
           ),
         for (final habit in habits)
           HabitRow(
             habit: habit,
             busy: busyHabitId == habit.id,
-            onComplete: onComplete == null ? null : () => onComplete!(habit.id),
+            // Candado del Camino: solo se cumple el hábito actual.
+            onComplete: onComplete == null || habit != current
+                ? null
+                : () => onComplete!(habit.id),
             menu: menuFor?.call(habit),
           ),
-        const SizedBox(height: 9),
-        const LifeQuestSectionHeading('RESUMEN SEMANAL'),
-        const SizedBox(height: 6),
+        const SizedBox(height: 16),
+        // Habitos.dc.html: Estadísticas de crecimiento (042).
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Semantics(
+            header: true,
+            child: Text(
+              'Estadísticas de crecimiento',
+              style: QText.title3(context.q.text).copyWith(fontSize: 20),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
         Row(
           children: [
+            Expanded(child: _Growth('Esta semana', board.weekDone)),
+            const SizedBox(width: 8),
+            Expanded(child: _Growth('Este mes', board.monthDone)),
+            const SizedBox(width: 8),
             Expanded(
-              child: LifeQuestStat(
-                value: '${board.weekXp} XP',
-                label: 'XP obtenida',
-              ),
-            ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: LifeQuestStat(
-                value: '${board.weekDone} / ${board.weekScheduled}',
-                label: 'Hábitos completados',
-              ),
+              child: _Growth('Este año', board.yearDone, highlight: true),
             ),
           ],
         ),
-        const SizedBox(height: 13),
-        HabitCalendar(month: now, activeDays: board.monthDays.toSet()),
+        const SizedBox(height: 6),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '+${board.weekXp} XP con hábitos en los últimos 7 días',
+            style: QText.body(context.q.text2).copyWith(fontSize: 13),
+          ),
+        ),
+        const SizedBox(height: 16),
+        MonthHeatCalendar(month: now, heat: board.monthHeat),
       ],
+    );
+  }
+}
+
+/// Una cifra de «Estadísticas de crecimiento»: hábitos buenos cumplidos.
+class _Growth extends StatelessWidget {
+  const _Growth(this.label, this.value, {this.highlight = false});
+
+  final String label;
+  final int value;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Semantics(
+      label: '$label: $value hábitos cumplidos',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.all(QSpace.m),
+        decoration: BoxDecoration(
+          color: highlight ? q.tint : q.card,
+          borderRadius: BorderRadius.circular(QRadius.control),
+          border: highlight ? null : Border.all(color: q.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: QText.body(
+                highlight ? q.ink : q.text2,
+              ).copyWith(fontSize: 12),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '$value',
+              style: QText.number(highlight ? q.ink : q.text, size: 24),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Ánimo tras reiniciarse una racha (§7: invitación, nunca culpa).
+class _StreakComeback extends StatelessWidget {
+  const _StreakComeback({required this.habit});
+
+  final Habit habit;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return QuestlyCard(
+      child: Row(
+        children: [
+          const MascotPose(pose: 'triste_animada', size: 84),
+          const SizedBox(width: QSpace.m),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '¡A retomar «${habit.name}»!',
+                  style: QText.title3(q.text),
+                ),
+                const SizedBox(height: QSpace.xs),
+                Text(
+                  'Tu racha volvió a empezar, pero tu récord de '
+                  '${habit.bestStreak} ${habit.bestStreak == 1 ? 'día' : 'días'} '
+                  'sigue ahí. Hoy es un buen día para el primero.',
+                  style: QText.body(q.text2).copyWith(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

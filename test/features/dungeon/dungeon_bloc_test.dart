@@ -43,6 +43,9 @@ void main() {
   late MockCompleteDungeonCycle completeCycle;
   late MockCompleteSessionTask completeTask;
   late MockEndDungeon end;
+  late MockAddSessionTask addTask;
+  late MockToggleSessionStep toggleStep;
+  late MockCompleteSessionHabit completeHabit;
   late DateTime now;
   const failure = ServerFailure('Sin conexión.');
 
@@ -62,6 +65,9 @@ void main() {
     completeCycle = MockCompleteDungeonCycle();
     completeTask = MockCompleteSessionTask();
     end = MockEndDungeon();
+    addTask = MockAddSessionTask();
+    toggleStep = MockToggleSessionStep();
+    completeHabit = MockCompleteSessionHabit();
     now = DateTime(2026, 10, 25, 9);
   });
 
@@ -71,6 +77,9 @@ void main() {
     completeCycle: completeCycle,
     completeTask: completeTask,
     end: end,
+    addTask: addTask,
+    toggleStep: toggleStep,
+    completeHabit: completeHabit,
     clock: () => now,
     ticker: () => const Stream.empty(),
   );
@@ -86,8 +95,55 @@ void main() {
     currentTaskId: 't1',
   );
 
+  // «Empezar en Foco» con una sesión ya abierta: la tarea se suma y queda elegida.
   blocTest<DungeonBloc, DungeonState>(
-    'completar una misión dice lo ganado y el total de la sesión',
+    'con sesión abierta, la tarea tocada se suma a la sesión y queda elegida',
+    setUp: () {
+      const t3 = DungeonTask(id: 't3', title: 'Leer');
+      final withT3 = DungeonBoard(
+        candidates: const [t3],
+        session: DungeonSession(
+          id: 's1',
+          totalMinutes: 60,
+          cycleMinutes: 25,
+          tasks: const [_t1, _t2, t3],
+        ),
+      );
+      var calls = 0;
+      when(() => getBoard(any())).thenAnswer(
+        (_) async => Right(
+          calls++ == 0
+              ? DungeonBoard(candidates: const [t3], session: _board().session)
+              : withT3,
+        ),
+      );
+      when(() => addTask(any())).thenAnswer((_) async => const Right(unit));
+    },
+    build: build,
+    act: (bloc) => bloc.add(const DungeonRequested(taskId: 't3')),
+    skip: 1,
+    expect: () => [
+      isA<DungeonReady>()
+          .having((s) => s.currentTaskId, 'tarea elegida', 't3')
+          .having((s) => s.board.session!.tasks.length, 'tareas', 3),
+    ],
+    verify: (_) => verify(
+      () => addTask(
+        const CompleteDungeonCycleParams(sessionId: 's1', taskId: 't3'),
+      ),
+    ).called(1),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'una tarea ya cerrada (fuera de candidatas) no se suma a la sesión',
+    setUp: () => givenBoard(_board()),
+    build: build,
+    act: (bloc) => bloc.add(const DungeonRequested(taskId: 'vieja')),
+    verify: (_) => verifyNever(() => addTask(any())),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'completar una tarea dice lo ganado y el total de la sesión',
     setUp: () {
       when(
         () => completeTask('t1'),
@@ -116,12 +172,12 @@ void main() {
     skip: 1,
     expect: () => [
       isA<DungeonReady>()
-          .having((s) => s.currentTaskId, 'siguiente misión', 't2')
-          .having((s) => s.board.session!.missionsDone, 'misiones', 1)
+          .having((s) => s.currentTaskId, 'siguiente tarea', 't2')
+          .having((s) => s.board.session!.missionsDone, 'tareas', 1)
           .having(
             (s) => s.message,
             'aviso',
-            '¡Misión completada! +25 XP · +8 Monedas. '
+            '¡Tarea completada! +25 XP · +8 Monedas. '
                 'En esta sesión llevas 35 XP y 11 Monedas.',
           ),
     ],
@@ -172,9 +228,9 @@ void main() {
         now: now,
         busy: true,
       ),
-      focus(
-        _board(),
-      ).copyWith(message: '¡Entraste a la Mazmorra! A por el primer ciclo.'),
+      focus(_board()).copyWith(
+        message: 'Has iniciado el Modo Foco. Vamos con el primer bloque.',
+      ),
     ],
   );
 
@@ -201,7 +257,7 @@ void main() {
         now: now,
         phaseEndsAt: now.add(const Duration(minutes: 5)),
         currentTaskId: 't1',
-        message: '¡Mazmorra superada! Toma un descanso.',
+        message: '¡Bloque completado! Toma un descanso.',
       ),
     ],
     verify: (_) => verify(
@@ -233,7 +289,7 @@ void main() {
         now: now,
         phaseEndsAt: now.add(const Duration(minutes: 8)),
         currentTaskId: 't1',
-        message: '¡Mazmorra superada! Toma un descanso.',
+        message: '¡Bloque completado! Toma un descanso.',
       ),
     ],
   );
@@ -259,7 +315,7 @@ void main() {
         phase: DungeonPhase.done,
         now: now,
         currentTaskId: 't1',
-        message: '¡Último ciclo superado! Termina la sesión para ver tu botín.',
+        message: '¡Bloque completado! Termina la sesión para ver el resumen.',
       ),
     ],
   );
@@ -331,5 +387,157 @@ void main() {
         summary: const DungeonSummary(cycles: 1, xp: 10, coins: 3, minutes: 26),
       ),
     ],
+  );
+
+  // ---- Foco unificado (068) ----
+  const habit = DungeonTask(id: 'h1', title: 'Leer', isHabit: true);
+  DungeonBoard withHabit({bool done = false}) => DungeonBoard(
+    session: DungeonSession(
+      id: 's1',
+      totalMinutes: 60,
+      cycleMinutes: 25,
+      tasks: const [_t1],
+      habits: [DungeonTask(id: 'h1', title: 'Leer', isHabit: true, done: done)],
+    ),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'paso hecho en Foco: lo marca, relee y avisa',
+    setUp: () {
+      when(() => toggleStep('p1')).thenAnswer((_) async => const Right(false));
+      givenBoard(_board());
+    },
+    build: build,
+    seed: () => focus(_board()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p1')),
+    expect: () => [
+      focus(_board()).copyWith(busy: true),
+      focus(_board()).copyWith(message: '¡Paso hecho! Sigue con el siguiente.'),
+    ],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'el último paso completa la tarea y lo dice',
+    setUp: () {
+      when(() => toggleStep('p9')).thenAnswer((_) async => const Right(true));
+      givenBoard(_board());
+    },
+    build: build,
+    seed: () => focus(_board()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p9')),
+    skip: 1,
+    expect: () => [
+      focus(_board()).copyWith(message: '¡Tarea completada! Era el último paso.'),
+    ],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'si el servidor no deja marcar el paso, avisa sin perder la sesión',
+    setUp: () =>
+        when(() => toggleStep('p1')).thenAnswer((_) async => const Left(failure)),
+    build: build,
+    seed: () => focus(_board()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p1')),
+    skip: 1,
+    expect: () => [focus(_board()).copyWith(message: 'Sin conexión.')],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'hábito hecho en Foco: lo cumple y pasa a lo siguiente abierto',
+    setUp: () {
+      when(() => completeHabit('h1')).thenAnswer((_) async => const Right(unit));
+      givenBoard(withHabit(done: true));
+    },
+    build: build,
+    seed: () => focus(withHabit()).copyWith(currentTaskId: () => 'h1'),
+    act: (bloc) => bloc.add(const DungeonHabitDone('h1')),
+    skip: 1,
+    expect: () => [
+      focus(withHabit(done: true)).copyWith(
+        currentTaskId: () => 't1',
+        message: '¡Hábito cumplido hoy! Tu racha sigue viva.',
+      ),
+    ],
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'el bloque de un hábito se cobra como hábito',
+    setUp: () {
+      when(() => completeCycle(any())).thenAnswer((_) async => const Right(unit));
+      givenBoard(withHabit());
+    },
+    build: build,
+    seed: () => focus(withHabit()).copyWith(currentTaskId: () => habit.id),
+    act: (bloc) {
+      now = now.add(const Duration(minutes: 25));
+      bloc.add(const DungeonTicked());
+    },
+    verify: (_) => verify(
+      () => completeCycle(
+        const CompleteDungeonCycleParams(
+          sessionId: 's1',
+          taskId: 'h1',
+          isHabit: true,
+        ),
+      ),
+    ).called(1),
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'cumplido lo último de la sesión, se cierra sola y muestra el resumen',
+    setUp: () {
+      when(() => completeHabit('h1')).thenAnswer((_) async => const Right(unit));
+      when(() => end('s1')).thenAnswer(
+        (_) async => const Right(
+          DungeonSummary(cycles: 0, xp: 25, coins: 8, minutes: 0, missions: 1),
+        ),
+      );
+      var calls = 0;
+      when(() => getBoard(any())).thenAnswer((_) async {
+        calls++;
+        // Primero la sesión con todo hecho; tras cerrar, sin sesión.
+        return Right(
+          calls == 1
+              ? DungeonBoard(
+                  session: DungeonSession(
+                    id: 's1',
+                    totalMinutes: 60,
+                    cycleMinutes: 25,
+                    tasks: const [
+                      DungeonTask(id: 't1', title: 'Estudiar', done: true),
+                    ],
+                    habits: const [
+                      DungeonTask(id: 'h1', title: 'Leer', isHabit: true, done: true),
+                    ],
+                  ),
+                )
+              : const DungeonBoard(),
+        );
+      });
+    },
+    build: build,
+    seed: () => focus(withHabit()).copyWith(currentTaskId: () => 'h1'),
+    act: (bloc) => bloc.add(const DungeonHabitDone('h1')),
+    wait: const Duration(milliseconds: 50),
+    verify: (bloc) {
+      verify(() => end('s1')).called(1);
+      final last = bloc.state as DungeonReady;
+      expect(last.phase, DungeonPhase.setup);
+      expect(last.summary?.xp, 25);
+      expect(last.message, contains('¡Terminaste todo!'));
+    },
+  );
+
+  blocTest<DungeonBloc, DungeonState>(
+    'si aún queda algo pendiente, la sesión sigue abierta',
+    setUp: () {
+      when(() => toggleStep('p1')).thenAnswer((_) async => const Right(false));
+      givenBoard(withHabit());
+    },
+    build: build,
+    seed: () => focus(withHabit()),
+    act: (bloc) => bloc.add(const DungeonStepDone('p1')),
+    wait: const Duration(milliseconds: 50),
+    verify: (_) => verifyNever(() => end(any())),
   );
 }

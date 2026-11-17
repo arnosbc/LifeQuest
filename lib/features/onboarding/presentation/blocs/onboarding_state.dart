@@ -34,5 +34,11 @@ class OnboardingPending extends OnboardingState {
 
 /// Ya lo hizo, lo acaba de terminar o no se pudo consultar: va a Inicio.
 class OnboardingNotNeeded extends OnboardingState {
-  const OnboardingNotNeeded();
+  const OnboardingNotNeeded({this.justCompleted = false});
+
+  /// Lo terminó en esta sesión: la app muestra la guía de Nevi una vez.
+  final bool justCompleted;
+
+  @override
+  List<Object?> get props => [justCompleted];
 }

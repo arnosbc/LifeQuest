@@ -4,6 +4,7 @@ import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 import 'package:proyecto_movil/features/home/data/models/home_dashboard_model.dart';
 
 /// RPCs del Home en Supabase. Lanza [ServerException] o [NetworkException].
@@ -18,12 +19,18 @@ abstract class HomeRemoteDataSource {
 
   /// Cobra el cofre del día (`claim_daily_chest`, 008).
   Future<void> claimDailyChest();
+
+  /// Completa una tarea de la lista «Hoy» (`complete_task`, 005).
+  Future<void> completeTask(String taskId);
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
-  const HomeRemoteDataSourceImpl(this._client);
+  const HomeRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<HomeDashboardModel> getDashboard({
@@ -37,21 +44,48 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     // Null: aún no existe la fila de profiles de este usuario.
     if (json == null) throw const ServerException(code: 'profile_not_found');
     final chest = await _client.rpc<Map<String, dynamic>>('daily_chest_status');
-    return HomeDashboardModel.fromJson({...json, 'daily_chest': chest});
+    return HomeDashboardModel.fromJson({
+      ...json,
+      'daily_chest': chest,
+      'daily_goal': await _dailyGoal(),
+    });
   });
+
+  /// Meta diaria de XP (063). Sin la migración el Inicio sigue, sin el anillo.
+  Future<Map<String, dynamic>?> _dailyGoal() async {
+    try {
+      return await _client.rpc<Map<String, dynamic>?>('daily_goal');
+    } on PostgrestException {
+      return null;
+    }
+  }
 
   @override
   Future<void> completeHabit({required String habitId, required String day}) =>
       _guard(
-        () => _client.rpc<void>(
-          'complete_habit',
-          params: {'p_habit_id': habitId, 'p_day': day},
+        () async => _rewards?.report(
+          await _client.rpc<dynamic>(
+            'complete_habit',
+            params: {'p_habit_id': habitId, 'p_day': day},
+          ),
         ),
       );
 
   @override
-  Future<void> claimDailyChest() =>
-      _guard(() => _client.rpc<void>('claim_daily_chest'));
+  Future<void> completeTask(String taskId) => _guard(
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_task',
+        params: {'p_task_id': taskId},
+      ),
+    ),
+  );
+
+  @override
+  Future<void> claimDailyChest() => _guard(
+    () async =>
+        _rewards?.report(await _client.rpc<dynamic>('claim_daily_chest')),
+  );
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej.
   /// `already_completed`); se pasa como [ServerException.code].

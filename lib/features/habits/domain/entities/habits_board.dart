@@ -22,6 +22,9 @@ class HabitsBoard extends Equatable {
     this.weekScheduled = 0,
     this.badFreeDays = 7,
     this.monthDays = const [],
+    this.monthHeat = const {},
+    this.monthDone = 0,
+    this.yearDone = 0,
     this.skills = const [],
   });
 
@@ -39,10 +42,58 @@ class HabitsBoard extends Equatable {
 
   /// Días del mes en curso con al menos un hábito bueno cumplido.
   final List<int> monthDays;
+
+  /// Registros de hábitos buenos por día del mes (mapa de calor, 042).
+  final Map<int, int> monthHeat;
+
+  /// Registros de hábitos buenos del mes y del año (042).
+  final int monthDone;
+  final int yearDone;
   final List<HabitSkill> skills;
 
   List<Habit> get good =>
       habits.where((h) => h.type == HabitType.good).toList();
+
+  /// Camino de hoy: hábitos buenos que tocan hoy, prioridad alta primero y,
+  /// dentro de cada prioridad, en el orden en que llegan.
+  List<Habit> get path {
+    final today = [
+      for (final h in good)
+        if (h.scheduledToday) h,
+    ];
+    // List.sort no es estable: el índice desempata.
+    final order = {for (final (i, h) in today.indexed) h.id: i};
+    return today..sort(
+      (a, b) => a.priority.index != b.priority.index
+          ? a.priority.index - b.priority.index
+          : order[a.id]! - order[b.id]!,
+    );
+  }
+
+  /// Único hábito del Camino que se puede cumplir: el primero sin hacer.
+  /// Los de después quedan bloqueados hasta cumplirlo.
+  Habit? get currentOnPath {
+    for (final h in path) {
+      if (!h.doneToday) return h;
+    }
+    return null;
+  }
+
+  /// Hábito bueno cuya racha se reinició (0 hoy, pero tuvo récord), el de
+  /// mayor récord: para animar a retomarla. Null si ninguna se rompió o si
+  /// ya se cumplió hoy.
+  Habit? get brokenStreak {
+    Habit? best;
+    for (final h in good) {
+      if (h.currentStreak == 0 &&
+          h.bestStreak > 0 &&
+          !h.doneToday &&
+          (best == null || h.bestStreak > best.bestStreak)) {
+        best = h;
+      }
+    }
+    return best;
+  }
 
   List<Habit> get bad => habits.where((h) => h.type == HabitType.bad).toList();
 
@@ -54,6 +105,9 @@ class HabitsBoard extends Equatable {
     weekScheduled,
     badFreeDays,
     monthDays,
+    monthHeat,
+    monthDone,
+    yearDone,
     skills,
   ];
 }

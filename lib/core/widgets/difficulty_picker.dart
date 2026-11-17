@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/core/entities/difficulty.dart';
 
-/// Opciones de dificultad con su efecto (XP y vida perdida). Lo usan el
+/// Opciones de dificultad con su efecto (XP y Constancia perdida). Lo usan el
 /// Onboarding y Configuración.
 class DifficultyPicker extends StatelessWidget {
   const DifficultyPicker({
@@ -67,7 +67,7 @@ class DifficultyPicker extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               'XP ${multiplier(option.xpMultiplier)} · '
-                              'Vida perdida ${multiplier(option.hpPenaltyMultiplier)}'
+                              'Constancia perdida ${multiplier(option.hpPenaltyMultiplier)}'
                               '${coins ? ' · Monedas ${multiplier(option.coinMultiplier)}' : ''}',
                               style: TextStyle(color: lq.muted, fontSize: 13),
                             ),
@@ -90,9 +90,9 @@ class DifficultyPicker extends StatelessWidget {
 }
 
 String difficultyName(GameDifficulty level) => switch (level) {
-  GameDifficulty.easy => 'Fácil',
-  GameDifficulty.normal => 'Normal',
-  GameDifficulty.hard => 'Difícil',
+  GameDifficulty.easy => 'Relajado',
+  GameDifficulty.normal => 'Equilibrado',
+  GameDifficulty.hard => 'Intenso',
 };
 
 /// ×1,2 · ×1 · ×0,85 (coma decimal).

@@ -17,7 +17,7 @@ class CompleteOnboarding implements UseCase<Unit, OnboardingChoices> {
       ? _repository.complete(params)
       : const Left(
           ServerFailure(
-            'Usa una identidad de hasta 280 caracteres y una skill de hasta 40.',
+            'Usa una identidad de hasta 280 caracteres y un área de hasta 40.',
           ),
         );
 }

@@ -92,7 +92,7 @@ void main() {
     );
 
     blocTest<GoalsBloc, GoalsState>(
-      'un golpe que no vence al jefe avisa el daño',
+      'una tarea suma avance a la meta',
       setUp: () => when(
         () => getBoard(any()),
       ).thenAnswer((_) async => const Right(alive)),
@@ -103,13 +103,13 @@ void main() {
         const GoalsSuccess(alive, busyKey: 't1'),
         const GoalsSuccess(
           alive,
-          message: '¡Golpe certero! −30 de vida al jefe.',
+          message: 'La tarea sumó 30 % al avance de la meta.',
         ),
       ],
     );
 
     blocTest<GoalsBloc, GoalsState>(
-      'si el jefe cae, anuncia la victoria con su premio',
+      'al completar la meta anuncia el premio',
       setUp: () => when(
         () => getBoard(any()),
       ).thenAnswer((_) async => const Right(defeated)),
@@ -120,7 +120,7 @@ void main() {
       expect: () => [
         const GoalsSuccess(
           defeated,
-          message: '¡Victoria! Venciste al jefe: +300 XP y +90 Monedas.',
+          message: '¡Meta cumplida! Ganaste +300 XP y +90 Monedas.',
         ),
       ],
     );

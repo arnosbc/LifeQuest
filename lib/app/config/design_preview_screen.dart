@@ -39,7 +39,7 @@ class _DesignPreviewScreenState extends State<DesignPreviewScreen> {
         children: [
           QuestlyHero(
             kicker: 'Sistema de diseño',
-            heading: 'Bosque vivo',
+            heading: 'LifeQuest',
             icon: QIcons.leaf,
             onBack: () => context.pop(),
             onAction: () => showQuestlyToast(context, 'Tienes 3 avisos'),
@@ -70,7 +70,7 @@ class _DesignPreviewScreenState extends State<DesignPreviewScreen> {
                 heading('Tema de color'),
                 QuestlySegmented<ThemeRealm>(
                   segments: const [
-                    (ThemeRealm.bosque, 'Verde'),
+                    (ThemeRealm.bosque, 'Lavanda'),
                     (ThemeRealm.rio, 'Azul'),
                     (ThemeRealm.brasa, 'Coral'),
                     (ThemeRealm.oro, 'Ámbar'),
@@ -78,29 +78,11 @@ class _DesignPreviewScreenState extends State<DesignPreviewScreen> {
                   selected: appearance.realm,
                   onChanged: (v) => bloc.add(AppearanceRealmChanged(v)),
                 ),
-                heading('Cabecera (Hero) · 5 tonos'),
-                for (final (tone, name) in const [
-                  (QHeroTone.forest, 'Verde'),
-                  (QHeroTone.river, 'Azul'),
-                  (QHeroTone.ember, 'Coral'),
-                  (QHeroTone.gold, 'Ámbar'),
-                  (QHeroTone.night, 'Noche'),
-                ]) ...[
-                  QuestlyHero(
-                    kicker: 'Tablero de tareas',
-                    heading: name,
-                    icon: QIcons.board,
-                    tone: tone,
-                    onAction: () {},
-                    actionLabel: 'Crear',
-                  ),
-                  const SizedBox(height: QSpace.m),
-                ],
                 heading('Tarjetas'),
                 const QuestlyCard(child: Text('Tarjeta · borde + 4 px')),
                 const SizedBox(height: QSpace.l),
                 QuestlyCard(
-                  onTap: () => showQuestlyToast(context, 'Misión abierta'),
+                  onTap: () => showQuestlyToast(context, 'Tarea abierta'),
                   semanticsLabel: 'Lee un capítulo en voz alta',
                   child: Row(
                     children: [

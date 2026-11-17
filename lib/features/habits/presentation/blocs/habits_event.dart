@@ -52,6 +52,17 @@ class HabitRenamed extends HabitsEvent {
   List<Object?> get props => [habitId, name];
 }
 
+/// Hora del hábito «HH:MM»; null la quita.
+class HabitTimeSet extends HabitsEvent {
+  const HabitTimeSet(this.habitId, this.time);
+
+  final String habitId;
+  final String? time;
+
+  @override
+  List<Object?> get props => [habitId, time];
+}
+
 class HabitDeleted extends HabitsEvent {
   const HabitDeleted(this.habitId);
 

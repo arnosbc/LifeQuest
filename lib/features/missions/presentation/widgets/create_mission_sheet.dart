@@ -141,7 +141,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
             ),
             const SizedBox(height: 15),
             Text(
-              'Nueva misión',
+              'Nueva tarea',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
@@ -163,24 +163,24 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                 hintText: 'Ej. Preparar la exposición del viernes',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.auto_awesome),
-                  tooltip: 'Convertir en misión',
+                  tooltip: 'Convertir en tarea',
                   onPressed: _interpret,
                 ),
                 helperText:
-                    'Escribe una idea y toca ✨ para completar un borrador.',
+                    'Escribe una idea y toca el icono para completar un borrador.',
               ),
             ),
             const SizedBox(height: 10),
-            _section('DEFINE LA MISIÓN'),
+            _section('DEFINE LA TAREA'),
             TextFormField(
               controller: _title,
               maxLength: 200,
               decoration: const InputDecoration(
-                labelText: 'Nombre de la misión *',
+                labelText: 'Nombre de la tarea *',
                 hintText: 'Preparar presentación del proyecto',
               ),
               validator: (v) => v == null || v.trim().isEmpty
-                  ? 'Escribe un nombre para la misión'
+                  ? 'Escribe un nombre para la tarea'
                   : null,
             ),
             const SizedBox(height: 8),
@@ -201,7 +201,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
               children: [
                 Expanded(
                   child: _linkDropdown(
-                    'Área / skill',
+                    'Área',
                     _skillId,
                     widget.board.skills,
                     (v) => setState(() => _skillId = v),
@@ -220,7 +220,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
             ),
             const SizedBox(height: 8),
             _linkDropdown(
-              'Meta (cada misión le resta vida al jefe)',
+              'Meta (cada tarea la hace avanzar)',
               _goalId,
               widget.board.goals,
               (v) => setState(() => _goalId = v),
@@ -258,7 +258,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                 ),
               ),
             const SizedBox(height: 14),
-            _section('SUBTAREAS (OPCIONAL)'),
+            _section('PASOS (OPCIONAL · HASTA 8)'),
             for (var i = 0; i < _checklist.length; i++)
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
@@ -267,13 +267,11 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
                     Expanded(
                       child: TextField(
                         controller: _checklist[i],
-                        decoration: InputDecoration(
-                          hintText: 'Subtarea ${i + 1}',
-                        ),
+                        decoration: InputDecoration(hintText: 'Paso ${i + 1}'),
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Quitar subtarea ${i + 1}',
+                      tooltip: 'Quitar paso ${i + 1}',
                       onPressed: () => setState(() {
                         _checklist[i].dispose();
                         _checklist.removeAt(i);
@@ -286,10 +284,14 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
-                onPressed: () =>
-                    setState(() => _checklist.add(TextEditingController())),
+                // 039: una tarea tiene hasta 8 pasos.
+                onPressed: _checklist.length >= 8
+                    ? null
+                    : () => setState(
+                        () => _checklist.add(TextEditingController()),
+                      ),
                 icon: const Icon(Icons.add),
-                label: const Text('Añadir subtarea'),
+                label: const Text('Añadir paso'),
               ),
             ),
             const SizedBox(height: 8),
@@ -331,7 +333,7 @@ class _CreateMissionSheetState extends State<CreateMissionSheet> {
               child: FilledButton.icon(
                 onPressed: () => _save(start: false),
                 icon: const Icon(Icons.check),
-                label: const Text('Crear misión'),
+                label: const Text('Crear tarea'),
               ),
             ),
             const SizedBox(height: 8),

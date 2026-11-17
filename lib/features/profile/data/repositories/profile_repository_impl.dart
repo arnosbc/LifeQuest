@@ -70,25 +70,25 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   /// Mensajes que dicen qué hacer, con tono de invitación.
-  static String _messageFor(ServerException error) =>
-      switch ((error.code, error.statusCode)) {
-        ('skill_limit_reached', _) =>
-          'Ya tienes el máximo de skills. Libera una o amplía el límite en '
-              'Game Master.',
-        // FK de npcs.skill_id (ON DELETE RESTRICT).
-        (_, '23503') =>
-          'Un NPC de la Taverna usa esta skill. Asígnale otra antes de '
-              'eliminarla.',
-        // CHECK de longitud (002_profile.sql).
-        (_, '23514') =>
-          'Usa un nombre de 1 a 40 caracteres y una identidad de hasta 280.',
-        // check_active_title (004_structure.sql).
-        ('title_not_earned', _) =>
-          'Ese título todavía no es tuyo. Los títulos se ganan con logros, '
-              'nivel y Tesoro.',
-        ('profile_not_found', _) =>
-          'Estamos preparando tu personaje. Desliza para actualizar en un '
-              'momento.',
-        _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
-      };
+  static String _messageFor(ServerException error) => switch ((
+    error.code,
+    error.statusCode,
+  )) {
+    ('skill_limit_reached', _) =>
+      'Ya tienes el máximo de áreas. Libera una o amplía el límite en '
+          'Ajustes.',
+    // FK de npcs.skill_id (ON DELETE RESTRICT).
+    (_, '23503') =>
+      'Un mentor usa esta área. Asígnale otra antes de '
+          'eliminarla.',
+    // CHECK de longitud (002_profile.sql).
+    (_, '23514') =>
+      'Usa un nombre de área de 1 a 40 caracteres y una identidad de hasta 280.',
+    // check_active_title (004_structure.sql).
+    ('title_not_earned', _) => 'Aún no has conseguido esa insignia.',
+    ('profile_not_found', _) =>
+      'Estamos preparando tu Perfil. Desliza para actualizar en un '
+          'momento.',
+    _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
+  };
 }

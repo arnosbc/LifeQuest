@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/app/config/theme.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 
 class LifeQuestSurface extends StatelessWidget {
   const LifeQuestSurface({
@@ -21,15 +22,9 @@ class LifeQuestSurface extends StatelessWidget {
     padding: padding,
     decoration: BoxDecoration(
       color: color ?? context.lq.surface,
-      borderRadius: BorderRadius.circular(11),
+      borderRadius: BorderRadius.circular(QRadius.block),
       border: Border.all(color: context.lq.line),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x08000000),
-          blurRadius: 7,
-          offset: Offset(0, 2),
-        ),
-      ],
+      boxShadow: qSolidShadow(context.q.cardShadow),
     ),
     child: child,
   );

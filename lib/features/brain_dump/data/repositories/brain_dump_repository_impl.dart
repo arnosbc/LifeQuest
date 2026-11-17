@@ -65,7 +65,7 @@ class BrainDumpRepositoryImpl implements BrainDumpRepository {
     'invalid_due_date' => 'La fecha no puede quedar en el pasado.',
     'smart_incomplete' =>
       'Responde las preguntas S.M.A.R.T. para darle forma a tu meta.',
-    'skill_not_found' => 'Esa skill ya no existe. Elige otra o ninguna.',
+    'skill_not_found' => 'Esa área ya no existe. Elige otra o ninguna.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

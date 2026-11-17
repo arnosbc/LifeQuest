@@ -1,6 +1,6 @@
 // Questly · tokens del sistema «Bosque vivo» para Flutter.
 // Generado desde DESIGN.md. Copiar a lib/theme/questly_theme.dart
-// Requiere el paquete google_fonts (Bricolage Grotesque, DM Sans, DM Mono).
+// Requiere el paquete google_fonts (DM Sans, DM Mono).
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,24 +9,24 @@ enum QuestlyRealm { bosque, rio, brasa, oro }
 
 class QColors {
   // Neutros claro
-  static const bg = Color(0xFFF3F6EF);
+  static const bg = Color(0xFFF6F3FC);
   static const card = Color(0xFFFFFFFF);
-  static const border = Color(0xFFDCE4D4);
-  static const track = Color(0xFFE7EDE1);
-  static const line = Color(0xFFEEF2EA);
-  static const text = Color(0xFF1E2A22);
-  static const text2 = Color(0xFF4E5C52);
-  static const text3 = Color(0xFF3E4A42);
-  static const inputBorder = Color(0xFFC9D3C2);
-  static const disabled = Color(0xFF7D8A80);
+  static const border = Color(0xFFECE6F7);
+  static const track = Color(0xFFEEE8F8);
+  static const line = Color(0xFFF1EDF8);
+  static const text = Color(0xFF2A2346);
+  static const text2 = Color(0xFF6B6585);
+  static const text3 = Color(0xFF4A4463);
+  static const inputBorder = Color(0xFFE3DCF2);
+  static const disabled = Color(0xFF8C86A3);
   // Neutros oscuro
-  static const bgDark = Color(0xFF13201A);
-  static const cardDark = Color(0xFF1C2C24);
-  static const borderDark = Color(0xFF2C4036);
-  static const trackDark = Color(0xFF24362C);
-  static const textDark = Color(0xFFEEF3EC);
-  static const text2Dark = Color(0xFFA9B8AD);
-  static const inputBorderDark = Color(0xFF3A5446);
+  static const bgDark = Color(0xFF16121F);
+  static const cardDark = Color(0xFF201A2E);
+  static const borderDark = Color(0xFF2F2742);
+  static const trackDark = Color(0xFF2A2339);
+  static const textDark = Color(0xFFF1EDFA);
+  static const text2Dark = Color(0xFFB4ABCB);
+  static const inputBorderDark = Color(0xFF3D3354);
   // Semánticos
   static const coral = Color(0xFFE0573F);
   static const coralInk = Color(0xFFA8361F);
@@ -38,7 +38,7 @@ class QColors {
   static const riverInk = Color(0xFF2C4580);
   static const riverTint = Color(0xFFE3E9F7);
   static const boss = Color(0xFF2A2020);
-  static const focus = Color(0xFF3C5BA8);
+  static const focus = Color(0xFF7C5CC4);
 }
 
 class QRealm {
@@ -54,15 +54,16 @@ class QRealm {
     required this.heroHill,
   });
 
+  // Tema por defecto: lavanda de LifeQuest (el enum conserva su nombre).
   static const bosque = QRealm(
-    accent: Color(0xFF2E7D4F),
+    accent: Color(0xFF7C5CC4),
     onAccent: Colors.white,
-    ink: Color(0xFF1F5C39),
-    inkDark: Color(0xFF9FDCB4),
-    tint: Color(0xFFE1F0E6),
-    tintDark: Color(0xFF1F3A2C),
-    heroBg: Color(0xFF1F5C39),
-    heroHill: Color(0xFF2E7D4F),
+    ink: Color(0xFF5B3FA8),
+    inkDark: Color(0xFFCDBDF5),
+    tint: Color(0xFFEFE9FB),
+    tintDark: Color(0xFF2E2547),
+    heroBg: Color(0xFF7C5CC4),
+    heroHill: Color(0xFF9A80DA),
   );
   static const rio = QRealm(
     accent: Color(0xFF3C5BA8),
@@ -94,7 +95,7 @@ class QRealm {
     heroBg: Color(0xFF5C4100),
     heroHill: Color(0xFF8A6200),
   );
-  static const night = (bg: Color(0xFF0E1B14), hill: Color(0xFF1C2C24));
+  static const night = (bg: Color(0xFF120E1B), hill: Color(0xFF201A2E));
 
   static QRealm of(QuestlyRealm r) => switch (r) {
     QuestlyRealm.bosque => bosque,
@@ -118,6 +119,9 @@ class QRadius {
   static const chip = 6.0,
       control = 12.0,
       button = 14.0,
+          // Botones de acción: píldora (diseño LifeQuest lavanda).
+          action =
+          99.0,
       block = 16.0,
       card = 20.0,
       sheet = 24.0,
@@ -139,34 +143,38 @@ class QMotion {
   static const bob = Duration(milliseconds: 2600);
 }
 
-/// Sombra «de juego»: sólida de 4 px bajo la tarjeta o el botón.
+/// Sombra suave y difusa bajo la tarjeta o el botón (diseño lavanda).
 List<BoxShadow> qSolidShadow(Color c, {double y = 4}) => [
-  BoxShadow(color: c, offset: Offset(0, y), blurRadius: 0),
+  BoxShadow(
+    color: c.withValues(alpha: .12),
+    offset: Offset(0, y + 2),
+    blurRadius: 18,
+  ),
 ];
 
 class QText {
-  static TextStyle display(Color c) => GoogleFonts.bricolageGrotesque(
+  static TextStyle display(Color c) => GoogleFonts.dmSans(
     fontSize: 34,
     height: 1.1,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w700,
     color: c,
   );
-  static TextStyle title1(Color c) => GoogleFonts.bricolageGrotesque(
+  static TextStyle title1(Color c) => GoogleFonts.dmSans(
     fontSize: 30,
     height: 1.1,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w700,
     color: c,
   );
-  static TextStyle title2(Color c) => GoogleFonts.bricolageGrotesque(
+  static TextStyle title2(Color c) => GoogleFonts.dmSans(
     fontSize: 22,
     height: 1.2,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w700,
     color: c,
   );
-  static TextStyle title3(Color c) => GoogleFonts.bricolageGrotesque(
+  static TextStyle title3(Color c) => GoogleFonts.dmSans(
     fontSize: 18,
     height: 1.25,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w700,
     color: c,
   );
   static TextStyle body(Color c) =>
@@ -197,6 +205,7 @@ ThemeData questlyTheme({required QuestlyRealm realm, required bool dark}) {
   final tint = dark ? r.tintDark : r.tint;
   return ThemeData(
     useMaterial3: true,
+    fontFamily: 'DM Sans',
     brightness: dark ? Brightness.dark : Brightness.light,
     scaffoldBackgroundColor: bg,
     colorScheme: ColorScheme(
@@ -232,7 +241,7 @@ ThemeData questlyTheme({required QuestlyRealm realm, required bool dark}) {
         minimumSize: const Size.fromHeight(QSize.buttonPrimary),
         textStyle: QText.label(r.onAccent).copyWith(fontSize: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(QRadius.button),
+          borderRadius: BorderRadius.circular(QRadius.action),
         ),
       ),
     ),

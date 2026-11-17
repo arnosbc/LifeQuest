@@ -6,15 +6,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/config/app_shell.dart';
+import 'package:proyecto_movil/app/home_screen_widget.dart';
+import 'package:proyecto_movil/core/widgets/mascot_background.dart';
+import 'package:proyecto_movil/core/widgets/show_lifequest_message.dart';
 import 'package:proyecto_movil/app/config/design_preview_screen.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
 import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
+import 'package:proyecto_movil/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/change_password.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/screens/brain_dump_screen.dart';
+import 'package:proyecto_movil/features/documents/presentation/blocs/document_editor_cubit.dart';
+import 'package:proyecto_movil/features/documents/presentation/blocs/documents_cubit.dart';
+import 'package:proyecto_movil/features/documents/presentation/screens/document_editor_screen.dart';
+import 'package:proyecto_movil/features/documents/presentation/screens/documents_screen.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/blocs/dungeon_bloc.dart';
 import 'package:proyecto_movil/features/dungeon/presentation/screens/dungeon_screen.dart';
 import 'package:proyecto_movil/features/goals/presentation/blocs/goals_bloc.dart';
@@ -23,6 +33,8 @@ import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.da
 import 'package:proyecto_movil/features/habits/presentation/screens/habits_screen.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
+import 'package:proyecto_movil/features/challenges/presentation/blocs/challenges_bloc.dart';
+import 'package:proyecto_movil/features/challenges/presentation/screens/challenges_screen.dart';
 import 'package:proyecto_movil/features/inventory/presentation/blocs/inventory_bloc.dart';
 import 'package:proyecto_movil/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
@@ -36,6 +48,7 @@ import 'package:proyecto_movil/features/missions/presentation/screens/missions_s
 import 'package:proyecto_movil/features/profile/domain/entities/theme_realm.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/appearance_screen.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/help_screen.dart';
 import 'package:proyecto_movil/features/notifications/presentation/blocs/notifications_bloc.dart';
@@ -53,6 +66,8 @@ import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.da
 import 'package:proyecto_movil/features/tavern/presentation/screens/tavern_screen.dart';
 import 'package:proyecto_movil/features/vision/presentation/blocs/vision_bloc.dart';
 import 'package:proyecto_movil/features/vision/presentation/screens/vision_screen.dart';
+import 'package:proyecto_movil/features/guided_task/presentation/blocs/guided_task_bloc.dart';
+import 'package:proyecto_movil/features/guided_task/presentation/screens/guided_task_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 /// Rutas de la app. Aquí se componen las features: cada pantalla recibe por
@@ -71,11 +86,12 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
       final signedIn = authBloc.state is AuthSuccess;
       final location = state.matchedLocation;
       final atAuth = const [
+        RoutePaths.welcome,
         RoutePaths.login,
         RoutePaths.register,
         RoutePaths.checkEmail,
       ].contains(location);
-      if (!signedIn) return atAuth ? null : RoutePaths.login;
+      if (!signedIn) return atAuth ? null : RoutePaths.welcome;
       // Mientras se consulta también va al Onboarding (muestra un indicador),
       // así quien lo tiene pendiente nunca ve Inicio antes (FR-001).
       final onboarding = onboardingBloc.state is! OnboardingNotNeeded;
@@ -91,12 +107,16 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
+        path: RoutePaths.welcome,
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
         path: RoutePaths.login,
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => const _AlwaysDark(child: LoginScreen()),
       ),
       GoRoute(
         path: RoutePaths.register,
-        builder: (context, state) => const RegisterScreen(),
+        builder: (context, state) => const _AlwaysDark(child: RegisterScreen()),
       ),
       GoRoute(
         path: RoutePaths.checkEmail,
@@ -107,9 +127,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             : RoutePaths.login,
         builder: (context, state) {
           final pending = state.extra! as AuthEmailConfirmationRequired;
-          return CheckEmailScreen(
-            username: pending.username,
-            email: pending.email,
+          return _AlwaysDark(
+            child: CheckEmailScreen(
+              username: pending.username,
+              email: pending.email,
+            ),
           );
         },
       ),
@@ -135,22 +157,28 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                             ..add(const NotificationsRequested()),
                     ),
                   ],
-                  child: _ReloadOnShow(
-                    location: shellLocation,
-                    path: RoutePaths.home,
-                    onShown: (c) {
-                      c.read<HomeBloc>().add(const HomeRequested());
-                      c.read<NotificationsBloc>().add(
-                        const NotificationsRequested(),
-                      );
-                    },
-                    child: BlocBuilder<NotificationsBloc, NotificationsState>(
-                      buildWhen: (a, b) => _unread(a) != _unread(b),
-                      builder: (context, notifications) => HomeScreen(
-                        userName: _userName(context),
-                        unreadNotifications: _unread(notifications),
-                        onNavigate: (tab) =>
-                            StatefulNavigationShell.of(context).goBranch(tab),
+                  child: BlocListener<HomeBloc, HomeState>(
+                    // El widget «Mi día» se actualiza con cada carga del Inicio.
+                    listenWhen: (_, state) => state is HomeSuccess,
+                    listener: (_, state) =>
+                        HomeScreenWidget.show((state as HomeSuccess).dashboard),
+                    child: _ReloadOnShow(
+                      location: shellLocation,
+                      path: RoutePaths.home,
+                      onShown: (c) {
+                        c.read<HomeBloc>().add(const HomeRequested());
+                        c.read<NotificationsBloc>().add(
+                          const NotificationsRequested(),
+                        );
+                      },
+                      child: BlocBuilder<NotificationsBloc, NotificationsState>(
+                        buildWhen: (a, b) => _unread(a) != _unread(b),
+                        builder: (context, notifications) => HomeScreen(
+                          userName: _userName(context),
+                          unreadNotifications: _unread(notifications),
+                          onNavigate: (tab) =>
+                              StatefulNavigationShell.of(context).goBranch(tab),
+                        ),
                       ),
                     ),
                   ),
@@ -179,12 +207,12 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: 'missions',
                     builder: (context, state) => Scaffold(
                       backgroundColor: context.lq.background,
-                      appBar: AppBar(backgroundColor: context.lq.background),
                       body: BlocProvider(
                         create: (_) =>
                             sl<MissionsBloc>()..add(const MissionsRequested()),
                         child: MissionsScreen(
-                          onStartFocus: () => context.go(RoutePaths.dungeon),
+                          onStartFocus: (id) =>
+                              context.go(RoutePaths.focusOn(id)),
                         ),
                       ),
                     ),
@@ -204,7 +232,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.habits,
                     onShown: (c) =>
                         c.read<HabitsBloc>().add(const HabitsRequested()),
-                    child: const HabitsScreen(),
+                    child: HabitsScreen(
+                      getPlan: sl(),
+                      generatePlan: sl(),
+                      suggestHabits: sl(),
+                    ),
                   ),
                 ),
               ),
@@ -215,34 +247,32 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
               GoRoute(
                 path: RoutePaths.dungeon,
                 builder: (context, state) => BlocProvider(
-                  create: (_) =>
-                      sl<DungeonBloc>()..add(const DungeonRequested()),
+                  create: (_) => sl<DungeonBloc>()
+                    ..add(
+                      DungeonRequested(
+                        taskId: state.uri.queryParameters['task'],
+                      ),
+                    ),
                   child: _ReloadOnShow(
                     location: shellLocation,
                     path: RoutePaths.dungeon,
-                    onShown: (c) =>
-                        c.read<DungeonBloc>().add(const DungeonRequested()),
-                    // La Mazmorra siempre es oscura (CLAUDE.md §14).
-                    child:
-                        BlocSelector<
-                          AppearanceBloc,
-                          AppearanceState,
-                          ThemeRealm
-                        >(
-                          selector: (state) => state.realm,
-                          builder: (context, realm) => Theme(
-                            data: LifeQuestTheme.build(
-                              questlyRealmOf(realm),
-                              dark: true,
-                            ),
-                            child: Builder(
-                              builder: (context) => ColoredBox(
-                                color: context.lq.background,
-                                child: const DungeonScreen(),
-                              ),
-                            ),
+                    onShown: (c) => c.read<DungeonBloc>().add(
+                      DungeonRequested(
+                        taskId: state.uri.queryParameters['task'],
+                      ),
+                    ),
+                    // La Mazmorra siempre es oscura (CLAUDE.md §14), con el
+                    // fondo de la mascota bajo un velo oscuro.
+                    child: _AlwaysDark(
+                      child: Builder(
+                        builder: (context) => MascotBackground(
+                          veil: context.lq.background,
+                          child: DungeonScreen(
+                            initialTaskId: state.uri.queryParameters['task'],
                           ),
                         ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -252,9 +282,14 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             routes: [
               GoRoute(
                 path: RoutePaths.profile,
-                builder: (context, state) => BlocProvider(
-                  create: (_) =>
-                      sl<ProfileBloc>()..add(const ProfileRequested()),
+                builder: (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (_) =>
+                          sl<ProfileBloc>()..add(const ProfileRequested()),
+                    ),
+                    BlocProvider(create: (_) => sl<ProfileLookCubit>()..load()),
+                  ],
                   child: _ReloadOnShow(
                     location: shellLocation,
                     path: RoutePaths.profile,
@@ -272,6 +307,17 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       onOpenStats: () => context.push(RoutePaths.stats),
                       onOpenVision: () => context.push(RoutePaths.vision),
                       onOpenInventory: () => context.push(RoutePaths.inventory),
+                      onSignOut: () =>
+                          context.read<AuthBloc>().add(const LogoutRequested()),
+                      onAddHomeWidget: () async {
+                        if (!await HomeScreenWidget.pin() && context.mounted) {
+                          showLifeQuestMessage(
+                            context,
+                            'Mantén presionada tu pantalla de inicio → Widgets '
+                            '→ LifeQuest para agregarlo.',
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -308,6 +354,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                 onSignOut: () =>
                     context.read<AuthBloc>().add(const LogoutRequested()),
                 onOpenAppearance: () => context.push(RoutePaths.appearance),
+                onChangePassword: (password) async =>
+                    (await sl<ChangePassword>()(
+                      password,
+                    )).match((failure) => failure.message, (_) => null),
               ),
             ),
           ),
@@ -319,6 +369,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
               body: SafeArea(
                 child: AppearanceScreen(
                   onBack: () => context.pop(),
+                  soundsOn: sl<SoundEffects>().enabled,
+                  onSoundsChanged: sl<SoundEffects>().setEnabled,
                   onOpenDesignPreview: kDebugMode
                       ? () => context.push(RoutePaths.designPreview)
                       : null,
@@ -342,6 +394,53 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
             onStartFocus: () => context.go(RoutePaths.dungeon),
           ),
         ),
+      ),
+      GoRoute(
+        path: RoutePaths.guidedTask,
+        builder: (context, state) => Scaffold(
+          backgroundColor: context.lq.background,
+          body: SafeArea(
+            child: BlocProvider(
+              create: (_) =>
+                  sl<GuidedTaskBloc>()
+                    ..add(GuidedTaskRequested(state.pathParameters['id']!)),
+              child: GuidedTaskScreen(
+                onStartFocus: (id) => context.go(RoutePaths.focusOn(id)),
+                onOpenDocument: (id, title) =>
+                    context.push(RoutePaths.documentForTask(id, title)),
+              ),
+            ),
+          ),
+        ),
+      ),
+      _section(
+        RoutePaths.documents,
+        (context) => BlocProvider(
+          create: (_) => sl<DocumentsCubit>()..load(),
+          child: DocumentsScreen(
+            onOpen: (id) => context.push(RoutePaths.documentById(id)),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.document,
+        builder: (context, state) {
+          final query = state.uri.queryParameters;
+          return Scaffold(
+            backgroundColor: context.lq.background,
+            body: SafeArea(
+              child: BlocProvider(
+                create: (_) => sl<DocumentEditorCubit>()
+                  ..open(
+                    id: query['id'],
+                    taskId: query['task'],
+                    title: query['title'],
+                  ),
+                child: DocumentEditorScreen(onBack: () => context.pop()),
+              ),
+            ),
+          );
+        },
       ),
       _section(
         RoutePaths.journal,
@@ -380,6 +479,13 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         ),
       ),
       _section(
+        RoutePaths.challenges,
+        (context) => BlocProvider(
+          create: (_) => sl<ChallengesBloc>()..add(const ChallengesRequested()),
+          child: const ChallengesScreen(),
+        ),
+      ),
+      _section(
         RoutePaths.stats,
         (context) => BlocProvider(
           create: (_) => sl<StatsBloc>()..add(const StatsRequested()),
@@ -407,12 +513,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
 }
 
 /// Secciones del menú (RF-114) que no caben en la barra inferior: pantalla
-/// completa con botón de volver. Siguen el tema claro/oscuro (`context.lq`).
+/// completa; el Hero de `LifeQuestPage` trae «Volver». Siguen el tema claro/oscuro.
 GoRoute _section(String path, WidgetBuilder screen) => GoRoute(
   path: path,
   builder: (context, state) => Scaffold(
     backgroundColor: context.lq.background,
-    appBar: AppBar(backgroundColor: context.lq.background),
     body: SafeArea(child: screen(context)),
   ),
 );
@@ -420,7 +525,7 @@ GoRoute _section(String path, WidgetBuilder screen) => GoRoute(
 String _userName(BuildContext context) =>
     switch (context.read<AuthBloc>().state) {
       AuthSuccess(:final user) => user.displayName,
-      _ => 'Héroe',
+      _ => 'tú',
     };
 
 int _unread(NotificationsState state) =>
@@ -482,4 +587,22 @@ class _BlocRefresh extends ChangeNotifier {
     _subscription.cancel();
     super.dispose();
   }
+}
+
+/// Tema oscuro del reino elegido, sin importar el modo del sistema: Mazmorra
+/// (CLAUDE.md §14) y Acceso (login, registro y correo, sobre la noche).
+class _AlwaysDark extends StatelessWidget {
+  const _AlwaysDark({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      BlocSelector<AppearanceBloc, AppearanceState, ThemeRealm>(
+        selector: (state) => state.realm,
+        builder: (context, realm) => Theme(
+          data: LifeQuestTheme.build(questlyRealmOf(realm), dark: true),
+          child: child,
+        ),
+      );
 }

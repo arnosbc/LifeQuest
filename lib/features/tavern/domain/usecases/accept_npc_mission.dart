@@ -4,6 +4,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/tavern/domain/repositories/tavern_repository.dart';
+import 'package:proyecto_movil/core/entities/task_guide.dart';
 
 /// Acepta una misión del NPC con su título y, si la hay, la guía de RPGenie.
 class AcceptNpcMission implements UseCase<Unit, AcceptNpcMissionParams> {
@@ -17,6 +18,7 @@ class AcceptNpcMission implements UseCase<Unit, AcceptNpcMissionParams> {
         npcId: params.npcId,
         title: params.title,
         description: params.description,
+        guide: params.guide,
       );
 }
 
@@ -25,12 +27,16 @@ class AcceptNpcMissionParams extends Equatable {
     required this.npcId,
     required this.title,
     this.description,
+    this.guide,
   });
 
   final String npcId;
   final String title;
   final String? description;
 
+  /// Pasos marcables de la guía (039).
+  final TaskGuide? guide;
+
   @override
-  List<Object?> get props => [npcId, title, description];
+  List<Object?> get props => [npcId, title, description, guide];
 }

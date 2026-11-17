@@ -33,10 +33,29 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   @override
   Future<CharacterProfileModel> getProfile() => _guard(() async {
-    final json = await _client.rpc<Map<String, dynamic>?>('profile_overview');
+    final now = DateTime.now();
+    final day =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+    // Future.wait deja pasar el primer error tal cual, para que _guard lo traduzca.
+    final [json, activity, inventory] = await Future.wait([
+      _client.rpc<Map<String, dynamic>?>('profile_overview'),
+      _client.rpc<Map<String, dynamic>?>(
+        'activity_month',
+        params: {
+          'p_day': day,
+          'p_utc_offset_minutes': now.timeZoneOffset.inMinutes,
+        },
+      ),
+      _client.rpc<Map<String, dynamic>?>('inventory_overview'),
+    ]);
     // Null: aún no existe la fila de profiles de este usuario.
     if (json == null) throw const ServerException(code: 'profile_not_found');
-    return CharacterProfileModel.fromJson(json);
+    return CharacterProfileModel.fromJson({
+      ...json,
+      'activity': activity,
+      'achievements': inventory?['achievements'],
+    });
   });
 
   @override

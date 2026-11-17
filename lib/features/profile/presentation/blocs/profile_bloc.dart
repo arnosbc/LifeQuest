@@ -44,7 +44,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       (event, emit) => _save(
         emit,
         () => _createSkill(event.name),
-        'Skill «${event.name.trim()}» creada.',
+        'Área «${event.name.trim()}» creada.',
       ),
       transformer: droppable(),
     );
@@ -54,13 +54,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         () => _renameSkill(
           RenameSkillParams(skillId: event.skillId, name: event.name),
         ),
-        'Skill renombrada.',
+        'Área renombrada.',
       ),
       transformer: droppable(),
     );
     on<ProfileSkillDeleted>(
       (event, emit) =>
-          _save(emit, () => _deleteSkill(event.skillId), 'Skill eliminada.'),
+          _save(emit, () => _deleteSkill(event.skillId), 'Área eliminada.'),
       transformer: droppable(),
     );
     on<ProfileActiveTitleChanged>(

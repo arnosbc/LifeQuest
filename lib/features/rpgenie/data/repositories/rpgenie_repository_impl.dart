@@ -34,9 +34,11 @@ class RpgenieRepositoryImpl implements RpgenieRepository {
     } on ServerException catch (error) {
       return Left(
         ServerFailure(switch (error.code) {
-          'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+          'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
+          'task_steps_pending' =>
+            'Completa los pasos de esta tarea para poder terminarla.',
           'task_not_found' =>
-            'No encontramos esa misión. Desliza para actualizar.',
+            'No encontramos esa tarea. Desliza para actualizar.',
           _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
         }),
       );

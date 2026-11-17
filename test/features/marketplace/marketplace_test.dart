@@ -82,7 +82,7 @@ void main() {
       result,
       const Left<Failure, Unit>(
         ServerFailure(
-          'Aún te faltan Monedas. Cada misión te acerca a este premio.',
+          'Aún te faltan Monedas. Cada tarea te acerca a esta recompensa.',
         ),
       ),
     );

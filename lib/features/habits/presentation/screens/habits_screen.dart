@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/habit_plan_usecases.dart';
 import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/bad_habits_view.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/create_habit_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/good_habits_view.dart';
-import 'package:proyecto_movil/features/habits/presentation/widgets/habit_tab_button.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_ideas_sheet.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_plan_sheet.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_time.dart';
 
 /// Hábitos. Necesita un [HabitsBloc] por encima (lo provee el router).
 class HabitsScreen extends StatefulWidget {
-  const HabitsScreen({super.key});
+  const HabitsScreen({
+    super.key,
+    this.getPlan,
+    this.generatePlan,
+    this.suggestHabits,
+  });
+
+  /// Plan de Nevi (065); sin ellos el menú no muestra la opción.
+  final GetHabitPlan? getPlan;
+  final GenerateHabitPlan? generatePlan;
+
+  /// «Ideas de Nevi»; sin él no se muestra el botón.
+  final SuggestHabits? suggestHabits;
 
   @override
   State<HabitsScreen> createState() => _HabitsScreenState();
@@ -28,20 +44,19 @@ class _HabitsScreenState extends State<HabitsScreen> {
         showLifeQuestMessage(context, (state as HabitsSuccess).message!),
     builder: (context, state) => switch (state) {
       HabitsInitial() || HabitsLoading() => Center(
-        child: CircularProgressIndicator(color: context.lq.deepGreen),
+        child: CircularProgressIndicator(color: context.q.ink),
       ),
-      HabitsFailure(:final message) => _ErrorView(
+      HabitsFailure(:final message) => LifeQuestErrorView(
         message: message,
         onRetry: () => context.read<HabitsBloc>().add(const HabitsRequested()),
       ),
       HabitsSuccess() => RefreshIndicator(
-        color: context.lq.deepGreen,
+        color: context.q.ink,
         onRefresh: () => _refresh(context.read<HabitsBloc>()),
         child: _content(context, state),
       ),
     },
   );
-
   static Future<void> _refresh(HabitsBloc bloc) {
     bloc.add(const HabitsRequested());
     return bloc.stream.firstWhere(
@@ -53,6 +68,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
     final bloc = context.read<HabitsBloc>();
     final habit = await showModalBottomSheet<NewHabit>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -74,59 +90,111 @@ class _HabitsScreenState extends State<HabitsScreen> {
       onRename: (name) => bloc.add(HabitRenamed(habit.id, name)),
       onDelete: () => bloc.add(HabitDeleted(habit.id)),
       deleteMessage: 'Se borra también su historial y su racha.',
-    );
-    return LifeQuestPage(
-      title: 'Hábitos',
-      subtitle: 'La constancia también es una aventura.',
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: HabitTabButton(
-                label: 'Buenos hábitos',
-                selected: !_showBadHabits,
-                onTap: () => setState(() => _showBadHabits = false),
-              ),
+      extras: [
+        if ((widget.getPlan, widget.generatePlan) case (
+          final get?,
+          final generate?,
+        ))
+          (
+            'Plan de Nevi',
+            () => showHabitPlanSheet(
+              context,
+              habit: habit,
+              getPlan: get,
+              generatePlan: generate,
             ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: HabitTabButton(
-                label: 'Malos hábitos',
-                selected: _showBadHabits,
-                onTap: () => setState(() => _showBadHabits = true),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 11),
-        if (_showBadHabits)
-          BadHabitsView(
-            board: state.board,
-            busyHabitId: state.busyHabitId,
-            onRegister: idle ? (id) => bloc.add(BadHabitRegistered(id)) : null,
-            menuFor: menu,
-          )
-        else
-          GoodHabitsView(
-            board: state.board,
-            now: DateTime.now(),
-            busyHabitId: state.busyHabitId,
-            onComplete: idle ? (id) => bloc.add(GoodHabitCompleted(id)) : null,
-            menuFor: menu,
           ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 48,
-          child: OutlinedButton.icon(
-            onPressed: idle ? () => _create(context, state) : null,
-            icon: state.saving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.add),
-            label: Text(state.saving ? 'Creando hábito…' : 'Nuevo hábito'),
+        // 071: Nevi avisa a esa hora si aún no lo hiciste.
+        if (habit.type == HabitType.good) ...[
+          (
+            habit.reminderTime == null ? 'Elegir hora' : 'Cambiar la hora',
+            () async {
+              final time = await pickHabitTime(context, habit.reminderTime);
+              if (time != null) bloc.add(HabitTimeSet(habit.id, time));
+            },
+          ),
+          if (habit.reminderTime != null)
+            ('Quitar la hora', () => bloc.add(HabitTimeSet(habit.id, null))),
+        ],
+      ],
+    );
+    final today = [
+      for (final h in state.board.good)
+        if (h.scheduledToday) h,
+    ];
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(bottom: 96),
+      children: [
+        QuestlyHero(
+          kicker: 'Tus rutinas',
+          heading: 'Hábitos',
+          icon: QIcons.leaf,
+          onAction: idle ? () => _create(context, state) : null,
+          actionLabel: 'Crear hábito',
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TodayRing(
+                done: today.where((h) => h.doneToday).length,
+                total: today.length,
+              ),
+              const SizedBox(height: QSpace.l),
+              QuestlySegmented<bool>(
+                segments: const [(false, 'Buenos'), (true, 'Malos')],
+                selected: _showBadHabits,
+                onChanged: (bad) => setState(() => _showBadHabits = bad),
+              ),
+              const SizedBox(height: QSpace.m),
+              if (_showBadHabits)
+                BadHabitsView(
+                  board: state.board,
+                  busyHabitId: state.busyHabitId,
+                  onRegister: idle
+                      ? (id) => bloc.add(BadHabitRegistered(id))
+                      : null,
+                  menuFor: menu,
+                )
+              else
+                GoodHabitsView(
+                  board: state.board,
+                  now: DateTime.now(),
+                  busyHabitId: state.busyHabitId,
+                  onComplete: idle
+                      ? (id) => bloc.add(GoodHabitCompleted(id))
+                      : null,
+                  menuFor: menu,
+                ),
+              const SizedBox(height: QSpace.l),
+              QuestlyButton(
+                label: state.saving ? 'Creando hábito…' : 'Nuevo hábito',
+                icon: QIcons.plus,
+                variant: QuestlyButtonVariant.tonal,
+                onPressed: idle ? () => _create(context, state) : null,
+                disabledReason: state.saving ? 'Creando hábito…' : null,
+              ),
+              if (widget.suggestHabits case final suggest?) ...[
+                const SizedBox(height: QSpace.s),
+                QuestlyButton(
+                  label: 'Ideas de Nevi',
+                  icon: QIcons.spark,
+                  variant: QuestlyButtonVariant.tonal,
+                  onPressed: idle
+                      ? () async {
+                          final habit = await showHabitIdeasSheet(
+                            context,
+                            suggest,
+                          );
+                          if (habit != null) bloc.add(HabitCreated(habit));
+                        }
+                      : null,
+                  disabledReason: state.saving ? 'Creando hábito…' : null,
+                ),
+              ],
+            ],
           ),
         ),
       ],
@@ -134,28 +202,64 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 }
 
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
+/// «Hoy» (Habitos.dc.html, Ritual de hoy): anillo con los hábitos buenos
+/// cumplidos de los que tocan hoy.
+class _TodayRing extends StatelessWidget {
+  const _TodayRing({required this.done, required this.total});
 
-  final String message;
-  final VoidCallback onRetry;
+  final int done;
+  final int total;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) {
+    final q = context.q;
+    final text = total == 0
+        ? 'Hoy no tienes hábitos buenos programados.'
+        : done == total
+        ? '¡Cumpliste los $total de hoy!'
+        : '$done de $total hábitos buenos cumplidos';
+    return QuestlyCard(
+      padding: const EdgeInsets.all(14),
+      child: Row(
         children: [
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: context.lq.ink),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Hoy', style: QText.title3(q.text).copyWith(fontSize: 17)),
+                const SizedBox(height: QSpace.xs),
+                Text(text, style: QText.body(q.text2).copyWith(fontSize: 14)),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: const Text('Reintentar')),
+          Semantics(
+            label: 'Progreso de hoy: $done de $total',
+            excludeSemantics: true,
+            child: SizedBox.square(
+              dimension: 56,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(end: total == 0 ? 0 : done / total),
+                    duration: context.motion(const Duration(milliseconds: 600)),
+                    builder: (_, v, _) => SizedBox.expand(
+                      child: CircularProgressIndicator(
+                        value: v,
+                        strokeWidth: 7,
+                        strokeCap: StrokeCap.round,
+                        color: q.accent,
+                        backgroundColor: q.border,
+                      ),
+                    ),
+                  ),
+                  Text('$done/$total', style: QText.number(q.text, size: 14)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }

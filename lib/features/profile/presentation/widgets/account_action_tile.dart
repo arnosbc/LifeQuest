@@ -30,7 +30,7 @@ class AccountActionTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             children: [
-              Icon(icon, color: lq.deepGreen, size: 22),
+              Icon(icon, color: lq.ink, size: 22),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -38,7 +38,7 @@ class AccountActionTile extends StatelessWidget {
                   style: TextStyle(
                     color: lq.ink,
                     fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

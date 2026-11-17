@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
+import 'package:proyecto_movil/core/entities/task_guide.dart';
+
 /// La Taverna: NPCs del usuario, su límite (3 + Estandarte) y lo que cuesta
 /// pedir una misión antes de tiempo.
 class TavernBoard extends Equatable {
@@ -148,13 +150,20 @@ class NpcMission extends Equatable {
 
 /// Lo que propone RPGenie: el título y, si pudo, la guía para cumplirla.
 class NpcMissionSuggestion extends Equatable {
-  const NpcMissionSuggestion({required this.title, this.guide});
+  const NpcMissionSuggestion({
+    required this.title,
+    this.guide,
+    this.structured,
+  });
 
   final String title;
   final String? guide;
 
+  /// La misma guía con pasos marcables (039); null si la IA no trajo pasos.
+  final TaskGuide? structured;
+
   @override
-  List<Object?> get props => [title, guide];
+  List<Object?> get props => [title, guide, structured];
 }
 
 class TavernSkill extends Equatable {

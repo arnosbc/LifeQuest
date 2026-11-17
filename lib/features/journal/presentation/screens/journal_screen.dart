@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/journal/domain/entities/journal_board.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
 
-/// Diario: resumen semanal + Bitácora filtrable (CLAUDE.md §13). Pantalla de
+/// Actividad: resumen semanal + historial filtrable. Pantalla de
 /// lectura; necesita un [JournalBloc] por encima.
 class JournalScreen extends StatefulWidget {
   const JournalScreen({super.key});
@@ -19,7 +20,7 @@ class _JournalScreenState extends State<JournalScreen> {
     'Todo': <JournalSource>{},
     'Tareas': {JournalSource.task, JournalSource.npc, JournalSource.project},
     'Hábitos': {JournalSource.habit},
-    'Mazmorras': {JournalSource.dungeon},
+    'Modo Foco': {JournalSource.dungeon},
     'Metas': {JournalSource.goal},
   };
 
@@ -61,8 +62,9 @@ class _JournalScreenState extends State<JournalScreen> {
         if (sources.isEmpty || sources.contains(e.source)) e,
     ];
     return LifeQuestPage(
-      title: 'Diario',
-      subtitle: 'La crónica de tu aventura.',
+      title: 'Actividad',
+      icon: QIcons.calendar,
+      subtitle: 'Todo lo que has hecho, día a día.',
       children: [
         const LifeQuestSectionHeading('ESTA SEMANA'),
         const SizedBox(height: 7),
@@ -70,9 +72,9 @@ class _JournalScreenState extends State<JournalScreen> {
           children: [
             Expanded(child: _stat('XP', s.xp, s.xpPrev)),
             const SizedBox(width: 6),
-            Expanded(child: _stat('Misiones', s.missions, s.missionsPrev)),
+            Expanded(child: _stat('Tareas', s.missions, s.missionsPrev)),
             const SizedBox(width: 6),
-            Expanded(child: _stat('Mazmorras', s.cycles, s.cyclesPrev)),
+            Expanded(child: _stat('Bloques de foco', s.cycles, s.cyclesPrev)),
             const SizedBox(width: 6),
             Expanded(
               child: LifeQuestStat(value: '${s.bestStreak}', label: 'Racha'),
@@ -80,7 +82,7 @@ class _JournalScreenState extends State<JournalScreen> {
           ],
         ),
         const SizedBox(height: 14),
-        const LifeQuestSectionHeading('BITÁCORA'),
+        const LifeQuestSectionHeading('ACTIVIDAD'),
         const SizedBox(height: 7),
         Wrap(
           spacing: 6,
@@ -97,9 +99,9 @@ class _JournalScreenState extends State<JournalScreen> {
         if (entries.isEmpty)
           const LifeQuestListRow(
             icon: Icons.auto_stories_outlined,
-            title: 'Aún no hay páginas aquí',
+            title: 'Aún no hay actividad',
             subtitle:
-                'Cada misión, hábito y Mazmorra quedará escrita en tu Diario.',
+                'Aquí verás las tareas, hábitos y bloques de foco que completes.',
           ),
         for (final e in entries)
           LifeQuestListRow(
@@ -127,20 +129,20 @@ class _JournalScreenState extends State<JournalScreen> {
   static String? _change(JournalEntry e) {
     final parts = [
       if (e.xp > 0) '+${e.xp} XP',
-      if (e.coins > 0) '+${e.coins} 🪙',
-      if (e.hp != 0) '${e.hp > 0 ? '+' : '−'}${e.hp.abs()} vida',
+      if (e.coins > 0) '+${e.coins} Monedas',
+      if (e.hp != 0) '${e.hp > 0 ? '+' : '−'}${e.hp.abs()} constancia',
     ];
     return parts.isEmpty ? null : parts.join(' ');
   }
 
   static String _sourceLabel(JournalSource source) => switch (source) {
-    JournalSource.task => 'Misión',
-    JournalSource.npc => 'Misión de NPC',
+    JournalSource.task => 'Tarea',
+    JournalSource.npc => 'Tarea guiada',
     JournalSource.project => 'Proyecto',
     JournalSource.goal => 'Meta',
     JournalSource.habit => 'Hábito',
-    JournalSource.dungeon => 'Mazmorra',
-    JournalSource.dailyChest => 'Cofre diario',
+    JournalSource.dungeon => 'Modo Foco',
+    JournalSource.dailyChest => 'Recompensa diaria',
     JournalSource.achievement => 'Logro',
   };
 }

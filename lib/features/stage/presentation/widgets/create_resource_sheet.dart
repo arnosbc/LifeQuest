@@ -223,7 +223,7 @@ class _CreateResourceSheetState extends State<CreateResourceSheet> {
             ),
             _chips(
               context,
-              'Área / skill',
+              'Área',
               widget.skills,
               _skillId,
               (id) => setState(() => _skillId = id),

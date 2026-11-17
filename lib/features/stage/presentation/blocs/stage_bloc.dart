@@ -39,7 +39,7 @@ class StageBloc extends Bloc<StageEvent, StageState> {
       (event, emit) => _act(
         emit,
         () => _createProject(event.project),
-        'Proyecto creado. Añádele misiones para avanzar.',
+        'Proyecto creado. Añádele tareas para avanzar.',
       ),
       transformer: droppable(),
     );
@@ -47,16 +47,13 @@ class StageBloc extends Bloc<StageEvent, StageState> {
       (event, emit) => _act(
         emit,
         () => _createGoal(event.goal),
-        '¡Nueva meta! Un jefe aparece en el horizonte.',
+        '¡Nueva meta! Cada tarea vinculada la hará avanzar.',
       ),
       transformer: droppable(),
     );
     on<StageTaskCompleted>(
-      (event, emit) => _act(
-        emit,
-        () => _completeTask(event.taskId),
-        '¡Misión completada! Tu héroe se hace más fuerte.',
-      ),
+      (event, emit) =>
+          _act(emit, () => _completeTask(event.taskId), '¡Tarea completada!'),
       transformer: droppable(),
     );
     on<StageResourceCreated>(
@@ -84,7 +81,7 @@ class StageBloc extends Bloc<StageEvent, StageState> {
       (event, emit) => _act(
         emit,
         () => _completeProject(event.projectId),
-        '¡Proyecto completado! Tu héroe se hace más fuerte.',
+        '¡Proyecto completado!',
       ),
       transformer: droppable(),
     );

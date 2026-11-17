@@ -29,8 +29,8 @@ void main() {
   });
 
   test('createMission pasa la misión al datasource', () async {
-    when(() => remote.createMission(any())).thenAnswer((_) async {});
-    expect(await repository.createMission(newMission), const Right(unit));
+    when(() => remote.createMission(any())).thenAnswer((_) async => 't-new');
+    expect(await repository.createMission(newMission), const Right('t-new'));
     verify(() => remote.createMission(newMission)).called(1);
   });
 
@@ -40,7 +40,7 @@ void main() {
     ).thenThrow(const ServerException(code: 'task_not_open'));
     expect(
       await repository.completeMission('t1'),
-      const Left(ServerFailure('Esa misión ya estaba cerrada. ¡Una menos!')),
+      const Left(ServerFailure('Esa tarea ya estaba cerrada. ¡Una menos!')),
     );
   });
 

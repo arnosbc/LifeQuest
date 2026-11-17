@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/goals/data/models/goals_board_model.dart';
 import 'package:proyecto_movil/features/goals/domain/entities/goals_board.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 
 /// RPCs de Objetivos: `goals_overview` (021), `complete_task`,
 /// `complete_project` y `archive_item`. Lanza [ServerException] o
@@ -19,9 +20,12 @@ abstract class GoalsRemoteDataSource {
 }
 
 class GoalsRemoteDataSourceImpl implements GoalsRemoteDataSource {
-  const GoalsRemoteDataSourceImpl(this._client);
+  const GoalsRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<GoalsBoardModel> getBoard() => _guard(
@@ -32,16 +36,16 @@ class GoalsRemoteDataSourceImpl implements GoalsRemoteDataSource {
 
   @override
   Future<void> attack(BossAttack attack) => _guard(
-    () => switch (attack.kind) {
-      AttackKind.task => _client.rpc<void>(
+    () async => _rewards?.report(await switch (attack.kind) {
+      AttackKind.task => _client.rpc<dynamic>(
         'complete_task',
         params: {'p_task_id': attack.id},
       ),
-      AttackKind.project => _client.rpc<void>(
+      AttackKind.project => _client.rpc<dynamic>(
         'complete_project',
         params: {'p_project_id': attack.id},
       ),
-    },
+    }),
   );
 
   @override

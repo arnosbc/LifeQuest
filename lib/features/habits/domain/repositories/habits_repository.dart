@@ -1,6 +1,8 @@
 import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit_idea.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit_plan.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
 
@@ -22,5 +24,17 @@ abstract class HabitsRepository {
 
   Future<Either<Failure, Unit>> renameHabit(String habitId, String name);
 
+  /// Pone o quita (null) la hora «HH:MM» del hábito.
+  Future<Either<Failure, Unit>> setHabitTime(String habitId, String? time);
+
   Future<Either<Failure, Unit>> deleteHabit(String habitId);
+
+  /// 3 hábitos que Nevi propone según el perfil; no crea nada.
+  Future<Either<Failure, List<HabitIdea>>> suggestHabits();
+
+  /// Plan de Nevi guardado (065); null si aún no tiene.
+  Future<Either<Failure, HabitPlan?>> getPlan(String habitId);
+
+  /// Nevi (IA) arma el plan y el servidor lo guarda.
+  Future<Either<Failure, HabitPlan>> generatePlan(String habitId);
 }

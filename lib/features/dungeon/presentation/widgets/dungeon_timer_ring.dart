@@ -14,7 +14,7 @@ class DungeonTimerRing extends StatelessWidget {
   final Duration remaining;
   final Duration total;
 
-  /// "MAZMORRA ACTIVA", "DESCANSO" o "EN PAUSA".
+  /// "BLOQUE ACTIVO", "DESCANSO" o "EN PAUSA".
   final String label;
 
   /// Línea inferior, p. ej. "Ciclo 2 de 4".

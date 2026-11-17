@@ -7,6 +7,16 @@ abstract final class AppConstants {
   /// públicas por diseño: los datos los protege el RLS.
   static const supabaseKey = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
 
+  /// ID de cliente «Aplicación web» de Google Cloud (el mismo que usa el
+  /// proveedor Google de Supabase). Vacío: «Continuar con Google» lo avisa.
+  static const googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+  );
+
+  /// H-04 (M5): solo HTTPS hacia el backend.
+  static bool isSecureUrl(String url) =>
+      Uri.tryParse(url)?.scheme == 'https' && Uri.parse(url).host.isNotEmpty;
+
   static void ensureSupabaseConfigured() {
     if (supabaseUrl.isEmpty || supabaseKey.isEmpty) {
       throw StateError(
@@ -14,6 +24,9 @@ abstract final class AppConstants {
         'supabase.example.json a supabase.json, rellénalo y ejecuta: '
         'flutter run --dart-define-from-file=supabase.json',
       );
+    }
+    if (!isSecureUrl(supabaseUrl)) {
+      throw StateError('SUPABASE_URL debe empezar por https://');
     }
   }
 }

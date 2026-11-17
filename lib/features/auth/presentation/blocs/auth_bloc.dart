@@ -7,6 +7,7 @@ import 'package:proyecto_movil/features/auth/domain/entities/sign_up_result.dart
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/get_current_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/login_with_google.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
 
@@ -19,18 +20,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({
     required this._getCurrentUser,
     required this._loginUser,
+    required this._loginWithGoogle,
     required this._registerUser,
     required this._logoutUser,
   }) : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     // droppable: un segundo toque mientras carga se ignora.
     on<LoginRequested>(_onLoginRequested, transformer: droppable());
+    on<GoogleLoginRequested>(_onGoogleLogin, transformer: droppable());
     on<RegisterRequested>(_onRegisterRequested, transformer: droppable());
     on<LogoutRequested>(_onLogoutRequested, transformer: droppable());
   }
 
   final GetCurrentUser _getCurrentUser;
   final LoginUser _loginUser;
+  final LoginWithGoogle _loginWithGoogle;
   final RegisterUser _registerUser;
   final LogoutUser _logoutUser;
 
@@ -60,6 +64,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       result.match(
         (failure) => AuthFailure(failure.message),
         (user) => AuthSuccess(user),
+      ),
+    );
+  }
+
+  /// Cerrar la ventana de Google no es un error: vuelve al login sin aviso.
+  Future<void> _onGoogleLogin(
+    GoogleLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+    final result = await _loginWithGoogle(const NoParams());
+    emit(
+      result.match(
+        (failure) => AuthFailure(failure.message),
+        (user) =>
+            user == null ? const AuthUnauthenticated() : AuthSuccess(user),
       ),
     );
   }

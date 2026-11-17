@@ -80,7 +80,7 @@ class QuestlyButton extends StatelessWidget {
     );
     return QuestlyPressable(
       onTap: onPressed,
-      radius: QRadius.button,
+      radius: QRadius.action,
       constraints: BoxConstraints(
         minHeight: height,
         minWidth: expand ? double.infinity : QSize.minTap,
@@ -91,7 +91,7 @@ class QuestlyButton extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(QRadius.button),
+        borderRadius: BorderRadius.circular(QRadius.action),
         border: border == null ? null : Border.all(color: border, width: 1.5),
         boxShadow: shadow == null ? null : qSolidShadow(shadow),
       ),

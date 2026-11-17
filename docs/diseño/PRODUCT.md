@@ -1,8 +1,8 @@
 # PRODUCT.md — Producto (v2 · moderno, sin fantasía)
 
 > **v2 (2026-10-29):** la app deja de presentarse como un RPG de fantasía. Se mantiene la gamificación
-> (XP, niveles, rachas, Monedas, logros) con el lenguaje de las apps de hábitos. El nombre comercial está
-> por decidir; el código y el título siguen como **LifeQuest**. Plan completo:
+> (XP, niveles, rachas, Monedas, logros) con el lenguaje de las apps de hábitos. El nombre de la app es
+> **LifeQuest** (decidido el 2026-10-29). Plan completo:
 > `docs/plan-funcionalidades-asistente.md`.
 
 ## Qué es

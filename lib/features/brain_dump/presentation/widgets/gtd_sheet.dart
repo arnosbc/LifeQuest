@@ -130,7 +130,7 @@ class _GtdSheetState extends State<GtdSheet> {
       ),
       _Step.details => (
         '¿Tiene un momento específico?',
-        [('Crear misión', () => _convert(ThoughtKind.task))],
+        [('Crear tarea', () => _convert(ThoughtKind.task))],
       ),
     };
 

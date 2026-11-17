@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
-/// Botón principal de Acceso (Auth.dc.html): 56 px, radio 16, acento con su
-/// sombra sólida de 4 px. Cargando no es «desactivado»: mantiene sus colores.
+/// Botón principal de Acceso: 56 px, píldora lavanda con sombra suave.
+/// Cargando no es «desactivado»: mantiene sus colores.
 class AuthPrimaryButton extends StatelessWidget {
   const AuthPrimaryButton({
     super.key,
@@ -22,11 +22,11 @@ class AuthPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = context.q;
-    final radius = BorderRadius.circular(QRadius.block);
+    final radius = BorderRadius.circular(QRadius.action);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: [BoxShadow(color: q.buttonShadow, offset: const Offset(0, 4))],
+        boxShadow: qSolidShadow(q.buttonShadow),
       ),
       child: SizedBox(
         height: 56,
@@ -39,7 +39,7 @@ class AuthPrimaryButton extends StatelessWidget {
             disabledForegroundColor: q.onAccent,
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: radius),
-            textStyle: QText.label(q.onAccent).copyWith(fontSize: 17),
+            textStyle: QText.label(q.onAccent).copyWith(fontSize: 16),
           ),
           child: isLoading
               ? Semantics(

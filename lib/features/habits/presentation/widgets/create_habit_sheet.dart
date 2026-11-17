@@ -4,6 +4,7 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_time.dart';
 
 /// Alta de un hábito; devuelve [NewHabit] al guardar.
 class CreateHabitSheet extends StatefulWidget {
@@ -23,7 +24,11 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
   late HabitType _type = widget.type;
   final Set<int> _days = {};
   int _severity = 5;
+  HabitPriority _priority = HabitPriority.medium;
   String? _skillId;
+
+  /// Hora opcional «HH:MM» (071).
+  String? _time;
 
   // Orden de lunes a domingo; el valor es 0 = domingo … 6 = sábado.
   static const _week = [
@@ -49,9 +54,11 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
       NewHabit(
         name: _name.text.trim(),
         type: _type,
+        priority: _priority,
         specificDays: _type == HabitType.good ? (_days.toList()..sort()) : [],
         hpPenalty: _type == HabitType.bad ? _severity : 0,
         skillId: _skillId,
+        reminderTime: _type == HabitType.good ? _time : null,
       ),
     );
   }
@@ -110,6 +117,24 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             const SizedBox(height: 8),
             if (_type == HabitType.good) ...[
               Text(
+                'Prioridad: las altas van primero en tu Camino.',
+                style: TextStyle(color: context.lq.muted, fontSize: 12),
+              ),
+              const SizedBox(height: 6),
+              SegmentedButton<HabitPriority>(
+                segments: const [
+                  ButtonSegment(value: HabitPriority.high, label: Text('Alta')),
+                  ButtonSegment(
+                    value: HabitPriority.medium,
+                    label: Text('Media'),
+                  ),
+                  ButtonSegment(value: HabitPriority.low, label: Text('Baja')),
+                ],
+                selected: {_priority},
+                onSelectionChanged: (s) => setState(() => _priority = s.first),
+              ),
+              const SizedBox(height: 12),
+              Text(
                 '¿Qué días? (ninguno = todos los días)',
                 style: TextStyle(color: context.lq.muted, fontSize: 12),
               ),
@@ -133,9 +158,23 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                     ),
                 ],
               ),
+              const SizedBox(height: 12),
+              // 071: con hora, Nevi avisa a esa hora si aún no lo hiciste.
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final time = await pickHabitTime(context, _time);
+                  if (time != null) setState(() => _time = time);
+                },
+                icon: const Icon(Icons.alarm),
+                label: Text(
+                  _time == null
+                      ? '¿A qué hora? (opcional)'
+                      : 'A las ${habitTimeLabel(_time!)} · Nevi te avisa',
+                ),
+              ),
             ] else ...[
               Text(
-                '¿Cuánto te afecta? Cada registro resta esa vida.',
+                '¿Cuánto te afecta? Cada registro resta esa Constancia.',
                 style: TextStyle(color: context.lq.muted, fontSize: 12),
               ),
               const SizedBox(height: 6),
@@ -153,7 +192,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
             DropdownButtonFormField<String?>(
               initialValue: _skillId,
               isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Área / skill'),
+              decoration: const InputDecoration(labelText: 'Área'),
               items: [
                 const DropdownMenuItem(
                   value: null,

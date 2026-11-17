@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/features/habits/data/models/habits_board_model.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 
 /// RPCs de Hábitos en Supabase. Lanza [ServerException] o [NetworkException].
 abstract class HabitsRemoteDataSource {
@@ -23,13 +24,28 @@ abstract class HabitsRemoteDataSource {
 
   Future<void> renameHabit(String habitId, String name);
 
+  /// Pone o quita (null) la hora «HH:MM» del hábito (071).
+  Future<void> setHabitTime(String habitId, String? time);
+
   Future<void> deleteHabit(String habitId);
+
+  /// `habits.plan` (065) con el RLS del usuario; null si no tiene.
+  Future<Map<String, dynamic>?> getPlan(String habitId);
+
+  /// `npc-mission` con `habit_id`: la IA arma el plan y lo guarda.
+  Future<Map<String, dynamic>> generatePlan(String habitId);
+
+  /// `npc-mission` con `ideas: 'habits'`: 3 ideas, sin guardar nada.
+  Future<List<Map<String, dynamic>>> suggestHabits();
 }
 
 class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
-  const HabitsRemoteDataSourceImpl(this._client);
+  const HabitsRemoteDataSourceImpl(this._client, [this._rewards]);
 
   final SupabaseClient _client;
+
+  /// Recibe lo que pagó el servidor para el momento de recompensa.
+  final RewardFeed? _rewards;
 
   @override
   Future<HabitsBoardModel> getBoard(String day) => _guard(() async {
@@ -41,8 +57,8 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   });
 
   @override
-  Future<void> createHabit(NewHabit habit) => _guard(
-    () => _client.rpc<void>(
+  Future<void> createHabit(NewHabit habit) => _guard(() async {
+    final id = await _client.rpc<String>(
       'create_habit',
       params: {
         'p_name': habit.name,
@@ -51,26 +67,41 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
         'p_specific_days': habit.specificDays,
         'p_hp_penalty': habit.hpPenalty,
         'p_skill_id': habit.skillId,
+        'p_priority': habit.priority.name,
       },
-    ),
-  );
+    );
+    if (habit.reminderTime case final time?) {
+      await _client.rpc<void>(
+        'set_habit_time',
+        params: {'p_habit_id': id, 'p_time': time},
+      );
+    }
+    _rewards?.announce(
+      'Nuevo hábito: ${habit.name}',
+      'Ya está en tu lista. Te recordaremos cuando esté pendiente.',
+    );
+  });
 
   @override
   Future<void> completeGoodHabit({
     required String habitId,
     required String day,
   }) => _guard(
-    () => _client.rpc<void>(
-      'complete_habit',
-      params: {'p_habit_id': habitId, 'p_day': day},
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'complete_habit',
+        params: {'p_habit_id': habitId, 'p_day': day},
+      ),
     ),
   );
 
   @override
   Future<void> registerBadHabit(String habitId) => _guard(
-    () => _client.rpc<void>(
-      'register_bad_habit',
-      params: {'p_habit_id': habitId},
+    () async => _rewards?.report(
+      await _client.rpc<dynamic>(
+        'register_bad_habit',
+        params: {'p_habit_id': habitId},
+      ),
     ),
   );
 
@@ -83,9 +114,61 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
   );
 
   @override
+  Future<void> setHabitTime(String habitId, String? time) => _guard(
+    () => _client.rpc<void>(
+      'set_habit_time',
+      params: {'p_habit_id': habitId, 'p_time': time},
+    ),
+  );
+
+  @override
   Future<void> deleteHabit(String habitId) => _guard(
     () => _client.rpc<void>('delete_habit', params: {'p_habit_id': habitId}),
   );
+
+  @override
+  Future<Map<String, dynamic>?> getPlan(String habitId) => _guard(() async {
+    final row = await _client
+        .from('habits')
+        .select('plan')
+        .eq('id', habitId)
+        .maybeSingle();
+    return row?['plan'] as Map<String, dynamic>?;
+  });
+
+  @override
+  Future<Map<String, dynamic>> generatePlan(String habitId) => _guard(() async {
+    try {
+      final response = await _client.functions.invoke(
+        'npc-mission',
+        body: {'habit_id': habitId},
+      );
+      final plan = (response.data as Map?)?['plan'];
+      if (plan is! Map<String, dynamic>) {
+        throw const ServerException(code: 'plan_unavailable');
+      }
+      return plan;
+    } on FunctionException {
+      throw const ServerException(code: 'plan_unavailable');
+    }
+  });
+
+  @override
+  Future<List<Map<String, dynamic>>> suggestHabits() => _guard(() async {
+    try {
+      final response = await _client.functions.invoke(
+        'npc-mission',
+        body: {'ideas': 'habits'},
+      );
+      final ideas = (response.data as Map?)?['ideas'];
+      if (ideas is! List || ideas.isEmpty) {
+        throw const ServerException(code: 'ideas_unavailable');
+      }
+      return ideas.cast<Map<String, dynamic>>();
+    } on FunctionException {
+      throw const ServerException(code: 'ideas_unavailable');
+    }
+  });
 
   /// Las funciones SQL lanzan su motivo como mensaje (p. ej.
   /// `already_completed`); se pasa como [ServerException.code].

@@ -37,6 +37,10 @@ class RegisterRequested extends AuthEvent {
   List<Object?> get props => [username, email, password];
 }
 
+class GoogleLoginRequested extends AuthEvent {
+  const GoogleLoginRequested();
+}
+
 class LogoutRequested extends AuthEvent {
   const LogoutRequested();
 }

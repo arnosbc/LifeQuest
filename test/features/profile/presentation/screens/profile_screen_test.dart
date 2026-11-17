@@ -4,10 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:proyecto_movil/features/profile/data/models/character_profile_model.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/character_profile.dart';
 import 'package:proyecto_movil/features/profile/domain/entities/theme_preference.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/profile_look.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/features/profile/presentation/screens/profile_screen.dart';
 
 import '../../../../helpers/mocks.dart';
@@ -16,6 +19,7 @@ import '../../profile_fixtures.dart';
 void main() {
   late MockProfileBloc bloc;
   late MockAppearanceBloc appearanceBloc;
+  late MockProfileLookCubit lookCubit;
   late int settingsOpened;
   late int journalOpened;
   late int marketplaceOpened;
@@ -24,6 +28,13 @@ void main() {
   setUp(() {
     bloc = MockProfileBloc();
     appearanceBloc = MockAppearanceBloc();
+    lookCubit = MockProfileLookCubit();
+    whenListen(
+      lookCubit,
+      const Stream<ProfileLook>.empty(),
+      // Sin luz: el avatar queda quieto y pumpAndSettle termina.
+      initialState: const ProfileLook(glow: ProfileGlow.none),
+    );
     whenListen(
       appearanceBloc,
       const Stream<AppearanceState>.empty(),
@@ -57,6 +68,7 @@ void main() {
               providers: [
                 BlocProvider<ProfileBloc>.value(value: bloc),
                 BlocProvider<AppearanceBloc>.value(value: appearanceBloc),
+                BlocProvider<ProfileLookCubit>.value(value: lookCubit),
               ],
               child: ProfileScreen(
                 userName: 'Alex',
@@ -76,11 +88,11 @@ void main() {
     );
   }
 
-  testWidgets('muestra identidad, vitalidad, tasa y skills', (tester) async {
+  testWidgets('muestra identidad, constancia, tasa y áreas', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
     expect(find.text('Ana'), findsOneWidget);
-    expect(find.text('Nivel 24 · Estratega'), findsOneWidget);
+    expect(find.text('Experto · Nivel 24'), findsOneWidget);
     expect(
       find.text('Una estratega que termina lo que empieza.'),
       findsOneWidget,
@@ -88,13 +100,41 @@ void main() {
     expect(find.text('80 / 100'), findsOneWidget);
     expect(find.text('2.450'), findsOneWidget);
     expect(find.text('76 %'), findsOneWidget);
-    expect(find.text('38 de 50 misiones cumplidas'), findsOneWidget);
+    expect(find.text('38 de 50 tareas cumplidas'), findsOneWidget);
     expect(find.text('Inglés'), findsOneWidget);
     expect(find.text('2 / 6'), findsOneWidget);
-    expect(find.text('Añadir skill'), findsOneWidget);
+    expect(find.text('Añadir área'), findsOneWidget);
   });
 
-  testWidgets('vitalidad baja explica la regla vigente', (tester) async {
+  testWidgets(
+    'vitrina de logros: insignias, conteo y abre Logros (360 dp, 1,3×)',
+    (tester) async {
+      final withAchievements = CharacterProfileModel.fromJson({
+        ...profileJson,
+        'achievements': [
+          {'name': 'Semana de fuego', 'unlocked_at': '2026-11-15T10:00:00Z'},
+          {'name': 'Maestro del foco', 'unlocked_at': '2026-11-14T10:00:00Z'},
+          {'name': 'Primer paso', 'unlocked_at': '2026-11-13T10:00:00Z'},
+          {'name': 'Leyenda', 'unlocked_at': null},
+        ],
+      }).toEntity();
+      await pump(
+        tester,
+        ProfileSuccess(withAchievements),
+        width: 360,
+        textScale: 1.3,
+      );
+
+      expect(find.text('Tus logros'), findsOneWidget);
+      expect(find.text('3/4'), findsOneWidget);
+      expect(find.text('Maestro del foco'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Tus logros'));
+      expect(otherOpened, 1);
+    },
+  );
+
+  testWidgets('constancia baja explica la regla vigente', (tester) async {
     const weakened = CharacterProfile(
       level: 3,
       currentXp: 0,
@@ -112,7 +152,7 @@ void main() {
 
     expect(
       find.text(
-        'Vitalidad baja: ganas un 25 % menos de XP hasta recuperarte. '
+        'Constancia baja: ganas un 25 % menos de XP hasta recuperarte. '
         'Tus Monedas no cambian.',
       ),
       findsOneWidget,
@@ -120,39 +160,31 @@ void main() {
     expect(find.byIcon(Icons.heart_broken_outlined), findsOneWidget);
   });
 
-  testWidgets('con vida suficiente no hay aviso de vitalidad', (tester) async {
+  testWidgets('con constancia suficiente no hay aviso', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
-    expect(find.textContaining('Vitalidad baja'), findsNothing);
+    expect(find.textContaining('Constancia baja'), findsNothing);
   });
 
-  testWidgets('muestra el título activo y el Tesoro', (tester) async {
+  testWidgets('muestra la insignia activa', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
     expect(find.text('Guardián del Huerto'), findsOneWidget);
-    expect(find.text('Tesoro del reino'), findsOneWidget);
-    expect(find.text('12.500'), findsOneWidget);
-    expect(
-      find.text('Lo que no cabe en tu bolsa. No se gasta: es tu prestigio.'),
-      findsOneWidget,
-    );
+    expect(find.text('Reserva'), findsNothing);
+    expect(find.text('12.500'), findsNothing);
   });
 
-  testWidgets('sin título ni Tesoro no deja huecos', (tester) async {
+  testWidgets('sin insignia activa no deja un espacio vacío', (tester) async {
     await pump(tester, const ProfileSuccess(newProfile));
 
     expect(find.text('Guardián del Huerto'), findsNothing);
-    expect(find.text('Tesoro del reino'), findsOneWidget);
-    expect(
-      find.text('Lo que no cabe en tu bolsa. No se gasta: es tu prestigio.'),
-      findsOneWidget,
-    );
+    expect(find.text('Reserva'), findsNothing);
   });
 
   testWidgets('elegir título envía el elegido', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
-    await tester.tap(find.text('Elegir título'));
+    await tester.tap(find.text('Elegir insignia'));
     await tester.pumpAndSettle();
 
     expect(find.text('Sin título'), findsOneWidget);
@@ -167,13 +199,12 @@ void main() {
   testWidgets('sin títulos la hoja explica cómo se ganan', (tester) async {
     await pump(tester, const ProfileSuccess(newProfile));
 
-    await tester.tap(find.text('Elegir título'));
+    await tester.tap(find.text('Elegir insignia'));
     await tester.pumpAndSettle();
 
     expect(
       find.text(
-        'Aún no tienes títulos. Se ganan con logros, subiendo de nivel y '
-        'llenando tu Tesoro del reino.',
+        'Aún no tienes insignias. Se ganan con logros y subiendo de nivel.',
       ),
       findsOneWidget,
     );
@@ -185,11 +216,11 @@ void main() {
     await pump(tester, const ProfileSuccess(profile));
 
     const labels = [
-      'Diario',
+      'Actividad',
       'Estadísticas',
-      'Vision Board',
-      'Inventario y logros',
-      'Marketplace',
+      'Visión',
+      'Logros',
+      'Recompensas',
       'Configuración',
     ];
     final positions = [
@@ -207,24 +238,24 @@ void main() {
       expect(find.text(gone), findsNothing);
     }
 
-    await tester.tap(find.text('Diario'));
-    await tester.tap(find.text('Marketplace'));
+    await tester.tap(find.text('Actividad'));
+    await tester.tap(find.text('Recompensas'));
     await tester.tap(find.text('Configuración'));
     expect((journalOpened, marketplaceOpened, settingsOpened), (1, 1, 1));
 
     await tester.tap(find.text('Estadísticas'));
-    await tester.tap(find.text('Vision Board'));
-    await tester.tap(find.text('Inventario y logros'));
+    await tester.tap(find.text('Visión'));
+    await tester.tap(find.text('Logros'));
     expect(otherOpened, 3);
   });
 
   testWidgets('editar la identidad envía lo escrito', (tester) async {
     await pump(tester, const ProfileSuccess(newProfile));
 
-    await tester.tap(find.text('¿Quién eres en este reino?'));
+    await tester.tap(find.text('¿En quién te quieres convertir?'));
     await tester.pumpAndSettle();
     await tester.enterText(
-      find.widgetWithText(TextFormField, '¿Quién eres en este reino?'),
+      find.widgetWithText(TextFormField, '¿En quién te quieres convertir?'),
       'Un aprendiz constante',
     );
     await tester.tap(find.text('Guardar'));
@@ -243,14 +274,14 @@ void main() {
   testWidgets('una skill sin nombre no se crea', (tester) async {
     await pump(tester, const ProfileSuccess(newProfile));
 
-    await tester.tap(find.text('Añadir skill'));
+    await tester.tap(find.text('Añadir área'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Crear skill'));
+    await tester.tap(find.text('Crear área'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Ponle un nombre a tu skill.'), findsOneWidget);
+    expect(find.text('Ponle un nombre a tu área.'), findsOneWidget);
     await tester.enterText(find.byType(TextFormField), 'Salud');
-    await tester.tap(find.text('Crear skill'));
+    await tester.tap(find.text('Crear área'));
     await tester.pumpAndSettle();
 
     verify(() => bloc.add(const ProfileSkillCreated('Salud'))).called(1);
@@ -261,7 +292,7 @@ void main() {
 
     await tester.tap(find.text('Inglés'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Eliminar skill'));
+    await tester.tap(find.text('Eliminar área'));
     await tester.pumpAndSettle();
 
     expect(find.text('¿Eliminar «Inglés»?'), findsOneWidget);
@@ -289,8 +320,8 @@ void main() {
       level: 24,
       currentXp: 7850,
       xpToNextLevel: 12000,
-      coins: 2450,
-      treasury: 1250000,
+      coins: 1250000,
+      treasury: 0,
       hpCurrent: 20,
       hpMax: 100,
       isWeakened: true,
@@ -310,7 +341,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('1.250.000'), findsOneWidget);
-    expect(find.text('Inventario y logros'), findsOneWidget);
+    expect(find.text('Logros'), findsOneWidget);
     expect(find.text('Ayuda'), findsOneWidget);
   });
 }

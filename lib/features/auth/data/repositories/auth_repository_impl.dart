@@ -22,6 +22,10 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
+  Future<Either<Failure, User?>> loginWithGoogle() =>
+      _run(() async => (await _remote.signInWithGoogle())?.toEntity());
+
+  @override
   Future<Either<Failure, SignUpResult>> registerUser({
     required String username,
     required String email,
@@ -56,6 +60,13 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User?>> getCurrentUser() async =>
       Right(_remote.currentUser()?.toEntity());
+
+  @override
+  Future<Either<Failure, Unit>> changePassword(String password) =>
+      _run(() async {
+        await _remote.updatePassword(password);
+        return unit;
+      });
 
   Future<Either<Failure, T>> _run<T>(Future<T> Function() action) async {
     try {
@@ -94,6 +105,12 @@ class AuthRepositoryImpl implements AuthRepository {
         code == 'over_request_rate_limit' ||
         error.statusCode == '429') {
       return 'Demasiados intentos seguidos. Espera un momento y reintenta.';
+    }
+    if (code == 'google_not_configured') {
+      return 'El inicio con Google aún no está configurado en esta versión.';
+    }
+    if (code == 'google_failed' || code == 'provider_disabled') {
+      return 'No pudimos entrar con Google. Inténtalo de nuevo o usa tu correo.';
     }
     return 'Algo salió mal. Inténtalo de nuevo en un momento.';
   }

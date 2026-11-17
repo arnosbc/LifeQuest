@@ -9,14 +9,14 @@ class RpGenieTipCard extends StatelessWidget {
   Widget build(BuildContext context) => LifeQuestSurface(
     child: Row(
       children: [
-        LifeQuestIconTile(Icons.auto_awesome),
+        const LifeQuestIconTile.nevi(size: 40),
         SizedBox(width: 9),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'GENIE DE RP',
+                'NEVI, TU ASISTENTE',
                 style: TextStyle(
                   color: context.lq.deepGreen,
                   fontSize: 10,
@@ -25,7 +25,7 @@ class RpGenieTipCard extends StatelessWidget {
               ),
               SizedBox(height: 5),
               Text(
-                'He revisado tu campaña, objetivos y plazos. Esta es la misión más importante para ti ahora.',
+                'Revisé tus metas y plazos. Esta es la tarea más importante para ti ahora.',
                 style: TextStyle(
                   color: context.lq.muted,
                   fontSize: 10,

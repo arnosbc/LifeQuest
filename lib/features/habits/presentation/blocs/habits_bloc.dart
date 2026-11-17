@@ -12,6 +12,7 @@ import 'package:proyecto_movil/features/habits/domain/usecases/delete_habit.dart
 import 'package:proyecto_movil/features/habits/domain/usecases/get_habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/register_bad_habit.dart';
 import 'package:proyecto_movil/features/habits/domain/usecases/rename_habit.dart';
+import 'package:proyecto_movil/features/habits/domain/usecases/set_habit_time.dart';
 
 part 'habits_event.dart';
 part 'habits_state.dart';
@@ -24,6 +25,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     required this._registerBadHabit,
     required this._renameHabit,
     required this._deleteHabit,
+    this._setHabitTime,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now,
        super(const HabitsInitial()) {
@@ -67,6 +69,17 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       ),
       transformer: droppable(),
     );
+    on<HabitTimeSet>(
+      (event, emit) => _act(
+        emit,
+        (s) => HabitsSuccess(s.board, busyHabitId: event.habitId),
+        () => _setHabitTime!(HabitTimeParams(event.habitId, event.time)),
+        event.time == null
+            ? 'Quitaste la hora del hábito.'
+            : 'Listo: Nevi te avisará a esa hora si aún no lo haces.',
+      ),
+      transformer: droppable(),
+    );
     on<HabitDeleted>(
       (event, emit) => _act(
         emit,
@@ -84,6 +97,9 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
   final RegisterBadHabit _registerBadHabit;
   final RenameHabit _renameHabit;
   final DeleteHabit _deleteHabit;
+
+  /// Opcional: sin él, el menú no ofrece «Hora del hábito».
+  final SetHabitTime? _setHabitTime;
   final DateTime Function() _clock;
 
   Future<void> _onRequested(

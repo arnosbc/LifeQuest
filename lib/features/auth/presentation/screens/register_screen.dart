@@ -11,7 +11,6 @@ import 'package:proyecto_movil/features/auth/presentation/widgets/auth_footer_li
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_form_layout.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_header.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/auth_primary_button.dart';
-import 'package:proyecto_movil/features/auth/presentation/widgets/auth_tabs.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:proyecto_movil/features/auth/presentation/widgets/terms_checkbox.dart';
 
@@ -62,6 +61,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  /// El registro va apilado sobre el login: vuelve si hay a dónde.
+  static void _backToLogin(BuildContext context) =>
+      context.canPop() ? context.pop() : context.go(RoutePaths.login);
+
   void _showMessage(String message) => showLifeQuestMessage(context, message);
 
   /// Lleva a la vista el primer campo con error y lo anuncia en TalkBack.
@@ -111,7 +114,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) => BlocListener<AuthBloc, AuthState>(
     // Solo reacciona si esta pantalla es la visible (login también escucha).
@@ -119,20 +121,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     listener: _onAuthStateChanged,
     child: AuthFormLayout(
       formKey: _formKey,
-      header: const AuthHeader(),
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+      padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
       children: [
-        const AuthTabs(register: true),
-        const SizedBox(height: 14),
-        const AuthTitle(
-          title: 'Crea tu cuenta',
-          lead: 'Guarda tu progreso y úsalo desde cualquier dispositivo.',
+        QuestlyHero(
+          kicker: '',
+          heading: 'Crear cuenta',
+          onBack: () => _backToLogin(context),
+          backLabel: 'Volver al inicio de sesión',
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: QSpace.m),
+        const AuthHeader(subtitle: 'Comienza tu camino', logoSize: 80),
+        const SizedBox(height: QSpace.xl),
         CustomTextField(
           controller: _nameController,
-          label: 'Tu nombre',
-          hint: 'Ej.: Jose',
+          label: 'Nombre completo',
+          icon: Icons.person_outline_rounded,
           maxLength: 30,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.newUsername],
@@ -144,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         CustomTextField(
           controller: _emailController,
           label: 'Correo electrónico',
-          hint: 'tu@correo.com',
+          icon: Icons.mail_outline_rounded,
           maxLength: 254,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
@@ -157,8 +160,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: QSpace.m),
         CustomTextField(
           controller: _passwordController,
-          label: 'Crea una contraseña',
-          hint: 'Mínimo 6 caracteres',
+          label: 'Contraseña',
+          icon: Icons.lock_outline_rounded,
           isPassword: true,
           maxLength: 128,
           textInputAction: TextInputAction.next,
@@ -170,7 +173,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: QSpace.m),
         CustomTextField(
           controller: _confirmPasswordController,
-          label: 'Confirma la contraseña',
+          label: 'Confirmar contraseña',
+          icon: Icons.lock_outline_rounded,
           isPassword: true,
           textInputAction: TextInputAction.done,
           autofillHints: const [AutofillHints.newPassword],
@@ -181,18 +185,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(height: QSpace.s),
         TermsCheckbox(),
-        const SizedBox(height: QSpace.s),
+        const SizedBox(height: QSpace.m),
         AuthPrimaryButton(
-          label: 'Crear cuenta',
+          label: 'Registrarse',
           onPressed: _onRegisterPressed,
           isLoading: context.watch<AuthBloc>().state is AuthLoading,
         ),
         const Spacer(),
-        const SizedBox(height: 14),
+        const SizedBox(height: QSpace.l),
         AuthFooterLink(
           question: '¿Ya tienes cuenta?',
           linkLabel: 'Inicia sesión',
-          onTap: () => AuthTabs.backToLogin(context),
+          onTap: () => _backToLogin(context),
         ),
       ],
     ),

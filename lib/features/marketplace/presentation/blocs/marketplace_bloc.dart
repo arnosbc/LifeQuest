@@ -41,7 +41,9 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
         emit,
         e.code,
         () => _buyBlackMarket(BlackMarketParams(e.code, habitId: e.habitId)),
-        e.habitId == null ? 'Pase guardado.' : '¡Racha salvada! Sigue así.',
+        e.habitId == null
+            ? 'Protector de racha guardado.'
+            : 'Racha reparada. Sigue así.',
       ),
       transformer: droppable(),
     );
@@ -50,7 +52,7 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
         emit,
         e.habitId,
         () => _usePass(e.habitId),
-        '¡Racha salvada! Sigue así.',
+        'Racha reparada. Sigue así.',
       ),
       transformer: droppable(),
     );
@@ -59,7 +61,7 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
         emit,
         e.building,
         () => _upgradeRefuge(e.building),
-        'Tu Refugio creció.',
+        'Mejora aplicada.',
       ),
       transformer: droppable(),
     );
@@ -68,7 +70,7 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
         emit,
         'elixir_activate',
         () => _activateElixir(const NoParams()),
-        'Elixir activo: tu próxima Mazmorra dará ×1,5 de XP.',
+        'Bonificación activada para tu próxima sesión de Modo Foco.',
       ),
       transformer: droppable(),
     );

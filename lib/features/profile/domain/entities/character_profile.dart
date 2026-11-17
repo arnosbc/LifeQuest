@@ -57,6 +57,11 @@ class CharacterProfile extends Equatable {
     this.displayName,
     this.characterClass,
     this.identityStatement,
+    this.activityStreak = 0,
+    this.activityHeat = const {},
+    this.recentAchievements = const [],
+    this.achievementsUnlocked = 0,
+    this.achievementsTotal = 0,
   });
 
   final String? displayName;
@@ -80,6 +85,17 @@ class CharacterProfile extends Equatable {
 
   /// Máximo de skills (6 por defecto, ampliable en Game Master).
   final int skillLimit;
+
+  /// Racha diaria de actividad (la del 🔥 del Inicio).
+  final int activityStreak;
+
+  /// Día de este mes → actividades reales hechas ese día.
+  final Map<int, int> activityHeat;
+
+  /// Vitrina: nombres de los 3 logros más recientes y el conteo total.
+  final List<String> recentAchievements;
+  final int achievementsUnlocked;
+  final int achievementsTotal;
 
   /// Título que el jugador eligió lucir; null si ninguno.
   final PrestigeTitle? activeTitle;
@@ -117,5 +133,10 @@ class CharacterProfile extends Equatable {
     skillLimit,
     activeTitle,
     earnedTitles,
+    activityStreak,
+    activityHeat,
+    recentAchievements,
+    achievementsUnlocked,
+    achievementsTotal,
   ];
 }

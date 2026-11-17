@@ -15,9 +15,15 @@ class AppearanceScreen extends StatelessWidget {
     super.key,
     required this.onBack,
     this.onOpenDesignPreview,
+    this.soundsOn,
+    this.onSoundsChanged,
   });
 
   final VoidCallback onBack;
+
+  /// Sonidos de logro (los guarda la app); null oculta el interruptor.
+  final bool? soundsOn;
+  final ValueChanged<bool>? onSoundsChanged;
 
   /// Solo en desarrollo: abre la galería de componentes Questly.
   final VoidCallback? onOpenDesignPreview;
@@ -68,7 +74,7 @@ class AppearanceScreen extends StatelessWidget {
                     ThemePreference.light =>
                       'Fondo de niebla y superficies blancas.',
                     ThemePreference.dark =>
-                      'Fondo de bosque nocturno, más cómodo con poca luz.',
+                      'Fondo violeta nocturno, más cómodo con poca luz.',
                     ThemePreference.system =>
                       'Cambia entre claro y oscuro según tu teléfono.',
                   },
@@ -100,6 +106,18 @@ class AppearanceScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (soundsOn != null) ...[
+                  const SizedBox(height: 28),
+                  const LifeQuestSectionHeading('SONIDOS'),
+                  const SizedBox(height: 8),
+                  LifeQuestSurface(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _SoundSwitch(
+                      initial: soundsOn!,
+                      onChanged: onSoundsChanged,
+                    ),
+                  ),
+                ],
                 if (onOpenDesignPreview != null) ...[
                   const SizedBox(height: 28),
                   QuestlyButton(
@@ -113,6 +131,39 @@ class AppearanceScreen extends StatelessWidget {
           ),
         ],
       );
+    },
+  );
+}
+
+/// Interruptor con estado propio: reconstruir la pantalla (p. ej. al cambiar
+/// el tema) no lo devuelve al valor inicial.
+class _SoundSwitch extends StatefulWidget {
+  const _SoundSwitch({required this.initial, this.onChanged});
+
+  final bool initial;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  State<_SoundSwitch> createState() => _SoundSwitchState();
+}
+
+class _SoundSwitchState extends State<_SoundSwitch> {
+  late bool _on = widget.initial;
+
+  @override
+  Widget build(BuildContext context) => SwitchListTile(
+    value: _on,
+    title: Text(
+      'Sonidos de logro',
+      style: TextStyle(color: context.lq.ink, fontSize: 14),
+    ),
+    subtitle: Text(
+      'Al completar tareas, cobrar cofres y subir de nivel.',
+      style: TextStyle(color: context.lq.muted, fontSize: 12),
+    ),
+    onChanged: (v) {
+      setState(() => _on = v);
+      widget.onChanged?.call(v);
     },
   );
 }

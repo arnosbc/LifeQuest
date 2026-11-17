@@ -12,7 +12,7 @@ class MissionImportanceCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '¿POR QUÉ ESTA MISIÓN ES IMPORTANTE?',
+          '¿POR QUÉ ESTA TAREA ES IMPORTANTE?',
           style: TextStyle(
             color: context.lq.deepGreen,
             fontSize: 10,

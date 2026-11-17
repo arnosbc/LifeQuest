@@ -110,9 +110,9 @@ Las medidas salen de `SistemaDiseno.dc.html`, `Hero.dc.html` y `Main.dc.html`. T
 |---|---|---|
 | **1** | Tema y tokens + paleta, fuentes, Hero, barra de 5 pestañas sobre las pantallas reales, tarjeta, botones, chips, segmentadas, hoja, diálogo, toast y galería `/diseno` (`/settings/diseno`, se abre desde Configuración → Apariencia en debug). Modo y tema del reino guardados. | **Hecho (2026-10-28)** |
 | 1b | Ajuste sin fantasía del paso 1: Hero con formas geométricas, iconos `focus`/`flag`/`trophy`/`users`/`spark`, etiquetas de la barra y de los temas. | **Hecho (2026-10-29)** |
-| 2 | Revestir Acceso (Login, Registro) y Onboarding, con los textos nuevos. | **En curso:** Acceso hecho (2026-10-29: cabecera `AuthHeader`, pestañas, campos y botones Questly; «Revisa tu correo» sin «Héroe»). Falta Onboarding. |
-| 3 | Revestir Inicio, Stage (Hoy), Crear (tarea, proyecto, meta) y Hábitos. | Pendiente |
-| 4 | Revestir la Mazmorra (preparar, mochila, sesión), Perfil, Diario y Configuración (selector de tema del reino aquí). | Pendiente |
+| 2 | Revestir Acceso (Login, Registro) y Onboarding, con los textos nuevos. | **Hecho (2026-10-29):** `AuthHeader`, pestañas, campos y botones; Onboarding con cabecera de formas, puntos de avance, icono del Asistente y textos sin fantasía. Ritmo: Relajado · Equilibrado · Intenso; «Vida» → «Constancia» en el selector. Sin emblema, 3 áreas ni primera misión (no hay datos). |
+| 3 | Revestir Inicio, Stage (Hoy), Crear (tarea, proyecto, meta) y Hábitos. | **Hecho en lo visible (2026-10-29):** Inicio = Hoy, Hábitos, Planificador y Tareas. `LifeQuestPage` ahora dibuja el Hero (con «Volver» automático; el router ya no pone AppBar), así las 14 secciones toman el diseño y sus nombres nuevos. Falta revestir los formularios de Crear. |
+| 4 | Revestir la Mazmorra (preparar, mochila, sesión), Perfil, Diario y Configuración (selector de tema del reino aquí). | **En curso:** Perfil con Hero, rango por nivel y textos sin fantasía (áreas, insignias, Reserva). |
 | 5 | Revestir Proyectos y Áreas, Boss Fight, Marketplace, Taverna, Misión actual, Estadísticas, Avisos, Brain Dump, Vision Board e Inventario. | Pendiente |
 | 6 | Funcionalidades nuevas de la sección 6, **una por una y con aprobación**. Primero las de IA de §13 (documentos de contexto del NPC). | Pendiente |
 
@@ -125,7 +125,7 @@ Después de cada paso: `flutter analyze`, `flutter test`, resumen, y **parar** h
 Cada una necesita RPC, columna o lógica nueva. En la fase visual **se omiten**. Se construyen después, con su migración, su RF y sus pruebas.
 
 **Inicio / Stage / Crear**
-- Inicio: lista «más tarde» marcable, «Boss del momento», captura rápida y nombre de rango por nivel («Explorador», «Guardabosques»).
+- ~~Inicio: lista «más tarde» marcable, «Boss del momento», nombre de rango por nivel~~ → **hecho** (038, 041: Hoy, Meta del momento, Mentores, Bandeja y rangos). Falta la captura rápida.
 - Stage Hoy: filtro Hoy/Mañana/7 días, desmarcar una tarea y estado «En progreso».
 - **Calendario** (tareas por rango de fechas, incluidas las hechas y las vencidas).
 - **Eventos**: `calendar_events` existe en `schema.sql`, pero sin RPC ni pantalla; falta «Asistí, +10 XP».
@@ -140,7 +140,7 @@ Cada una necesita RPC, columna o lógica nueva. En la fase visual **se omiten**.
 - Boss Fight: consejo de RPGenie según los ataques y título al vencer.
 
 **Hábitos / Mazmorra / Perfil y subpáginas**
-- Hábitos: mapa de calor con 4 intensidades, meses anteriores, totales del mes y del año, frecuencia «X veces por semana», recordatorio con hora e «N veces este mes» en los malos.
+- Hábitos: ~~mapa de calor con 4 intensidades, totales del mes y del año~~ → **hecho** (042). Faltan meses anteriores, frecuencia «X veces por semana», recordatorio con hora e «N veces este mes» en los malos.
 - Mazmorra: buscador y filtros de la mochila con XP, prioridad, proyecto o meta y plazo; botín por tarea; ajustar la sesión en curso.
 - **Estadísticas mensuales** (hoy `stats_overview` solo trae 7 + 7 días), vencidas, 7 puntos por día en hábitos, selector de rango.
 - Diario: barras de XP por día y conteo de fallos.
@@ -148,7 +148,7 @@ Cada una necesita RPC, columna o lógica nueva. En la fase visual **se omiten**.
 - Inventario: progreso de los logros, bloqueados y secretos, títulos bloqueados con su condición, «Usar» objetos (el catálogo de logros está vacío).
 - Marketplace: **carrito** (compra múltiple), **Cofre** (abrir y premios), historial de compras, «Monedas de hoy» y tope de la bolsa.
 - Configuración: «Resumen diario» (`digest_*` existe, falta exponerlo), aviso de racha en riesgo, **cambiar contraseña** y estado «Sincronizado».
-- **Momentos**: modal de subida de nivel con confetti (el servidor ya devuelve `level_up` en `_award`, pero la app no lo lee) y hojas «¿Cómo funciona?» de XP y vida.
+- ~~**Momentos**: modal de subida de nivel y hojas «¿Cómo funciona?» de XP y vida~~ → **hecho** (037 + `RewardMomentListener`; `how_it_works_sheet.dart`). Falta el confetti.
 
 **Acceso / Onboarding / Taverna / Avisos / Estados**
 - **Recuperar contraseña**: no hay usecase, pantalla ni ruta; falta también la pantalla de contraseña nueva.

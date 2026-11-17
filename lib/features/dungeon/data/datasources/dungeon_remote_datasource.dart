@@ -15,14 +15,25 @@ abstract class DungeonRemoteDataSource {
     required int totalMinutes,
     required int cycleMinutes,
     required List<String> taskIds,
+    List<String> habitIds = const [],
   });
 
+  /// [itemId] es la tarea o, con [isHabit], el hábito del bloque (068).
   Future<void> completeCycle({
     required String sessionId,
-    required String taskId,
+    required String itemId,
+    bool isHabit = false,
   });
 
+  /// Marca el paso de una tarea de la sesión; true si con él terminó la tarea.
+  Future<bool> toggleStep(String stepId);
+
+  /// Cumple hoy un hábito de la sesión (racha incluida).
+  Future<void> completeHabit(String habitId);
+
   Future<DungeonRewardModel> completeTask(String taskId);
+
+  Future<void> addTask({required String sessionId, required String taskId});
 
   Future<DungeonSummaryModel> end(String sessionId);
 }
@@ -44,6 +55,7 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
     required int totalMinutes,
     required int cycleMinutes,
     required List<String> taskIds,
+    List<String> habitIds = const [],
   }) => _guard(
     () => _client.rpc<String>(
       'start_dungeon',
@@ -51,6 +63,7 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
         'p_total_minutes': totalMinutes,
         'p_cycle_minutes': cycleMinutes,
         'p_task_ids': taskIds,
+        if (habitIds.isNotEmpty) 'p_habit_ids': habitIds,
       },
     ),
   );
@@ -58,13 +71,40 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
   @override
   Future<void> completeCycle({
     required String sessionId,
-    required String taskId,
+    required String itemId,
+    bool isHabit = false,
   }) => _guard(
     () => _client.rpc<void>(
       'complete_dungeon_cycle',
-      params: {'p_session_id': sessionId, 'p_task_id': taskId},
+      params: {
+        'p_session_id': sessionId,
+        if (isHabit) 'p_habit_id': itemId else 'p_task_id': itemId,
+      },
     ),
   );
+
+  @override
+  Future<bool> toggleStep(String stepId) => _guard(() async {
+    final result = await _client.rpc<Map<String, dynamic>>(
+      'toggle_task_step',
+      params: {'p_step_id': stepId},
+    );
+    // 'done' es el paso; la tarea terminó si viene 'task_completed' (044).
+    return result['task_completed'] == true;
+  });
+
+  // Día local del teléfono, como en Hábitos.
+  @override
+  Future<void> completeHabit(String habitId) => _guard(() async {
+    final now = DateTime.now();
+    final day =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+    await _client.rpc<dynamic>(
+      'complete_habit',
+      params: {'p_habit_id': habitId, 'p_day': day},
+    );
+  });
 
   @override
   Future<DungeonRewardModel> completeTask(String taskId) => _guard(
@@ -75,6 +115,17 @@ class DungeonRemoteDataSourceImpl implements DungeonRemoteDataSource {
       ),
     ),
   );
+
+  // El RLS exige que la sesión sea del usuario; el trigger de 006 revisa el
+  // tope de tareas y que la tarea también lo sea.
+  @override
+  Future<void> addTask({required String sessionId, required String taskId}) =>
+      _guard(
+        () => _client.from('focus_session_tasks').upsert({
+          'session_id': sessionId,
+          'task_id': taskId,
+        }, ignoreDuplicates: true),
+      );
 
   @override
   Future<DungeonSummaryModel> end(String sessionId) => _guard(

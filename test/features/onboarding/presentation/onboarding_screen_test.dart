@@ -68,31 +68,34 @@ void main() {
     await tapMain(tester, 'Continuar');
 
     // Paso 4: valores del servidor, Normal preseleccionada.
-    expect(find.text('XP ×1,2 · Vida perdida ×0,75'), findsOneWidget);
-    expect(find.text('XP ×0,85 · Vida perdida ×1,25'), findsOneWidget);
-    expect(find.text('Las Monedas son iguales en las tres.'), findsOneWidget);
+    expect(find.text('XP ×1,2 · Constancia perdida ×0,75'), findsOneWidget);
+    expect(find.text('XP ×0,85 · Constancia perdida ×1,25'), findsOneWidget);
     expect(
-      find.text('Después solo podrás cambiarla en Configuración.'),
+      find.textContaining('Las Monedas son iguales en los tres.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Después solo podrás cambiarlo en Ajustes.'),
       findsOneWidget,
     );
     expect(
       find.descendant(
         of: find.ancestor(
-          of: find.text('Normal'),
+          of: find.text('Equilibrado'),
           matching: find.byType(InkWell),
         ),
         matching: find.byIcon(Icons.check_circle_rounded),
       ),
       findsOneWidget,
     );
-    await tester.tap(find.text('Difícil'));
+    await tester.tap(find.text('Intenso'));
     await tester.pump();
     await tapMain(tester, 'Continuar');
 
     expect(find.text('Guardiana del huerto'), findsOneWidget);
     expect(find.text('Salud física'), findsOneWidget);
-    expect(find.text('Difícil'), findsOneWidget);
-    await tapMain(tester, 'Entrar al reino');
+    expect(find.text('Intenso'), findsOneWidget);
+    await tapMain(tester, 'Ir al inicio');
 
     expect(
       submitted(),
@@ -133,7 +136,7 @@ void main() {
     await tapMain(tester, 'Empezar');
     await tapMain(tester, 'Continuar');
     await tapMain(tester, 'Continuar');
-    await tester.tap(find.text('Fácil'));
+    await tester.tap(find.text('Relajado'));
     await tester.pump();
     await tester.tap(find.text('Saltar'));
     await tester.pump();
@@ -174,6 +177,6 @@ void main() {
     );
     await pump(tester);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.bySemanticsLabel('Preparando tu aventura'), findsOneWidget);
+    expect(find.bySemanticsLabel('Preparando tu cuenta'), findsOneWidget);
   });
 }

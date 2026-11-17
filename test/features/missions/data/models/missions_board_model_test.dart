@@ -22,6 +22,7 @@ void main() {
           'goal_title': 'Aprobar',
           'subtasks_total': 2,
           'subtasks_done': 1,
+          'repeat_rule': 'weekdays',
         },
       ],
       'skills': [
@@ -45,6 +46,7 @@ void main() {
       [40, 12, 2, 1],
     );
     expect(m.goalTitle, 'Aprobar');
+    expect(m.repeat, MissionRepeat.weekdays);
     expect(board.projects, [
       const MissionLink(id: 'p1', name: 'Curso', goalId: 'g1'),
     ]);

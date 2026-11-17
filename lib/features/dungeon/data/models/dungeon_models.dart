@@ -1,7 +1,7 @@
 import 'package:proyecto_movil/features/dungeon/domain/entities/dungeon_board.dart';
 
 /// Respuesta JSON de la RPC `dungeon_overview`
-/// (supabase/migrations/012_dungeon.sql).
+/// (supabase/migrations/012_dungeon.sql; minutos, pasos y hábitos en 068).
 class DungeonBoardModel {
   const DungeonBoardModel(this.json);
 
@@ -25,8 +25,12 @@ class DungeonBoardModel {
               coinsEarned: _int(s['coins_earned']),
               missionsDone: _int(s['missions_done']),
               tasks: [for (final t in _list(s['tasks'])) _task(t)],
+              habits: [for (final h in _list(s['habits'])) _task(h, habit: true)],
             ),
       candidates: [for (final t in _list(json['candidates'])) _task(t)],
+      habitCandidates: [
+        for (final h in _list(json['habit_candidates'])) _task(h, habit: true),
+      ],
       maxTasks: _int(json['max_tasks'], 5),
       cycleXp: _int(json['cycle_xp'], 10),
       shortBreakMinutes: _int(breaks['short_minutes'], 5),
@@ -35,12 +39,26 @@ class DungeonBoardModel {
     );
   }
 
-  static DungeonTask _task(Map<String, dynamic> t) => DungeonTask(
-    id: t['id'] as String,
-    title: t['title'] as String,
-    done: t['done'] as bool? ?? false,
-    cycles: _int(t['cycles']),
-  );
+  static DungeonTask _task(Map<String, dynamic> t, {bool habit = false}) {
+    final step = t['step'] as Map<String, dynamic>?;
+    return DungeonTask(
+      id: t['id'] as String,
+      title: t['title'] as String,
+      done: t['done'] as bool? ?? false,
+      cycles: _int(t['cycles']),
+      isHabit: habit,
+      minutes: (t['minutes'] as num?)?.toInt(),
+      stepCount: _int(t['step_count']),
+      step: step == null
+          ? null
+          : DungeonStep(
+              id: step['id'] as String,
+              title: step['title'] as String,
+              position: _int(step['position'], 1),
+              minutes: (step['minutes'] as num?)?.toInt(),
+            ),
+    );
+  }
 
   static List<Map<String, dynamic>> _list(Object? value) =>
       (value as List<dynamic>? ?? const []).cast<Map<String, dynamic>>();

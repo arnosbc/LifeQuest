@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stats/domain/entities/stats_board.dart';
 import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
@@ -43,28 +44,69 @@ class StatsScreen extends StatelessWidget {
     final maxSkill = b.xpBySkill.fold<int>(1, (m, s) => math.max(m, s.xp));
     return LifeQuestPage(
       title: 'Estadísticas',
+      icon: QIcons.star,
       subtitle: 'Últimos 7 días frente a los 7 anteriores.',
       children: [
+        _WeekRing(activeDays: b.xpByDay.where((d) => d.xp > 0).length),
+        const SizedBox(height: 20),
+        Semantics(
+          header: true,
+          child: Text('Resumen', style: QText.title3(context.q.text)),
+        ),
+        const SizedBox(height: QSpace.m),
         Row(
           children: [
-            Expanded(child: _compare('XP', b.xp, b.xpPrev)),
-            const SizedBox(width: 6),
-            Expanded(child: _compare('Misiones', b.missions, b.missionsPrev)),
-            const SizedBox(width: 6),
             Expanded(
-              child: _compare('Min. foco', b.focusMinutes, b.focusMinutesPrev),
+              child: _SummaryTile(
+                icon: Icons.bolt_rounded,
+                label: _compareLabel('XP', b.xp, b.xpPrev),
+                value: b.xp,
+                tint: context.q.tint,
+                ink: context.q.ink,
+              ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: QSpace.m),
             Expanded(
-              child: LifeQuestStat(
-                value: '${b.bestStreak}',
+              child: _SummaryTile(
+                icon: Icons.check_rounded,
+                label: _compareLabel('Tareas', b.missions, b.missionsPrev),
+                value: b.missions,
+                tint: context.q.riverTint,
+                ink: context.q.riverInk,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: QSpace.m),
+        Row(
+          children: [
+            Expanded(
+              child: _SummaryTile(
+                icon: Icons.schedule_rounded,
+                label: _compareLabel(
+                  'Min. foco',
+                  b.focusMinutes,
+                  b.focusMinutesPrev,
+                ),
+                value: b.focusMinutes,
+                tint: context.q.mustardTint,
+                ink: context.q.mustardInk,
+              ),
+            ),
+            const SizedBox(width: QSpace.m),
+            Expanded(
+              child: _SummaryTile(
+                icon: Icons.local_fire_department_outlined,
                 label: 'Racha (récord ${b.recordStreak})',
+                value: b.bestStreak,
+                tint: context.q.coralTint,
+                ink: context.q.coralInk,
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        const LifeQuestSectionHeading('RPGENIE OBSERVA'),
+        const LifeQuestSectionHeading('EL ASISTENTE OBSERVA'),
         const SizedBox(height: 7),
         for (final note in b.observations)
           LifeQuestListRow(icon: Icons.auto_awesome, title: note, subtitle: ''),
@@ -132,7 +174,7 @@ class StatsScreen extends StatelessWidget {
           const LifeQuestListRow(
             icon: Icons.category_outlined,
             title: 'Sin XP por Área esta semana',
-            subtitle: 'Vincula tus misiones y hábitos a una skill.',
+            subtitle: 'Vincula tus tareas y hábitos a un área.',
           ),
         for (final s in b.xpBySkill)
           Padding(
@@ -177,11 +219,133 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
-  static Widget _compare(String label, int value, int prev) {
+  static String _compareLabel(String label, int value, int prev) {
     final diff = value - prev;
-    return LifeQuestStat(
-      value: '$value',
-      label: diff == 0 ? label : '$label ${diff > 0 ? '▲' : '▼'}${diff.abs()}',
+    return diff == 0 ? label : '$label ${diff > 0 ? '▲' : '▼'}${diff.abs()}';
+  }
+}
+
+/// Anillo con los días de la semana en que se sumó XP.
+class _WeekRing extends StatelessWidget {
+  const _WeekRing({required this.activeDays});
+
+  final int activeDays;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    final pct = (activeDays * 100 / 7).round();
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: q.tint,
+        borderRadius: BorderRadius.circular(QRadius.card),
+      ),
+      child: Row(
+        children: [
+          SizedBox.square(
+            dimension: 92,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                CircularProgressIndicator(
+                  value: activeDays / 7,
+                  strokeWidth: 9,
+                  strokeCap: StrokeCap.round,
+                  color: q.accent,
+                  backgroundColor: q.card,
+                  semanticsLabel: 'Días activos esta semana',
+                  semanticsValue: '$pct %',
+                ),
+                Center(
+                  child: Text(
+                    '$pct%',
+                    style: QText.title2(q.text).copyWith(fontSize: 20),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activeDays >= 4 ? '¡Vas muy bien!' : 'Cada día cuenta',
+                  style: QText.title3(q.text),
+                ),
+                const SizedBox(height: QSpace.xs),
+                Text(
+                  'Sumaste XP en $activeDays de 7 días esta semana.',
+                  style: QText.body(q.text2).copyWith(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tarjeta de color del Resumen: icono, etiqueta y cifra grande.
+class _SummaryTile extends StatelessWidget {
+  const _SummaryTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.tint,
+    required this.ink,
+  });
+
+  final IconData icon;
+  final String label;
+  final int value;
+  final Color tint;
+  final Color ink;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = context.q;
+    return Semantics(
+      label: '$label: $value',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: tint,
+          borderRadius: BorderRadius.circular(QRadius.block),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: q.card,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, size: 18, color: ink),
+                ),
+                const SizedBox(width: QSpace.s),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    style: QText.body(q.text2).copyWith(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: QSpace.m),
+            Text('$value', style: QText.title2(q.text)),
+          ],
+        ),
+      ),
     );
   }
 }

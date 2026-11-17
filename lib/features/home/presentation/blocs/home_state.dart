@@ -22,6 +22,7 @@ class HomeSuccess extends HomeState {
     this.dashboard, {
     this.refreshing = false,
     this.busyHabitId,
+    this.busyTaskId,
     this.claimingChest = false,
     this.message,
   });
@@ -34,6 +35,9 @@ class HomeSuccess extends HomeState {
   /// Hábito que se está registrando.
   final String? busyHabitId;
 
+  /// Tarea que se está completando.
+  final String? busyTaskId;
+
   /// Abriendo el cofre del día.
   final bool claimingChest;
 
@@ -45,6 +49,7 @@ class HomeSuccess extends HomeState {
     dashboard,
     refreshing,
     busyHabitId,
+    busyTaskId,
     claimingChest,
     message,
   ];

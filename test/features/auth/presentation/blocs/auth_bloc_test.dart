@@ -16,6 +16,7 @@ import '../../../../helpers/mocks.dart';
 void main() {
   late MockGetCurrentUser getCurrentUser;
   late MockLoginUser loginUser;
+  late MockLoginWithGoogle loginWithGoogle;
   late MockRegisterUser registerUser;
   late MockLogoutUser logoutUser;
 
@@ -36,6 +37,7 @@ void main() {
   setUp(() {
     getCurrentUser = MockGetCurrentUser();
     loginUser = MockLoginUser();
+    loginWithGoogle = MockLoginWithGoogle();
     registerUser = MockRegisterUser();
     logoutUser = MockLogoutUser();
   });
@@ -43,6 +45,7 @@ void main() {
   AuthBloc build() => AuthBloc(
     getCurrentUser: getCurrentUser,
     loginUser: loginUser,
+    loginWithGoogle: loginWithGoogle,
     registerUser: registerUser,
     logoutUser: logoutUser,
   );
@@ -71,6 +74,41 @@ void main() {
       build: build,
       act: (bloc) => bloc.add(const AuthCheckRequested()),
       expect: () => [const AuthUnauthenticated()],
+    );
+  });
+
+  group('GoogleLoginRequested', () {
+    blocTest<AuthBloc, AuthState>(
+      'éxito → Loading, Success',
+      setUp: () => when(
+        () => loginWithGoogle(any()),
+      ).thenAnswer((_) async => const Right(user)),
+      build: build,
+      act: (bloc) => bloc.add(const GoogleLoginRequested()),
+      expect: () => [const AuthLoading(), const AuthSuccess(user)],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'cerrar la ventana de Google vuelve al login sin aviso',
+      setUp: () => when(
+        () => loginWithGoogle(any()),
+      ).thenAnswer((_) async => const Right(null)),
+      build: build,
+      act: (bloc) => bloc.add(const GoogleLoginRequested()),
+      expect: () => [const AuthLoading(), const AuthUnauthenticated()],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'error → Loading, Failure con el mensaje',
+      setUp: () => when(() => loginWithGoogle(any())).thenAnswer(
+        (_) async => const Left(ServerFailure('No pudimos entrar con Google.')),
+      ),
+      build: build,
+      act: (bloc) => bloc.add(const GoogleLoginRequested()),
+      expect: () => [
+        const AuthLoading(),
+        const AuthFailure('No pudimos entrar con Google.'),
+      ],
     );
   });
 

@@ -18,6 +18,10 @@ class HabitsBoardModel {
           id: h['id'] as String,
           name: h['name'] as String,
           type: HabitType.values.byName(h['type'] as String),
+          // Antes de 051 no llega: media.
+          priority:
+              HabitPriority.values.asNameMap()[h['priority']] ??
+              HabitPriority.medium,
           specificDays: [
             for (final d in h['specific_days'] as List<dynamic>? ?? const [])
               (d as num).toInt(),
@@ -30,6 +34,7 @@ class HabitsBoardModel {
           doneToday: h['done_today'] as bool? ?? false,
           todayCount: _int(h['today_count']),
           week: (h['week'] as List<dynamic>? ?? const []).cast<bool>(),
+          reminderTime: h['reminder_time'] as String?,
         ),
     ],
     weekXp: _int(json['week_xp']),
@@ -40,6 +45,18 @@ class HabitsBoardModel {
       for (final d in json['month_days'] as List<dynamic>? ?? const [])
         (d as num).toInt(),
     ],
+    // 042; antes, el mapa de calor sale de month_days con intensidad 1.
+    monthHeat: json['month_heat'] is Map
+        ? {
+            for (final e in (json['month_heat'] as Map).entries)
+              int.parse('${e.key}'): (e.value as num).toInt(),
+          }
+        : {
+            for (final d in json['month_days'] as List<dynamic>? ?? const [])
+              (d as num).toInt(): 1,
+          },
+    monthDone: _int(json['month_done']),
+    yearDone: _int(json['year_done']),
     skills: [
       for (final s in _list('skills'))
         HabitSkill(id: s['id'] as String, name: s['name'] as String),

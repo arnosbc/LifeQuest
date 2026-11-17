@@ -1,11 +1,11 @@
 {
-    "name": "proyecto_movil",
-    "short_name": "proyecto_movil",
+    "name": "LifeQuest",
+    "short_name": "LifeQuest",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Organiza lo que quieres lograr, avanza paso a paso y ve cómo creces.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

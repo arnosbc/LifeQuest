@@ -1,12 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:proyecto_movil/core/sound/sound_effects.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/app/app.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly_nav_bar.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:proyecto_movil/core/rewards/reward_feed.dart';
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/missions/presentation/blocs/missions_bloc.dart';
 import 'package:proyecto_movil/features/notifications/domain/entities/app_notification.dart';
@@ -18,7 +20,9 @@ import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart
 import 'package:proyecto_movil/features/tavern/domain/entities/tavern_board.dart';
 import 'package:proyecto_movil/features/tavern/presentation/blocs/tavern_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
+import 'package:proyecto_movil/features/profile/domain/entities/profile_look.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:proyecto_movil/features/profile/presentation/blocs/profile_look_cubit.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 import 'features/home/home_fixtures.dart';
@@ -42,6 +46,8 @@ void main() {
     authBloc = MockAuthBloc();
     appearanceBloc = MockAppearanceBloc();
     onboardingBloc = MockOnboardingBloc();
+    sl.registerLazySingleton(RewardFeed.new);
+    sl.registerLazySingleton(SoundEffects.new);
     whenListen(
       onboardingBloc,
       const Stream<OnboardingState>.empty(),
@@ -130,6 +136,16 @@ void main() {
       );
       return profileBloc;
     });
+    sl.registerFactory<ProfileLookCubit>(() {
+      final lookCubit = MockProfileLookCubit();
+      whenListen(
+        lookCubit,
+        const Stream<ProfileLook>.empty(),
+        initialState: const ProfileLook(glow: ProfileGlow.none),
+      );
+      when(lookCubit.load).thenAnswer((_) async {});
+      return lookCubit;
+    });
   });
 
   tearDown(() => sl.reset());
@@ -140,7 +156,7 @@ void main() {
     initialState: state,
   );
 
-  testWidgets('sin sesión abre el login y desde ahí el registro', (
+  testWidgets('sin sesión abre la bienvenida, el login y el registro', (
     tester,
   ) async {
     givenAuthState(const AuthUnauthenticated());
@@ -153,14 +169,19 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Bienvenido de vuelta'), findsOneWidget);
-    expect(find.text('Google'), findsOneWidget);
-
-    await tester.tap(find.text('Regístrate'));
+    await tester.tap(find.text('Comenzar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Crea tu cuenta'), findsOneWidget);
-    expect(find.text('Crear cuenta'), findsOneWidget);
+    expect(find.text('Inicia sesión en tu cuenta'), findsOneWidget);
+    expect(find.text('Continuar con Google'), findsOneWidget);
+
+    final registerLink = find.text('Regístrate');
+    await tester.ensureVisible(registerLink);
+    await tester.tap(registerLink);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Comienza tu camino'), findsOneWidget);
+    expect(find.text('Registrarse'), findsOneWidget);
   });
 
   testWidgets('con sesión abre Home y navega entre pestañas y secciones', (
@@ -187,17 +208,12 @@ void main() {
     // El saludo cambia con la hora; el nombre sale del perfil.
     expect(find.textContaining(', Ana'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
-    expect(find.byTooltip('Notificaciones, 2 sin leer'), findsOneWidget);
+    expect(find.byTooltip('Avisos, 2 sin leer'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('Taverna'), 200);
+    // Mentores ocultos (2026-11-15): ni tarjeta ni botón en Más herramientas.
+    await tester.scrollUntilVisible(find.text('Más herramientas'), 200);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Taverna'));
-    await tester.pumpAndSettle();
-    expect(find.text('Vera · Salud'), findsOneWidget);
-
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    expect(find.text('EXPLORA EL REINO'), findsOneWidget);
+    expect(find.text('Mentores'), findsNothing);
 
     // La barra sigue el diseño: Inicio · Planificador · Hábitos · Foco · Perfil.
     for (final tab in ['Inicio', 'Planificador', 'Hábitos', 'Foco', 'Perfil']) {
@@ -217,11 +233,11 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Lanzamiento de la app'), findsOneWidget);
-    expect(find.textContaining('🔴 Alta'), findsOneWidget);
-    expect(find.text('METAS (JEFES)'), findsOneWidget);
+    expect(find.textContaining('▲ Alta'), findsOneWidget);
+    expect(find.text('METAS'), findsOneWidget);
 
     // Misiones vive dentro de Stage y conserva la barra inferior.
-    await tester.tap(find.text('Ver misiones (1)'));
+    await tester.tap(find.text('Ver tareas (1)'));
     await tester.pumpAndSettle();
     expect(find.text('Preparar la exposición'), findsOneWidget);
     expect(find.byType(QuestlyNavBar), findsOneWidget);
@@ -235,7 +251,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(tab('Planificador'));
     await tester.pumpAndSettle();
-    expect(find.text('METAS (JEFES)'), findsOneWidget);
+    expect(find.text('METAS'), findsOneWidget);
     expect(find.text('Preparar la exposición'), findsNothing);
   });
 
@@ -319,14 +335,32 @@ void main() {
 
     await tester.tap(find.text('Perfil').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Configuración'));
+    // Hasta que se pueda tocar: visible a medias queda tras la barra inferior.
+    await tester.scrollUntilVisible(
+      find.text('Configuración').hitTestable(),
+      200,
+      // La lista del Perfil (el calendario de racha también es un Scrollable).
+      scrollable: find
+          .ancestor(
+            of: find.text('Configuración'),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.tap(find.text('Configuración'));
     await tester.pumpAndSettle();
     final signOutButton = find.text('Cerrar sesión');
     await tester.scrollUntilVisible(signOutButton, 200);
     await tester.pumpAndSettle();
     await tester.tap(signOutButton);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Cerrar sesión'));
+    expect(find.text('¿Cerrar sesión?'), findsOneWidget);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Cerrar sesión'),
+      ),
+    );
     await tester.pumpAndSettle();
 
     verify(() => authBloc.add(const LogoutRequested())).called(1);

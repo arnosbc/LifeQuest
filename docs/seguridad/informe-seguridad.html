@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe de seguridad · LifeQuest</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; color: #1c1b22; line-height: 1.45; }
+  h1 { font-size: 20pt; margin: 0 0 4px; color: #4b2a9a; }
+  h2 { font-size: 13.5pt; color: #4b2a9a; border-bottom: 2px solid #d9cff5; padding-bottom: 3px; margin-top: 22px; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 14px 0 4px; page-break-after: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 10px; font-size: 9.3pt; page-break-inside: auto; }
+  tr { page-break-inside: avoid; }
+  th, td { border: 1px solid #c9c3d9; padding: 4px 6px; vertical-align: top; text-align: left; }
+  th { background: #efeaff; }
+  code, pre { font-family: Consolas, monospace; font-size: 8.8pt; }
+  pre { background: #f5f3fa; border: 1px solid #ddd6ef; padding: 6px 8px; white-space: pre-wrap; word-break: break-all; margin: 4px 0; }
+  .meta { color: #555; margin-bottom: 10px; }
+  .ok { color: #1d7a3a; font-weight: 600; }
+  .no { color: #b3261e; font-weight: 600; }
+  .mid { color: #9a6700; font-weight: 600; }
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ba > div > b { display: block; font-size: 9pt; margin-bottom: 2px; }
+  .finding { page-break-inside: avoid; }
+  svg text { font-family: "Segoe UI", Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<h1>Informe de seguridad móvil · LifeQuest</h1>
+<div class="meta">
+  Programación Móvil · Universidad Popular del Cesar · Docente: Alex Vacca · 16 de noviembre de 2026<br>
+  Integrantes: Estevan Yesid Sánchez y Jhon Bermúdez<br>
+  Repositorio: <code>https://github.com/arnosbc/LifeQuest</code> · rama <code>estevan_duolingo</code> ·
+  versión auditada 1.29.0 → versión corregida 1.30.0
+</div>
+
+<p><b>LifeQuest</b> es una app Flutter (Android) de productividad gamificada: tareas, hábitos y sesiones de concentración que dan XP y monedas.
+El backend es Supabase (Auth, PostgreSQL con RLS, funciones RPC y Edge Functions en Deno) y usa la API de Gemini para el asistente «Nevi».
+Solo se probaron sistemas propios del equipo. Las evidencias no contienen tokens, contraseñas, correos ni identificadores de usuario: los valores sensibles aparecen como «oculto».</p>
+
+<h2>1. Modelo de amenazas</h2>
+<h3>1.1 Diagrama de componentes y flujo de datos</h3>
+<svg viewBox="0 0 760 270" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de flujo de datos de LifeQuest">
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4b2a9a"/></marker></defs>
+  <rect x="10" y="10" width="300" height="250" rx="10" fill="#f6f2ff" stroke="#4b2a9a"/>
+  <text x="20" y="30" font-size="13" font-weight="700" fill="#4b2a9a">Teléfono Android (zona no confiable)</text>
+  <rect x="25" y="45" width="130" height="60" rx="6" fill="#fff" stroke="#888"/><text x="35" y="68" font-size="11">Pantallas Flutter</text><text x="35" y="84" font-size="10">login, tareas, hábitos,</text><text x="35" y="97" font-size="10">Foco, fotos de evidencia</text>
+  <rect x="170" y="45" width="125" height="60" rx="6" fill="#fff" stroke="#888"/><text x="180" y="68" font-size="11">Widget «Mi día»</text><text x="180" y="84" font-size="10">deep link</text><text x="180" y="97" font-size="10">lifequest://focus?task=</text>
+  <rect x="25" y="120" width="270" height="60" rx="6" fill="#fff" stroke="#888"/><text x="35" y="140" font-size="11">Almacenamiento local</text><text x="35" y="156" font-size="10">Keystore + FlutterSecureStorage: sesión (tokens)</text><text x="35" y="170" font-size="10">SharedPreferences: tema, código de dispositivo</text>
+  <rect x="25" y="195" width="270" height="52" rx="6" fill="#fff" stroke="#888"/><text x="35" y="215" font-size="11">APK firmado (R8 + Dart ofuscado)</text><text x="35" y="231" font-size="10">sin copia de seguridad · solo HTTPS</text>
+  <rect x="450" y="10" width="300" height="250" rx="10" fill="#eef7f1" stroke="#1d7a3a"/>
+  <text x="460" y="30" font-size="13" font-weight="700" fill="#1d7a3a">Nube (zona confiable)</text>
+  <rect x="465" y="45" width="270" height="55" rx="6" fill="#fff" stroke="#888"/><text x="475" y="66" font-size="11">Supabase Auth (correo / Google)</text><text x="475" y="84" font-size="10">emite access y refresh token (JWT)</text>
+  <rect x="465" y="110" width="270" height="65" rx="6" fill="#fff" stroke="#888"/><text x="475" y="130" font-size="11">PostgREST + PostgreSQL</text><text x="475" y="146" font-size="10">RLS auth.uid() = user_id</text><text x="475" y="161" font-size="10">RPC SECURITY DEFINER (XP, monedas)</text>
+  <rect x="465" y="185" width="270" height="62" rx="6" fill="#fff" stroke="#888"/><text x="475" y="205" font-size="11">Edge Functions (Deno) → Gemini API</text><text x="475" y="221" font-size="10">verifican JWT; GEMINI_API_KEY solo</text><text x="475" y="235" font-size="10">en secrets del servidor; Firebase push</text>
+  <line x1="310" y1="72" x2="462" y2="72" stroke="#4b2a9a" stroke-width="2" marker-end="url(#a)"/><text x="325" y="65" font-size="10">HTTPS/TLS: credenciales</text>
+  <line x1="310" y1="142" x2="462" y2="142" stroke="#4b2a9a" stroke-width="2" marker-end="url(#a)"/><text x="325" y="135" font-size="10">HTTPS + JWT: datos</text>
+  <line x1="310" y1="215" x2="462" y2="215" stroke="#4b2a9a" stroke-width="2" marker-end="url(#a)"/><text x="325" y="208" font-size="10">HTTPS + JWT: fotos, texto</text>
+  <line x1="380" y1="10" x2="380" y2="260" stroke="#b3261e" stroke-dasharray="6 4"/><text x="338" y="255" font-size="10" fill="#b3261e">frontera de confianza</text>
+</svg>
+
+<h3>1.2 Datos sensibles</h3>
+<table>
+<tr><th>Dato</th><th>Dónde vive</th><th>Impacto si se filtra</th></tr>
+<tr><td>Access token y refresh token de Supabase</td><td>Teléfono (almacén local) y memoria</td><td>Alto: quien lo tenga entra a la cuenta sin contraseña hasta que el refresh token se revoque.</td></tr>
+<tr><td>Correo y contraseña / cuenta de Google</td><td>Solo en tránsito hacia Supabase Auth</td><td>Alto: robo de cuenta.</td></tr>
+<tr><td>Datos personales: nombre, tareas, hábitos, fotos de evidencia, documentos</td><td>PostgreSQL y Storage (RLS por usuario)</td><td>Medio: privacidad (rutinas, horarios, fotos).</td></tr>
+<tr><td>Llaves del servidor: <code>GEMINI_API_KEY</code>, cuenta de servicio de Firebase, <code>service_role</code></td><td>Solo en secrets de Supabase, nunca en la app</td><td>Alto: costos en la API y acceso total a la base.</td></tr>
+<tr><td>Llave de firma del APK</td><td>Fuera del repositorio (<code>key.properties</code> y <code>.jks</code> ignorados por git)</td><td>Alto: publicar una app falsa como actualización.</td></tr>
+</table>
+<p>La app no usa ubicación ni contactos. Permisos: <code>INTERNET</code> y <code>POST_NOTIFICATIONS</code>.</p>
+
+<h3>1.3 Amenazas y atacantes</h3>
+<table>
+<tr><th>#</th><th>Atacante</th><th>Amenaza</th><th>Hallazgo relacionado</th></tr>
+<tr><td>A1</td><td>Persona con acceso físico o con depuración USB / malware con root</td><td>Copia los archivos de la app o hace un respaldo de Android y obtiene la sesión en texto plano.</td><td>H-01, H-03</td></tr>
+<tr><td>A2</td><td>App maliciosa instalada en el mismo teléfono</td><td>Abre el deep link <code>lifequest://focus?task=…</code> con datos manipulados para inyectar parámetros en la navegación.</td><td>H-05</td></tr>
+<tr><td>A3</td><td>Atacante en la red (Wi-Fi pública)</td><td>Intercepta tráfico si la app acepta HTTP o certificados instalados por el usuario.</td><td>H-04</td></tr>
+<tr><td>A4</td><td>Ingeniero inverso / quien redistribuye el APK</td><td>Descompila para entender la lógica, o firma una copia modificada con la llave pública de depuración.</td><td>H-06, H-02</td></tr>
+<tr><td>A5</td><td>Usuario tramposo</td><td>Modifica peticiones para darse XP y monedas.</td><td>Mitigado: el cliente no puede escribir recompensas (RLS + RPC en el servidor, M3).</td></tr>
+</table>
+
+<h2>2. Auditoría OWASP Mobile Top 10 (2024)</h2>
+<p><b>Técnicas usadas (6):</b> (1) búsqueda de secretos en el código y en todo el historial de git (<code>git log -p</code> con patrones de llaves); (2) inspección de permisos y configuración del APK (<code>aapt dump xmltree</code>, <code>apksigner verify --print-certs</code>, <code>dumpsys package</code>); (3) inspección del almacenamiento del teléfono con <code>adb shell run-as</code>; (4) análisis del binario (búsqueda de nombres de clase en <code>libapp.so</code>); (5) revisión de dependencias (<code>flutter pub outdated</code>); (6) revisión de logs (<code>logcat</code> y uso de <code>print</code>/<code>debugPrint</code>) y pruebas automáticas.</p>
+<table>
+<tr><th>Riesgo</th><th>Resultado</th><th>Justificación</th></tr>
+<tr><td>M1 Uso inadecuado de credenciales</td><td class="ok">Cumple</td><td>Sin llaves en el código ni en el historial de git: solo la llave pública (publishable) de Supabase, inyectada con <code>--dart-define-from-file</code> (archivo ignorado por git). Gemini, Firebase y <code>service_role</code> viven solo en secrets del servidor. No hay secretos expuestos que rotar.</td></tr>
+<tr><td>M2 Cadena de suministro</td><td class="ok">Cumple</td><td>Dependencias de pub.dev con versiones fijadas en <code>pubspec.lock</code>; <code>flutter pub outdated</code> solo muestra versiones menores pendientes, sin paquetes abandonados.</td></tr>
+<tr><td>M3 Autenticación / autorización insegura</td><td class="ok">Cumple</td><td>RLS <code>auth.uid() = user_id</code> en todas las tablas; recompensas solo por RPC <code>SECURITY DEFINER</code> que validan dueño y estado; las Edge Functions verifican el JWT; <code>push-dispatch</code> responde 403 sin su secreto.</td></tr>
+<tr><td>M4 Validación de entradas/salidas</td><td class="no">No cumple → corregido</td><td>H-05: el id del deep link del widget llegaba sin validar a la ruta. En el servidor las RPC usan parámetros tipados (<code>uuid</code>) y checks de rango.</td></tr>
+<tr><td>M5 Comunicación insegura</td><td class="mid">Parcial → corregido</td><td>H-04: Supabase ya era HTTPS, pero la app no prohibía HTTP ni limitaba las CA de confianza.</td></tr>
+<tr><td>M6 Privacidad insuficiente</td><td class="ok">Cumple</td><td>Solo se pide lo necesario; a Gemini se envía el texto y la foto de la tarea, sin correo ni ids; RLS aísla los datos por usuario.</td></tr>
+<tr><td>M7 Protección del binario</td><td class="no">No cumple → corregido</td><td>H-06: R8 desactivado y Dart sin ofuscar; los nombres de clases se leían en el APK.</td></tr>
+<tr><td>M8 Mala configuración de seguridad</td><td class="no">No cumple → corregido</td><td>H-02: el APK de release se firmaba con la llave pública de depuración. Componentes: el receptor del widget ya era <code>exported=false</code>.</td></tr>
+<tr><td>M9 Almacenamiento inseguro</td><td class="no">No cumple → corregido</td><td>H-01: tokens en <code>SharedPreferences</code> en texto plano. H-03: copia de seguridad de Android activa.</td></tr>
+<tr><td>M10 Criptografía insuficiente</td><td class="ok">Cumple</td><td>La app no implementa criptografía propia: usa TLS del sistema y, tras H-01, AES-GCM con una llave del Android Keystore.</td></tr>
+</table>
+
+<h2>3. Hallazgos</h2>
+<table>
+<tr><th>ID</th><th>OWASP</th><th>Descripción</th><th>Evidencia (antes)</th><th>Severidad</th><th>Corrección</th><th>Commit</th></tr>
+<tr><td>H-01</td><td>M9</td><td>Access y refresh token de Supabase guardados en <code>FlutterSharedPreferences.xml</code> sin cifrar.</td><td><code>run-as … cat shared_prefs/…</code>: <code>access_token</code> y <code>refresh_token</code> legibles</td><td class="no">Alta</td><td>Almacenamiento de sesión propio sobre <code>flutter_secure_storage</code> (AES-GCM + RSA en Keystore), con migración y borrado de la copia en claro.</td><td><code>14a1773</code></td></tr>
+<tr><td>H-02</td><td>M8</td><td>Release firmado con el certificado público «Android Debug».</td><td><code>apksigner</code>: <code>CN=Android Debug</code></td><td class="no">Alta</td><td>Llave propia RSA-4096 cargada desde <code>key.properties</code> (fuera de git).</td><td><code>ec148f8</code></td></tr>
+<tr><td>H-03</td><td>M9</td><td>Copia de seguridad y transferencia entre dispositivos activas: los datos de la app salían del teléfono.</td><td><code>dumpsys</code>: <code>ALLOW_BACKUP</code>; manifiesto sin <code>allowBackup</code></td><td class="mid">Media</td><td><code>allowBackup=false</code>, <code>fullBackupContent=false</code>, <code>data_extraction_rules.xml</code> excluye todo.</td><td><code>7274f11</code></td></tr>
+<tr><td>H-04</td><td>M5</td><td>Sin política de red: se permitía HTTP y CA instaladas por el usuario; la URL del backend no se verificaba.</td><td>Manifiesto sin <code>networkSecurityConfig</code> ni <code>usesCleartextTraffic</code></td><td class="mid">Media</td><td><code>network_security_config.xml</code> (sin texto plano, solo CA del sistema) y <code>AppConstants.isSecureUrl</code> rechaza URLs no HTTPS.</td><td><code>5564493</code></td></tr>
+<tr><td>H-05</td><td>M4</td><td>El parámetro <code>task</code> del deep link <code>lifequest://focus</code> pasaba sin validar a la ruta interna.</td><td>Prueba: <code>Actual: '/dungeon?task=1' OR '1'='1'</code></td><td class="mid">Media</td><td>Solo se acepta un UUID; lo demás abre Foco sin tarea. Prueba automática con 5 entradas maliciosas.</td><td><code>5128baa</code></td></tr>
+<tr><td>H-06</td><td>M7</td><td>Release sin R8 ni ofuscación de Dart: código y nombres legibles.</td><td><code>isMinifyEnabled = false</code>; <code>libapp.so</code> con <code>DungeonBloc</code>, <code>HabitsRemoteDataSource</code>…</td><td class="mid">Media</td><td>R8 + reducción de recursos con reglas <code>keep</code>; build con <code>--obfuscate --split-debug-info</code>.</td><td><code>7118cb3</code>, <code>aa86d86</code></td></tr>
+</table>
+
+<h2>4. Correcciones aplicadas (fase 3)</h2>
+<ul>
+<li><b>Sin secretos en código ni repositorio:</b> confirmado (M1). La llave de firma nueva y su contraseña tampoco van al repositorio (<code>android/.gitignore</code>).</li>
+<li><b>Tokens en Keystore:</b> H-01 (<code>lib/core/storage/secure_session_storage.dart</code>, registrado en <code>main.dart</code>).</li>
+<li><b>Solo HTTPS en release:</b> H-04.</li>
+<li><b>Validación de entradas en la app y permisos en el servidor:</b> H-05 en la app; RLS y RPC en el servidor (M3), validación del correo en el formulario de inicio de sesión.</li>
+<li><b>Release sin debug, sin logs sensibles y con R8:</b> H-06 y H-02. El build release no es <code>debuggable</code>; los logs de <code>AppBlocObserver</code> solo se imprimen con <code>kDebugMode</code>.</li>
+<li><b>Protección extra:</b> H-03 (sin copia de seguridad) y una pantalla de error de arranque para no quedar nunca en negro (<code>aa86d86</code>).</li>
+</ul>
+<p>Comando del release corregido:</p>
+<pre>flutter build apk --release --split-per-abi --target-platform android-arm64 --obfuscate --split-debug-info=build/debug-info --dart-define-from-file=supabase.json</pre>
+
+<h2>5. Verificación antes / después (fase 4)</h2>
+<p>Cada prueba se repitió igual sobre el APK release v1.29.0 (antes) y v1.30.0 (después) en un teléfono Android físico. Archivos completos en <code>docs/seguridad/evidencias/</code>.</p>
+
+<div class="finding"><h3>H-01 · Sesión cifrada (<code>14a1773</code>)</h3>
+<div class="ba">
+<div><b>Antes</b><pre>$ adb shell run-as com.example.proyecto_movil cat shared_prefs/FlutterSharedPreferences.xml
+Clave: flutter.sb-zwjfqwqrozncyzlmetsc-auth-token
+¿access_token legible?: True
+¿refresh_token legible?: True
+{"access_token":"«oculto»","expires_in":3600,
+ "refresh_token":"«oculto»","token_type":"bearer",…</pre></div>
+<div><b>Después</b><pre>Claves en FlutterSharedPreferences.xml:
+  (ninguna sesión)
+¿access_token legible en SharedPreferences?: False
+FlutterSecureStorage.xml:
+  valor: xn18NLyo8KeF… (cifrado)
+  ¿contiene "access_token"?: False
+La sesión sigue activa al cerrar y abrir la app.</pre></div>
+</div></div>
+
+<div class="finding"><h3>H-02 · Firma propia (<code>ec148f8</code>)</h3>
+<div class="ba">
+<div><b>Antes</b><pre>$ apksigner verify --print-certs app-release.apk
+Signer #1 certificate DN: C=US, O=Android, CN=Android Debug</pre></div>
+<div><b>Después</b><pre>Signer #1 certificate DN: CN=LifeQuest,
+  OU=Programacion Movil, O=UNICESAR, C=CO</pre></div>
+</div>
+<p>El inicio con Google se volvió a verificar registrando la huella SHA-1 pública de la llave nueva en Google Cloud.</p></div>
+
+<div class="finding"><h3>H-03 · Sin copia de seguridad (<code>7274f11</code>)</h3>
+<div class="ba">
+<div><b>Antes</b><pre>$ adb shell dumpsys package com.example.proyecto_movil
+flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]</pre></div>
+<div><b>Después</b><pre>flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+android:allowBackup = false
+android:fullBackupContent = false
+android:dataExtractionRules = @xml/data_extraction_rules</pre></div>
+</div></div>
+
+<div class="finding"><h3>H-04 · Solo HTTPS (<code>5564493</code>)</h3>
+<div class="ba">
+<div><b>Antes</b><pre>$ aapt dump xmltree app-release.apk AndroidManifest.xml
+(sin networkSecurityConfig ni usesCleartextTraffic:
+ valores por defecto de Android)</pre></div>
+<div><b>Después</b><pre>android:usesCleartextTraffic = false
+android:networkSecurityConfig = @xml/network_security_config
+  base-config cleartextTrafficPermitted="false"
+  trust-anchors: system
+test isSecureUrl('http://…') → false (pasa)</pre></div>
+</div></div>
+
+<div class="finding"><h3>H-05 · Deep link validado (<code>5128baa</code>)</h3>
+<div class="ba">
+<div><b>Antes</b><pre>$ flutter test test/app/home_screen_widget_test.dart
+H-05: un id de tarea que no es UUID no llega a la ruta
+Expected: '/dungeon'
+  Actual: '/dungeon?task=1\' OR \'1\'=\'1'
+FAILED</pre></div>
+<div><b>Después</b><pre>$ flutter test (pruebas de seguridad)
++6: All tests passed! (H-01, H-04, H-05)
+("1' OR '1'='1", "../../admin", "abc&amp;task=otra",
+ "%00", "x"×5000 → /dungeon)</pre></div>
+</div></div>
+
+<div class="finding"><h3>H-06 · Binario protegido (<code>7118cb3</code>, <code>aa86d86</code>)</h3>
+<div class="ba">
+<div><b>Antes</b><pre>build.gradle.kts: isMinifyEnabled = false
+libapp.so: DungeonBloc, DungeonRemoteDataSource,
+           GuidedTaskBloc, HabitsRemoteDataSource
+APK: 44 124 512 bytes</pre></div>
+<div><b>Después</b><pre>libapp.so: (ninguno: Dart ofuscado)
+mapping.txt de R8: 41 937 437 bytes
+APK: 35 715 963 bytes (−19 %)</pre></div>
+</div>
+<p><b>Hallazgo durante la verificación:</b> la primera build con R8 abría en negro. Una pantalla de error de arranque mostró la causa (<code>ClassNotFoundException: kotlin/Result</code>: <code>shared_preferences</code> llama clases de Kotlin por nombre vía JNI y R8 las quitaba). Se agregaron reglas <code>keep</code> (<code>aa86d86</code>) y la app volvió a funcionar: inicio de sesión, Inicio, Hábitos y Foco probados en el teléfono. El hallazgo se cerró solo cuando la prueba repetida dejó de reproducirlo.</p></div>
+
+<h2>6. Riesgos pendientes</h2>
+<ul>
+<li>El nombre del paquete sigue siendo <code>com.example.proyecto_movil</code>; Google Play lo rechaza y conviene cambiarlo antes de publicar.</li>
+<li>No hay <i>certificate pinning</i> (se confía en las CA del sistema); es una mejora posible, con el costo de mantener los pines al renovar certificados.</li>
+<li>La llave de firma debe respaldarse fuera del equipo: si se pierde, no se pueden publicar actualizaciones con la misma firma.</li>
+</ul>
+</body>
+</html>

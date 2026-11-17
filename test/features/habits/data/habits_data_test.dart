@@ -21,6 +21,7 @@ void main() {
             'id': 'h1',
             'name': 'Gimnasio',
             'type': 'good',
+            'priority': 'high',
             'frequency': 'specific_days',
             'specific_days': [1, 3],
             'skill_name': 'Salud',
@@ -45,6 +46,7 @@ void main() {
 
       final h = board.habits.single;
       expect(h.type, HabitType.good);
+      expect(h.priority, HabitPriority.high);
       expect(h.specificDays, [1, 3]);
       expect([h.currentStreak, h.bestStreak], [2, 5]);
       expect(h.scheduledToday, isFalse);

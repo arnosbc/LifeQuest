@@ -44,7 +44,7 @@ void main() {
     act: (bloc) => bloc.add(const MissionDeleted('m1')),
     expect: () => [
       const MissionsSuccess(board, busyMissionId: 'm1'),
-      const MissionsSuccess(board, message: 'Misión borrada.'),
+      const MissionsSuccess(board, message: 'Tarea borrada.'),
     ],
   );
 

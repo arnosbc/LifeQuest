@@ -7,14 +7,15 @@ class UserModel {
   const UserModel({required this.id, required this.email, this.username});
 
   factory UserModel.fromSupabase(supabase.User user) {
-    final username = user.userMetadata?['username'];
-    return UserModel(
-      id: user.id,
-      email: user.email ?? '',
-      username: username is String && username.trim().isNotEmpty
-          ? username.trim()
-          : null,
-    );
+    String? username;
+    for (final key in const ['username', 'full_name', 'name']) {
+      final value = user.userMetadata?[key];
+      if (value is String && value.trim().isNotEmpty) {
+        username = value.trim();
+        break;
+      }
+    }
+    return UserModel(id: user.id, email: user.email ?? '', username: username);
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(

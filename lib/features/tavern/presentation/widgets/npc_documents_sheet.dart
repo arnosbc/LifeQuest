@@ -21,7 +21,7 @@ class RemoveNpcDocumentAction extends NpcDocumentsAction {
   final NpcDocument document;
 }
 
-/// Documentos de contexto del NPC (p. ej. el plan de la asignatura): lista,
+/// Documentos de contexto del mentor (p. ej. el plan de la asignatura): lista,
 /// quitar y adjuntar uno nuevo en PDF, Word (.docx) o Markdown.
 class NpcDocumentsSheet extends StatefulWidget {
   const NpcDocumentsSheet({super.key, required this.npc});
@@ -125,8 +125,8 @@ class _NpcDocumentsSheetState extends State<NpcDocumentsSheet> {
                 children: [
                   Text(
                     'Adjunta el plan de la asignatura u otro documento del tema. '
-                    'RPGenie lo lee una vez y saca de él las misiones de '
-                    '${npc.name}, siguiendo sus temas.',
+                    'El Asistente lo leerá una vez para proponer tareas guiadas '
+                    'relacionadas con ${npc.name}.',
                     style: TextStyle(color: context.lq.muted, fontSize: 13),
                   ),
                   const SizedBox(height: 12),
@@ -207,7 +207,7 @@ class _NpcDocumentsSheetState extends State<NpcDocumentsSheet> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'No subas documentos personales. RPGenie usa la capa '
+                          'No subas documentos personales. El Asistente usa la capa '
                           'gratis de Gemini y Google puede usar el texto para '
                           'mejorar sus modelos.',
                           style: TextStyle(

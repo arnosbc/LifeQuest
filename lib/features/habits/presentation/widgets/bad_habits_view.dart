@@ -113,7 +113,7 @@ class BadHabitsView extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Hoy: ${habit.todayCount} · −${habit.hpPenalty} de vida por registro',
+                  'Hoy: ${habit.todayCount} · −${habit.hpPenalty} de Constancia por registro',
                   style: TextStyle(color: context.lq.muted, fontSize: 9),
                 ),
               ],

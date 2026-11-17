@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
@@ -27,6 +29,11 @@ abstract class NotificationsLocalDataSource {
   Future<void> startPeriodicCheck();
 
   Future<void> stopPeriodicCheck();
+
+  /// Token de Firebase (FCM) para recibir push al instante; null si Firebase no
+  /// está configurado (sin google-services.json). [onRefresh] recibe los
+  /// tokens nuevos. Los push que llegan con la app abierta se muestran aquí.
+  Future<String?> pushToken({required void Function(String) onRefresh});
 }
 
 class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
@@ -48,28 +55,39 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
   static const _tokenKey = 'device_notifications_token';
   static const periodicTask = 'lifequest.device_notifications';
 
-  // Un canal por nivel: el usuario puede silenciar cada uno en Ajustes.
+  // Un canal por nivel: el usuario puede silenciar cada uno en Ajustes. Todos
+  // con prioridad alta: aparecen arriba como un mensaje y suenan. Los ids
+  // llevan _v2 porque Android no deja subir la importancia de un canal ya creado.
   static const _channels = {
     NotificationKind.critical: AndroidNotificationDetails(
-      'critical',
-      'Avisos críticos',
-      channelDescription: 'Rachas y proyectos que necesitan tu atención hoy.',
-      importance: Importance.high,
-      priority: Priority.high,
+      'critical_v2',
+      'Recordatorios',
+      channelDescription: 'Rachas, hábitos y tareas pendientes.',
+      importance: Importance.max,
+      priority: Priority.max,
+      category: AndroidNotificationCategory.reminder,
+      // La cara de Nevi, como Duo en los avisos de Duolingo.
+      largeIcon: DrawableResourceAndroidBitmap('widget_mascot_waiting'),
     ),
     NotificationKind.motivational: AndroidNotificationDetails(
-      'motivational',
-      'Avisos importantes',
-      channelDescription: 'Logros, niveles y cofres listos.',
+      'motivational_v2',
+      'Logros y novedades',
+      channelDescription: 'Lo que creas, logros, niveles y cofres listos.',
+      importance: Importance.high,
+      priority: Priority.high,
+      largeIcon: DrawableResourceAndroidBitmap('widget_mascot_happy'),
     ),
     NotificationKind.informative: AndroidNotificationDetails(
-      'informational',
+      'informational_v2',
       'Resumen del día',
       channelDescription: 'El resumen con lo que vence y lo pendiente.',
-      importance: Importance.low,
-      priority: Priority.low,
+      importance: Importance.high,
+      priority: Priority.high,
+      largeIcon: DrawableResourceAndroidBitmap('widget_mascot_happy'),
     ),
   };
+
+  static const _oldChannels = ['critical', 'motivational', 'informational'];
 
   bool _ready = false;
 
@@ -97,6 +115,13 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
           : (_) => onOpened(),
     );
     _ready = true;
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    for (final id in _oldChannels) {
+      await android?.deleteNotificationChannel(channelId: id);
+    }
     if (onOpened == null) return;
     final launch = await _plugin.getNotificationAppLaunchDetails();
     if (launch?.didNotificationLaunchApp ?? false) onOpened();
@@ -145,7 +170,10 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
         body: n.description,
         notificationDetails: NotificationDetails(
           android: _channels[n.kind],
-          iOS: const DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentSound: true,
+          ),
         ),
       );
     }
@@ -162,6 +190,52 @@ class NotificationsLocalDataSourceImpl implements NotificationsLocalDataSource {
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
   });
+
+  static bool _pushListening = false;
+
+  @override
+  Future<String?> pushToken({required void Function(String) onRefresh}) async {
+    try {
+      await Firebase.initializeApp();
+    } catch (_) {
+      return null; // Firebase sin configurar: queda la revisión cada ~15 min
+    }
+    final messaging = FirebaseMessaging.instance;
+    if (!_pushListening) {
+      _pushListening = true;
+      // shortcut: getToken/onTokenRefresh están deprecados por register/FID;
+      // la API HTTP v1 de push-dispatch envía al token clásico. Migrar juntos.
+      // ignore: deprecated_member_use
+      messaging.onTokenRefresh.listen(onRefresh);
+      // Con la app cerrada el sistema muestra el push; abierta, se muestra aquí.
+      FirebaseMessaging.onMessage.listen((message) {
+        final n = message.notification;
+        if (n == null) return;
+        show([
+          AppNotification(
+            id:
+                message.data['id'] as String? ??
+                message.messageId ??
+                '${n.hashCode}',
+            kind: switch (message.data['type']) {
+              'critical' => NotificationKind.critical,
+              'motivational' => NotificationKind.motivational,
+              _ => NotificationKind.informative,
+            },
+            title: n.title ?? 'LifeQuest',
+            description: n.body ?? '',
+            createdAt: DateTime.now(),
+          ),
+        ]).ignore();
+      });
+    }
+    try {
+      // ignore: deprecated_member_use
+      return await messaging.getToken();
+    } catch (_) {
+      return null; // sin Google Play Services o sin red
+    }
+  }
 
   @override
   Future<void> stopPeriodicCheck() =>

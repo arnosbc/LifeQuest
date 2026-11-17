@@ -27,9 +27,9 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
         e.attack.id,
         () => _attack(e.attack),
         (board) => _defeated(board, e.goalId)
-            ? '¡Victoria! Venciste al jefe: '
-                  '+${board.victoryXp} XP y +${board.victoryCoins} Monedas.'
-            : '¡Golpe certero! −${e.attack.damage} de vida al jefe.',
+            ? '¡Meta cumplida! Ganaste +${board.victoryXp} XP y '
+                  '+${board.victoryCoins} Monedas.'
+            : 'La tarea sumó ${e.attack.damage} % al avance de la meta.',
       ),
       transformer: droppable(),
     );

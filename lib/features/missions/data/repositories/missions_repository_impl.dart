@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
+import 'package:proyecto_movil/features/missions/domain/entities/mission.dart';
 import 'package:proyecto_movil/features/missions/data/datasources/missions_remote_datasource.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/missions_board.dart';
 import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dart';
@@ -17,11 +18,8 @@ class MissionsRepositoryImpl implements MissionsRepository {
       _run(() async => (await _remote.getBoard()).toEntity());
 
   @override
-  Future<Either<Failure, Unit>> createMission(NewMission mission) =>
-      _run(() async {
-        await _remote.createMission(mission);
-        return unit;
-      });
+  Future<Either<Failure, String>> createMission(NewMission mission) =>
+      _run(() => _remote.createMission(mission));
 
   @override
   Future<Either<Failure, Unit>> completeMission(String missionId) =>
@@ -46,13 +44,15 @@ class MissionsRepositoryImpl implements MissionsRepository {
 
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
-    'invalid_title' => 'Dale a tu misión un nombre de hasta 200 caracteres.',
+    'invalid_title' => 'Escribe un nombre de hasta 200 caracteres.',
     'skill_not_found' || 'project_not_found' || 'goal_not_found' =>
-      'Ese vínculo ya no está disponible. Elige otro o deja la misión sin vincular.',
-    'task_not_found' => 'No encontramos esa misión. Desliza para actualizar.',
-    'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+      'Ese vínculo ya no está disponible. Elige otro o deja la tarea sin vincular.',
+    'task_not_found' => 'No encontramos esa tarea. Desliza para actualizar.',
+    'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
+    'task_steps_pending' =>
+      'Completa los pasos de esta tarea para poder terminarla.',
     'task_in_use' =>
-      'Esa misión ya tiene Mazmorras jugadas. Complétala en lugar de borrarla.',
+      'Esa tarea ya tiene bloques de foco registrados. Complétala en lugar de borrarla.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 
@@ -62,6 +62,15 @@ class MissionsRepositoryImpl implements MissionsRepository {
         await _remote.renameMission(missionId, title);
         return unit;
       });
+
+  @override
+  Future<Either<Failure, Unit>> setMissionRepeat(
+    String missionId,
+    MissionRepeat? repeat,
+  ) => _run(() async {
+    await _remote.setMissionRepeat(missionId, repeat?.name);
+    return unit;
+  });
 
   @override
   Future<Either<Failure, Unit>> deleteMission(String missionId) =>

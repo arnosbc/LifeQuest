@@ -30,6 +30,7 @@ class MissionsBoardModel {
           goalTitle: _text(m['goal_title']),
           subtasksTotal: _int(m['subtasks_total']),
           subtasksDone: _int(m['subtasks_done']),
+          repeat: MissionRepeat.values.asNameMap()[m['repeat_rule']],
         ),
     ],
     skills: [

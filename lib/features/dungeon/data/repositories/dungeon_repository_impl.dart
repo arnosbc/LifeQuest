@@ -20,26 +20,53 @@ class DungeonRepositoryImpl implements DungeonRepository {
     required int totalMinutes,
     required int cycleMinutes,
     required List<String> taskIds,
+    List<String> habitIds = const [],
   }) => _run(
     () => _remote.start(
       totalMinutes: totalMinutes,
       cycleMinutes: cycleMinutes,
       taskIds: taskIds,
+      habitIds: habitIds,
     ),
   );
 
   @override
   Future<Either<Failure, Unit>> completeCycle({
     required String sessionId,
-    required String taskId,
+    required String itemId,
+    bool isHabit = false,
   }) => _run(() async {
-    await _remote.completeCycle(sessionId: sessionId, taskId: taskId);
+    await _remote.completeCycle(
+      sessionId: sessionId,
+      itemId: itemId,
+      isHabit: isHabit,
+    );
     return unit;
   });
 
   @override
+  Future<Either<Failure, bool>> toggleStep(String stepId) =>
+      _run(() => _remote.toggleStep(stepId));
+
+  @override
+  Future<Either<Failure, Unit>> completeHabit(String habitId) =>
+      _run(() async {
+        await _remote.completeHabit(habitId);
+        return unit;
+      });
+
+  @override
   Future<Either<Failure, DungeonReward>> completeTask(String taskId) =>
       _run(() async => (await _remote.completeTask(taskId)).toEntity());
+
+  @override
+  Future<Either<Failure, Unit>> addTask({
+    required String sessionId,
+    required String taskId,
+  }) => _run(() async {
+    await _remote.addTask(sessionId: sessionId, taskId: taskId);
+    return unit;
+  });
 
   @override
   Future<Either<Failure, DungeonSummary>> end(String sessionId) =>
@@ -62,19 +89,28 @@ class DungeonRepositoryImpl implements DungeonRepository {
   /// Motivos que lanzan las funciones SQL, en tono de invitación.
   static String _messageFor(String? code) => switch (code) {
     'session_already_open' =>
-      'Ya tienes una Mazmorra en curso. Desliza para retomarla.',
+      'Ya tienes una sesión de Modo Foco en curso. Desliza para retomarla.',
     'invalid_duration' =>
       'La sesión dura de 30 min a 8 h, en pasos de 30, y cabe al menos un ciclo.',
-    'no_tasks' => 'Elige al menos una misión para tu mochila.',
-    'session_task_limit' => 'Tu mochila admite hasta 5 misiones.',
+    'no_tasks' => 'Elige al menos una tarea o un hábito para tu sesión.',
+    'session_task_limit' => 'Tu sesión admite hasta 5 tareas y hábitos.',
+    'habit_not_found' =>
+      'Algún hábito ya no está disponible. Desliza para actualizar.',
+    'step_order_required' => 'Completa primero el paso anterior.',
+    'step_not_found' => 'Ese paso ya no existe. Desliza para actualizar.',
+    'already_completed' => 'Ya cumpliste este hábito hoy. ¡Bien hecho!',
+    'not_scheduled' => 'Este hábito no toca hoy.',
     'task_not_found' =>
-      'Alguna misión ya no está abierta. Desliza para actualizar.',
-    'cycle_not_finished' => 'Al ciclo aún le falta un poco. Sigue concentrado.',
+      'Alguna tarea ya no está abierta. Desliza para actualizar.',
+    'cycle_not_finished' =>
+      'A este bloque aún le falta un poco. Sigue concentrado.',
     'session_cycles_exhausted' =>
-      'Completaste todos los ciclos de esta sesión. ¡Gran trabajo!',
+      'Completaste todos los bloques de esta sesión. ¡Gran trabajo!',
     'session_not_found' || 'session_not_active' =>
       'Esta sesión ya terminó. Puedes empezar otra cuando quieras.',
-    'task_not_open' => 'Esa misión ya estaba cerrada. ¡Una menos!',
+    'task_not_open' => 'Esa tarea ya estaba cerrada. ¡Una menos!',
+    'task_steps_pending' =>
+      'Completa el paso actual de esta tarea para poder terminarla.',
     _ => 'Algo salió mal. Inténtalo de nuevo en un momento.',
   };
 }

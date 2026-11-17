@@ -6,12 +6,12 @@ import 'package:proyecto_movil/features/missions/domain/entities/new_mission.dar
 import 'package:proyecto_movil/features/missions/domain/repositories/missions_repository.dart';
 
 /// Crea una misión con sus subtareas.
-class CreateMission implements UseCase<Unit, NewMission> {
+class CreateMission implements UseCase<String, NewMission> {
   const CreateMission(this._repository);
 
   final MissionsRepository _repository;
 
   @override
-  Future<Either<Failure, Unit>> call(NewMission params) =>
+  Future<Either<Failure, String>> call(NewMission params) =>
       _repository.createMission(params);
 }

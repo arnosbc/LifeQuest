@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_time.dart';
 
 /// Hábito bueno: progreso de la semana y botón para cumplirlo hoy.
 class HabitRow extends StatelessWidget {
@@ -72,7 +73,7 @@ class HabitRow extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 4, top: 4),
                             child: Text(
-                              '🔥 ${habit.currentStreak}',
+                              'Racha ${habit.currentStreak}',
                               style: TextStyle(
                                 color: context.lq.muted,
                                 fontSize: 8,
@@ -86,7 +87,8 @@ class HabitRow extends StatelessWidget {
               ),
             ),
             Text(
-              '$doneDays/7\n$_frequency',
+              '$doneDays/7\n$_frequency'
+              '${habit.reminderTime == null ? '' : '\n⏰ ${habitTimeLabel(habit.reminderTime!)}'}',
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: context.lq.muted,

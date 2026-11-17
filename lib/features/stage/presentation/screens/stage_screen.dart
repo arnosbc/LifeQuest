@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:proyecto_movil/app/config/route_paths.dart';
+import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/entities/new_project.dart';
@@ -10,17 +13,18 @@ import 'package:proyecto_movil/features/stage/domain/entities/new_resource.dart'
 import 'package:proyecto_movil/features/stage/domain/entities/stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/create_resource_sheet.dart';
+import 'package:proyecto_movil/features/stage/presentation/widgets/highlight_section.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/quick_add_sheets.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/stage_action_row.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/stage_project_card.dart';
 
-/// Stage · P.A.R.A.: centro de mando de lectura sobre misiones, proyectos,
+/// Stage · P.A.R.A.: centro de mando de lectura sobre tareas, proyectos,
 /// áreas (skills), recursos y archivo. No guarda datos propios.
 /// Necesita un [StageBloc] por encima (lo provee el router).
 class StageScreen extends StatelessWidget {
   const StageScreen({super.key, required this.onOpenMissions});
 
-  /// Abre la lista completa de Misiones (y su alta).
+  /// Abre la lista completa de Tareas (y su alta).
   final VoidCallback onOpenMissions;
 
   @override
@@ -80,6 +84,7 @@ class StageScreen extends StatelessWidget {
   static Future<void> _showNote(BuildContext context, StageResource note) =>
       showModalBottomSheet<void>(
         context: context,
+        useRootNavigator: true,
         isScrollControlled: true,
         useSafeArea: true,
         backgroundColor: Colors.transparent,
@@ -153,6 +158,7 @@ class StageScreen extends StatelessWidget {
     final bloc = context.read<StageBloc>();
     Future<T?> sheet<T>(Widget child) => showModalBottomSheet<T>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -212,67 +218,45 @@ class StageScreen extends StatelessWidget {
     final board = state.board;
     final idle = !state.busy;
     return LifeQuestPage(
-      title: 'Stage · P.A.R.A.',
-      subtitle: 'Tu centro de mando, todo en un vistazo.',
-      trailing: IconButton.filledTonal(
-        tooltip: 'Añadir misión, proyecto, meta o recurso',
-        onPressed: idle ? () => _quickAdd(context, board) : null,
-        icon: state.busy
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.add),
-      ),
+      title: 'Planificador',
+      icon: QIcons.stage,
+      subtitle: 'Todo lo que tienes entre manos, en un vistazo.',
+      onAction: idle ? () => _quickAdd(context, board) : null,
+      actionLabel: 'Agregar tarea, proyecto, meta o recurso',
       children: [
         // RF-089: orden fijo urgent → high → medium → low → pending.
-        LifeQuestSectionHeading(
-          'DAILY HIGHLIGHT',
-          action: 'Ver misiones (${board.highlightTotal})',
-          onTap: onOpenMissions,
+        HighlightSection(
+          items: board.highlight,
+          total: board.highlightTotal,
+          onOpenAll: onOpenMissions,
+          labelFor: _bucketLabel,
         ),
-        const SizedBox(height: 7),
-        if (board.highlight.isEmpty)
-          _empty(
-            context,
-            'Sin misiones abiertas. Añade una para empezar el día.',
-          ),
-        for (final item in board.highlight)
-          LifeQuestListRow(
-            icon: switch (item.bucket) {
-              StageBucket.urgent => Icons.bolt,
-              StageBucket.pending => Icons.hourglass_empty_rounded,
-              _ => Icons.flag_outlined,
-            },
-            title: item.title,
-            subtitle: _bucketLabel(item.bucket),
-          ),
         const SizedBox(height: 14),
-        // Meta (Boss) → Proyecto → Misión: las metas van primero.
+        // Meta (Boss) → Proyecto → Tarea: las metas van primero.
         LifeQuestSectionHeading(
-          'METAS (JEFES)',
+          'METAS',
           action: '${board.goals.length} activas',
         ),
         const SizedBox(height: 7),
         if (board.goals.isEmpty)
           _empty(
             context,
-            'Sin metas activas. Crea una con + y cada misión vinculada le restará vida al jefe.',
+            'Sin metas activas. Crea una con + y cada tarea vinculada la hará avanzar.',
           ),
         for (final goal in board.goals)
           StageActionRow(
-            icon: Icons.emoji_events_outlined,
+            icon: Icons.flag_outlined,
             title: goal.title,
             subtitle: [
-              '❤ ${goal.bossHp}/${goal.bossMaxHp} de vida del jefe',
+              '${_progress(goal.bossHp, goal.bossMaxHp)} % de avance',
               if (goal.dueDate case final due?)
                 'vence ${due.day}/${due.month}/${due.year}',
-              '${goal.projects} proyectos · ${goal.openTasks} misiones',
+              '${goal.projects} proyectos · ${goal.openTasks} tareas',
               ?goal.skillName,
             ].join(' · '),
-            // Barra = vida que le queda al jefe.
-            progress: goal.bossMaxHp == 0 ? 0 : goal.bossHp / goal.bossMaxHp,
+            progress: goal.bossMaxHp == 0
+                ? 0
+                : (goal.bossMaxHp - goal.bossHp) / goal.bossMaxHp,
             enabled: idle,
             actions: [
               (
@@ -292,7 +276,7 @@ class StageScreen extends StatelessWidget {
         if (board.projects.isEmpty)
           _empty(
             context,
-            'Sin proyectos activos. Un proyecto agrupa misiones de semanas.',
+            'Sin proyectos activos. Un proyecto agrupa tareas de semanas.',
           ),
         for (final project in board.projects)
           StageProjectCard(
@@ -301,7 +285,7 @@ class StageScreen extends StatelessWidget {
             urgencyLabel: _urgencyLabel(project.urgency),
             onAddMission: onOpenMissions,
             onCompleteTask: idle
-                ? (id) => bloc.add(StageTaskCompleted(id))
+                ? (id) => context.go(RoutePaths.focusOn(id))
                 : null,
             onComplete: idle
                 ? () => bloc.add(StageProjectCompleted(project.id))
@@ -316,20 +300,16 @@ class StageScreen extends StatelessWidget {
                 : null,
           ),
         const SizedBox(height: 14),
-        LifeQuestSectionHeading(
-          'ÁREAS (SKILLS)',
-          action: '${board.areas.length}',
-        ),
+        LifeQuestSectionHeading('ÁREAS', action: '${board.areas.length}'),
         const SizedBox(height: 7),
-        if (board.areas.isEmpty)
-          _empty(context, 'Crea tus áreas como skills desde tu Perfil.'),
+        if (board.areas.isEmpty) _empty(context, 'Crea áreas desde tu Perfil.'),
         for (final area in board.areas)
           LifeQuestListRow(
             icon: Icons.category_outlined,
             title: area.name,
             subtitle:
                 '${area.habits} hábitos · ${area.projects} proyectos · '
-                '${area.openTasks} misiones abiertas',
+                '${area.openTasks} tareas abiertas',
             trailing: 'Nv ${area.level}',
           ),
         const SizedBox(height: 14),
@@ -425,6 +405,10 @@ class StageScreen extends StatelessWidget {
     ),
   );
 
+  /// Avance de la meta (0–100 %): la vida que ya se le quitó, solo en la UI.
+  static int _progress(int hp, int maxHp) =>
+      maxHp <= 0 ? 0 : ((maxHp - hp) * 100 / maxHp).round().clamp(0, 100);
+
   static String _bucketLabel(StageBucket bucket) => switch (bucket) {
     StageBucket.urgent => '¡Hazlo ahora! · vence en menos de 24 h',
     StageBucket.high => 'Prioridad alta',
@@ -434,8 +418,8 @@ class StageScreen extends StatelessWidget {
   };
 
   static String _urgencyLabel(StageUrgency urgency) => switch (urgency) {
-    StageUrgency.high => '🔴 Alta',
-    StageUrgency.medium => '🟡 Media',
-    StageUrgency.low => '🟢 Baja',
+    StageUrgency.high => '▲ Alta',
+    StageUrgency.medium => '● Media',
+    StageUrgency.low => '▼ Baja',
   };
 }

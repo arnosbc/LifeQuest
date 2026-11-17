@@ -16,4 +16,7 @@ abstract class HomeRepository {
 
   /// Cobra el cofre del día; el servidor valida las misiones y paga.
   Future<Either<Failure, Unit>> claimDailyChest();
+
+  /// Completa una tarea desde el Inicio; el servidor paga.
+  Future<Either<Failure, Unit>> completeTask(String taskId);
 }
