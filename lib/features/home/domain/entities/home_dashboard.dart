@@ -39,14 +39,40 @@ class PriorityTask extends Equatable {
 
 /// Hábito bueno programado para hoy.
 class TodayHabit extends Equatable {
-  const TodayHabit({required this.id, required this.name, required this.done});
+  const TodayHabit({
+    required this.id,
+    required this.name,
+    required this.done,
+    this.reminderAt,
+  });
 
   final String id;
   final String name;
   final bool done;
 
+  /// Hora de aviso de hoy (046); con ella sale en la agenda.
+  final DateTime? reminderAt;
+
   @override
-  List<Object?> get props => [id, name, done];
+  List<Object?> get props => [id, name, done, reminderAt];
+}
+
+/// Meta sin avance en 7 días (046) con su siguiente tarea, si tiene.
+class StalledGoal extends Equatable {
+  const StalledGoal({
+    required this.id,
+    required this.title,
+    this.nextTaskId,
+    this.nextTaskTitle,
+  });
+
+  final String id;
+  final String title;
+  final String? nextTaskId;
+  final String? nextTaskTitle;
+
+  @override
+  List<Object?> get props => [id, title, nextTaskId, nextTaskTitle];
 }
 
 /// Bloque de la agenda de hoy (tarea con hora, `day_agenda` de 032).
@@ -126,6 +152,7 @@ class HomeDashboard extends Equatable {
     this.displayName,
     this.characterClass,
     this.priorityTask,
+    this.stalledGoal,
     this.agenda = const [],
     this.unscheduled = const [],
     this.events = const [],
@@ -146,6 +173,9 @@ class HomeDashboard extends Equatable {
 
   /// Null cuando no hay tareas abiertas.
   final PriorityTask? priorityTask;
+
+  /// Null si todas las metas avanzaron esta semana.
+  final StalledGoal? stalledGoal;
   final List<TodayHabit> habits;
   final int habitsDone;
   final int habitsTotal;
@@ -177,6 +207,7 @@ class HomeDashboard extends Equatable {
         hpMax: hpMax,
         isWeakened: isWeakened,
         priorityTask: priorityTask,
+        stalledGoal: stalledGoal,
         habits: habits,
         habitsDone: habitsDone,
         habitsTotal: habitsTotal,
@@ -202,6 +233,7 @@ class HomeDashboard extends Equatable {
     hpMax,
     isWeakened,
     priorityTask,
+    stalledGoal,
     habits,
     habitsDone,
     habitsTotal,

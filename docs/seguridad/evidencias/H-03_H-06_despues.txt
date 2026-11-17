@@ -1,0 +1,7 @@
+$ aapt2 dump xmltree base.apk (instalado, v2.7.0)
+        A: http://schemas.android.com/apk/res/android:allowBackup(0x01010280)=false
+        A: http://schemas.android.com/apk/res/android:fullBackupContent(0x010104eb)=false
+        A: http://schemas.android.com/apk/res/android:networkSecurityConfig(0x01010527)=@0x7f110002
+        A: http://schemas.android.com/apk/res/android:dataExtractionRules(0x0101063e)=@0x7f110000
+            A: http://schemas.android.com/apk/res/android:name(0x01010003)="es.antonborri.home_widget.HomeWidgetBackgroundReceiver" (Raw: "es.antonborri.home_widget.HomeWidgetBackgroundReceiver")
+            A: http://schemas.android.com/apk/res/android:exported(0x01010010)=false

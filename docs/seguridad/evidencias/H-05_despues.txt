@@ -1,0 +1,3 @@
+$ adb logcat --pid <app> -s flutter   # release v2.7.0, app abierta (después)
+--------- beginning of main
+(0 líneas de la app: nada de errores ni datos en el log)

@@ -25,8 +25,12 @@ class DaySheet extends StatelessWidget {
     this.onCloseDay,
     this.busyHabitId,
     this.onCompleteReminder,
+    this.onOpenGoal,
     this.minHeight = 0,
   });
+
+  /// Abre Proyectos y metas (meta quieta sin tareas).
+  final VoidCallback? onOpenGoal;
 
   /// Abre «Cierra el día» (revisión de lo pendiente).
   final VoidCallback? onCloseDay;
@@ -225,6 +229,25 @@ class DaySheet extends StatelessWidget {
                 onTap: () => onStartFocus(task.id),
               ),
             ),
+          // Meta sin avance en 7 días: su siguiente paso, sin culpa.
+          if (d.stalledGoal case final goal?)
+            SheetRow(
+              title: 'Tu meta «${goal.title}» te espera',
+              subtitle: goal.nextTaskTitle == null
+                  ? 'Aún no tiene pasos. Dale uno pequeño.'
+                  : 'Siguiente paso: ${goal.nextTaskTitle}',
+              action: switch (goal.nextTaskId) {
+                final id? => SheetPill(
+                  label: 'Empezar foco',
+                  onTap: () => onStartFocus(id),
+                ),
+                null when onOpenGoal != null => SheetPill(
+                  label: 'Ver meta',
+                  onTap: onOpenGoal!,
+                ),
+                null => null,
+              },
+            ),
           // Hábitos antes que la agenda: son de un toque y no deben quedar
           // enterrados bajo una agenda llena.
           const SizedBox(height: 20),
@@ -267,6 +290,8 @@ class DaySheet extends StatelessWidget {
             onReplan: onReplan,
             onConnectCalendar: onConnectCalendar,
             onCompleteReminder: onCompleteReminder,
+            onCompleteHabit: onCompleteHabit,
+            busyHabitId: busyHabitId,
             onPickTime: (id, current) => _pickTime(context, id, current),
           ),
         ],
@@ -664,8 +689,13 @@ class _Agenda extends StatefulWidget {
     required this.onReplan,
     required this.onConnectCalendar,
     required this.onPickTime,
+    required this.onCompleteHabit,
     this.onCompleteReminder,
+    this.busyHabitId,
   });
+
+  final ValueChanged<String> onCompleteHabit;
+  final String? busyHabitId;
 
   final HomeDashboard dashboard;
   final DateTime now;
@@ -708,6 +738,30 @@ class _AgendaState extends State<_Agenda> {
             muted: event.end.isBefore(now),
           ),
         ),
+      // Hábitos con hora (046): un instante, como un recordatorio.
+      for (final habit in d.habits)
+        if (habit.reminderAt case final at?)
+          (
+            start: at,
+            upcoming: !habit.done && at.isAfter(now),
+            row: SheetRow(
+              leading: SheetCheck(
+                done: habit.done,
+                label: habit.done
+                    ? '${habit.name}, hecho'
+                    : 'Marcar «${habit.name}» como hecho',
+                onTap: habit.done || habit.id == widget.busyHabitId
+                    ? null
+                    : () => widget.onCompleteHabit(habit.id),
+              ),
+              time: time(at),
+              timeIcon: Icons.repeat_rounded,
+              title: habit.name,
+              subtitle: 'Hábito',
+              done: habit.done,
+              muted: !habit.done && at.isBefore(now),
+            ),
+          ),
       for (final block in d.agenda)
         (
           start: block.start,

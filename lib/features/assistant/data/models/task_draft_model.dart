@@ -45,6 +45,7 @@ class TaskDraftModel {
     'p_estimated_minutes': d.estimatedMinutes,
     'p_reminder_minutes': d.scheduledAt == null ? null : d.reminderMinutes,
     'p_repeat_rule': d.repeatRule,
+    'p_skill_id': d.area?.id,
     // Solo si lo es: así crear tareas no depende de tener 038 aplicada.
     if (d.isReminder) 'p_is_reminder': true,
   };

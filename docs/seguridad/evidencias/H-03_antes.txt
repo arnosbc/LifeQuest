@@ -1,0 +1,5 @@
+$ aapt2 dump xmltree base.apk (instalado, v2.5.0) — receptor del widget
+            A: http://schemas.android.com/apk/res/android:name(0x01010003)="es.antonborri.home_widget.HomeWidgetBackgroundReceiver" (Raw: "es.antonborri.home_widget.HomeWidgetBackgroundReceiver")
+            A: http://schemas.android.com/apk/res/android:exported(0x01010010)=true
+              E: intent-filter (line=124)
+                  E: action (line=125)

@@ -1,7 +1,7 @@
 import 'package:proyecto_movil/features/home/domain/entities/home_dashboard.dart';
 
 /// Respuesta JSON de la RPC `home_dashboard` (supabase/migrations/001_home.sql)
-/// con la de `day_agenda` (032) en la clave `agenda`.
+/// con la de `day_agenda` (032, 046) en la clave `agenda` y el día pedido en `day`.
 class HomeDashboardModel {
   const HomeDashboardModel(this.json);
 
@@ -18,6 +18,26 @@ class HomeDashboardModel {
     List<Map<String, dynamic>> list(String key) =>
         (agenda[key] as List<dynamic>? ?? const [])
             .cast<Map<String, dynamic>>();
+    // Hora de aviso de cada hábito (046) sobre el día pedido.
+    final day = DateTime.tryParse(json['day'] as String? ?? '');
+    final habitTimes = <String, DateTime>{
+      if (day != null)
+        for (final h in list('habit_times'))
+          if ((h['reminder_time'] as String?)?.split(':') case [
+            final hh,
+            final mm,
+            ...,
+          ])
+            h['id'] as String: DateTime(
+              day.year,
+              day.month,
+              day.day,
+              int.parse(hh),
+              int.parse(mm),
+            ),
+    };
+    final goal = agenda['stalled_goal'] as Map<String, dynamic>?;
+    final next = goal?['next_task'] as Map<String, dynamic>?;
     return HomeDashboard(
       displayName: _text(json['display_name']),
       characterClass: _text(json['character_class']),
@@ -47,8 +67,17 @@ class HomeDashboardModel {
             id: habit['id'] as String,
             name: habit['name'] as String,
             done: habit['done'] as bool,
+            reminderAt: habitTimes[habit['id']],
           ),
       ],
+      stalledGoal: goal == null
+          ? null
+          : StalledGoal(
+              id: goal['id'] as String,
+              title: goal['title'] as String,
+              nextTaskId: next?['id'] as String?,
+              nextTaskTitle: next?['title'] as String?,
+            ),
       habitsDone: _int(json['habits_done']),
       habitsTotal: _int(json['habits_total']),
       streakDays: _int(json['streak_days']),

@@ -28,7 +28,8 @@ Hecha con la skill `revision-funcionalidades` (`.claude/skills/revision-funciona
 2. ~~**Proyecto en 🔴 avisa**~~ — hecho el 2026-11-07 (042): aviso a las 9:00 del día en que pasaría a 🔴.
 3. ~~**Avisos que abren su acción**~~ — hecho el 2026-11-07 (043): «Abrir» en el centro de avisos y tocar un aviso del teléfono lleva a su pantalla.
 4. ~~**Bandeja dentro del cierre del día**~~ — hecho el 2026-11-07 (044): «N notas sin decidir» con «Decidir» en la revisión.
-5. **Historial dentro de «Tu semana»** — quitar una pantalla de solo lectura (9).
+5. ~~**Historial dentro de «Tu semana»**~~ — hecho el 2026-11-16.
+6. ~~**Estadísticas con acción, metas quietas en Hoy y hábitos con hora en la agenda**~~ — hecho el 2026-11-16 (046).
 
 ## Bloqueadas
 

@@ -1,0 +1,1 @@
+Signer #1 certificate DN: C=US, O=Android, CN=Android Debug

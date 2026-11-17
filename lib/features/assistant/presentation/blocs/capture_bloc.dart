@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:proyecto_movil/core/resources/resource.dart';
 
+import 'package:proyecto_movil/features/assistant/domain/entities/area_suggester.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/local_parser.dart';
 import 'package:proyecto_movil/features/assistant/domain/entities/task_draft.dart';
 import 'package:proyecto_movil/features/assistant/domain/usecases/break_down_task.dart';
@@ -27,6 +28,10 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
   }) : _clock = clock ?? DateTime.now,
        super(const CaptureWriting()) {
     on<CaptureKindChanged>((event, _) => _kind = event.kind);
+    on<CaptureAreasLoaded>((event, _) {
+      _areas = event.areas;
+      _history = event.history;
+    });
     on<CaptureListenRequested>(_onListen, transformer: droppable());
     on<CaptureListenStopped>((_, _) => _listen.stop());
     on<CaptureSubmitted>(_onSubmitted, transformer: droppable());
@@ -43,6 +48,8 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
   final PlanGoal _planGoal;
   final DateTime Function() _clock;
   CaptureKind _kind = CaptureKind.task;
+  List<DraftArea> _areas = const [];
+  List<({String title, String areaName})> _history = const [];
   final SaveCapture _save;
   final ListenVoice _listen;
 
@@ -98,7 +105,7 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
       result.match(
         (failure) => CaptureWriting(message: failure.message),
         (i) => CapturePreview(
-          draft: i.draft,
+          draft: _withArea(i.draft),
           usedAi: i.usedAi,
           aiAvailable: i.aiAvailable,
           message: i.notice,
@@ -149,6 +156,13 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
         ),
       ),
     );
+  }
+
+  /// El área la sugieren las reglas; la persona la cambia o la quita.
+  TaskDraft _withArea(TaskDraft d) {
+    if (d.isNote) return d;
+    final area = AreaSuggester.suggest(d.title, _areas, _history);
+    return area == null ? d : d.copyWith(area: () => area);
   }
 
   void _onEdited(CaptureDraftEdited event, Emitter<CaptureState> emit) {

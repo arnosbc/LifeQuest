@@ -44,19 +44,26 @@ void main() {
         ],
         xpBySkill: const [SkillXp('Salud', 60)],
       );
-      expect(b.observations, [
+      expect(b.observations.map((n) => n.text), [
         'Ganaste 40 XP más que la semana pasada. ¡Vas en subida!',
         'Tu mejor día fue el martes: 100 XP.',
         'Salud es el Área que más creció esta semana.',
       ]);
+      expect(b.observations.first.action, StatsAction.review);
+    });
+
+    test('la semana floja lleva a armar el día; la racha, a Hábitos', () {
+      final sinXp = const StatsBoard(bestStreak: 3).observations;
+      expect(sinXp.first.action, StatsAction.planDay);
+      expect(sinXp.last.action, StatsAction.habits);
     });
 
     test('sin actividad invitan sin culpa y siempre son 3 o menos', () {
       final notes = const StatsBoard().observations;
-      expect(notes.first, contains('una tarea pequeña basta'));
+      expect(notes.first.text, contains('una tarea pequeña basta'));
       expect(notes.length, lessThanOrEqualTo(3));
       for (final n in notes) {
-        expect(n.toLowerCase(), isNot(contains('perder')));
+        expect(n.text.toLowerCase(), isNot(contains('perder')));
       }
     });
   });

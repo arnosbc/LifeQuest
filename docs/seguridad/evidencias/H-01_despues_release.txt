@@ -1,0 +1,2 @@
+$ adb shell run-as com.example.proyecto_movil ls shared_prefs   # release v2.7.0 (después)
+run-as: package not debuggable: com.example.proyecto_movil

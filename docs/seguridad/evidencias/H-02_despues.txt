@@ -1,0 +1,3 @@
+$ adb shell dumpsys package com.example.proyecto_movil | findstr flags   # v2.7.0 (después)
+    versionName=2.7.0
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]

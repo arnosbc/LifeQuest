@@ -129,5 +129,13 @@ Principios:
 - **Foco:** prueba del paso (nota o foto opcional al marcarlo), «Dónde lo dejé» al cerrar (propone «Sigue: <siguiente paso>»), repaso al empezar con las notas y, con la IA, 1–3 preguntas (`recall`), y «Anotar distracción» a la Bandeja.
 - **Falta:** aplicar `045_resources.sql` en Supabase (crea el bucket y sus políticas), desplegar de nuevo la Edge Function `assistant` y probar en un teléfono. `shortcut:` al borrar una tarea, proyecto o meta, sus archivos quedan en Storage (las filas se borran por cascada).
 
+## Cierre para la entrega (v2.9.0, 2026-11-16)
+- **Área sugerida al crear:** `AreaSuggester` (reglas: el título nombra el área o comparte 2+ palabras con tareas anteriores de esa área); chip en «Anotar» que se cambia o se quita; se guarda con `p_skill_id`.
+- **Estadísticas que actúan:** cada observación lleva su botón (Armar mi día · Ir a Hábitos · Revisar semana); sale el rótulo «RPGenie».
+- **Hábitos con hora en la agenda (046):** `day_agenda` trae `habit_times`; Hoy los pone en la línea de tiempo con «Hecho» (`complete_habit`). `shortcut:` `PlanDay` no los esquiva (son un instante, como un recordatorio).
+- **Meta quieta (046):** `day_agenda` trae `stalled_goal` (sin tareas completadas en 7 días, creada hace más de 7) y Hoy invita a «Empezar foco» con su siguiente tarea o a «Ver meta» si no tiene.
+- **Historial dentro de «Tu semana»:** la Bitácora de la semana va plegada en la revisión (`JournalLog`, compuesto en `app/`); se borró la pantalla y la ruta `/journal`; en Tú el acceso se llama «Tu semana».
+- **Falta:** aplicar 037–046 en Supabase, redesplegar la Edge Function `assistant`, probar en un teléfono Android y generar el APK de release.
+
 ## Fuera de alcance
 Borrar las tablas económicas, push remoto (FCM), widget y acciones de notificación en iOS, sincronización con Google Calendar en la nube, traducción al inglés.

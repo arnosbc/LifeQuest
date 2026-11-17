@@ -1,5 +1,11 @@
 import 'package:equatable/equatable.dart';
 
+/// Qué puede hacer la persona desde una observación.
+enum StatsAction { planDay, habits, review }
+
+/// Observación con su acción opcional (el texto siempre va en tono de invitación).
+typedef StatsNote = ({String text, StatsAction? action});
+
 /// Estadísticas: últimos 7 días frente a los 7 anteriores (CLAUDE.md §13).
 class StatsBoard extends Equatable {
   const StatsBoard({
@@ -34,43 +40,59 @@ class StatsBoard extends Equatable {
 
   /// Las 3 observaciones del asistente (v1, por reglas). Siempre en tono de
   /// invitación: comparan con uno mismo, nunca culpan.
-  List<String> get observations {
-    final notes = <String>[];
+  /// Cada observación puede llevar a una acción real (`null` = solo texto).
+  List<StatsNote> get observations {
+    final notes = <StatsNote>[];
     if (xp > xpPrev) {
-      notes.add(
-        'Ganaste ${xp - xpPrev} XP más que la semana pasada. ¡Vas en subida!',
-      );
+      notes.add((
+        text:
+            'Ganaste ${xp - xpPrev} XP más que la semana pasada. ¡Vas en subida!',
+        action: StatsAction.review,
+      ));
     } else if (xp == 0) {
-      notes.add(
-        'Esta semana aún no hay XP: una tarea pequeña basta para arrancar.',
-      );
+      notes.add((
+        text: 'Esta semana aún no hay XP: una tarea pequeña basta para arrancar.',
+        action: StatsAction.planDay,
+      ));
     } else {
-      notes.add('Llevas $xp XP esta semana. Cada tarea cuenta, sin prisa.');
+      notes.add((
+        text: 'Llevas $xp XP esta semana. Cada tarea cuenta, sin prisa.',
+        action: StatsAction.planDay,
+      ));
     }
     final bestDay = xpByDay.isEmpty
         ? null
         : xpByDay.reduce((a, b) => b.xp > a.xp ? b : a);
     if (bestDay != null && bestDay.xp > 0) {
-      notes.add(
-        'Tu mejor día fue el ${_weekday(bestDay.day)}: ${bestDay.xp} XP.',
-      );
+      notes.add((
+        text: 'Tu mejor día fue el ${_weekday(bestDay.day)}: ${bestDay.xp} XP.',
+        action: null,
+      ));
     }
     if (xpBySkill.isNotEmpty) {
-      notes.add(
-        '${xpBySkill.first.name} es el Área que más creció esta semana.',
-      );
+      notes.add((
+        text: '${xpBySkill.first.name} es el Área que más creció esta semana.',
+        action: null,
+      ));
     } else if (topHabits.isNotEmpty) {
-      notes.add('${topHabits.first.name} es tu hábito más constante del mes.');
+      notes.add((
+        text: '${topHabits.first.name} es tu hábito más constante del mes.',
+        action: null,
+      ));
     }
     if (focusMinutes > 0 && notes.length < 3) {
-      notes.add('Pasaste $focusMinutes minutos en foco.');
+      notes.add((
+        text: 'Pasaste $focusMinutes minutos en foco.',
+        action: null,
+      ));
     }
     if (notes.length < 3) {
-      notes.add(
-        bestStreak > 0
+      notes.add((
+        text: bestStreak > 0
             ? 'Tu racha de $bestStreak días te está esperando.'
             : 'Un hábito bueno hoy enciende una racha nueva.',
-      );
+        action: StatsAction.habits,
+      ));
     }
     return notes.take(3).toList();
   }

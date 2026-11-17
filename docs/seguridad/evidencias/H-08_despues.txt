@@ -1,0 +1,3 @@
+$ apksigner verify --print-certs base.apk (instalado, v2.7.0)
+Signer #1 certificate DN: CN=Jhon Bermudez, OU=Programacion Movil, O=UNICESAR, L=Valledupar, ST=Cesar, C=CO
+Signer #1 certificate SHA-256 digest: 0db4794f760fe01aa70b97514b02a1acc07626a1250e94ee7d766f71b26252bf

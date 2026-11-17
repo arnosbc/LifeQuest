@@ -13,9 +13,13 @@ class TaskDraft extends Equatable {
     this.reminderMinutes,
     this.repeatRule,
     this.priority = 0,
+    this.area,
   });
 
   final String title;
+
+  /// Área (skill) sugerida o elegida; null = sin área.
+  final DraftArea? area;
 
   /// No es algo por hacer: va a la Bandeja.
   final bool isNote;
@@ -43,6 +47,7 @@ class TaskDraft extends Equatable {
     String? Function()? repeatRule,
     int? priority,
     bool? isReminder,
+    DraftArea? Function()? area,
   }) {
     final at = scheduledAt == null ? this.scheduledAt : scheduledAt();
     return TaskDraft(
@@ -63,6 +68,7 @@ class TaskDraft extends Equatable {
                 : reminderMinutes()),
       repeatRule: repeatRule == null ? this.repeatRule : repeatRule(),
       priority: priority ?? this.priority,
+      area: area == null ? this.area : area(),
     );
   }
 
@@ -77,7 +83,19 @@ class TaskDraft extends Equatable {
     reminderMinutes,
     repeatRule,
     priority,
+    area,
   ];
+}
+
+/// Área (skill) del usuario: lo que el asistente sugiere y el chip muestra.
+class DraftArea extends Equatable {
+  const DraftArea({required this.id, required this.name});
+
+  final String id;
+  final String name;
+
+  @override
+  List<Object?> get props => [id, name];
 }
 
 /// Paso de «Dividir en pasos» con su fecha (`DayPlanner.spreadDates`).

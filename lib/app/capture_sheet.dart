@@ -19,6 +19,8 @@ import 'package:proyecto_movil/features/stage/domain/usecases/create_goal.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/create_project.dart';
 import 'package:proyecto_movil/features/stage/domain/usecases/get_stage_board.dart';
 import 'package:proyecto_movil/features/stage/presentation/widgets/quick_add_sheets.dart';
+import 'package:proyecto_movil/features/tasks/domain/entities/task.dart';
+import 'package:proyecto_movil/features/tasks/domain/entities/tasks_board.dart';
 import 'package:proyecto_movil/features/tasks/domain/usecases/create_task.dart';
 import 'package:proyecto_movil/features/tasks/domain/usecases/get_tasks_board.dart';
 import 'package:proyecto_movil/features/tasks/presentation/widgets/create_task_sheet.dart';
@@ -34,17 +36,30 @@ Future<bool> openCaptureSheet(
   bool listen = false,
   String? sharedText,
 }) async {
+  // Áreas e historial para sugerir el área; si falla, la hoja sigue sin ellas.
+  final board = (await sl<GetTasksBoard>()(const NoParams())).getRight().toNullable();
+  final areas = [
+    for (final s in board?.skills ?? const <TaskLink>[])
+      DraftArea(id: s.id, name: s.name),
+  ];
+  final history = [
+    for (final t in board?.tasks ?? const <Task>[])
+      if (t.skillName case final name?) (title: t.title, areaName: name),
+  ];
+  if (!context.mounted) return false;
   final result = await showQuestlySheet<Object>(
     context,
     title: sharedText == null ? 'Crear' : 'Guardar lo compartido',
     child: BlocProvider(
-      create: (_) => sl<CaptureBloc>(),
+      create: (_) => sl<CaptureBloc>()
+        ..add(CaptureAreasLoaded(areas, history)),
       child: Builder(
         builder: (sheet) => CaptureView(
           startListening: listen,
           initialText: sharedText,
           preferInbox: sharedText != null,
           onOpenForm: (kind) => Navigator.pop(sheet, kind),
+          areas: areas,
         ),
       ),
     ),

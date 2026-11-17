@@ -60,7 +60,7 @@ void main() {
                 userName: 'Alex',
                 onOpenNotifications: () {},
                 onOpenHelp: () {},
-                onOpenJournal: () => journalOpened++,
+                onOpenReview: () => journalOpened++,
                 onOpenSettings: () => settingsOpened++,
                 onOpenStats: () => otherOpened++,
               ),
@@ -101,10 +101,10 @@ void main() {
     }
   });
 
-  testWidgets('3 accesos: Historial, Estadísticas y Ajustes', (tester) async {
+  testWidgets('3 accesos: Tu semana, Estadísticas y Ajustes', (tester) async {
     await pump(tester, const ProfileSuccess(profile));
 
-    await tester.tap(find.text('Historial'));
+    await tester.tap(find.text('Tu semana'));
     await tester.tap(find.text('Ajustes'));
     await tester.tap(find.text('Estadísticas'));
     expect((journalOpened, settingsOpened, otherOpened), (1, 1, 1));

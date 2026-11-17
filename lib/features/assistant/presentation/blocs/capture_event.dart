@@ -7,6 +7,17 @@ sealed class CaptureEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Áreas del usuario y su historial de tareas, para sugerir el área.
+class CaptureAreasLoaded extends CaptureEvent {
+  const CaptureAreasLoaded(this.areas, this.history);
+
+  final List<DraftArea> areas;
+  final List<({String title, String areaName})> history;
+
+  @override
+  List<Object?> get props => [areas, history];
+}
+
 /// Interpretar lo que el usuario escribió.
 class CaptureSubmitted extends CaptureEvent {
   const CaptureSubmitted(this.text);

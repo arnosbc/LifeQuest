@@ -84,6 +84,7 @@ class HomeScreen extends StatelessWidget {
           onConnectCalendar: () =>
               context.read<HomeBloc>().add(const HomeCalendarConnected()),
           onCreateTask: () => context.go(RoutePaths.tasks),
+          onOpenGoal: () => context.go(RoutePaths.stage),
           onOpenHabits: () => onNavigate(2),
           onCompleteHabit: (id) =>
               context.read<HomeBloc>().add(HomeHabitCompleted(id)),

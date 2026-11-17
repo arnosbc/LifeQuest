@@ -16,7 +16,11 @@ class CaptureView extends StatefulWidget {
     this.startListening = false,
     this.preferInbox = false,
     this.onOpenForm,
+    this.areas = const [],
   });
+
+  /// Áreas del usuario para cambiar la sugerida.
+  final List<DraftArea> areas;
 
   /// «Usar el formulario» del tipo elegido; lo compone app/.
   final ValueChanged<CaptureKind>? onOpenForm;
@@ -259,7 +263,7 @@ class _CaptureViewState extends State<CaptureView> {
           ),
           const SizedBox(height: 10),
         ],
-        if (chips.isEmpty)
+        if (chips.isEmpty && d.area == null)
           Text(
             'Sin fecha ni hora. Puedes ponérsela después.',
             style: QText.body(q.text2),
@@ -269,6 +273,25 @@ class _CaptureViewState extends State<CaptureView> {
             spacing: 8,
             runSpacing: 8,
             children: [
+              // Área sugerida: toca para cambiarla, la X la quita.
+              if (d.area case final area?)
+                PopupMenuButton<DraftArea>(
+                  enabled: !state.busy && widget.areas.isNotEmpty,
+                  tooltip: 'Cambiar área',
+                  onSelected: (a) => edit(d.copyWith(area: () => a)),
+                  itemBuilder: (_) => [
+                    for (final a in widget.areas)
+                      PopupMenuItem(value: a, child: Text(a.name)),
+                  ],
+                  child: InputChip(
+                    avatar: const Icon(Icons.folder_outlined, size: 18),
+                    label: Text(area.name),
+                    onDeleted: state.busy
+                        ? null
+                        : () => edit(d.copyWith(area: () => null)),
+                    deleteButtonTooltipMessage: 'Quitar área',
+                  ),
+                ),
               for (final (label, icon, remove) in chips)
                 InputChip(
                   avatar: Icon(icon, size: 18),

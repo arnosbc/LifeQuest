@@ -30,7 +30,7 @@ import 'package:proyecto_movil/features/habits/presentation/screens/habits_scree
 import 'package:proyecto_movil/features/home/presentation/blocs/home_bloc.dart';
 import 'package:proyecto_movil/features/home/presentation/screens/home_screen.dart';
 import 'package:proyecto_movil/features/journal/presentation/blocs/journal_bloc.dart';
-import 'package:proyecto_movil/features/journal/presentation/screens/journal_screen.dart';
+import 'package:proyecto_movil/features/journal/presentation/widgets/journal_log.dart';
 import 'package:proyecto_movil/features/review/presentation/blocs/review_bloc.dart';
 import 'package:proyecto_movil/features/review/presentation/screens/review_screen.dart';
 import 'package:proyecto_movil/features/tasks/presentation/blocs/tasks_bloc.dart';
@@ -47,6 +47,7 @@ import 'package:proyecto_movil/features/settings/presentation/blocs/settings_blo
 import 'package:proyecto_movil/features/settings/presentation/screens/settings_screen.dart';
 import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart';
 import 'package:proyecto_movil/features/stage/presentation/screens/stage_screen.dart';
+import 'package:proyecto_movil/features/stats/domain/entities/stats_board.dart';
 import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
 import 'package:proyecto_movil/features/stats/presentation/screens/stats_screen.dart';
 import 'package:proyecto_movil/injection_container.dart';
@@ -284,7 +285,7 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       onOpenNotifications: () =>
                           context.go(RoutePaths.notifications),
                       onOpenHelp: () => context.go(RoutePaths.help),
-                      onOpenJournal: () => context.push(RoutePaths.journal),
+                      onOpenReview: () => context.push(RoutePaths.review),
                       onOpenSettings: () => context.push(RoutePaths.settings),
                       onOpenStats: () => context.push(RoutePaths.stats),
                     ),
@@ -350,20 +351,19 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         ],
       ),
       _section(
-        RoutePaths.journal,
-        (context) => BlocProvider(
-          create: (_) => sl<JournalBloc>()..add(const JournalRequested()),
-          child: JournalScreen(
-            onOpenReview: () => context.push(RoutePaths.review),
-          ),
-        ),
-      ),
-      _section(
         RoutePaths.review,
-        (context) => BlocProvider(
-          create: (_) => sl<ReviewBloc>()..add(const ReviewRequested()),
+        (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => sl<ReviewBloc>()..add(const ReviewRequested()),
+            ),
+            BlocProvider(
+              create: (_) => sl<JournalBloc>()..add(const JournalRequested()),
+            ),
+          ],
           child: ReviewScreen(
             onOpenInbox: () => context.push(RoutePaths.brainDump),
+            history: (weekStart) => JournalLog(since: weekStart),
           ),
         ),
       ),
@@ -380,7 +380,13 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
         RoutePaths.stats,
         (context) => BlocProvider(
           create: (_) => sl<StatsBloc>()..add(const StatsRequested()),
-          child: const StatsScreen(),
+          child: StatsScreen(
+            onAction: (action) => switch (action) {
+              StatsAction.planDay => context.go(RoutePaths.home),
+              StatsAction.habits => context.go(RoutePaths.habits),
+              StatsAction.review => context.push(RoutePaths.review),
+            },
+          ),
         ),
       ),
     ],

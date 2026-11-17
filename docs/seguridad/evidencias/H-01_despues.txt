@@ -1,0 +1,11 @@
+$ adb shell run-as com.example.proyecto_movil cat shared_prefs/FlutterSharedPreferences.xml   # debug v2.7.0, con sesión iniciada (después)
+cat: shared_prefs/FlutterSharedPreferences.xml: No such file or directory
+
+$ ... | findstr auth-token
+(coincidencias: 0)
+
+$ adb shell run-as com.example.proyecto_movil cat shared_prefs/FlutterSecureStorage.xml   # almacén cifrado (valor recortado a 200 caracteres)
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIHNlY3VyZSBzdG9yYWdlCg_sb-admyvhbfxnitcwedywak-auth-token">BWxGgUf2wUGbYoXGdd6vf8APebRUUP3GwdME+LcUa+37Pb9r5wdzrIvWbSnyN6j2WHMdM7XbWS9C&#10;y6qaOEZF6N
+</map>

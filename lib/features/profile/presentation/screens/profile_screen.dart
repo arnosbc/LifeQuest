@@ -19,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
     required this.userName,
     required this.onOpenNotifications,
     required this.onOpenHelp,
-    required this.onOpenJournal,
+    required this.onOpenReview,
     required this.onOpenSettings,
     required this.onOpenStats,
   });
@@ -28,7 +28,7 @@ class ProfileScreen extends StatelessWidget {
   final String userName;
   final VoidCallback onOpenNotifications;
   final VoidCallback onOpenHelp;
-  final VoidCallback onOpenJournal;
+  final VoidCallback onOpenReview;
   final VoidCallback onOpenSettings;
   final VoidCallback onOpenStats;
 
@@ -141,9 +141,9 @@ class ProfileScreen extends StatelessWidget {
             children: [
               for (final link in [
                 ProfileQuickLink(
-                  icon: Icons.history_rounded,
-                  label: 'Historial',
-                  onTap: onOpenJournal,
+                  icon: Icons.fact_check_outlined,
+                  label: 'Tu semana',
+                  onTap: onOpenReview,
                 ),
                 ProfileQuickLink(
                   icon: Icons.insights_outlined,

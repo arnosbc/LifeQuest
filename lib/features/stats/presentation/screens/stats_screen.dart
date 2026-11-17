@@ -7,10 +7,13 @@ import 'package:proyecto_movil/core/widgets/widgets.dart';
 import 'package:proyecto_movil/features/stats/domain/entities/stats_board.dart';
 import 'package:proyecto_movil/features/stats/presentation/blocs/stats_bloc.dart';
 
-/// Estadísticas: la semana frente a la anterior. Pantalla de lectura;
-/// necesita un [StatsBloc] por encima.
+/// Estadísticas: la semana frente a la anterior; cada observación lleva a su
+/// acción. Necesita un [StatsBloc] por encima.
 class StatsScreen extends StatelessWidget {
-  const StatsScreen({super.key});
+  const StatsScreen({super.key, this.onAction});
+
+  /// Abre la pantalla de la acción; lo compone app/.
+  final ValueChanged<StatsAction>? onAction;
 
   @override
   Widget build(BuildContext context) => BlocConsumer<StatsBloc, StatsState>(
@@ -64,10 +67,23 @@ class StatsScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        const LifeQuestSectionHeading('RPGENIE OBSERVA'),
+        const LifeQuestSectionHeading('QUÉ PUEDES HACER'),
         const SizedBox(height: 7),
         for (final note in b.observations)
-          LifeQuestListRow(icon: Icons.auto_awesome, title: note, subtitle: ''),
+          if (note.action case final action? when onAction != null)
+            LifeQuestActionRow(
+              icon: Icons.lightbulb_outline,
+              title: note.text,
+              subtitle: '',
+              actionLabel: switch (action) {
+                StatsAction.planDay => 'Armar mi día',
+                StatsAction.habits => 'Ir a Hábitos',
+                StatsAction.review => 'Revisar semana',
+              },
+              onAction: () => onAction!(action),
+            )
+          else
+            LifeQuestListRow(title: note.text, subtitle: ''),
         const SizedBox(height: 14),
         const LifeQuestSectionHeading('XP POR DÍA'),
         const SizedBox(height: 7),

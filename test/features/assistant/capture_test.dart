@@ -180,6 +180,29 @@ void main() {
     );
 
     blocTest<CaptureBloc, CaptureState>(
+      'el área que nombra el título se sugiere en la vista previa',
+      setUp: () => givenStatus(AiStatus.off),
+      build: build,
+      act: (bloc) async {
+        bloc.add(
+          const CaptureAreasLoaded([
+            DraftArea(id: 's1', name: 'Salud'),
+            DraftArea(id: 's2', name: 'Estudio'),
+          ], []),
+        );
+        bloc.add(const CaptureSubmitted('salud: correr'));
+      },
+      skip: 1,
+      expect: () => [
+        isA<CapturePreview>().having(
+          (s) => s.draft.area,
+          'area',
+          const DraftArea(id: 's1', name: 'Salud'),
+        ),
+      ],
+    );
+
+    blocTest<CaptureBloc, CaptureState>(
       'meta: la IA escribe el S.M.A.R.T. y los pasos; se crea la meta con ellos',
       setUp: () {
         when(() => repo.planGoal(any())).thenAnswer(

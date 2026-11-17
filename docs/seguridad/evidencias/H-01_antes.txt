@@ -1,0 +1,5 @@
+$ adb shell run-as com.example.proyecto_movil cat shared_prefs/FlutterSharedPreferences.xml   # v2.5.0 (antes)
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="flutter.sb-admyvhbfxnitcwedywak-auth-token">{&quot;access_token&quot;:&quot;eyJ…[OCULTO]&quot;,&quot;expires_in&quot;:3600,&quot;expires_at&quot;:1793947709,&quot;refresh_token&quot;:&quot;[OCULTO]&quot;,&quot;token_type&quot;:&quot;bearer&quot;,&quot;provider_token&quot;:null,&quot;provider_refresh_token&quot;:null,&quot;user&quot;:{&quot;id&quot;:&quot;[uuid oculto]&quot;,&qu
+</map>

@@ -7,7 +7,10 @@ import 'package:proyecto_movil/features/review/presentation/blocs/review_bloc.da
 /// Cierre del día (y de la semana): lo que hiciste y, para cada pendiente, una decisión
 /// (pasar a la otra semana o soltarla). Necesita un [ReviewBloc] encima.
 class ReviewScreen extends StatelessWidget {
-  const ReviewScreen({super.key, this.onOpenInbox});
+  const ReviewScreen({super.key, this.onOpenInbox, this.history});
+
+  /// «Lo que hiciste» desde [weekStart] (la Bitácora); lo compone app/.
+  final Widget Function(DateTime weekStart)? history;
 
   /// Abre la Bandeja; al volver se relee la revisión.
   final Future<void> Function()? onOpenInbox;
@@ -60,6 +63,10 @@ class ReviewScreen extends StatelessWidget {
             ),
           ],
         ),
+        if (history case final build?) ...[
+          const SizedBox(height: 20),
+          build(r.weekStart),
+        ],
         if (r.inbox > 0 && onOpenInbox != null) ...[
           const SizedBox(height: 20),
           SheetRow(

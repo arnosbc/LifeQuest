@@ -27,7 +27,6 @@ abstract final class RoutePaths {
 
   // Subpáginas de Configuración.
   static const appearance = '/settings/appearance';
-  static const journal = '/journal';
   static const review = '/review';
   static const brainDump = '/brain-dump';
 
