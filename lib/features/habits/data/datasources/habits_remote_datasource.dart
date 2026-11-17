@@ -34,6 +34,9 @@ abstract class HabitsRemoteDataSource {
 
   /// `npc-mission` con `habit_id`: la IA arma el plan y lo guarda.
   Future<Map<String, dynamic>> generatePlan(String habitId);
+
+  /// `npc-mission` con `ideas: 'habits'`: 3 ideas, sin guardar nada.
+  Future<List<Map<String, dynamic>>> suggestHabits();
 }
 
 class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
@@ -147,6 +150,23 @@ class HabitsRemoteDataSourceImpl implements HabitsRemoteDataSource {
       return plan;
     } on FunctionException {
       throw const ServerException(code: 'plan_unavailable');
+    }
+  });
+
+  @override
+  Future<List<Map<String, dynamic>>> suggestHabits() => _guard(() async {
+    try {
+      final response = await _client.functions.invoke(
+        'npc-mission',
+        body: {'ideas': 'habits'},
+      );
+      final ideas = (response.data as Map?)?['ideas'];
+      if (ideas is! List || ideas.isEmpty) {
+        throw const ServerException(code: 'ideas_unavailable');
+      }
+      return ideas.cast<Map<String, dynamic>>();
+    } on FunctionException {
+      throw const ServerException(code: 'ideas_unavailable');
     }
   });
 

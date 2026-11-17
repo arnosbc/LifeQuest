@@ -2,11 +2,13 @@
 import { assertEquals } from 'jsr:@std/assert@1';
 import {
   buildHabitPrompt,
+  buildIdeasPrompt,
   buildPrompt,
   buildTaskPrompt,
   cleanTitle,
   formatGuide,
   parseGuide,
+  parseIdeas,
   parsePlan,
   parseReply,
   parseSuggestion,
@@ -112,4 +114,36 @@ Deno.test('parseGuide trae los minutos de cada paso, con tope y null si no son v
   }));
   assertEquals(guide?.minutes, [5, 120, null]);
   assertEquals(parseGuide(JSON.stringify({ steps: ['Uno'] }))?.minutes, [null]);
+});
+
+Deno.test('buildIdeasPrompt usa solo datos de la app y sirve sin datos', () => {
+  assertEquals(
+    buildIdeasPrompt({ identity: ' Alguien sano ', areas: ['Inglés'], habits: ['Leer'] }),
+    'Quién quiere ser: Alguien sano\nSus áreas: Inglés\nHábitos que ya tiene (no los repitas): Leer',
+  );
+  assertEquals(
+    buildIdeasPrompt({}),
+    'Aún no hay datos: propón hábitos de bienestar básicos y variados.',
+  );
+});
+
+Deno.test('parseIdeas: máximo 3, sin repetir los suyos, hora válida o null', () => {
+  const text = JSON.stringify({
+    ideas: [
+      { name: ' Leer ', why: 'Ya lo tienes', time: '21:00' },
+      { name: 'Caminar 10 minutos', why: 'Te despeja', time: '07:30' },
+      { name: 'Tomar agua al despertar', why: 'Te hidrata', time: '25:99' },
+      { name: '', why: 'vacío', time: '08:00' },
+      { name: 'caminar 10 minutos', why: 'repetida', time: '08:00' },
+      { name: 'Estirar 2 minutos', why: 'Menos tensión', time: '18:00' },
+      { name: 'Escribir 1 línea', why: 'sobra', time: '22:00' },
+    ],
+  });
+  assertEquals(parseIdeas(text, ['Leer']), [
+    { name: 'Caminar 10 minutos', why: 'Te despeja', time: '07:30' },
+    { name: 'Tomar agua al despertar', why: 'Te hidrata', time: null },
+    { name: 'Estirar 2 minutos', why: 'Menos tensión', time: '18:00' },
+  ]);
+  assertEquals(parseIdeas('no es json'), []);
+  assertEquals(parseIdeas('{"ideas":"x"}'), []);
 });

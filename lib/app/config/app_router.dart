@@ -211,7 +211,8 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                         create: (_) =>
                             sl<MissionsBloc>()..add(const MissionsRequested()),
                         child: MissionsScreen(
-                          onStartFocus: (id) => context.go(RoutePaths.focusOn(id)),
+                          onStartFocus: (id) =>
+                              context.go(RoutePaths.focusOn(id)),
                         ),
                       ),
                     ),
@@ -231,7 +232,11 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.habits,
                     onShown: (c) =>
                         c.read<HabitsBloc>().add(const HabitsRequested()),
-                    child: HabitsScreen(getPlan: sl(), generatePlan: sl()),
+                    child: HabitsScreen(
+                      getPlan: sl(),
+                      generatePlan: sl(),
+                      suggestHabits: sl(),
+                    ),
                   ),
                 ),
               ),

@@ -309,6 +309,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => SetGuidedSteps(sl()));
   sl.registerLazySingleton(() => GetHabitPlan(sl()));
   sl.registerLazySingleton(() => GenerateHabitPlan(sl()));
+  sl.registerLazySingleton(() => SuggestHabits(sl()));
   sl.registerLazySingleton(() => GenerateGuidedSteps(sl()));
   sl.registerLazySingleton(() => GetGuidedTask(sl()));
   sl.registerLazySingleton(() => ToggleGuidedStep(sl()));

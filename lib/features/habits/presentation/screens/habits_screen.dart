@@ -10,16 +10,25 @@ import 'package:proyecto_movil/features/habits/presentation/blocs/habits_bloc.da
 import 'package:proyecto_movil/features/habits/presentation/widgets/bad_habits_view.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/create_habit_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/good_habits_view.dart';
+import 'package:proyecto_movil/features/habits/presentation/widgets/habit_ideas_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_plan_sheet.dart';
 import 'package:proyecto_movil/features/habits/presentation/widgets/habit_time.dart';
 
 /// Hábitos. Necesita un [HabitsBloc] por encima (lo provee el router).
 class HabitsScreen extends StatefulWidget {
-  const HabitsScreen({super.key, this.getPlan, this.generatePlan});
+  const HabitsScreen({
+    super.key,
+    this.getPlan,
+    this.generatePlan,
+    this.suggestHabits,
+  });
 
   /// Plan de Nevi (065); sin ellos el menú no muestra la opción.
   final GetHabitPlan? getPlan;
   final GenerateHabitPlan? generatePlan;
+
+  /// «Ideas de Nevi»; sin él no se muestra el botón.
+  final SuggestHabits? suggestHabits;
 
   @override
   State<HabitsScreen> createState() => _HabitsScreenState();
@@ -167,6 +176,24 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 onPressed: idle ? () => _create(context, state) : null,
                 disabledReason: state.saving ? 'Creando hábito…' : null,
               ),
+              if (widget.suggestHabits case final suggest?) ...[
+                const SizedBox(height: QSpace.s),
+                QuestlyButton(
+                  label: 'Ideas de Nevi',
+                  icon: QIcons.spark,
+                  variant: QuestlyButtonVariant.tonal,
+                  onPressed: idle
+                      ? () async {
+                          final habit = await showHabitIdeasSheet(
+                            context,
+                            suggest,
+                          );
+                          if (habit != null) bloc.add(HabitCreated(habit));
+                        }
+                      : null,
+                  disabledReason: state.saving ? 'Creando hábito…' : null,
+                ),
+              ],
             ],
           ),
         ),

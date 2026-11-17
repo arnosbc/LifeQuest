@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:proyecto_movil/core/errors/exceptions.dart';
 import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/features/habits/data/datasources/habits_remote_datasource.dart';
+import 'package:proyecto_movil/features/habits/domain/entities/habit_idea.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habit_plan.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/habits_board.dart';
 import 'package:proyecto_movil/features/habits/domain/entities/new_habit.dart';
@@ -75,6 +76,19 @@ class HabitsRepositoryImpl implements HabitsRepository {
         (throw const ServerException(code: 'plan_unavailable')),
   );
 
+  @override
+  Future<Either<Failure, List<HabitIdea>>> suggestHabits() => _run(
+    () async => [
+      for (final i in await _remote.suggestHabits())
+        if (i['name'] case final String name when name.trim().isNotEmpty)
+          HabitIdea(
+            name: name.trim(),
+            why: (i['why'] as String? ?? '').trim(),
+            time: i['time'] as String?,
+          ),
+    ],
+  );
+
   static HabitPlan? _plan(Map<String, dynamic>? json) {
     String? text(String key) => switch (json?[key]) {
       final String s when s.trim().isNotEmpty => s.trim(),
@@ -110,6 +124,8 @@ class HabitsRepositoryImpl implements HabitsRepository {
     'already_completed' => 'Ese hábito ya quedó registrado hoy. ¡Bien hecho!',
     'not_scheduled' => 'Este hábito no toca hoy. Te espera su próximo día.',
     'habit_not_found' => 'No encontramos ese hábito. Desliza para actualizar.',
+    'ideas_unavailable' =>
+      'Nevi no pudo pensar ideas ahora. Inténtalo en un momento.',
     'plan_unavailable' || 'invalid_plan' =>
       'Nevi no pudo armar tu plan ahora. Inténtalo en un momento.',
     'invalid_day' =>
