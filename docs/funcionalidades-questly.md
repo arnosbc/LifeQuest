@@ -1,7 +1,7 @@
 # Questly: todas las funcionalidades y cómo se conectan
 
-> Referencia completa de lo que hace la app (rama `Remaked`, v2.9.0, 16 de noviembre de 2026). Sirve para recordar todo lo que tiene Questly, explicarlo sin olvidar nada y ver qué pieza alimenta a cuál.
-> El nombre visible es **Questly**; el repositorio y el paquete siguen llamándose LifeQuest.
+> Referencia completa de lo que hace la app (rama `Remaked`, v2.10.0, 19 de noviembre de 2026). Sirve para recordar todo lo que tiene Questly, explicarlo sin olvidar nada y ver qué pieza alimenta a cuál.
+> Desde la v2.10.0 la app se instala como **LifeQuest**, con el logo del calendario con check, y la mascota es una hoja de calendario. **Questly** sigue siendo el nombre del sistema de diseño en el código.
 
 ---
 
@@ -108,6 +108,19 @@ Cada ficha dice: **qué hace**, **cómo se usa**, **con qué se conecta** y **qu
   5. **Asistente con IA:** encenderlo ya o dejarlo para después, con su aviso de privacidad.
 - **Con qué se conecta:** la identidad y las áreas aparecen en **Tú**; la dificultad multiplica la XP de todo; la IA habilita las funciones inteligentes de **Crear** y **Foco**.
 - **Detrás:** `onboarding_overview`, `complete_onboarding` (015, marca `profiles.onboarded_at`). Mientras no se complete, el router lleva siempre al Onboarding.
+
+### 4.2 bis Guía de uso (primera vez)
+
+- **Qué hace:** al terminar el Onboarding, la primera vez que la app abre en **Hoy** aparece sola una guía de 6 pasos con la mascota. Cada paso tiene su ilustración, un texto corto, «1 de 6» y «Siguiente» (en el último, «¡Vamos!»):
+  1. **Hola, así funciona LifeQuest:** anotas, lo ves en tu día y lo cumples.
+  2. **Anota con el botón +:** escribes como hablas («llamar a mamá mañana 7pm») y la app entiende la fecha y la hora, y avisa.
+  3. **Hoy es tu agenda:** lo que toca hoy, por horas; marcar el círculo da XP.
+  4. **Hábitos y racha:** lo que haces cada día mantiene viva la racha.
+  5. **Foco para concentrarte:** temporizador sin distracciones, descansos automáticos.
+  6. **Tu progreso está en Tú:** nivel, historial y Ajustes (donde se pone el widget).
+- **Cómo se usa:** tocar fuera la cierra. Sale **una vez por cuenta**: otra cuenta en el mismo teléfono también la ve. Se repite desde **Ajustes → Guía de uso**.
+- **Con qué se conecta:** solo explica; son diálogos encima de la app y no cambian ningún flujo.
+- **Detrás:** `app/first_tour.dart` (`firstTourSteps`, `maybeShowFirstTour`, `showFirstTour`), lanzada desde `AppShell`; la marca `first_tour_seen_<id de usuario>` se guarda en el teléfono (`shared_preferences`). Ilustraciones en `assets/images/guia/`.
 
 ### 4.3 Hoy (la pestaña principal)
 
@@ -362,6 +375,8 @@ Siempre en **modo oscuro**, sin navegación extra y respetando la reducción de 
 | **Avisos** | Límite diario (sin límite por defecto), **ventana de silencio** (desde–hasta) y si los críticos pueden sonar dentro de ella |
 | **Descansos del foco** | Descanso corto, descanso largo y cada cuántos ciclos |
 | **Apariencia** | Tema claro / oscuro / del sistema y tamaño del texto |
+| **Guía de uso** | Vuelve a mostrar la guía de 6 pasos (§4.2 bis) |
+| **Widget de inicio** | Pide al teléfono poner el widget en la pantalla de inicio; si el launcher no lo permite, explica cómo hacerlo a mano (§4.17) |
 | **Cuenta** | Cerrar sesión (con confirmación) |
 
 - **Detrás:** `settings_overview` y un update directo de `game_master_settings` con checks de rango (016/033). La apariencia se guarda en el teléfono (`AppearanceBloc`, `shared_preferences`).
@@ -373,8 +388,27 @@ Siempre en **modo oscuro**, sin navegación extra y respetando la reducción de 
 | **Voz** | Micrófono en Hoy y en Crear: dictas, y al terminar la frase se interpreta sola, en el idioma del teléfono | `speech_to_text`, `VoiceInput` |
 | **Calendario** | Lee los eventos de hoy y mañana (con permiso explicado antes de pedirlo). Se ven en la agenda y «Armar mi día» los esquiva. Sin permiso todo funciona igual. No escribe en el calendario | `device_calendar_plus`, `core/calendar` |
 | **Compartir a Questly** | Un texto o enlace compartido desde Chrome, WhatsApp, etc. abre «Guardar lo compartido», con la Bandeja como acción principal. Si no hay sesión, espera a que la haya. Se corta a 500 caracteres | `receive_sharing_intent`, `app/share_intake.dart` |
-| **Widget de inicio** | Las próximas 3 tareas de hoy; «✓» la completa en segundo plano. Se actualiza cada vez que cambia Hoy y se vacía al cerrar sesión | `home_widget`, `QuestlyWidgetProvider.kt`, `app/home_widget_sync.dart` |
+| **Widget de inicio** | Ver la ficha de abajo | `home_widget`, `QuestlyWidgetProvider.kt`, `WidgetMood.kt`, `app/home_widget_sync.dart` |
 | **Notificaciones con acción** | Ver §4.14 | `flutter_local_notifications`, `app/background_boot.dart` |
+
+#### Widget de inicio (4×2)
+
+- **Qué muestra:** la mascota a la izquierda y, a la derecha, el logo LifeQuest, la **racha** («12 días»), una frase y una píldora con el **progreso de hoy** (tareas + hábitos). Fondo grafito con montañas. Tocarlo abre la app en Hoy.
+- **Ánimos de la mascota** (`WidgetMood.kt`, con su test JUnit):
+
+| Ánimo | Cuándo | Frase |
+|---|---|---|
+| Feliz | Todo lo de hoy está hecho | «¡Día completo!» |
+| Esperando | Día en curso (o sesión cerrada: «Toca para entrar») | «¡Tu día te espera!» / «¡Sigue así!» |
+| Preocupado | Faltan menos de 4 h para medianoche y queda algo | «Tu racha te espera»; la píldora muestra una **cuenta atrás** («Quedan 3:12:05») |
+| Triste | Ayer no se cumplió y la racha aún se puede salvar (48 h, §13 de CLAUDE.md) | «Aún puedes salvar tu racha» |
+| Dormido | 2 días o más sin abrir la app | «Toca para volver» |
+
+- **Píldora:** «Te faltan N» mientras queda algo; «N de M hechas hoy» al terminar. Se oculta si no hay nada para hoy.
+- **Cuándo se actualiza:** al cargar Hoy, **al salir de la app** (Hoy se recarga y lo creado en otras pestañas llega al widget) y cada **30 min** solo, para que el ánimo siga la hora. Lo guardado de un día anterior no se muestra como de hoy. Al cerrar sesión se vacía.
+- **Tono:** ninguna frase culpa (CLAUDE.md §7); la tristeza es suave y con esperanza.
+- **Detrás:** la app guarda `streak`, `done`, `total`, `saved_day`, `day_done` y `signed_in` con `HomeWidget.saveWidgetData` (`HomeWidgetSync.update`); el widget calcula el ánimo con esos datos y la hora del teléfono. Solo usa vistas permitidas en `RemoteViews`. Imágenes en `android/app/src/main/res/drawable-nodpi/` (`widget_mascot_*.png`).
+- **Nota:** el widget anterior mostraba las próximas 3 tareas con «✓»; el diseño nuevo no tiene la lista.
 
 ---
 
