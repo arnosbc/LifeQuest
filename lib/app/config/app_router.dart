@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:proyecto_movil/app/config/app_shell.dart';
 import 'package:proyecto_movil/app/config/route_paths.dart';
 import 'package:proyecto_movil/app/capture_sheet.dart';
+import 'package:proyecto_movil/app/first_tour.dart';
 import 'package:proyecto_movil/app/home_widget_sync.dart';
 import 'package:proyecto_movil/app/reminder_actions.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly_sheet.dart';
@@ -340,6 +341,7 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     context.read<AuthBloc>().add(const LogoutRequested()),
                 onOpenAppearance: () => context.push(RoutePaths.appearance),
                 onAddWidget: HomeWidgetSync.pin,
+                onOpenGuide: () => showFirstTour(context),
               ),
             ),
           ),

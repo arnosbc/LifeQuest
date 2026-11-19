@@ -17,6 +17,7 @@ class SettingsScreen extends StatelessWidget {
     required this.onSignOut,
     required this.onOpenAppearance,
     this.onAddWidget,
+    this.onOpenGuide,
   });
 
   final String userName;
@@ -32,6 +33,9 @@ class SettingsScreen extends StatelessWidget {
   /// Pide al teléfono poner el widget en el inicio. Devuelve false si el
   /// launcher no lo permite. Lo provee la app (el widget vive en app/).
   final Future<bool> Function()? onAddWidget;
+
+  /// Vuelve a mostrar la guía de uso. Lo provee la app (la guía vive en app/).
+  final VoidCallback? onOpenGuide;
 
   @override
   Widget build(
@@ -85,6 +89,13 @@ class SettingsScreen extends StatelessWidget {
           description: 'Modo claro, oscuro o del sistema.',
           onTap: onOpenAppearance,
         ),
+        if (onOpenGuide case final openGuide?)
+          SettingLink(
+            icon: Icons.menu_book_outlined,
+            title: 'Guía de uso',
+            description: 'Cómo anotar, organizar tu día y usar Foco.',
+            onTap: openGuide,
+          ),
         if (onAddWidget case final addWidget?)
           SettingLink(
             icon: Icons.widgets_outlined,

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:proyecto_movil/app/capture_sheet.dart';
+import 'package:proyecto_movil/app/first_tour.dart';
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 
 /// Barra de navegación inferior. Cada pestaña es una rama del router que
@@ -15,6 +16,10 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = context.q;
+    // Guía de uso la primera vez de cada cuenta (ella decide si toca).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) maybeShowFirstTour(context);
+    });
     // Iconos de las barras del sistema legibles sobre el fondo de cada tema.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: (q.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)

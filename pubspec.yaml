@@ -87,6 +87,10 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # Ilustraciones de la guía de uso (lib/app/first_tour.dart).
+  assets:
+    - assets/images/guia/
+
   # Archivo empaquetada (assets/fonts, licencia OFL): sin descarga en runtime.
   fonts:
     - family: Archivo
