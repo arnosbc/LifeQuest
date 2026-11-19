@@ -16,6 +16,7 @@ class SettingsScreen extends StatelessWidget {
     required this.onBack,
     required this.onSignOut,
     required this.onOpenAppearance,
+    this.onAddWidget,
   });
 
   final String userName;
@@ -27,6 +28,10 @@ class SettingsScreen extends StatelessWidget {
 
   /// Abre la pantalla de Apariencia (modo claro, oscuro o del sistema).
   final VoidCallback onOpenAppearance;
+
+  /// Pide al teléfono poner el widget en el inicio. Devuelve false si el
+  /// launcher no lo permite. Lo provee la app (el widget vive en app/).
+  final Future<bool> Function()? onAddWidget;
 
   @override
   Widget build(
@@ -80,6 +85,20 @@ class SettingsScreen extends StatelessWidget {
           description: 'Modo claro, oscuro o del sistema.',
           onTap: onOpenAppearance,
         ),
+        if (onAddWidget case final addWidget?)
+          SettingLink(
+            icon: Icons.widgets_outlined,
+            title: 'Widget de inicio',
+            description: 'Tu racha y tus tareas de hoy en la pantalla de inicio.',
+            onTap: () async {
+              if (await addWidget() || !context.mounted) return;
+              showLifeQuestMessage(
+                context,
+                'Tu teléfono no permite añadirlo desde aquí. Mantén presionado '
+                'el inicio, toca Widgets y elige LifeQuest.',
+              );
+            },
+          ),
         SettingLink(
           icon: Icons.shopping_bag_outlined,
           title: 'Contenido de la Tienda',

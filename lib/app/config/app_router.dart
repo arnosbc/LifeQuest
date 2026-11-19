@@ -127,6 +127,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                     path: RoutePaths.home,
                     onShown: (c) =>
                         c.read<HomeBloc>().add(const HomeRequested()),
+                    // Lo creado o hecho en otras pestañas llega al widget al
+                    // salir de la app (el listener de abajo lo guarda).
+                    onHidden: (c) =>
+                        c.read<HomeBloc>().add(const HomeRequested()),
                     // La agenda cambió: reprograma los avisos.
                     child: MultiBlocListener(
                       listeners: [
@@ -335,6 +339,7 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                 onSignOut: () =>
                     context.read<AuthBloc>().add(const LogoutRequested()),
                 onOpenAppearance: () => context.push(RoutePaths.appearance),
+                onAddWidget: HomeWidgetSync.pin,
               ),
             ),
           ),
@@ -447,6 +452,7 @@ class _ReloadOnShow extends StatefulWidget {
     required this.path,
     required this.onShown,
     required this.child,
+    this.onHidden,
   });
 
   final ValueListenable<String> location;
@@ -454,15 +460,27 @@ class _ReloadOnShow extends StatefulWidget {
   final void Function(BuildContext context) onShown;
   final Widget child;
 
+  /// Al salir de la app (pasa a segundo plano).
+  final void Function(BuildContext context)? onHidden;
+
   @override
   State<_ReloadOnShow> createState() => _ReloadOnShowState();
 }
 
 class _ReloadOnShowState extends State<_ReloadOnShow> {
+  AppLifecycleListener? _lifecycle;
+
   @override
   void initState() {
     super.initState();
     widget.location.addListener(_onLocation);
+    if (widget.onHidden case final onHidden?) {
+      _lifecycle = AppLifecycleListener(
+        onHide: () {
+          if (mounted) onHidden(context);
+        },
+      );
+    }
   }
 
   void _onLocation() {
@@ -474,6 +492,7 @@ class _ReloadOnShowState extends State<_ReloadOnShow> {
   @override
   void dispose() {
     widget.location.removeListener(_onLocation);
+    _lifecycle?.dispose();
     super.dispose();
   }
 

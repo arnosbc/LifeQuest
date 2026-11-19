@@ -1,119 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Widget de inicio: mascota a la izquierda; a la derecha logo, racha,
+     frase y progreso de tareas de hoy. Tocarlo abre la app. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/questly_widget_bg"
-    android:orientation="vertical"
-    android:padding="14dp">
-    <TextView
+    android:background="@drawable/questly_widget_bg">
+
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hoy"
-        android:textColor="#DC2626"
-        android:textSize="13sp"
-        android:textStyle="bold" />
-    <TextView
-        android:id="@+id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:text="Abre Questly para ver tus tareas."
-        android:textColor="#71717A"
-        android:textSize="14sp" />
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="2dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:maxWidth="230dp"
+        android:src="@drawable/widget_mountains" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/mascot"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.44"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:src="@drawable/widget_mascot_waiting" />
+
         <LinearLayout
-            android:id="@+id/row0"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/row0_time"
-                android:layout_width="48dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.56"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="6dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_logo" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#71717A"
-                android:textSize="13sp" />
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/widget_flame" />
+
+                <TextView
+                    android:id="@+id/streak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="0 días"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- ImageView y no View: RemoteViews no permite View sin más. -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="#66FFFFFF"
+                android:importantForAccessibility="no" />
+
             <TextView
-                android:id="@+id/row0_title"
-                android:layout_width="0dp"
+                android:id="@+id/phrase"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#18181B"
-                android:textSize="15sp" />
-            <TextView
-                android:id="@+id/row0_done"
-                android:layout_width="48dp"
-                android:layout_height="44dp"
-                android:gravity="center"
-                android:text="✓"
-                android:textColor="#18181B"
-                android:textSize="20sp" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/row1"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/row1_time"
-                android:layout_width="48dp"
+                android:text="¡Tu día te espera!"
+                android:textColor="#F2F0EB"
+                android:textSize="16sp"
+                android:textStyle="italic" />
+
+            <LinearLayout
+                android:id="@+id/progress_pill"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#71717A"
-                android:textSize="13sp" />
-            <TextView
-                android:id="@+id/row1_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#18181B"
-                android:textSize="15sp" />
-            <TextView
-                android:id="@+id/row1_done"
-                android:layout_width="48dp"
-                android:layout_height="44dp"
-                android:gravity="center"
-                android:text="✓"
-                android:textColor="#18181B"
-                android:textSize="20sp" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/row2"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/row2_time"
-                android:layout_width="48dp"
-                android:layout_height="wrap_content"
-                android:textColor="#71717A"
-                android:textSize="13sp" />
-            <TextView
-                android:id="@+id/row2_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#18181B"
-                android:textSize="15sp" />
-            <TextView
-                android:id="@+id/row2_done"
-                android:layout_width="48dp"
-                android:layout_height="44dp"
-                android:gravity="center"
-                android:text="✓"
-                android:textColor="#18181B"
-                android:textSize="20sp" />
+                android:layout_marginTop="6dp"
+                android:background="@drawable/questly_widget_pill"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingTop="7dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp">
+
+                <ProgressBar
+                    android:id="@+id/progress"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="9dp"
+                    android:layout_weight="1"
+                    android:max="1"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/questly_widget_progress" />
+
+                <TextView
+                    android:id="@+id/progress_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:maxLines="1"
+                    android:text="0 de 0 hechas hoy"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <!-- Cuenta atrás hasta medianoche cuando la mascota se preocupa. -->
+                <Chronometer
+                    android:id="@+id/countdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:visibility="gone" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>
