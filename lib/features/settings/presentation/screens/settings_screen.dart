@@ -46,7 +46,7 @@ class SettingsScreen extends StatelessWidget {
         showLifeQuestMessage(context, (state as SettingsSuccess).message!),
     builder: (context, state) => LifeQuestPage(
       title: 'Ajustes',
-      subtitle: 'Cómo funciona Questly para ti.',
+      subtitle: 'Cómo funciona LifeQuest para ti.',
       trailing: IconButton(
         onPressed: onBack,
         tooltip: 'Volver al perfil',
