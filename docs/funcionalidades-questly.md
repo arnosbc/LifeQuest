@@ -1,7 +1,7 @@
 # Questly: todas las funcionalidades y cómo se conectan
 
 > Referencia completa de lo que hace la app (rama `Remaked`, v2.10.0, 19 de noviembre de 2026). Sirve para recordar todo lo que tiene Questly, explicarlo sin olvidar nada y ver qué pieza alimenta a cuál.
-> Desde la v2.10.0 la app se instala como **LifeQuest**, con el logo del calendario con check, y la mascota es una hoja de calendario. **Questly** sigue siendo el nombre del sistema de diseño en el código.
+> Desde la v2.10.0 la app lleva el logo del calendario con check y la mascota es una hoja de calendario. Desde el 2026-11-21 se instala como **Questly**; el repo y el paquete siguen llamándose LifeQuest.
 
 ---
 
@@ -112,7 +112,7 @@ Cada ficha dice: **qué hace**, **cómo se usa**, **con qué se conecta** y **qu
 ### 4.2 bis Guía de uso (primera vez)
 
 - **Qué hace:** al terminar el Onboarding, la primera vez que la app abre en **Hoy** aparece sola una guía de 6 pasos con la mascota. Cada paso tiene su ilustración, un texto corto, «1 de 6» y «Siguiente» (en el último, «¡Vamos!»):
-  1. **Hola, así funciona LifeQuest:** anotas, lo ves en tu día y lo cumples.
+  1. **Hola, así funciona Questly:** anotas, lo ves en tu día y lo cumples.
   2. **Anota con el botón +:** escribes como hablas («llamar a mamá mañana 7pm») y la app entiende la fecha y la hora, y avisa.
   3. **Hoy es tu agenda:** lo que toca hoy, por horas; marcar el círculo da XP.
   4. **Hábitos y racha:** lo que haces cada día mantiene viva la racha.
@@ -393,7 +393,7 @@ Siempre en **modo oscuro**, sin navegación extra y respetando la reducción de 
 
 #### Widget de inicio (4×2)
 
-- **Qué muestra:** la mascota a la izquierda y, a la derecha, el logo LifeQuest, la **racha** («12 días»), una frase y una píldora con el **progreso de hoy** (tareas + hábitos). Fondo grafito con montañas. Tocarlo abre la app en Hoy.
+- **Qué muestra:** la mascota a la izquierda y, a la derecha, el logo Questly, la **racha** («12 días»), una frase y una píldora con el **progreso de hoy** (tareas + hábitos). Fondo grafito con montañas. Tocarlo abre la app en Hoy.
 - **Ánimos de la mascota** (`WidgetMood.kt`, con su test JUnit):
 
 | Ánimo | Cuándo | Frase |
@@ -529,7 +529,7 @@ Los nombres nuevos son **Hoy · Tareas · Hábitos · Foco · Tú**, Bandeja (an
 **Detalles visibles que quedan del diseño anterior:**
 
 - [ ] Ajustes → «Contenido de la Tienda» todavía aparece (solo dice «próximamente»): conviene quitarlo.
-- [ ] El Onboarding dice «Bienvenido a LifeQuest»: debería decir Questly.
+- [x] El Onboarding dice «Bienvenido a Questly».
 - [ ] Botones «Google» y «Apple» en el inicio de sesión que aún no funcionan.
 - [ ] Ayuda: preguntas frecuentes fijas; revisar que no prometan tiempos de respuesta.
 

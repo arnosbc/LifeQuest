@@ -1,6 +1,6 @@
-# CLAUDE.md — LifeQuest
+# CLAUDE.md — Questly
 
-Instrucciones de contexto para trabajar en **LifeQuest**, una app móvil de productividad gamificada. Léelo completo antes de diseñar, codificar o modificar documentación del proyecto.
+Instrucciones de contexto para trabajar en **Questly** (repo y paquete: LifeQuest), una app móvil de productividad gamificada. Léelo completo antes de diseñar, codificar o modificar documentación del proyecto.
 
 > **Idioma:** toda la documentación, los comentarios de dominio y los textos de la interfaz van en **español**. Los identificadores de código y de base de datos (tablas, columnas, enums, funciones) van en **inglés** y en `snake_case` para SQL.
 
@@ -20,13 +20,13 @@ El tutor rechazó la versión RPG: crear una tarea (manual o con IA) solo guarda
 
 ---
 
-## 1. Qué es LifeQuest
+## 1. Qué es Questly
 
 App móvil que convierte tareas, hábitos, proyectos y metas reales en misiones de un RPG: **el progreso real del usuario hace progresar a su personaje.**
 
 - **Problema que resuelve:** la brecha entre intención y acción. Las tareas grandes no tienen punto de entrada, falta feedback inmediato, organizar pendientes produce fatiga de decisión y romper una racha dispara el pensamiento todo-o-nada.
 - **Usuario:** una sola persona. No hay modo cooperativo, gremios ni ranking social en esta fase.
-- **Nombres provisionales:** LifeQuest (nombre del proyecto), Questly, LevelUp.
+- **Nombre:** **Questly** es el nombre visible de la app (desde 2026-11-21). El repo, el paquete y el Project de claude.ai siguen como LifeQuest.
 - **Monetización prevista:** freemium. El premium futuro incluiría más de 6 skills, estadísticas avanzadas y RPGenie avanzado.
 
 ### Ciclo principal
