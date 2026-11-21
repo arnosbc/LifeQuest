@@ -46,7 +46,7 @@ class SettingsScreen extends StatelessWidget {
         showLifeQuestMessage(context, (state as SettingsSuccess).message!),
     builder: (context, state) => LifeQuestPage(
       title: 'Ajustes',
-      subtitle: 'Cómo funciona LifeQuest para ti.',
+      subtitle: 'Cómo funciona Questl para ti.',
       trailing: IconButton(
         onPressed: onBack,
         tooltip: 'Volver al perfil',
@@ -106,7 +106,7 @@ class SettingsScreen extends StatelessWidget {
               showLifeQuestMessage(
                 context,
                 'Tu teléfono no permite añadirlo desde aquí. Mantén presionado '
-                'el inicio, toca Widgets y elige LifeQuest.',
+                'el inicio, toca Widgets y elige Questl.',
               );
             },
           ),

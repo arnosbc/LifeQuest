@@ -13,7 +13,7 @@ class WelcomeStep extends StatelessWidget {
   Widget build(BuildContext context) => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      _Title('Bienvenido a LifeQuest'),
+      _Title('Bienvenido a Questl'),
       _Body('Lo que cumples en tu día se convierte en progreso visible.'),
       SizedBox(height: 20),
       LifeQuestSurface(

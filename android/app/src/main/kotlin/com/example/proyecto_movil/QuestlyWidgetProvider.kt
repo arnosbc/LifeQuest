@@ -89,7 +89,7 @@ class QuestlyWidgetProvider : HomeWidgetProvider() {
                 setChronometerCountDown(R.id.countdown, true)
                 setContentDescription(
                     R.id.widget_container,
-                    "LifeQuest. Racha de $streak días. $phrase. $done de $total hechas hoy.",
+                    "Questl. Racha de $streak días. $phrase. $done de $total hechas hoy.",
                 )
             }
             appWidgetManager.updateAppWidget(widgetId, views)
