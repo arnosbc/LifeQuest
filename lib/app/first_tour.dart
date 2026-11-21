@@ -9,14 +9,14 @@ import 'package:proyecto_movil/core/widgets/questly/questly.dart';
 const firstTourSteps = [
   (
     'assets/images/guia/guia_hola.png',
-    'Hola, así funciona Questl',
+    'Hola, así funciona Questly',
     'Anotas lo que tienes que hacer, lo ves en tu día y lo cumples. '
         'Te muestro lo básico en 6 pasos.',
   ),
   (
     'assets/images/guia/guia_anotar.png',
     'Anota con el botón +',
-    'Escribe como hablas: «llamar a mamá mañana 7pm». Questl entiende '
+    'Escribe como hablas: «llamar a mamá mañana 7pm». Questly entiende '
         'la fecha y la hora, y te avisa a tiempo.',
   ),
   (

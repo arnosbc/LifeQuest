@@ -127,7 +127,7 @@ class _AppState extends State<App> {
     child: BlocBuilder<AppearanceBloc, AppearanceState>(
       buildWhen: (a, b) => a.theme != b.theme,
       builder: (context, state) => MaterialApp.router(
-        title: 'Questl',
+        title: 'Questly',
         debugShowCheckedModeBanner: false,
         theme: LifeQuestTheme.light,
         darkTheme: LifeQuestTheme.dark,

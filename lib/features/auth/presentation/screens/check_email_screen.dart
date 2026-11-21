@@ -24,7 +24,7 @@ class CheckEmailScreen extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
     children: [
       Text(
-        'Questl',
+        'Questly',
         style: TextStyle(
           color: context.lq.deepGreen,
           fontSize: 16,

@@ -20,7 +20,7 @@ class LoginBrandHeader extends StatelessWidget {
       ),
       const SizedBox(height: 7),
       Text(
-        'Questl',
+        'Questly',
         style: TextStyle(
           color: context.lq.ink,
           fontSize: 19,

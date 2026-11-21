@@ -57,7 +57,7 @@ class TermsCheckbox extends FormField<bool> {
                       builder: (context) => AlertDialog(
                         title: const Text('Términos y condiciones'),
                         content: const Text(
-                          'Al crear tu cuenta, aceptas usar Questl de forma responsable.',
+                          'Al crear tu cuenta, aceptas usar Questly de forma responsable.',
                         ),
                         actions: [
                           TextButton(
