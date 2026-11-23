@@ -43,11 +43,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       'day_agenda',
       params: params,
     );
-    return HomeDashboardModel.fromJson({
-      ...json,
-      'agenda': agenda,
-      'day': day,
-    });
+    return HomeDashboardModel.fromJson({...json, 'agenda': agenda, 'day': day});
   });
 
   @override

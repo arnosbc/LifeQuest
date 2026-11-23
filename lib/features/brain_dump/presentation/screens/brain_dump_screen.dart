@@ -37,6 +37,8 @@ class _BrainDumpScreenState extends State<BrainDumpScreen> {
   Future<void> _diagnose(BrainDumpBloc bloc, Thought thought) async {
     final outcome = await showModalBottomSheet<GtdOutcome>(
       context: context,
+      // Encima de la barra y del botón «+», que tapaban los botones de abajo.
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,

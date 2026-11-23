@@ -71,32 +71,39 @@ abstract final class TasksFormat {
   static String origin(Task task) =>
       task.goalTitle ?? task.projectTitle ?? task.skillName ?? 'Tarea libre';
 
-  /// "Hoy · 18:00", "Mañana · 09:30", "12 oct · 18:00" o, si ya pasó,
-  /// "Pendiente desde el 12 oct" (sin culpa, solo el dato).
-  /// "18:30", o vacío si no tiene fecha.
-  static String time(DateTime? due) => due == null
-      ? ''
-      : '${due.hour.toString().padLeft(2, '0')}:'
-            '${due.minute.toString().padLeft(2, '0')}';
+  /// "18:30", o vacío si no tiene fecha u hora (solo día).
+  static String time(DateTime? due) => _hhmm(due) ?? '';
 
+  /// "Hoy · 18:00", "Mañana · 09:30", "12 oct · 18:00" o, si ya pasó,
+  /// "Pendiente desde el 12 oct" (sin culpa, solo el dato). Sin hora, solo
+  /// el día: "Hoy", "Mañana", "12 oct".
   static String due(DateTime? due, DateTime now) {
     if (due == null) return 'Sin fecha límite';
     // En UTC para que un cambio de horario no altere la resta de días.
     final day = DateTime.utc(due.year, due.month, due.day);
     final today = DateTime.utc(now.year, now.month, now.day);
-    final time =
-        '${due.hour.toString().padLeft(2, '0')}:'
-        '${due.minute.toString().padLeft(2, '0')}';
+    final time = switch (_hhmm(due)) {
+      final t? => ' · $t',
+      null => '',
+    };
     final date = '${due.day} ${_months[due.month - 1]}';
     if (due.isBefore(now)) {
-      return day == today ? 'Era para hoy · $time' : 'Pendiente desde el $date';
+      return day == today ? 'Era para hoy$time' : 'Pendiente desde el $date';
     }
     return switch (day.difference(today).inDays) {
-      0 => 'Hoy · $time',
-      1 => 'Mañana · $time',
-      _ => '$date · $time',
+      0 => 'Hoy$time',
+      1 => 'Mañana$time',
+      _ => '$date$time',
     };
   }
+
+  /// "18:30"; null sin fecha o si es 23:59, la hora interna de una tarea
+  /// que solo tiene día («vence hoy»).
+  static String? _hhmm(DateTime? t) =>
+      t == null || (t.hour == 23 && t.minute == 59)
+      ? null
+      : '${t.hour.toString().padLeft(2, '0')}:'
+            '${t.minute.toString().padLeft(2, '0')}';
 
   /// Vista previa de la regla del servidor (`_task_xp`, migración 005):
   /// 10 base, +10 título de 5 palabras o más, +10 alta / +5 media,

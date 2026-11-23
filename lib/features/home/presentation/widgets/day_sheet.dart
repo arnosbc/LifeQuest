@@ -221,7 +221,16 @@ class DaySheet extends StatelessWidget {
           else
             SheetRow(
               current: true,
-              time: _time(task.dueDate),
+              // La hora de su bloque en la agenda; si solo tiene fecha, nada
+              // (23:59 es la hora interna de «vence hoy»).
+              time: _time(
+                d.agenda.where((b) => b.id == task.id).firstOrNull?.start ??
+                    switch (task.dueDate) {
+                      final due? when due.hour == 23 && due.minute == 59 =>
+                        null,
+                      final due => due,
+                    },
+              ),
               title: task.title,
               subtitle: '+${task.xpReward} XP',
               action: SheetPill(
@@ -326,7 +335,7 @@ class DaySheet extends StatelessWidget {
   static String _greeting(DateTime now, String? name) {
     final hello = switch (now.hour) {
       < 12 => 'Buenos días',
-      < 20 => 'Buenas tardes',
+      < 18 => 'Buenas tardes', // En Colombia oscurece hacia las 6 p. m.
       _ => 'Buenas noches',
     };
     final first = name?.trim().split(' ').first ?? '';

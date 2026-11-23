@@ -153,10 +153,8 @@ class _ResourcesView extends StatelessWidget {
     final q = context.q;
     return BlocConsumer<ResourcesBloc, ResourcesState>(
       listenWhen: (a, b) => b.toOpen != null && a.toOpen != b.toOpen,
-      listener: (_, s) => launchUrl(
-        Uri.parse(s.toOpen!),
-        mode: LaunchMode.externalApplication,
-      ),
+      listener: (_, s) =>
+          launchUrl(Uri.parse(s.toOpen!), mode: LaunchMode.externalApplication),
       builder: (context, s) {
         final bloc = context.read<ResourcesBloc>();
         return Column(
@@ -200,7 +198,10 @@ class _ResourcesView extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text('«${r.title}» quitado', style: QText.meta(q.text2)),
+                      child: Text(
+                        '«${r.title}» quitado',
+                        style: QText.meta(q.text2),
+                      ),
                     ),
                     TextButton(
                       onPressed: () => bloc.add(const ResourceRemoveUndone()),

@@ -67,6 +67,8 @@ class StageScreen extends StatelessWidget {
     final bloc = context.read<StageBloc>();
     Future<T?> sheet<T>(Widget child) => showModalBottomSheet<T>(
       context: context,
+      // Encima de la barra y del botón «+», que tapaban los botones de abajo.
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,

@@ -5,15 +5,18 @@ import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 
 /// Abre una hoja inferior con tirador, título y cierre visible. Devuelve lo
-/// que se pase a `Navigator.pop`.
+/// que se pase a `Navigator.pop`. Se abre sobre toda la app (encima de la
+/// barra y del botón «+») con el tema de quien la abre (Foco es oscuro).
 Future<T?> showQuestlySheet<T>(
   BuildContext context, {
   required String title,
   required Widget child,
 }) {
   final q = context.q;
+  final theme = Theme.of(context);
   return showModalBottomSheet<T>(
     context: context,
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
@@ -27,7 +30,10 @@ Future<T?> showQuestlySheet<T>(
       reverseDuration: context.motion(QMotion.fade),
       curve: QMotion.drawer,
     ),
-    builder: (_) => QuestlySheet(title: title, child: child),
+    builder: (_) => Theme(
+      data: theme,
+      child: QuestlySheet(title: title, child: child),
+    ),
   );
 }
 
