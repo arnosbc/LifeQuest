@@ -2,9 +2,9 @@
 
 Questly es una app de productividad para Android. Capturas lo que tienes en mente y la app lo convierte en un día que avanza: lo pone en tu agenda, te avisa a tiempo, mide el tiempo que trabajas y te ayuda a cerrar lo pendiente. Lo que cumples suma XP, sube tu nivel y mantiene tu racha.
 
-> El repositorio y el paquete se llaman **LifeQuest** (`proyecto_movil`); el nombre visible de la app es **Questly**.
+> El repositorio es `arnosbc/Questly-app` (antes LifeQuest) y el paquete Dart sigue llamándose `proyecto_movil`; el nombre visible de la app es **Questly**.
 
-**Descargar:** [última versión del APK](https://github.com/arnosbc/LifeQuest/releases/latest) · página de presentación en [`landing/`](landing/).
+**Descargar:** [última versión del APK](https://github.com/arnosbc/Questly-app/releases/latest) · página de presentación en [`landing/`](landing/).
 
 ---
 
@@ -88,8 +88,8 @@ Reglas de arquitectura: `domain` no importa Flutter ni Supabase; `presentation` 
 ### 2. Clonar e instalar
 
 ```bash
-git clone https://github.com/arnosbc/LifeQuest.git
-cd LifeQuest
+git clone https://github.com/arnosbc/Questly-app.git
+cd Questly-app
 git checkout Remaked
 flutter pub get
 ```
@@ -166,7 +166,7 @@ Las pruebas SQL comprueban comportamiento, no solo sintaxis: límites, unicidad,
 3. En GitHub → **Releases → Draft a new release**: etiqueta `vX.Y.Z`, título `Questly X.Y.Z`, adjunta el APK y publica.
 4. Actualiza `VERSION` y `APK_SIZE` al inicio de `landing/src/pages/index.astro` para que el botón de descarga apunte al nuevo APK.
 
-Enlace directo para compartir: `https://github.com/arnosbc/LifeQuest/releases/download/vX.Y.Z/Questly-X.Y.Z.apk`.
+Enlace directo para compartir: `https://github.com/arnosbc/Questly-app/releases/download/vX.Y.Z/Questly-X.Y.Z.apk`.
 
 ---
 
