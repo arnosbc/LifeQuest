@@ -1,0 +1,9 @@
+# En Netlify: Base directory = landing. Plan gratis, sin tarjeta vinculada.
+[build]
+  command = "npm run build"
+  publish = "dist"
+  # No compila si el commit no toca landing/ (ahorra minutos del plan gratis).
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ."
+
+[build.environment]
+  NODE_VERSION = "22"

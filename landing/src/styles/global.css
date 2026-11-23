@@ -1,0 +1,54 @@
+/* Tokens de docs/diseño/DESIGN.md («Calendario de taco»). */
+@font-face { font-family: Archivo; src: url('/fonts/Archivo-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: Archivo; src: url('/fonts/Archivo-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: Archivo; src: url('/fonts/Archivo-ExtraBold.ttf') format('truetype'); font-weight: 800; font-display: swap; }
+@font-face { font-family: Archivo; src: url('/fonts/Archivo-Black.ttf') format('truetype'); font-weight: 900; font-display: swap; }
+
+:root {
+  color-scheme: light dark;
+  --bg: #F1EFEA;
+  --card: #FFFFFF;
+  --line: #E4E1DA;
+  --tint: #ECE9E3;
+  --ink: #111111;
+  --on-ink: #FFFFFF;
+  --text2: #6B6862;
+  --input-border: #D3CFC6;
+  --mark: #D7262E;
+  --focus: #2B59C3;
+  --binding: #2A2A2A;
+  --on-mark: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141312;
+    --card: #1E1D1B;
+    --line: #2E2C29;
+    --tint: #2A2826;
+    --ink: #F2F0EB;
+    --on-ink: #111111;
+    --text2: #A6A29A;
+    --input-border: #44413C;
+    --mark: #FF6B70;
+    --binding: #3A3834;
+    --on-mark: #111111;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Archivo, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3, p { margin: 0; }
+
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }

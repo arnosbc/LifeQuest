@@ -1,0 +1,153 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PaperSheet from '../components/PaperSheet.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import hola from '../assets/guia_hola.png';
+import hoy from '../assets/guia_hoy.png';
+import anotar from '../assets/guia_anotar.png';
+import habitos from '../assets/guia_habitos.png';
+import foco from '../assets/guia_foco.png';
+
+// Cambiar aquí al publicar una versión nueva en GitHub Releases.
+const VERSION = '2.10.0';
+const APK_URL = `https://github.com/arnosbc/LifeQuest/releases/download/v${VERSION}/Questly-${VERSION}.apk`;
+const APK_SIZE = '65 MB';
+const REPO_URL = 'https://github.com/arnosbc/LifeQuest';
+
+const features = [
+  { img: hoy, title: 'Hoy', text: 'Arma tu día con tus tareas, eventos y hábitos, y te dice qué toca ahora.' },
+  { img: anotar, title: 'Tareas', text: 'Escribe como hablas, «llamar al médico el martes a las 10», y queda con fecha y aviso. Si es grande, la divide en pasos.' },
+  { img: habitos, title: 'Hábitos', text: 'Márcalos en un toque, recibe un recordatorio y mira crecer tu racha.' },
+  { img: foco, title: 'Foco', text: 'Sesiones por ciclos con descansos, sobre una tarea concreta. El tiempo queda medido.' },
+];
+
+const steps = [
+  'Toca «Descargar para Android» y espera a que baje el archivo.',
+  'Ábrelo. Si Android lo pide, permite «Instalar apps desconocidas» para tu navegador.',
+  'Instala, abre Questly y crea tu cuenta.',
+];
+
+const now = new Date();
+const month = now.toLocaleDateString('es', { month: 'short' }).replace('.', '');
+---
+<Base
+  title="Questly · Tu día, una hoja a la vez"
+  description="Questly es una app de productividad para Android: agenda tu día, tus tareas, hábitos y sesiones de foco, con XP, nivel y racha."
+>
+  <main class="wrap">
+    <header class="hero">
+      <div class="hero-text">
+        <div class="brand">
+          <h1>Questly</h1>
+          <div class="cal" aria-hidden="true">
+            <span class="cal-month" data-cal-month>{month}</span>
+            <span class="cal-day" data-cal-day>{now.getDate()}</span>
+          </div>
+        </div>
+        <p class="lead">Tu día, una hoja a la vez. Anota lo que tienes pendiente y Questly lo convierte en agenda, recordatorios y tiempo de foco.</p>
+        <div class="cta">
+          <DownloadButton href={APK_URL} />
+          <p class="meta">Android · v{VERSION} · {APK_SIZE}</p>
+        </div>
+      </div>
+      <Image class="hero-img" src={hola} alt="La mascota de Questly, una hoja de calendario, saludando" width={320} densities={[1, 2]} loading="eager" />
+    </header>
+
+    <PaperSheet aria-labelledby="que-hace">
+      <h2 id="que-hace">Qué hace</h2>
+      <ul class="rows">
+        {features.map((f) => (
+          <li class="row">
+            <Image src={f.img} alt="" width={72} densities={[1, 2]} />
+            <div>
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p class="game">Lo que cumples suma XP, sube tu nivel y mantiene tu racha.</p>
+    </PaperSheet>
+
+    <PaperSheet aria-labelledby="instalar">
+      <h2 id="instalar">Cómo instalarla</h2>
+      <ol class="steps">
+        {steps.map((s, i) => (
+          <li><span class="n">{i + 1}</span><p>{s}</p></li>
+        ))}
+      </ol>
+      <DownloadButton href={APK_URL} />
+    </PaperSheet>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Questly · proyecto universitario</p>
+    <a href={REPO_URL}>Código en GitHub</a>
+  </footer>
+
+  <!-- La hoja muestra la fecha del visitante, no la del día en que se compiló. -->
+  <script is:inline>
+    const d = new Date();
+    document.querySelector('[data-cal-day]').textContent = d.getDate();
+    document.querySelector('[data-cal-month]').textContent = d.toLocaleDateString('es', { month: 'short' }).replace('.', '');
+  </script>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 24px;
+    padding: 32px 4px 24px;
+    align-items: center;
+  }
+  .brand { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  h1 { font-size: clamp(44px, 11vw, 72px); font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
+  .lead { margin-top: 16px; font-size: 17px; color: var(--text2); max-width: 34ch; }
+  .cta { margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  .meta { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--text2); }
+
+  /* Hoja de calendario en miniatura: el único rojo de la página. */
+  .cal {
+    flex: none;
+    width: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+  .cal-month { display: block; background: var(--mark); color: var(--on-mark); font-size: 12px; font-weight: 600; text-transform: capitalize; padding: 2px 0; }
+  .cal-day { display: block; font-size: 36px; font-weight: 900; line-height: 1; letter-spacing: -0.04em; padding: 4px 0 6px; }
+
+  .hero-img { width: 100%; max-width: 280px; border-radius: 12px; justify-self: center; }
+
+  h2 { font-size: 20px; font-weight: 700; }
+  h3 { font-size: 17px; font-weight: 600; }
+
+  .rows { list-style: none; margin: 8px 0 0; padding: 0; }
+  .row { display: flex; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .row img { flex: none; width: 72px; height: 72px; border-radius: 10px; }
+  .row p { color: var(--text2); margin-top: 2px; }
+  .game { margin-top: 16px; padding: 12px 16px; background: var(--tint); border-radius: 10px; }
+
+  .steps { list-style: none; margin: 8px 0 24px; padding: 0; }
+  .steps li { display: flex; gap: 16px; align-items: baseline; padding: 12px 0; border-bottom: 1px dashed var(--input-border); }
+  .n { font-size: 22px; font-weight: 800; min-width: 1ch; }
+
+  .foot {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+    padding-top: 32px; padding-bottom: 32px;
+    font-size: 12px; font-weight: 600; color: var(--text2);
+  }
+  .foot a { display: inline-flex; align-items: center; min-height: 44px; margin: -14px 0; }
+
+  main :global(.sheet) + :global(.sheet) { margin-top: 32px; }
+
+  @media (min-width: 760px) {
+    .hero { grid-template-columns: 1fr auto; padding: 64px 4px 48px; gap: 48px; }
+    .brand { justify-content: flex-start; gap: 24px; }
+    .hero-img { max-width: 320px; }
+    :global(.sheet) { padding: 32px; }
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+interface Props { href: string; label?: string }
+const { href, label = 'Descargar para Android' } = Astro.props;
+---
+<a class="download" href={href} download>
+  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" />
+  </svg>
+  {label}
+</a>
+
+<style>
+  .download {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 24px;
+    border-radius: 24px;
+    background: var(--ink);
+    color: var(--on-ink);
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .download:active { transform: scale(0.97); }
+  @media (prefers-reduced-motion: reduce) { .download { transition: none; } }
+</style>

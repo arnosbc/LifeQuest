@@ -1,0 +1,31 @@
+---
+// Hoja blanca con el borde de arriba arrancado (PaperSheet de la app).
+interface Props { as?: string; class?: string; 'aria-labelledby'?: string }
+const { as: Tag = 'section', class: className = '', ...rest } = Astro.props;
+---
+<Tag class:list={['sheet', className]} {...rest}>
+  <slot />
+</Tag>
+
+<style>
+  .sheet {
+    position: relative;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    border-radius: 0 0 12px 12px;
+    padding: 24px 20px;
+    margin-top: 10px;
+  }
+  /* Zigzag fijo: triángulos del color de la hoja sobre el suelo. */
+  .sheet::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 10px;
+    background:
+      linear-gradient(-45deg, var(--card) 5px, transparent 0) 0 100% / 10px 10px repeat-x,
+      linear-gradient(45deg, var(--card) 5px, transparent 0) 0 100% / 10px 10px repeat-x;
+  }
+</style>
