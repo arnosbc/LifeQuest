@@ -13,7 +13,7 @@ class HelpScreen extends StatelessWidget {
   static const _phone = '573001376592';
   static const _phoneLabel = '+57 300 137 6592';
   // shortcut: versión escrita a mano, sincronizar con pubspec.yaml al publicar.
-  static const _version = '2.10.1';
+  static const _version = '2.10.2';
 
   static const _faqs = [
     (
