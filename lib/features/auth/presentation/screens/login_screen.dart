@@ -114,7 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
           isLoading: context.watch<AuthBloc>().state is AuthLoading,
         ),
         const SizedBox(height: 13),
-        SocialLoginButtons(onNotice: _showNotice),
+        SocialLoginButtons(
+          onGoogle: () =>
+              context.read<AuthBloc>().add(const GoogleLoginRequested()),
+        ),
         const SizedBox(height: 3),
         AuthFooterLink(
           question: '¿No tienes cuenta? ',

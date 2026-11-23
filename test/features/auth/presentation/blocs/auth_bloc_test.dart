@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -18,6 +20,8 @@ void main() {
   late MockLoginUser loginUser;
   late MockRegisterUser registerUser;
   late MockLogoutUser logoutUser;
+  late MockLoginWithGoogle loginWithGoogle;
+  late MockWatchSignedInUser watchSignedInUser;
 
   const user = User(id: 'u1', email: 'ana@correo.com', username: 'Ana');
   const loginParams = LoginParams(email: 'ana@correo.com', password: 'x1');
@@ -38,6 +42,9 @@ void main() {
     loginUser = MockLoginUser();
     registerUser = MockRegisterUser();
     logoutUser = MockLogoutUser();
+    loginWithGoogle = MockLoginWithGoogle();
+    watchSignedInUser = MockWatchSignedInUser();
+    when(() => watchSignedInUser()).thenAnswer((_) => const Stream.empty());
   });
 
   AuthBloc build() => AuthBloc(
@@ -45,6 +52,8 @@ void main() {
     loginUser: loginUser,
     registerUser: registerUser,
     logoutUser: logoutUser,
+    loginWithGoogle: loginWithGoogle,
+    watchSignedInUser: watchSignedInUser,
   );
 
   test(
@@ -169,4 +178,50 @@ void main() {
     act: (bloc) => bloc.add(const LogoutRequested()),
     expect: () => [const AuthUnauthenticated()],
   );
+
+  group('Google', () {
+    blocTest<AuthBloc, AuthState>(
+      'si no se abre Google → AuthFailure, sin AuthLoading',
+      setUp: () => when(() => loginWithGoogle(any())).thenAnswer(
+        (_) async => const Left(ServerFailure('No pudimos abrir Google.')),
+      ),
+      build: build,
+      act: (bloc) => bloc.add(const GoogleLoginRequested()),
+      expect: () => [const AuthFailure('No pudimos abrir Google.')],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'si se abre Google no cambia el estado hasta que vuelve',
+      setUp: () => when(
+        () => loginWithGoogle(any()),
+      ).thenAnswer((_) async => const Right(unit)),
+      build: build,
+      act: (bloc) => bloc.add(const GoogleLoginRequested()),
+      expect: () => <AuthState>[],
+    );
+
+    final signedIn = StreamController<Either<Failure, User>>();
+    blocTest<AuthBloc, AuthState>(
+      'al volver de Google con sesión → AuthSuccess; un error luego no la cierra',
+      setUp: () =>
+          when(() => watchSignedInUser()).thenAnswer((_) => signedIn.stream),
+      build: build,
+      act: (bloc) async {
+        signedIn.add(const Right(user));
+        await Future<void>.delayed(Duration.zero);
+        signedIn.add(const Left(ServerFailure('falló')));
+      },
+      expect: () => [const AuthSuccess(user)],
+    );
+
+    final failing = StreamController<Either<Failure, User>>();
+    blocTest<AuthBloc, AuthState>(
+      'al volver de Google con error y sin sesión → AuthFailure',
+      setUp: () =>
+          when(() => watchSignedInUser()).thenAnswer((_) => failing.stream),
+      build: build,
+      act: (_) => failing.add(const Left(ServerFailure('No se completó.'))),
+      expect: () => [const AuthFailure('No se completó.')],
+    );
+  });
 }

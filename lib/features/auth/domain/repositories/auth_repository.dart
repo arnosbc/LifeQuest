@@ -17,6 +17,12 @@ abstract class AuthRepository {
     required String password,
   });
 
+  /// Abre Google. Si sale bien, el usuario llega por [signedInUsers].
+  Future<Either<Failure, Unit>> loginWithGoogle();
+
+  /// Cada inicio de sesión, incluido el que vuelve de Google.
+  Stream<Either<Failure, User>> signedInUsers();
+
   Future<Either<Failure, Unit>> logoutUser();
 
   /// Usuario de la sesión guardada en el dispositivo, o null si no hay.

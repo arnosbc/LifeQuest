@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 
 import 'package:proyecto_movil/core/errors/exceptions.dart';
@@ -39,6 +41,29 @@ class AuthRepositoryImpl implements AuthRepository {
       user: result.user.toEntity(),
     );
   });
+
+  @override
+  Future<Either<Failure, Unit>> loginWithGoogle() => _run(() async {
+    await _remote.signInWithGoogle();
+    return unit;
+  });
+
+  @override
+  Stream<Either<Failure, User>> signedInUsers() =>
+      _remote.signedInUsers().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (model, sink) => sink.add(Right(model.toEntity())),
+          handleError: (error, _, sink) => sink.add(
+            Left(
+              ServerFailure(
+                error is ServerException
+                    ? _messageFor(error)
+                    : _messageFor(const ServerException(code: 'oauth_failed')),
+              ),
+            ),
+          ),
+        ),
+      );
 
   @override
   Future<Either<Failure, Unit>> logoutUser() async {
@@ -89,6 +114,12 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     if (code == 'weak_password' || message.contains('password should')) {
       return 'Elige una contraseña más segura, de al menos 6 caracteres.';
+    }
+    if (code == 'oauth_not_opened') {
+      return 'No pudimos abrir Google. Revisa que tengas un navegador e inténtalo de nuevo.';
+    }
+    if (code == 'oauth_failed' || message.contains('access_denied')) {
+      return 'No se completó el inicio con Google. Inténtalo de nuevo.';
     }
     if (code == 'over_email_send_rate_limit' ||
         code == 'over_request_rate_limit' ||

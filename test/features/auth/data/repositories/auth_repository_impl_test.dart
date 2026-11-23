@@ -155,4 +155,26 @@ void main() {
       const Right<Failure, User?>(null),
     );
   });
+
+  group('Google', () {
+    test('si no se abre el navegador → mensaje de Google', () async {
+      when(
+        () => remote.signInWithGoogle(),
+      ).thenThrow(const ServerException(code: 'oauth_not_opened'));
+      final result = await repository.loginWithGoogle();
+      expect(result.getLeft().toNullable()!.message, contains('Google'));
+    });
+
+    test('signedInUsers convierte usuarios y errores', () async {
+      Stream<UserModel> events() async* {
+        yield model;
+        throw const ServerException(code: 'oauth_failed');
+      }
+
+      when(() => remote.signedInUsers()).thenAnswer((_) => events());
+      final results = await repository.signedInUsers().toList();
+      expect(results.first, const Right<Failure, User>(user));
+      expect(results.last.isLeft(), isTrue);
+    });
+  });
 }

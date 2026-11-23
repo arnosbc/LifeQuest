@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/core/widgets/widgets.dart';
 
-/// Separador "O ingresa con" + botones de Google y Apple (aún sin conectar).
+/// Separador "O ingresa con" + botón de Google.
 class SocialLoginButtons extends StatelessWidget {
-  const SocialLoginButtons({super.key, required this.onNotice});
+  const SocialLoginButtons({super.key, required this.onGoogle});
 
-  final ValueChanged<String> onNotice;
+  final VoidCallback onGoogle;
 
   static ButtonStyle _buttonStyle(BuildContext context) => ButtonStyle(
-    minimumSize: WidgetStatePropertyAll(Size.fromHeight(40)),
+    minimumSize: WidgetStatePropertyAll(Size.fromHeight(44)),
     padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 6)),
     foregroundColor: WidgetStatePropertyAll(context.lq.ink),
     textStyle: WidgetStatePropertyAll(
-      TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+      TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
     ),
     side: WidgetStatePropertyAll(BorderSide(color: context.lq.outline)),
     shape: WidgetStatePropertyAll(
@@ -41,28 +41,11 @@ class SocialLoginButtons extends StatelessWidget {
         ],
       ),
       const SizedBox(height: 9),
-      Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () =>
-                  onNotice('El inicio con Google estará disponible pronto.'),
-              icon: const Icon(Icons.g_mobiledata, size: 18),
-              label: const Text('Google'),
-              style: _buttonStyle(context),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () =>
-                  onNotice('El inicio con Apple estará disponible pronto.'),
-              icon: const Icon(Icons.phone_iphone, size: 15),
-              label: const Text('Apple'),
-              style: _buttonStyle(context),
-            ),
-          ),
-        ],
+      OutlinedButton.icon(
+        onPressed: onGoogle,
+        icon: const Icon(Icons.g_mobiledata, size: 22),
+        label: const Text('Continuar con Google'),
+        style: _buttonStyle(context),
       ),
     ],
   );

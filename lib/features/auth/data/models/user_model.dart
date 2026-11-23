@@ -7,7 +7,9 @@ class UserModel {
   const UserModel({required this.id, required this.email, this.username});
 
   factory UserModel.fromSupabase(supabase.User user) {
-    final username = user.userMetadata?['username'];
+    // Google no trae `username`: se usa su nombre visible.
+    final meta = user.userMetadata;
+    final username = meta?['username'] ?? meta?['full_name'] ?? meta?['name'];
     return UserModel(
       id: user.id,
       email: user.email ?? '',

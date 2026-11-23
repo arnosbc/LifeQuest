@@ -41,6 +41,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
             </intent-filter>
+            <!-- Vuelta del inicio con Google (Supabase): questly://login-callback -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="questly" android:host="login-callback" />
+            </intent-filter>
+            <!-- Ese enlace lo procesa Supabase, no go_router. -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
         </activity>
         <!-- flutter_local_notifications: avisos programados, reinicio y botones Hecha / Posponer. -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
@@ -88,6 +97,11 @@
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
+        </intent>
+        <!-- Ayuda: llamar a soporte. -->
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
         </intent>
         <!-- speech_to_text: reconocimiento de voz del sistema. -->
         <intent>

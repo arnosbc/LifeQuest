@@ -35,7 +35,10 @@ class ShareIntake {
   void _handle(List<SharedMediaFile> files) {
     final text = [
       for (final f in files)
-        if (f.type == SharedMediaType.text || f.type == SharedMediaType.url)
+        if ((f.type == SharedMediaType.text || f.type == SharedMediaType.url) &&
+            // La vuelta de Google (questly://login-callback) también llega
+            // aquí, pero la procesa Supabase: no es algo compartido.
+            !f.path.trim().toLowerCase().startsWith('questly://'))
           f.path.trim(),
     ].where((t) => t.isNotEmpty).join('\n');
     if (text.isNotEmpty) {

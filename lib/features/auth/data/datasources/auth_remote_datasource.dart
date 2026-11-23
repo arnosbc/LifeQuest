@@ -14,10 +14,21 @@ abstract class AuthRemoteDataSource {
     required String password,
   });
 
+  /// Abre la página de Google; la sesión llega luego por [signedInUsers].
+  Future<void> signInWithGoogle();
+
+  /// Cada inicio de sesión (correo o Google, que vuelve por el enlace
+  /// [googleRedirect]).
+  Stream<UserModel> signedInUsers();
+
   Future<void> signOut();
 
   UserModel? currentUser();
 }
+
+/// Enlace de vuelta a la app tras Google. Debe estar en Supabase → Auth →
+/// URL Configuration → Redirect URLs, y en AndroidManifest e Info.plist.
+const googleRedirect = 'questly://login-callback';
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   const AuthRemoteDataSourceImpl(this._client);
@@ -56,6 +67,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       hasSession: response.session != null,
     );
   });
+
+  @override
+  Future<void> signInWithGoogle() => _guard(() async {
+    final opened = await _client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: googleRedirect,
+    );
+    if (!opened) throw const ServerException(code: 'oauth_not_opened');
+  });
+
+  @override
+  Stream<UserModel> signedInUsers() => _client.auth.onAuthStateChange
+      .where((s) => s.event == AuthChangeEvent.signedIn && s.session != null)
+      .map((s) => UserModel.fromSupabase(s.session!.user))
+      // Un enlace de vuelta con error (p. ej. acceso denegado) llega aquí.
+      .handleError(
+        (Object error) => throw error is AuthException
+            ? ServerException(code: error.code, message: error.message)
+            : const ServerException(code: 'oauth_failed'),
+      );
 
   @override
   Future<void> signOut() => _guard(() => _client.auth.signOut());

@@ -32,8 +32,10 @@ import 'package:proyecto_movil/features/auth/data/datasources/auth_remote_dataso
 import 'package:proyecto_movil/features/auth/domain/repositories/auth_repository.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/get_current_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/login_with_google.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/watch_signed_in_user.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/focus/data/datasources/focus_remote_datasource.dart';
 import 'package:proyecto_movil/features/focus/domain/repositories/focus_repository.dart';
@@ -115,6 +117,10 @@ class MockLoginUser extends Mock implements LoginUser {}
 class MockRegisterUser extends Mock implements RegisterUser {}
 
 class MockLogoutUser extends Mock implements LogoutUser {}
+
+class MockLoginWithGoogle extends Mock implements LoginWithGoogle {}
+
+class MockWatchSignedInUser extends Mock implements WatchSignedInUser {}
 
 class MockFocusRemoteDataSource extends Mock implements FocusRemoteDataSource {}
 

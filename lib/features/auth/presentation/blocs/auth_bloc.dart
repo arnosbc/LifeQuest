@@ -1,14 +1,20 @@
+import 'dart:async';
+
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:proyecto_movil/core/errors/failures.dart';
 import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/sign_up_result.dart';
 import 'package:proyecto_movil/features/auth/domain/entities/user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/get_current_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/login_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/login_with_google.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/logout_user.dart';
 import 'package:proyecto_movil/features/auth/domain/usecases/register_user.dart';
+import 'package:proyecto_movil/features/auth/domain/usecases/watch_signed_in_user.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -21,18 +27,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this._loginUser,
     required this._registerUser,
     required this._logoutUser,
+    required this._loginWithGoogle,
+    required WatchSignedInUser watchSignedInUser,
   }) : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     // droppable: un segundo toque mientras carga se ignora.
     on<LoginRequested>(_onLoginRequested, transformer: droppable());
     on<RegisterRequested>(_onRegisterRequested, transformer: droppable());
     on<LogoutRequested>(_onLogoutRequested, transformer: droppable());
+    on<GoogleLoginRequested>(_onGoogleLoginRequested, transformer: droppable());
+    on<AuthSignedInChanged>(_onSignedInChanged);
+    _signedIn = watchSignedInUser().listen(
+      (result) => add(AuthSignedInChanged(result)),
+    );
   }
+
+  late final StreamSubscription<Either<Failure, User>> _signedIn;
 
   final GetCurrentUser _getCurrentUser;
   final LoginUser _loginUser;
   final RegisterUser _registerUser;
   final LogoutUser _logoutUser;
+  final LoginWithGoogle _loginWithGoogle;
 
   Future<void> _onCheckRequested(
     AuthCheckRequested event,
@@ -102,5 +118,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (_) => const AuthUnauthenticated(),
       ),
     );
+  }
+
+  /// Sin AuthLoading: si el usuario cierra el navegador no vuelve nada.
+  Future<void> _onGoogleLoginRequested(
+    GoogleLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final result = await _loginWithGoogle(const NoParams());
+    result.match((failure) => emit(AuthFailure(failure.message)), (_) {});
+  }
+
+  void _onSignedInChanged(AuthSignedInChanged event, Emitter<AuthState> emit) =>
+      event.result.match(
+        // Un enlace fallido no cierra una sesión ya abierta.
+        (failure) {
+          if (state is! AuthSuccess) emit(AuthFailure(failure.message));
+        },
+        (user) => emit(AuthSuccess(user)),
+      );
+
+  @override
+  Future<void> close() async {
+    await _signedIn.cancel();
+    return super.close();
   }
 }

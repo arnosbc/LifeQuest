@@ -40,3 +40,17 @@ class RegisterRequested extends AuthEvent {
 class LogoutRequested extends AuthEvent {
   const LogoutRequested();
 }
+
+class GoogleLoginRequested extends AuthEvent {
+  const GoogleLoginRequested();
+}
+
+/// Llegó un inicio de sesión (p. ej. al volver de Google) o su error.
+class AuthSignedInChanged extends AuthEvent {
+  const AuthSignedInChanged(this.result);
+
+  final Either<Failure, User> result;
+
+  @override
+  List<Object?> get props => [result];
+}
