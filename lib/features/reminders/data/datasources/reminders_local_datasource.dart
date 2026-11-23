@@ -26,15 +26,26 @@ class RemindersLocalDataSourceImpl implements RemindersLocalDataSource {
   static const actionSnooze = 'snooze';
   static const actionHabitDone = 'habit_done';
 
-  /// `<tipo>:<id>` (task, habit, project) o `close` (cierre del día): lo lee
+  /// `<tipo>:<id>` (task, habit, project) o el `kind` (close, today, streak): lo lee
   /// `app/reminder_actions.dart` para el botón o para abrir la pantalla.
   static String? payloadOf(LocalReminder r) => switch (r) {
     LocalReminder(:final taskId?) => 'task:$taskId',
     LocalReminder(:final habitId?) => 'habit:$habitId',
     LocalReminder(:final projectId?) => 'project:$projectId',
-    LocalReminder(daily: true) => 'close',
+    LocalReminder(:final kind?) => kind,
     _ => null,
   };
+
+  /// Aviso inmediato (sale arriba) en el mismo canal que los recordatorios.
+  static const NotificationDetails instantDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _channelId,
+      _channelName,
+      channelDescription: _channelDescription,
+      importance: Importance.high,
+      priority: Priority.high,
+    ),
+  );
 
   static const _channelId = 'reminders';
   static const _channelName = 'Recordatorios';
@@ -58,7 +69,10 @@ class RemindersLocalDataSourceImpl implements RemindersLocalDataSource {
   @override
   Future<void> replaceAll(List<LocalReminder> reminders) async {
     try {
-      await _plugin.cancelAll();
+      // Solo lo pendiente: lo que ya llegó sigue en la bandeja del teléfono.
+      for (final p in await _plugin.pendingNotificationRequests()) {
+        await _plugin.cancel(id: p.id);
+      }
       if (reminders.isEmpty) return;
       // Android 13+: pide permiso la primera vez que hay algo que avisar.
       await _plugin
@@ -75,9 +89,7 @@ class RemindersLocalDataSourceImpl implements RemindersLocalDataSource {
           payload: payloadOf(r),
           // Inexacta: no necesita el permiso de alarma exacta.
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          matchDateTimeComponents: r.daily
-              ? DateTimeComponents.time
-              : r.weekly
+          matchDateTimeComponents: r.weekly
               ? DateTimeComponents.dayOfWeekAndTime
               : null,
           notificationDetails: NotificationDetails(

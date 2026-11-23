@@ -2,7 +2,8 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart' show Right, unit;
+import 'package:proyecto_movil/features/reminders/domain/entities/reminder_plan.dart';
+import 'package:fpdart/fpdart.dart' show Right;
 import 'package:mocktail/mocktail.dart';
 
 import 'package:proyecto_movil/app/app.dart';
@@ -18,7 +19,6 @@ import 'package:proyecto_movil/features/stage/presentation/blocs/stage_bloc.dart
 import 'package:proyecto_movil/features/profile/presentation/blocs/appearance_bloc.dart';
 import 'package:proyecto_movil/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:proyecto_movil/features/reminders/domain/usecases/sync_reminders.dart';
-import 'package:proyecto_movil/core/usecases/usecase.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
 import 'features/home/home_fixtures.dart';
@@ -51,8 +51,8 @@ void main() {
     // Los avisos del teléfono, simulados: sin plugin nativo en los tests.
     final syncReminders = MockSyncReminders();
     when(
-      () => syncReminders(const NoParams()),
-    ).thenAnswer((_) async => const Right(unit));
+      () => syncReminders(any()),
+    ).thenAnswer((_) async => const Right(<LocalReminder>[]));
     sl.registerLazySingleton<SyncReminders>(() => syncReminders);
     final plugin = MockNotificationsPlugin();
     when(plugin.cancelAll).thenAnswer((_) async {});
@@ -113,7 +113,7 @@ void main() {
     initialState: state,
   );
 
-  testWidgets('sin sesión abre el login y desde ahí el registro', (
+  testWidgets('sin sesión abre la bienvenida, luego el login y el registro', (
     tester,
   ) async {
     givenAuthState(const AuthUnauthenticated());
@@ -124,10 +124,16 @@ void main() {
         onboardingBloc: onboardingBloc,
       ),
     );
+    // La mascota flota en bucle: se avanza el tiempo en vez de pumpAndSettle.
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(find.text('Comenzar'), findsOneWidget);
+    await tester.tap(find.text('Comenzar'));
     await tester.pumpAndSettle();
 
     expect(find.text('Continuar'), findsOneWidget);
-    expect(find.text('Google'), findsOneWidget);
+    expect(find.text('Continuar con Google'), findsOneWidget);
+    expect(find.text('Apple'), findsNothing);
 
     await tester.tap(find.text('Crea tu perfil'));
     await tester.pumpAndSettle();

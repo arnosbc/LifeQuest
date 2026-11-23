@@ -91,10 +91,14 @@ void main() {
       ),
       'project:p',
     );
-    expect(
-      payload(LocalReminder(id: 1, title: 't', body: 'b', at: at, daily: true)),
-      'close',
-    );
+    for (final kind in ['close', 'today', 'streak']) {
+      expect(
+        payload(
+          LocalReminder(id: 1, title: 't', body: 'b', at: at, kind: kind),
+        ),
+        kind,
+      );
+    }
   });
 
   late MockGetNotifications getNotifications;

@@ -58,6 +58,31 @@ class ProjectAlert extends Equatable {
   List<Object?> get props => [id, title, day];
 }
 
+/// Lo que toca un día (048): tareas y hábitos pendientes y racha en peligro.
+class DayOutlook extends Equatable {
+  const DayOutlook({
+    required this.day,
+    this.tasks = 0,
+    this.habits = 0,
+    this.streakHabits = 0,
+    this.bestStreak = 0,
+  });
+
+  /// Día local (sin hora).
+  final DateTime day;
+  final int tasks;
+
+  /// Hábitos buenos que tocan y aún no se marcan.
+  final int habits;
+
+  /// De esos, los que tienen racha viva; [bestStreak] es la más larga.
+  final int streakHabits;
+  final int bestStreak;
+
+  @override
+  List<Object?> get props => [day, tasks, habits, streakHabits, bestStreak];
+}
+
 /// Lo que el servidor pide avisar y la ventana de silencio de Ajustes.
 class ReminderPlan extends Equatable {
   const ReminderPlan({
@@ -67,7 +92,17 @@ class ReminderPlan extends Equatable {
     this.silenceStart,
     this.silenceEnd,
     this.dayClose = false,
+    this.days = const [],
+    this.dailyLimit,
+    this.criticalBypassSilence = false,
   });
+
+  /// Hoy y los 6 días siguientes.
+  final List<DayOutlook> days;
+
+  /// Máximo de avisos al día (Ajustes); null = sin límite.
+  final int? dailyLimit;
+  final bool criticalBypassSilence;
 
   final List<TaskReminder> tasks;
 
@@ -88,6 +123,9 @@ class ReminderPlan extends Equatable {
     silenceStart,
     silenceEnd,
     dayClose,
+    days,
+    dailyLimit,
+    criticalBypassSilence,
   ];
 }
 
@@ -101,8 +139,8 @@ class LocalReminder extends Equatable {
     this.taskId,
     this.habitId,
     this.projectId,
+    this.kind,
     this.weekly = false,
-    this.daily = false,
   });
 
   final int id;
@@ -119,11 +157,23 @@ class LocalReminder extends Equatable {
   /// Aviso de un proyecto atrasado (042).
   final String? projectId;
 
+  /// Avisos de la app sin entidad: `today` (resumen), `streak`, `close`.
+  final String? kind;
+
   /// Se repite cada semana el mismo día y hora (hábitos).
   final bool weekly;
 
-  /// Se repite cada día a la misma hora.
-  final bool daily;
+  LocalReminder withId(int id) => LocalReminder(
+    id: id,
+    title: title,
+    body: body,
+    at: at,
+    taskId: taskId,
+    habitId: habitId,
+    projectId: projectId,
+    kind: kind,
+    weekly: weekly,
+  );
 
   @override
   List<Object?> get props => [
@@ -134,7 +184,7 @@ class LocalReminder extends Equatable {
     taskId,
     habitId,
     projectId,
+    kind,
     weekly,
-    daily,
   ];
 }

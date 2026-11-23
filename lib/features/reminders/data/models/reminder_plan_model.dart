@@ -1,7 +1,8 @@
 import 'package:proyecto_movil/features/reminders/domain/entities/reminder_plan.dart';
 
 /// Respuesta JSON de la RPC `sync_reminders`
-/// (supabase/migrations/032_scheduling.sql; `projects` llega con 042).
+/// (supabase/migrations/032_scheduling.sql; `projects` llega con 042 y
+/// `days`, `daily_limit`, `critical_bypass_silence` con 048).
 class ReminderPlanModel {
   const ReminderPlanModel(this.json);
 
@@ -40,6 +41,18 @@ class ReminderPlanModel {
     silenceEnd: _minutes(json['silence_end']),
     // shortcut: siempre activo; pasarlo a Ajustes si alguien lo pide.
     dayClose: true,
+    days: [
+      for (final d in _list('days'))
+        DayOutlook(
+          day: DateTime.parse(d['day'] as String),
+          tasks: (d['tasks'] as num).toInt(),
+          habits: (d['habits'] as num).toInt(),
+          streakHabits: (d['streak_habits'] as num).toInt(),
+          bestStreak: (d['best_streak'] as num).toInt(),
+        ),
+    ],
+    dailyLimit: (json['daily_limit'] as num?)?.toInt(),
+    criticalBypassSilence: json['critical_bypass_silence'] == true,
   );
 
   List<Map<String, dynamic>> _list(String key) =>

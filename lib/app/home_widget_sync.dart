@@ -18,7 +18,11 @@ abstract final class HomeWidgetSync {
         if (!b.done && b.end.isAfter(now)) (b.id, b.title, _hhmm(b.start)),
       for (final t in d.unscheduled) (t.id, t.title, ''),
     ].take(3).toList(),
-    progress: (d.streakDays, d.tasksDone + d.habitsDone, d.tasksTotal + d.habitsTotal),
+    progress: (
+      d.streakDays,
+      d.tasksDone + d.habitsDone,
+      d.tasksTotal + d.habitsTotal,
+    ),
     day: (dayKey(now), dayDone(d)),
   );
 

@@ -21,6 +21,7 @@ import 'package:proyecto_movil/app/config/theme.dart';
 import 'package:proyecto_movil/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/login_screen.dart';
+import 'package:proyecto_movil/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:proyecto_movil/features/auth/presentation/screens/register_screen.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/blocs/brain_dump_bloc.dart';
 import 'package:proyecto_movil/features/brain_dump/presentation/screens/brain_dump_screen.dart';
@@ -69,11 +70,12 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
       final signedIn = authBloc.state is AuthSuccess;
       final location = state.matchedLocation;
       final atAuth = const [
+        RoutePaths.welcome,
         RoutePaths.login,
         RoutePaths.register,
         RoutePaths.checkEmail,
       ].contains(location);
-      if (!signedIn) return atAuth ? null : RoutePaths.login;
+      if (!signedIn) return atAuth ? null : RoutePaths.welcome;
       // Mientras se consulta también va al Onboarding (muestra un indicador),
       // así quien lo tiene pendiente nunca ve Inicio antes (FR-001).
       final onboarding = onboardingBloc.state is! OnboardingNotNeeded;
@@ -87,6 +89,10 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
       GoRoute(
         path: RoutePaths.onboarding,
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.welcome,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: RoutePaths.login,
@@ -259,11 +265,21 @@ GoRouter createAppRouter(AuthBloc authBloc, OnboardingBloc onboardingBloc) {
                       child: Builder(
                         builder: (context) => ColoredBox(
                           color: context.lq.background,
-                          child: FocusScreen(
-                            preselectedTaskId:
-                                state.uri.queryParameters['task'],
-                            suggestSteps: (title, taskId) => sl<BreakDownTask>()
-                                .titles(title, taskId: taskId),
+                          // En una sesión, lo no crítico espera (§7).
+                          child: BlocListener<FocusBloc, FocusState>(
+                            listenWhen: (a, b) =>
+                                _focusQuiet(a) != _focusQuiet(b),
+                            listener: (_, s) =>
+                                ReminderActions.quietUntil(_focusQuiet(s)),
+                            child: FocusScreen(
+                              preselectedTaskId:
+                                  state.uri.queryParameters['task'],
+                              suggestSteps: (title, taskId) =>
+                                  sl<BreakDownTask>().titles(
+                                    title,
+                                    taskId: taskId,
+                                  ),
+                            ),
                           ),
                         ),
                       ),
@@ -436,12 +452,16 @@ Future<void> _openPlan(BuildContext context, PlanMode mode) async {
   ReminderActions.sync();
 }
 
-/// «Anotar» desde Hoy; si se guardó algo, Hoy se recarga.
-Future<void> _capture(BuildContext context, {bool listen = false}) async {
-  if (await openCaptureSheet(context, listen: listen) && context.mounted) {
-    context.read<HomeBloc>().add(const HomeRequested());
-  }
-}
+/// Fin del ciclo o descanso en curso; null fuera de sesión o en pausa.
+DateTime? _focusQuiet(FocusState s) =>
+    s is FocusReady &&
+        (s.phase == FocusPhase.focus || s.phase == FocusPhase.rest)
+    ? s.phaseEndsAt
+    : null;
+
+/// «Anotar» desde Hoy; si se guardó algo, Hoy se recarga (captureSaved).
+Future<void> _capture(BuildContext context, {bool listen = false}) =>
+    openCaptureSheet(context, listen: listen);
 
 /// Foco con la tarea en la mochila (`?task=<id>`).
 String _focusPath(String? taskId) => taskId == null
@@ -476,6 +496,7 @@ class _ReloadOnShowState extends State<_ReloadOnShow> {
   void initState() {
     super.initState();
     widget.location.addListener(_onLocation);
+    captureSaved.addListener(_onLocation);
     if (widget.onHidden case final onHidden?) {
       _lifecycle = AppLifecycleListener(
         onHide: () {
@@ -485,6 +506,7 @@ class _ReloadOnShowState extends State<_ReloadOnShow> {
     }
   }
 
+  /// Al volver a esta pestaña, o si «Crear» guardó algo con ella a la vista.
   void _onLocation() {
     if (mounted && widget.location.value == widget.path) {
       widget.onShown(context);
@@ -494,6 +516,7 @@ class _ReloadOnShowState extends State<_ReloadOnShow> {
   @override
   void dispose() {
     widget.location.removeListener(_onLocation);
+    captureSaved.removeListener(_onLocation);
     _lifecycle?.dispose();
     super.dispose();
   }

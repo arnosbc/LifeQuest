@@ -109,12 +109,12 @@ void main() {
     ],
   );
 
-  test('el aviso de cerrar el día cae a las 21:00 y se repite cada día', () {
+  test('el aviso de cerrar el día cae a las 21:00 los próximos días', () {
     final out = SyncReminders.build(const ReminderPlan(dayClose: true), now);
-    expect(out.single.title, 'Cierra el día');
-    final day = now.hour < 21 ? now.day : now.day + 1;
-    expect(out.single.at, DateTime(now.year, now.month, day, 21));
-    expect(out.single.daily, isTrue);
+    expect(out.every((r) => r.title == 'Cierra el día' && !r.weekly), isTrue);
+    final first = now.hour < 21 ? now.day : now.day + 1;
+    expect(out.first.at, DateTime(now.year, now.month, first, 21));
+    expect(out.length, now.hour < 21 ? 7 : 6);
     expect(SyncReminders.build(const ReminderPlan(), now), isEmpty);
   });
 }

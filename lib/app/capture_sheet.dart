@@ -26,6 +26,10 @@ import 'package:proyecto_movil/features/tasks/domain/usecases/get_tasks_board.da
 import 'package:proyecto_movil/features/tasks/presentation/widgets/create_task_sheet.dart';
 import 'package:proyecto_movil/injection_container.dart';
 
+/// Sube cada vez que la hoja «Crear» guarda algo: la pestaña visible se
+/// recarga (el botón «+» no sabe qué pestaña tiene debajo).
+final captureSaved = ValueNotifier<int>(0);
+
 /// Hoja «Crear» (barra de Hoy y botón flotante): tarea, proyecto o meta
 /// escribiendo o dictando, con IA si está activa, o con el formulario
 /// completo. Devuelve true si se guardó algo; los avisos ya se reprogramaron.
@@ -36,8 +40,11 @@ Future<bool> openCaptureSheet(
   bool listen = false,
   String? sharedText,
 }) async {
+  final before = ReminderActions.scheduled;
   // Áreas e historial para sugerir el área; si falla, la hoja sigue sin ellas.
-  final board = (await sl<GetTasksBoard>()(const NoParams())).getRight().toNullable();
+  final board = (await sl<GetTasksBoard>()(
+    const NoParams(),
+  )).getRight().toNullable();
   final areas = [
     for (final s in board?.skills ?? const <TaskLink>[])
       DraftArea(id: s.id, name: s.name),
@@ -51,8 +58,7 @@ Future<bool> openCaptureSheet(
     context,
     title: sharedText == null ? 'Crear' : 'Guardar lo compartido',
     child: BlocProvider(
-      create: (_) => sl<CaptureBloc>()
-        ..add(CaptureAreasLoaded(areas, history)),
+      create: (_) => sl<CaptureBloc>()..add(CaptureAreasLoaded(areas, history)),
       child: Builder(
         builder: (sheet) => CaptureView(
           startListening: listen,
@@ -69,8 +75,20 @@ Future<bool> openCaptureSheet(
     final CaptureKind kind => await _openForm(context, kind),
     _ => result == true,
   };
-  if (saved) ReminderActions.sync();
-  return saved;
+  if (!saved) return false;
+  captureSaved.value++;
+  final after = await ReminderActions.syncNow();
+  // Sin sincronización previa no se sabe qué aviso es nuevo: mejor callar.
+  if (before != null && after != null && context.mounted) {
+    final text = ReminderActions.newReminderText(before, after, DateTime.now());
+    if (text != null &&
+        !await ReminderActions.confirm('Listo, quedó guardado', text) &&
+        context.mounted) {
+      // Sin permiso de notificaciones: en cola, sin tapar «Tarea creada.».
+      showLifeQuestMessage(context, text, replace: false);
+    }
+  }
+  return true;
 }
 
 /// Formulario completo de cada feature. Une Asistente con Tareas y Proyectos,
@@ -78,6 +96,8 @@ Future<bool> openCaptureSheet(
 Future<bool> _openForm(BuildContext context, CaptureKind kind) async {
   Future<T?> sheet<T>(Widget child) => showModalBottomSheet<T>(
     context: context,
+    // Encima de la barra y del botón «+», que tapaban los botones de abajo.
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
