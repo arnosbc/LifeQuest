@@ -100,7 +100,8 @@ class SettingsScreen extends StatelessWidget {
           SettingLink(
             icon: Icons.widgets_outlined,
             title: 'Widget de inicio',
-            description: 'Tu racha y tus tareas de hoy en la pantalla de inicio.',
+            description:
+                'Tu racha y tus tareas de hoy en la pantalla de inicio.',
             onTap: () async {
               if (await addWidget() || !context.mounted) return;
               showLifeQuestMessage(
@@ -110,15 +111,6 @@ class SettingsScreen extends StatelessWidget {
               );
             },
           ),
-        SettingLink(
-          icon: Icons.shopping_bag_outlined,
-          title: 'Contenido de la Tienda',
-          description: 'Elige qué recompensas aparecen en tu Tienda.',
-          onTap: () => showLifeQuestMessage(
-            context,
-            'La Tienda estará disponible próximamente.',
-          ),
-        ),
         const SizedBox(height: 12),
         Text(
           'Tu progreso está guardado en la nube. Puedes volver a entrar '
@@ -213,9 +205,8 @@ class SettingsScreen extends StatelessWidget {
                           'Lo que escribas en «Anotar», los títulos que '
                           'dividas en pasos, los recursos (fotos, PDF, notas '
                           'y enlaces) de esa tarea y tus notas de repaso se '
-                          'envían a Gemini (Google). En su capa gratis, Google '
-                          'puede usarlos para mejorar sus modelos. No adjuntes '
-                          'datos sensibles. '
+                          'envían a Gemini (Google) para procesarlos. No '
+                          'adjuntes datos sensibles. '
                           'Puedes apagarla cuando quieras.',
                       confirmLabel: 'Activar',
                     )) {

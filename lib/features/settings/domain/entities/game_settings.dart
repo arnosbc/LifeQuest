@@ -41,7 +41,7 @@ class GameSettings extends Equatable {
   final int longBreakMinutes;
   final int longBreakEveryNCycles;
 
-  /// El asistente usa IA (Gemini capa gratis, 033). Apagado por defecto.
+  /// El asistente usa IA (Gemini, 033). Apagado por defecto.
   final bool aiEnabled;
 
   bool get isValid {

@@ -6,7 +6,9 @@
 // breakdown y goal aceptan paths (máx. 3 fotos o PDF en el bucket `resources`,
 // 045) y context (notas y enlaces en texto) que el usuario adjuntó.
 // Fechas, huecos y repartos los deciden las reglas de la app, no la IA.
-// Secrets: GEMINI_API_KEY y GEMINI_MODEL (capa gratis, sin facturación).
+// Secrets: GEMINI_API_KEY y GEMINI_MODEL (rápido: entender frases). Opcional:
+// GEMINI_MODEL_PRO, un modelo más potente para lo creativo (pasos, metas y
+// repaso); sin él, todo usa GEMINI_MODEL.
 // Antes de llamar a Gemini se cuenta la llamada con consume_ai_call() (033):
 // falla si el usuario no activó la IA o pasó el tope diario.
 // Solo se envía el texto, el título y los recursos que el usuario eligió.
@@ -81,8 +83,13 @@ async function resourceParts(
   return parts;
 }
 
-async function gemini(system: string, prompt: string, extra: Part[] = []): Promise<unknown> {
-  const model = Deno.env.get('GEMINI_MODEL');
+async function gemini(
+  system: string,
+  prompt: string,
+  extra: Part[] = [],
+  creativo = false,
+): Promise<unknown> {
+  const model = (creativo && Deno.env.get('GEMINI_MODEL_PRO')) || Deno.env.get('GEMINI_MODEL');
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
@@ -158,15 +165,15 @@ if (import.meta.main) {
           .filter((n: unknown) => typeof n === 'string' && n.trim())
           .slice(0, 10).map((n: string) => n.trim().slice(0, 300));
         if (!notes.length) return json({ error: 'invalid_request' }, 400);
-        const questions = sanitizeQuestions(await gemini(RECALL, JSON.stringify({ title: input, notes })));
+        const questions = sanitizeQuestions(await gemini(RECALL, JSON.stringify({ title: input, notes }), [], true));
         return questions ? json({ questions }) : json({ error: 'sin_preguntas' }, 502);
       }
       const extra = await resourceParts(supabase, auth.user.id, body.paths, body.context);
       if (mode === 'goal') {
-        const goal = sanitizeGoal(await gemini(GOAL, input, extra), input);
+        const goal = sanitizeGoal(await gemini(GOAL, input, extra, true), input);
         return goal ? json(goal) : json({ error: 'sin_pasos' }, 502);
       }
-      const steps = sanitizeSteps(await gemini(BREAKDOWN, input, extra));
+      const steps = sanitizeSteps(await gemini(BREAKDOWN, input, extra, true));
       return steps ? json({ steps }) : json({ error: 'sin_pasos' }, 502);
     } catch (e) {
       // La app cae al parser local; la llamada ya contó en el tope.
