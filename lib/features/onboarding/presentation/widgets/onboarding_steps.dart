@@ -13,6 +13,10 @@ class WelcomeStep extends StatelessWidget {
   Widget build(BuildContext context) => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      Calindir(
+        pose: 'hola',
+        dice: '¡Hola! Soy Calindir. Te ayudo a que cada día cuente.',
+      ),
       _Title('Bienvenido a Questly'),
       _Body('Lo que cumples en tu día se convierte en progreso visible.'),
       SizedBox(height: 20),
@@ -33,6 +37,11 @@ class IdentityStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      const Calindir(
+        pose: 'anotar',
+        dice:
+            'Cuéntame qué quieres lograr. Lo uso para animarte, nunca para juzgarte.',
+      ),
       const _Title('¿Qué quieres lograr este año?'),
       const _Body('Puedes dejarlo para después.'),
       const SizedBox(height: 16),
@@ -70,6 +79,11 @@ class SkillStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      const Calindir(
+        pose: 'habitos',
+        dice:
+            'Un área agrupa lo que haces: estudio, salud, trabajo… Elige la primera.',
+      ),
       const _Title('¿Qué área de tu vida quieres hacer crecer?'),
       const _Body('Será tu primera área. Puedes dejarlo para después.'),
       const SizedBox(height: 16),
@@ -123,6 +137,10 @@ class DifficultyStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      const Calindir(
+        pose: 'foco',
+        dice: '¿Con cuánta exigencia quieres avanzar? Elige con calma.',
+      ),
       const _Title('Elige tu dificultad'),
       const _Body('Cambia cuánta XP ganas. Lo puedes ajustar luego.'),
       const SizedBox(height: 16),
@@ -165,6 +183,10 @@ class SummaryStep extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      const Calindir(
+        pose: 'listo',
+        dice: '¡Listo! Ya preparé tu espacio. Vamos por tu primer día.',
+      ),
       const _Title('¡Todo listo!'),
       const _Body('Esto es lo que elegiste. Puedes cambiarlo cuando quieras.'),
       const SizedBox(height: 16),
@@ -198,6 +220,93 @@ class SummaryStep extends StatelessWidget {
 
   static String _or(String value, String empty) =>
       value.trim().isEmpty ? empty : value.trim();
+}
+
+/// Calindir, la mascota de Questly, dice [dice] desde un globo. Solo
+/// acompaña: no cambia qué se pregunta ni qué se guarda.
+class Calindir extends StatelessWidget {
+  const Calindir({super.key, required this.pose, required this.dice});
+
+  /// Pose de `assets/images/guia/guia_<pose>.png`.
+  final String pose;
+  final String dice;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 18),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ExcludeSemantics(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: Image.asset(
+              'assets/images/guia/guia_$pose.png',
+              width: 96,
+              height: 96,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Semantics(
+            label: 'Calindir dice: $dice',
+            excludeSemantics: true,
+            child: CustomPaint(
+              painter: _Pico(color: context.lq.surface, borde: context.lq.line),
+              child: Container(
+                margin: const EdgeInsets.only(left: 10),
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                decoration: BoxDecoration(
+                  color: context.lq.surface,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: context.lq.line),
+                ),
+                child: Text(
+                  dice,
+                  style: TextStyle(
+                    color: context.lq.ink,
+                    fontSize: 14,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Pico del globo, hacia Calindir (a la izquierda).
+class _Pico extends CustomPainter {
+  const _Pico({required this.color, required this.borde});
+
+  final Color color;
+  final Color borde;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height / 2;
+    final path = Path()
+      ..moveTo(11, y - 8)
+      ..lineTo(0, y)
+      ..lineTo(11, y + 8);
+    canvas
+      ..drawPath(path, Paint()..color = color)
+      ..drawPath(
+        path,
+        Paint()
+          ..color = borde
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+  }
+
+  @override
+  bool shouldRepaint(_Pico old) => old.color != color || old.borde != borde;
 }
 
 class _Title extends StatelessWidget {

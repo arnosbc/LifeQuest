@@ -1,6 +1,8 @@
 /// Rutas de la app. Las features navegan con estas constantes, sin importar
 /// pantallas de otras features.
 abstract final class RoutePaths {
+  /// Portada antes del acceso (sin sesión).
+  static const welcome = '/welcome';
   static const login = '/login';
   static const register = '/register';
   static const checkEmail = '/check-email';

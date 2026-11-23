@@ -90,6 +90,8 @@ flutter:
   # Ilustraciones de la guía de uso (lib/app/first_tour.dart).
   assets:
     - assets/images/guia/
+    # Logo y mascota de la bienvenida y el acceso.
+    - assets/images/marca/
 
   # Archivo empaquetada (assets/fonts, licencia OFL): sin descarga en runtime.
   fonts:

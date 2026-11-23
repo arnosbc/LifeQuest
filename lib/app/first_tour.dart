@@ -3,15 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:proyecto_movil/core/widgets/questly/questly.dart';
+import 'package:proyecto_movil/injection_container.dart';
 
 /// Pasos de la guía: imagen de la mascota, título y texto. Describen lo que
 /// la app ya hace; no cambian ningún flujo.
 const firstTourSteps = [
   (
     'assets/images/guia/guia_hola.png',
-    'Hola, así funciona Questly',
-    'Anotas lo que tienes que hacer, lo ves en tu día y lo cumples. '
-        'Te muestro lo básico en 6 pasos.',
+    'Hola, soy Calindir',
+    'Te muestro cómo funciona Questly en 6 pasos: anotas lo que tienes '
+        'que hacer, lo ves en tu día y lo cumples.',
   ),
   (
     'assets/images/guia/guia_anotar.png',
@@ -22,8 +23,8 @@ const firstTourSteps = [
   (
     'assets/images/guia/guia_hoy.png',
     'Hoy es tu agenda',
-    'Ahí ves lo que toca hoy, por horas. Marca el círculo cuando termines '
-        'una tarea y ganas XP.',
+    'Ahí ves lo que toca hoy, por horas. Cuando termines una tarea, toca '
+        '«Ya la hice» o deslízala en Tareas y ganas XP.',
   ),
   (
     'assets/images/guia/guia_habitos.png',
@@ -50,7 +51,10 @@ String? _checkedFor;
 /// La guía sale sola al abrir la app en Hoy por primera vez con cada cuenta
 /// (después del registro y el Onboarding: antes el router no muestra el shell).
 Future<void> maybeShowFirstTour(BuildContext context) async {
-  final userId = Supabase.instance.client.auth.currentUser?.id;
+  // Por get_it, como el resto de la app: sin Supabase (tests) no hay cuenta.
+  final userId = sl.isRegistered<SupabaseClient>()
+      ? sl<SupabaseClient>().auth.currentUser?.id
+      : null;
   // Se llama en cada build del shell: solo se mira una vez por cuenta.
   if (userId == null || userId == _checkedFor) return;
   _checkedFor = userId;
@@ -83,7 +87,11 @@ Future<void> showFirstTour(BuildContext context) async {
               borderRadius: BorderRadius.circular(QRadius.card),
               child: ColoredBox(
                 color: const Color(0xFF1C1C1C),
-                child: Image.asset(image, height: 150, excludeFromSemantics: true),
+                child: Image.asset(
+                  image,
+                  height: 150,
+                  excludeFromSemantics: true,
+                ),
               ),
             ),
             const SizedBox(height: QSpace.xs),
