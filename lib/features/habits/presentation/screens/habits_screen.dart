@@ -53,6 +53,8 @@ class _HabitsScreenState extends State<HabitsScreen> {
     final bloc = context.read<HabitsBloc>();
     final habit = await showModalBottomSheet<NewHabit>(
       context: context,
+      // Encima de la barra y del botón «+», que tapaban los botones de abajo.
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -119,6 +121,8 @@ class _HabitsScreenState extends State<HabitsScreen> {
       subtitle: 'Lo que repites define tu semana.',
       numeral: '$streak',
       numeralLabel: streak == 1 ? 'día de racha' : 'días de racha',
+      // Salta y suelta chispas cuando la racha sube.
+      numeralLead: StreakFlame(streak: streak, size: 56),
       children: [
         Row(
           children: [

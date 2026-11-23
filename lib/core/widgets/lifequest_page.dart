@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_movil/app/config/theme.dart';
+import 'package:proyecto_movil/core/theme/questly_palette.dart';
 import 'package:proyecto_movil/core/theme/questly_theme.dart';
 import 'package:proyecto_movil/core/widgets/paper_sheet.dart';
 
@@ -13,6 +14,7 @@ class LifeQuestPage extends StatelessWidget {
     this.trailing,
     this.numeral,
     this.numeralLabel,
+    this.numeralLead,
   });
 
   final String title;
@@ -23,6 +25,9 @@ class LifeQuestPage extends StatelessWidget {
   /// La cifra de la pantalla, en grande, como el número de una hoja.
   final String? numeral;
   final String? numeralLabel;
+
+  /// Va antes de la cifra (p. ej. la llama de la racha en Hábitos).
+  final Widget? numeralLead;
 
   @override
   Widget build(BuildContext context) => ListView(
@@ -69,9 +74,30 @@ class LifeQuestPage extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      numeral!,
-                      style: QText.numeral(context.lq.ink, size: 88),
+                    if (numeralLead case final lead?) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: lead,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    // Cuando cambia, la cifra entra con un pequeño «pop».
+                    AnimatedSwitcher(
+                      duration: context.motion(
+                        const Duration(milliseconds: 450),
+                      ),
+                      transitionBuilder: (child, anim) => ScaleTransition(
+                        scale: CurvedAnimation(
+                          parent: anim,
+                          curve: Curves.elasticOut,
+                        ),
+                        child: FadeTransition(opacity: anim, child: child),
+                      ),
+                      child: Text(
+                        numeral!,
+                        key: ValueKey(numeral),
+                        style: QText.numeral(context.lq.ink, size: 88),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

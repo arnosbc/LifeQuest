@@ -30,7 +30,9 @@ class QuestlySegmented<T> extends StatelessWidget {
         children: [
           for (final (i, (value, label)) in segments.indexed) ...[
             if (i > 0) const SizedBox(width: QSpace.xs),
+            // Ancho según el texto: «Importantes» no cabe en un cuarto igual.
             Expanded(
+              flex: label.length + 4,
               child: _Segment(
                 label: label,
                 active: value == selected,
@@ -86,10 +88,19 @@ class _Segment extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: QSize.minTap),
               child: Center(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: QText.label(active ? q.text : q.text2),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  // Una sola línea; con letra grande se achica para caber.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: QText.label(active ? q.text : q.text2),
+                    ),
+                  ),
                 ),
               ),
             ),
